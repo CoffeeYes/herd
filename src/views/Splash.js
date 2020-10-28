@@ -12,7 +12,11 @@ const Splash = ({ navigation }) => {
       <Text style={{color : "white",marginBottom : 20}}>
         Welcome to Herd, the peer-to-peer messaging app!
       </Text>
-      <Button title="Get Started" color={palette.secondary}/>
+      <Button
+      title="Get Started"
+      color={palette.secondary}
+      onPress={() => navigation.navigate('chooseUsername')}
+      />
     </View>
   )
 }

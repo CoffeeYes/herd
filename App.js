@@ -30,6 +30,7 @@ import AddContact from './src/views/AddContact';
 import Chats from './src/views/Chats';
 import Contacts from './src/views/Contacts';
 import Splash from './src/views/Splash';
+import ChooseUsername from './src/views/ChooseUsername'
 
 const Stack = createStackNavigator()
 
@@ -41,6 +42,7 @@ const App = ({ }) => {
             <Stack.Screen name="addContact" component={AddContact}/>
             <Stack.Screen name="chat" component={Chats}/>
             <Stack.Screen name="splash" component={Splash}/>
+            <Stack.Screen name="chooseUsername" component={ChooseUsername}/>
           </Stack.Navigator>
     </>
   );
