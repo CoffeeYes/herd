@@ -1,4 +1,4 @@
-package com.reactnativecrypto
+package com.herd
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

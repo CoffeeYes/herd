@@ -1,4 +1,4 @@
-package com.reactnativecrypto
+package com.herd
 
 import android.graphics.Color
 import android.view.View
