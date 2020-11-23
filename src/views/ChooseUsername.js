@@ -5,11 +5,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ChooseUsername = ({ }) => {
   const [username, setUsername] = useState("");
+  const [error,setError] = useState("");
 
   const storeUsername = async () => {
-    await AsyncStorage.setItem('@username',username);
+    setError("");
+    const usernameRegex = /^[a-zA-Z_]+$/;
+    if(!usernameRegex.test(username)) {
+      setError("Username can only contain letters and undescore")
+    }
+    else {
+      await AsyncStorage.setItem('@username',username);
+    }
   }
-  
+
   return (
     <View style={{
       flex : 1,
@@ -19,7 +27,7 @@ const ChooseUsername = ({ }) => {
         Choose your username. This username will be attached to every message at
         the time of sending.
         </Text>
-
+        <Text style={{color : "red", fontWeight : "bold"}}>{error}</Text>
         <TextInput
         placeholder="Username"
         style={{
