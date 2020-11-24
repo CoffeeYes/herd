@@ -3,7 +3,7 @@ import { View, TextInput, Text, Button } from 'react-native';
 import palette from '../assets/palette';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ChooseUsername = ({ }) => {
+const ChooseUsername = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [error,setError] = useState("");
 
@@ -15,6 +15,7 @@ const ChooseUsername = ({ }) => {
     }
     else {
       await AsyncStorage.setItem('@username',username);
+      navigation.navigate("main")
     }
   }
 
@@ -22,8 +23,9 @@ const ChooseUsername = ({ }) => {
     <View style={{
       flex : 1,
       alignItems : "center",
-      justifyContent : "center"}}>
-        <Text style={{textAlign : "center"}}>
+      justifyContent : "center",
+      backgroundColor : "#e05e3f"}}>
+        <Text style={{textAlign : "center",fontSize : 18,color : "white"}}>
         Choose your username. This username will be attached to every message at
         the time of sending.
         </Text>
@@ -46,7 +48,7 @@ const ChooseUsername = ({ }) => {
         title="Next"
         onPress={storeUsername}
         color={palette.secondary}
-      />
+        />
     </View>
   )
 }

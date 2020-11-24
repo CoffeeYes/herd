@@ -25,24 +25,27 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AddContact from './src/views/AddContact';
 import Chats from './src/views/Chats';
 import Contacts from './src/views/Contacts';
 import Splash from './src/views/Splash';
-import ChooseUsername from './src/views/ChooseUsername'
+import ChooseUsername from './src/views/ChooseUsername';
+import Main from './src/views/Main';
 
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
   return (
     <>
-          <Stack.Navigator initialRouteName="splash">
+          <Stack.Navigator initialRouteName={AsyncStorage.getItem('@username') ? "main" : "splash"}>
             <Stack.Screen name="contacts" component={Contacts}/>
             <Stack.Screen name="addContact" component={AddContact}/>
             <Stack.Screen name="chat" component={Chats}/>
             <Stack.Screen name="splash" component={Splash}/>
             <Stack.Screen name="chooseUsername" component={ChooseUsername}/>
+            <Stack.Screen name="main" component={Main}/>
           </Stack.Navigator>
     </>
   );
