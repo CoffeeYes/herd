@@ -1,23 +1,38 @@
-import React from 'react';
-import { View, ScrollView, Text,} from 'react-native';
+import React, {useState} from 'react';
+import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
+
+import Chats from './Chats';
+import Contacts from './Contacts';
 
 const Main = ({ navigation }) => {
+    const [activePage, setActivePage] = useState("contacts");
     return(
-      <ScrollView>
+      <>
+        <ScrollView>
+          {activePage === "contacts" && <Contacts/>}
+          {activePage === "chats" && <Chats/>}
+        </ScrollView>
+
         <View style={styles.navContainer}>
-          <View>
+          <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setActivePage("chats")}>
             <Text>Chats</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View>
+          <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setActivePage("contacts")}>
             <Text>Contacts</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View>
+          <TouchableOpacity
+          style={styles.navItem}
+          onPress={() => setActivePage("settings")}>
             <Text>Settings</Text>
-          </View>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      </>
     )
 }
 
@@ -27,6 +42,9 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-between"
   },
+  navItem : {
+    padding : 20
+  }
 }
 
 export default Main
