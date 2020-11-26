@@ -29,6 +29,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import AddContact from './src/views/AddContact';
 import Chats from './src/views/Chats';
+import Chat from './src/views/Chat';
 import Contacts from './src/views/Contacts';
 import Splash from './src/views/Splash';
 import ChooseUsername from './src/views/ChooseUsername';
@@ -42,10 +43,11 @@ const App = ({ }) => {
           <Stack.Navigator initialRouteName={AsyncStorage.getItem('@username') ? "main" : "splash"}>
             <Stack.Screen name="contacts" component={Contacts}/>
             <Stack.Screen name="addContact" component={AddContact}/>
-            <Stack.Screen name="chat" component={Chats}/>
+            <Stack.Screen name="chats" component={Chats}/>
             <Stack.Screen name="splash" component={Splash}/>
             <Stack.Screen name="chooseUsername" component={ChooseUsername}/>
             <Stack.Screen name="main" component={Main}/>
+            <Stack.Screen name="chat" component={Chat}/>
           </Stack.Navigator>
     </>
   );

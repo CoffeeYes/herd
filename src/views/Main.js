@@ -9,8 +9,12 @@ const Main = ({ navigation }) => {
     return(
       <>
         <ScrollView>
-          {activePage === "contacts" && <Contacts/>}
-          {activePage === "chats" && <Chats/>}
+          {activePage === "contacts" &&
+            <Contacts navigation={navigation}/>
+          }
+          {activePage === "chats" &&
+            <Chats navigation={navigation}/>
+          }
         </ScrollView>
 
         <View style={styles.navContainer}>
