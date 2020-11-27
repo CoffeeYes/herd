@@ -5,8 +5,9 @@ const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([{name : "Test1"},{name : "Test2"},{name : "Test3"}]);
   return (
     <>
-    {chats.map(chat =>
+    {chats.map( (chat, index) =>
       <TouchableOpacity
+      key={index}
       style={styles.chat}
       onPress={() => navigation.navigate("chat")}>
         <Text>{chat.name}</Text>

@@ -3,6 +3,7 @@ import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
 
 import Chats from './Chats';
 import Contacts from './Contacts';
+import Settings from './Settings';
 
 const Main = ({ navigation }) => {
     const [activePage, setActivePage] = useState("contacts");
@@ -14,6 +15,9 @@ const Main = ({ navigation }) => {
           }
           {activePage === "chats" &&
             <Chats navigation={navigation}/>
+          }
+          {activePage === "settings" &&
+            <Settings navigation={navigation}/>
           }
         </ScrollView>
 
