@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, Image } from 'react-native';
+import { Text, TouchableOpacity, Image, View} from 'react-native';
 
 const Contact = ({ navigation }) => {
   const [contacts, setContacts] = useState([{name : "Test"}]);
@@ -9,6 +9,13 @@ const Contact = ({ navigation }) => {
   }
   return (
     <>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Contacts</Text>
+        <TouchableOpacity
+        style={{backgroundColor : "#EBB3A9",padding : 15}}>
+          <Text style={styles.headerText}>+</Text>
+        </TouchableOpacity>
+      </View>
       {contacts.map( (contact, index) =>
         <TouchableOpacity
         key={index}
@@ -26,6 +33,17 @@ const Contact = ({ navigation }) => {
 }
 
 const styles = {
+  header : {
+    flexDirection : "row",
+    justifyContent : "space-between",
+    alignItems : "center",
+    backgroundColor : "#e05e3f",
+    paddingLeft : 20
+  },
+  headerText : {
+    fontSize : 18,
+    color : "white"
+  },
   contact : {
     backgroundColor : "white",
     padding : 20,

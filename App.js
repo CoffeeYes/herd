@@ -40,7 +40,9 @@ const Stack = createStackNavigator()
 const App = ({ }) => {
   return (
     <>
-          <Stack.Navigator initialRouteName={AsyncStorage.getItem('@username') ? "main" : "splash"}>
+          <Stack.Navigator
+          initialRouteName={AsyncStorage.getItem('@username') ? "main" : "splash"}
+          screenOptions={{headerShown : false}}>
             <Stack.Screen name="contacts" component={Contacts}/>
             <Stack.Screen name="addContact" component={AddContact}/>
             <Stack.Screen name="chats" component={Chats}/>
