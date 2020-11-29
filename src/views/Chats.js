@@ -9,7 +9,7 @@ const Chats = ({ navigation }) => {
       <TouchableOpacity
       key={index}
       style={styles.chat}
-      onPress={() => navigation.navigate("chat")}>
+      onPress={() => navigation.navigate("chat", {username : chat.name})}>
         <Text>{chat.name}</Text>
       </TouchableOpacity>
     )}

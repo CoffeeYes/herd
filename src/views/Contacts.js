@@ -7,12 +7,14 @@ const Contact = ({ navigation }) => {
   const handlePressContact = () => {
     navigation.navigate("chat")
   }
+  
   return (
     <>
       <View style={styles.header}>
         <Text style={styles.headerText}>Contacts</Text>
         <TouchableOpacity
-        style={{backgroundColor : "#EBB3A9",padding : 15}}>
+        onPress={() => navigation.navigate("addContact")}
+        style={{backgroundColor : "#EBB3A9",paddingVertical : 10,paddingHorizontal : 20}}>
           <Text style={styles.headerText}>+</Text>
         </TouchableOpacity>
       </View>
