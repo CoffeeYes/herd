@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
 
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import Chats from './Chats';
 import Contacts from './Contacts';
 import Settings from './Settings';
@@ -25,19 +27,19 @@ const Main = ({ navigation }) => {
           <TouchableOpacity
           style={styles.navItem}
           onPress={() => setActivePage("chats")}>
-            <Text>Chats</Text>
+            <Icon name="chat" size={24}/>
           </TouchableOpacity>
 
           <TouchableOpacity
           style={styles.navItem}
           onPress={() => setActivePage("contacts")}>
-            <Text>Contacts</Text>
+            <Icon name="contacts" size={24}/>
           </TouchableOpacity>
 
           <TouchableOpacity
           style={styles.navItem}
           onPress={() => setActivePage("settings")}>
-            <Text>Settings</Text>
+            <Icon name="settings" size={24}/>
           </TouchableOpacity>
         </View>
       </>
