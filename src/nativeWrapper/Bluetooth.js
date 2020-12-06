@@ -1,5 +1,5 @@
 import { NativeModules, requireNativeComponent, ViewStyle } from 'react-native';
 
-const { CryptoModule } = NativeModules;
+const { BluetoothModule } = NativeModules;
 
-export default CryptoModule;
+export default BluetoothModule;

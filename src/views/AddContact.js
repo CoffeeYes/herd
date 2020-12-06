@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
+import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const AddContact = () => {
+
+  useEffect(() => {
+      Bluetooth.scanForDevices().then(result => console.log(result))
+  },[])
+
   return (
     <>
     <View style={styles.header}>
