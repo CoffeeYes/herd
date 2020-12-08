@@ -34,7 +34,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         if(adapter.isEnabled()) {
-
+          val discoveryStarted = adapter.startDiscovery();
+          if(!discoveryStarted) {
+            throw Exception("Device Discovery could not be started")
+          }
         }
         else {
           throw Exception("Bluetooth Adapter is disabled")

@@ -1,12 +1,8 @@
 import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const AddContact = () => {
-
-  useEffect(() => {
-      Bluetooth.scanForDevices().then(result => console.log(result))
-  },[])
 
   return (
     <>
@@ -14,7 +10,12 @@ const AddContact = () => {
       <Text style={{color : "white"}}>Add Contact</Text>
     </View>
     <View style={styles.main}>
-      <Text>Enable NFC and place your phones next to each other!</Text>
+      <Text>Enable Bluetooth and place your phones next to each other!</Text>
+      <TouchableOpacity
+      onPress={() => Bluetooth.scanForDevices()}
+      style={styles.button}>
+        <Text style={{color : "white"}}>Start Scanning</Text>
+      </TouchableOpacity>
     </View>
     </>
   )
@@ -29,6 +30,13 @@ const styles = {
     alignSelf : "center",
     marginTop : "auto",
     marginBottom : "auto"
+  },
+  button : {
+    backgroundColor : "#E86252",
+    padding : 10,
+    alignSelf : "center",
+    marginTop : 10,
+    borderRadius : 5
   }
 }
 
