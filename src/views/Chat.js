@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, ScrollView } from 'react-native';
+import { AsyncStorage } from 'react-native';
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([
     {from : "other", text : "test from other"},
     {from : "you", text : "test from you"}
   ])
+
+  useEffect(() => {
+    AsyncStorage.getItem(route.params.username).then(result => {
+      result?.messages && setMessages(result.messages)
+    })
+  },[])
+
   return (
     <ScrollView>
       <View style={{backgroundColor : "white",paddingVertical : 15,paddingLeft : 10}}>

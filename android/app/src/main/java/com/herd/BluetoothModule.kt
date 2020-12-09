@@ -14,17 +14,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         return "BluetoothModule"
     }
 
-    private val profileListener = object : BluetoothProfile.ServiceListener {
-
-      override fun onServiceConnected(profile: Int, proxy: BluetoothProfile) {
-
-      }
-
-      override fun onServiceDisconnected(profile: Int) {
-
-      }
-    }
-
     @ReactMethod
     fun scanForDevices(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
