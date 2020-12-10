@@ -1,8 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const AddContact = () => {
+  const [error,setError] = useState("");
+
+  useEffect(() => {
+    Bluetooth.checkBTEnabled().then(enabled => {
+      if(!enabled) {
+        setError("Bluetooth is not enabled")
+      }
+    })
+  },[])
 
   return (
     <>
@@ -10,10 +19,12 @@ const AddContact = () => {
       <Text style={{color : "white"}}>Add Contact</Text>
     </View>
     <View style={styles.main}>
+      <Text style={styles.error}>{error}</Text>
       <Text>Enable Bluetooth and place your phones next to each other!</Text>
       <TouchableOpacity
       onPress={() => Bluetooth.scanForDevices()}
-      style={styles.button}>
+      style={!!error ? styles.buttonDisabled : styles.button}
+      disabled={!!error}>
         <Text style={{color : "white"}}>Start Scanning</Text>
       </TouchableOpacity>
     </View>
@@ -37,6 +48,19 @@ const styles = {
     alignSelf : "center",
     marginTop : 10,
     borderRadius : 5
+  },
+  buttonDisabled : {
+    backgroundColor : "grey",
+    padding : 10,
+    alignSelf : "center",
+    marginTop : 10,
+    borderRadius : 5
+  },
+  error : {
+    color : "red",
+    fontWeight : "bold",
+    textAlign : "center",
+    fontSize : 18
   }
 }
 

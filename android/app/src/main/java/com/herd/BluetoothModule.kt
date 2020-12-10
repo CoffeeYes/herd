@@ -33,4 +33,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
       }
     }
+
+    @ReactMethod
+    fun checkBTEnabled(promise : Promise) {
+      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+
+      if(adapter === null) {
+        throw Exception("No BluetoothAdapter Found")
+      }
+      else {
+        if(adapter.isEnabled()) {
+          promise.resolve(true);
+        }
+        else {
+          promise.resolve(false);
+        }
+      }
+    }
 }
