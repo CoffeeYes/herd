@@ -6,28 +6,34 @@ const AddContact = () => {
   const [error,setError] = useState("");
 
   useEffect(() => {
-    Bluetooth.checkBTEnabled().then(enabled => {
+    const checkForBT = setInterval(async () => {
+      let enabled = await Bluetooth.checkBTEnabled();
+      console.log(enabled)
       if(!enabled) {
         setError("Bluetooth is not enabled")
       }
-    })
+      else {
+        setError("")
+      }
+    },200)
+    return () => clearInterval(checkForBT);
   },[])
 
   return (
     <>
-    <View style={styles.header}>
-      <Text style={{color : "white"}}>Add Contact</Text>
-    </View>
-    <View style={styles.main}>
-      <Text style={styles.error}>{error}</Text>
-      <Text>Enable Bluetooth and place your phones next to each other!</Text>
-      <TouchableOpacity
-      onPress={() => Bluetooth.scanForDevices()}
-      style={!!error ? styles.buttonDisabled : styles.button}
-      disabled={!!error}>
-        <Text style={{color : "white"}}>Start Scanning</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.header}>
+        <Text style={{color : "white"}}>Add Contact</Text>
+      </View>
+      <View style={styles.main}>
+        <Text style={styles.error}>{error}</Text>
+        <Text>Enable Bluetooth and place your phones next to each other!</Text>
+        <TouchableOpacity
+        onPress={() => Bluetooth.scanForDevices()}
+        style={!!error ? styles.buttonDisabled : styles.button}
+        disabled={!!error}>
+          <Text style={{color : "white"}}>Start Scanning</Text>
+        </TouchableOpacity>
+      </View>
     </>
   )
 }
