@@ -5,11 +5,24 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ActivityEventListener
+import com.facebook.react.bridge.BaseActivityEventListener
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
+import android.content.Intent
+import android.app.Activity
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+    private final val activityListener = object : BaseActivityEventListener() {
+      override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+
+      }
+    }
+
+    init {
+      reactContext.addActivityEventListener(activityListener)
+    }
     override fun getName(): String {
         return "BluetoothModule"
     }
@@ -48,6 +61,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         else {
           promise.resolve(false);
         }
+      }
+    }
+
+    @ReactMethod
+    fun checkForBTAdapter(promise : Promise) {
+      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+
+      if(adapter === null) {
+        promise.resolve(false);
+      }
+      else {
+        promise.resolve(true);
       }
     }
 }

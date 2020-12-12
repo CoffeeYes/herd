@@ -7,9 +7,13 @@ const AddContact = () => {
 
   useEffect(() => {
     const checkForBT = setInterval(async () => {
+      let adapter = await Bluetooth.checkForBTAdapter();
       let enabled = await Bluetooth.checkBTEnabled();
-      console.log(enabled)
-      if(!enabled) {
+
+      if(!adapter) {
+        return setError("No Bluetooth Adapters Found");
+      }
+      else if(!enabled) {
         setError("Bluetooth is not enabled")
       }
       else {
