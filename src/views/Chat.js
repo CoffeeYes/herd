@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView } from 'react-native';
+import { Text, View, ScrollView, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Chat = ({ route, navigation }) => {
@@ -15,21 +15,25 @@ const Chat = ({ route, navigation }) => {
   },[])
 
   return (
-    <ScrollView>
+    <View>
       <View style={{backgroundColor : "white",paddingVertical : 15,paddingLeft : 10}}>
         <Text>{route.params.username}</Text>
       </View>
-      {messages.map( (message,index) =>
-        <View
-        style={message.from === "other" ?
-          {...styles.message,...styles.messageFromOther}
-          :
-          {...styles.message,...styles.messageFromYou}}
-        key={index}>
-          <Text style={styles.messageText}>{message.text}</Text>
-        </View>
-      )}
-    </ScrollView>
+      <ScrollView contentContainerStyle={styles.messageContainer}>
+        {messages.map( (message,index) =>
+          <View
+          style={message.from === "other" ?
+            {...styles.message,...styles.messageFromOther}
+            :
+            {...styles.message,...styles.messageFromYou}}
+          key={index}>
+            <Text style={styles.messageText}>{message.text}</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      <TextInput placeholder="Send a Message" style={styles.chatInput}/>
+    </View>
   )
 }
 
@@ -51,6 +55,14 @@ const styles = {
   },
   messageText : {
     color : "#f5f5f5"
+  },
+  chatInput : {
+    backgroundColor : "white",
+    marginTop : "auto",
+    paddingLeft : 10
+  },
+  messageContainer : {
+    height : "100%"
   }
 }
 
