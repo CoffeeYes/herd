@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Contact = ({ navigation }) => {
   const [contacts, setContacts] = useState([{name : "Test"}]);
 
-  const handlePressContact = () => {
-    navigation.navigate("chat")
-  }
-  
+  useEffect(() => {
+    AsyncStorage.getItem("contacts")
+    .then(contactList => contactList && setContacts(contactList))
+  },[])
+
   return (
     <>
       <View style={styles.header}>
@@ -22,7 +24,7 @@ const Contact = ({ navigation }) => {
         <TouchableOpacity
         key={index}
         style={styles.contact}
-        onPress={handlePressContact}>
+        onPress={() => navigation.navigate("chat", {username : contact.name})}>
           <Image
           source={contact.image}
           style={styles.image}/>
