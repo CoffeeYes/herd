@@ -19,10 +19,12 @@ import {
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import AddContact from './src/views/AddContact';
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
 import Contacts from './src/views/Contacts';
+import Contact from './src/views/Contact';
+import AddContact from './src/views/AddContact';
+import CreateContact from './src/views/CreateContact';
 import Splash from './src/views/Splash';
 import ChooseUsername from './src/views/ChooseUsername';
 import Main from './src/views/Main';
@@ -42,6 +44,8 @@ const App = ({ }) => {
             <Stack.Screen name="chooseUsername" component={ChooseUsername}/>
             <Stack.Screen name="main" component={Main}/>
             <Stack.Screen name="chat" component={Chat}/>
+            <Stack.Screen name="contact" component={Contact}/>
+            <Stack.Screen name="createcontact" component={CreateContact}/>
           </Stack.Navigator>
     </>
   );

@@ -24,7 +24,7 @@ const Contact = ({ navigation }) => {
         <TouchableOpacity
         key={index}
         style={styles.contact}
-        onPress={() => navigation.navigate("chat", {username : contact.name})}>
+        onPress={() => navigation.navigate("contact", {username : contact.name})}>
           <Image
           source={contact.image}
           style={styles.image}/>
