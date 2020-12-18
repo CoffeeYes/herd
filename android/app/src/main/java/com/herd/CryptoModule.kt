@@ -27,7 +27,7 @@ import javax.crypto.spec.PSource
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
     override fun getName(): String {
-        return "Crypto"
+        return "CryptoModule"
     }
 
     override fun getConstants(): Map<String, Any>? {

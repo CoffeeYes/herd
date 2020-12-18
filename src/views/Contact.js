@@ -1,9 +1,16 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Crypto from '../nativeWrapper/Crypto';
 
 const Contact = ({route, navigation}) => {
+  const [ userKey, setUserKey ] = useState("");
+
+  useEffect(() => {
+    Crypto.loadKeyFromKeystore(route.params.username).then(publicKey => {
+      publicKey && setUserKey(publicKey)
+    })
+  },[])
   return (
     <>
       <View style={styles.header}>
@@ -14,6 +21,12 @@ const Contact = ({route, navigation}) => {
       </View>
 
       <ScrollView>
+        <TextInput disabled="true" value={userKey} style={{alignSelf : "center"}}/>
+
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Copy Key</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Share Contact</Text>
         </TouchableOpacity>
