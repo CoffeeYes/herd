@@ -9,27 +9,54 @@ const CreateContact = ({navigation}) => {
 
   const createContact = async () => {
     setError("");
+    console.log(username);
+    console.log(publicKey);
     if(username.trim() === "" || publicKey.trim() === "") {
-      return setError("Fields Cannot be empty")
+      setError("Fields Cannot be empty")
+    }
+    else {
+      var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+      //create empty contacts array and load it back
+      if(!contacts) {
+        await AsyncStorage.setItem("contacts",JSON.stringify([]));
+        contacts = await AsyncStorage.getItem("contacts");
+      }
+
+      //create new user if the username isnt taken
+      if(!(contacts.find(user => user.name === username))) {
+        AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
+          name : username,
+          key : publicKey
+        }]))
+      }
+      else {
+        setError("You Already have a contact with that username")
+      }
     }
   }
 
   return (
     <View style={{padding : 20}}>
       <Text style={styles.error}>{error}</Text>
+
       <TextInput
       placeholder="Name"
-      onChange={setUsername}
+      onChangeText={name => setUsername(name)}
+      defaultValue={""}
       style={styles.input}/>
+
       <TextInput
       placeholder="Public Key"
-      onChange={setPublicKey}
-      style={styles.input}/>
+      onChangeText={key => setPublicKey(key)}
+      style={styles.input}
+      defaultValue={""}/>
+
       <TouchableOpacity
       style={styles.button}
       onPress={() => createContact()}>
         <Text style={styles.buttonText}>Import</Text>
       </TouchableOpacity>
+
     </View>
   )
 }
