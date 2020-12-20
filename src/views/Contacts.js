@@ -7,7 +7,7 @@ const Contact = ({ navigation }) => {
 
   useEffect(() => {
     AsyncStorage.getItem("contacts")
-    .then(contactList => contactList && setContacts(contactList))
+    .then(contactList => contactList && setContacts(JSON.parse(contactList)))
   },[])
 
   return (
@@ -24,7 +24,7 @@ const Contact = ({ navigation }) => {
         <TouchableOpacity
         key={index}
         style={styles.contact}
-        onPress={() => navigation.navigate("contact", {username : contact.name})}>
+        onPress={() => navigation.navigate("contact", {...contact})}>
           <Image
           source={contact.image}
           style={styles.image}/>
