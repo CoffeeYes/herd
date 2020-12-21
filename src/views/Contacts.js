@@ -1,9 +1,44 @@
 import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Contact = ({ navigation }) => {
-  const [contacts, setContacts] = useState([{name : "Test"}]);
+const ContactItem = ({ navigation, contact, setContacts }) => {
+  const [allowDelete, setAllowDelete] = useState(false);
+
+  const deleteContact = async name => {
+    var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+    for(var i = 0; i < contacts.length; i++) {
+      if(contacts[i].name === name) {
+        contacts.splice(i,1);
+      }
+    }
+    await AsyncStorage.setItem("contacts",JSON.stringify(contacts));
+    setContacts(contacts)
+  }
+
+  return (
+    <TouchableOpacity
+    style={styles.contact}
+    onPress={() => navigation.navigate("contact", {...contact})}
+    onLongPress={() => setAllowDelete(true)}>
+      <Image
+      source={contact.image}
+      style={styles.image}/>
+
+      <Text style={styles.contactText}>{contact.name}</Text>
+      {allowDelete &&
+      <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => deleteContact(contact.name)}>
+        <Icon name="delete" size={24} style={{color : "black"}}/>
+      </TouchableOpacity>}
+    </TouchableOpacity>
+  )
+}
+
+const Contacts = ({ navigation }) => {
+  const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem("contacts")
@@ -21,16 +56,11 @@ const Contact = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       {contacts.map( (contact, index) =>
-        <TouchableOpacity
+        <ContactItem
         key={index}
-        style={styles.contact}
-        onPress={() => navigation.navigate("contact", {...contact})}>
-          <Image
-          source={contact.image}
-          style={styles.image}/>
-
-          <Text>{contact.name}</Text>
-        </TouchableOpacity>
+        contact={contact}
+        navigation={navigation}
+        setContacts={setContacts}/>
       )}
     </>
   )
@@ -50,13 +80,20 @@ const styles = {
   },
   contact : {
     backgroundColor : "white",
-    padding : 20,
     flexDirection : "row"
+  },
+  contactText : {
+    padding : 20
   },
   image : {
     borderRadius : 50,
     overflow : "hidden",
+  },
+  deleteButton : {
+    backgroundColor : "#e05e3f",
+    marginLeft : "auto",
+    padding : 13
   }
 }
 
-export default Contact;
+export default Contacts;
