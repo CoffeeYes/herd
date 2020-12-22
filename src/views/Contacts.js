@@ -20,7 +20,7 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
   return (
     <TouchableOpacity
     style={styles.contact}
-    onPress={() => navigation.navigate("contact", {...contact})}
+    onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
     onLongPress={() => setAllowDelete(true)}>
       <Image
       source={contact.image}

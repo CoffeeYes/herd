@@ -16,8 +16,8 @@ const Chat = ({ route, navigation }) => {
 
   return (
     <View>
-      <View style={{backgroundColor : "white",paddingVertical : 15,paddingLeft : 10}}>
-        <Text>{route.params.username}</Text>
+      <View style={{backgroundColor : "#e05e3f",paddingVertical : 15,paddingLeft : 10}}>
+        <Text style={{color : "white",fontSize : 18}}>{route.params.username}</Text>
       </View>
       <ScrollView contentContainerStyle={styles.messageContainer}>
         {messages.map( (message,index) =>
