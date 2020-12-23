@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 
 const ContactItem = ({ navigation, contact, setContacts }) => {
   const [allowDelete, setAllowDelete] = useState(false);
@@ -18,22 +19,26 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
   }
 
   return (
-    <TouchableOpacity
-    style={styles.contact}
-    onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
-    onLongPress={() => setAllowDelete(true)}>
-      <Image
-      source={contact.image}
-      style={styles.image}/>
-
-      <Text style={styles.contactText}>{contact.name}</Text>
-      {allowDelete &&
+    <GestureRecognizer
+    onSwipeLeft={() => setAllowDelete(true)}
+    onSwipeRight={() => setAllowDelete(false)}>
       <TouchableOpacity
-      style={styles.deleteButton}
-      onPress={() => deleteContact(contact.name)}>
-        <Icon name="delete" size={24} style={{color : "black"}}/>
-      </TouchableOpacity>}
-    </TouchableOpacity>
+      style={styles.contact}
+      onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
+      onLongPress={() => setAllowDelete(true)}>
+        <Image
+        source={contact.image}
+        style={styles.image}/>
+
+        <Text style={styles.contactText}>{contact.name}</Text>
+        {allowDelete &&
+        <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => deleteContact(contact.name)}>
+          <Icon name="delete" size={24} style={{color : "black"}}/>
+        </TouchableOpacity>}
+      </TouchableOpacity>
+    </GestureRecognizer>
   )
 }
 
