@@ -1,18 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, ScrollView, TextInput } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Crypto from '../nativeWrapper/Crypto'
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([
     {from : "other", text : "test from other"},
     {from : "you", text : "test from you"}
-  ])
+  ]);
+  const [yourMessages, setYourMessages] = useState([]);
+  const [otherMessages, setOtherMessages] = useState([]);
+  const [contactInfo, setContactInfo] = useState({});
+  const [ownPublicKey, setOwnPublicKey] = useState("");
 
   useEffect(() => {
-    AsyncStorage.getItem(route.params.username).then(result => {
-      result?.messages && setMessages(result.messages)
-    })
+    AsyncStorage.getItem("contacts").then(result => {
+      result = JSON.parse(result);
+      result &&
+      setContactInfo(result.find(contact => contact.name === route.params.username))
+    });
+    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
+    loadMessages()
   },[])
+
+  const loadMessages = async () => {
+    var allMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
+
+    if(allMessages) {
+      //decrypt all message text payloads (sent and received) using private key
+      for(var message in allMessages) {
+        allMessages[message].text = await Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          allMessages[message].text
+        )
+      }
+      setMessages(allMessages)
+    }
+  }
+
+  const sendMessage = async message => {
+
+    //encrypt the passed in message using the users own public key
+    const newMessageEncrypted = await Crypto.encryptString(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      message
+    )
+    //create a message object with relevant metadata
+    const messageToAdd = {
+      to : contactInfo.key,
+      from : ownPublicKey,
+      text : newMessageEncrypted,
+      timestamp : Date.now()
+    }
+
+    //load the existing messages with this user and append our new message
+    var storedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    if(!storedMessages) {
+      storedMessages = []
+    }
+    //store the new message array
+    await AsyncStorage.setItem(
+      route.params.username,
+      JSON.stringify([...storedMessages,messageToAdd])
+    )
+  }
 
   return (
     <View>
@@ -22,17 +79,20 @@ const Chat = ({ route, navigation }) => {
       <ScrollView contentContainerStyle={styles.messageContainer}>
         {messages.map( (message,index) =>
           <View
-          style={message.from === "other" ?
-            {...styles.message,...styles.messageFromOther}
+          style={message.from === ownPublicKey ?
+            {...styles.message,...styles.messageFromYou}
             :
-            {...styles.message,...styles.messageFromYou}}
+            {...styles.message,...styles.messageFromOther}}
           key={index}>
             <Text style={styles.messageText}>{message.text}</Text>
           </View>
         )}
       </ScrollView>
 
-      <TextInput placeholder="Send a Message" style={styles.chatInput}/>
+      <TextInput
+      placeholder="Send a Message"
+      style={styles.chatInput}
+      onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
   )
 }

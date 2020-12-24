@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 
 const Chats = ({ navigation }) => {
-  const [chats,setChats] = useState([{name : "Test1"},{name : "Test2"},{name : "Test3"}]);
+  const [chats,setChats] = useState([{name : "Test1"},{name : "test2"},{name : "Test3"}]);
   return (
     <>
     <View style={styles.header}>
