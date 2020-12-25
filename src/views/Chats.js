@@ -1,8 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Chats = ({ navigation }) => {
-  const [chats,setChats] = useState([{name : "Test1"},{name : "test2"},{name : "Test3"}]);
+  const [chats,setChats] = useState([]);
+
+  useEffect(() => {
+    loadContactsWithChats()
+  },[])
+
+  const loadContactsWithChats = async () => {
+    //load all contacts from storage
+    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+
+    //check storage for each contact to see if messages have been sent/received
+    //and add them to contact list if so
+    contacts.forEach(async contact => {
+      const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
+      if(chat) {
+        setChats([...chats,{name : contact.name}])
+      }
+    })
+  }
+
   return (
     <>
     <View style={styles.header}>

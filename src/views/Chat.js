@@ -4,10 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto'
 
 const Chat = ({ route, navigation }) => {
-  const [messages,setMessages] = useState([
-    {from : "other", text : "test from other"},
-    {from : "you", text : "test from you"}
-  ]);
+  const [messages,setMessages] = useState([]);
   const [yourMessages, setYourMessages] = useState([]);
   const [otherMessages, setOtherMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
