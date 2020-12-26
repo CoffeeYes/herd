@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, Image, View} from 'react-native';
+import { Text, TouchableOpacity, Image, View, ActivityIndicator} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
@@ -44,10 +44,14 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
 
 const Contacts = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     AsyncStorage.getItem("contacts")
-    .then(contactList => contactList && setContacts(JSON.parse(contactList)))
+    .then(contactList => {
+      contactList && setContacts(JSON.parse(contactList))
+      setLoading(false);
+    })
   },[])
 
   return (
@@ -60,6 +64,7 @@ const Contacts = ({ navigation }) => {
           <Text style={styles.headerText}>+</Text>
         </TouchableOpacity>
       </View>
+      {loading && <ActivityIndicator size="large" color="#EBB3A9"/>}
       {contacts.map( (contact, index) =>
         <ContactItem
         key={index}

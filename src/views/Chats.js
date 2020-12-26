@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadContactsWithChats()
+    loadContactsWithChats().then(() => setLoading(false))
   },[])
 
   const loadContactsWithChats = async () => {
@@ -30,6 +31,7 @@ const Chats = ({ navigation }) => {
         Chats
       </Text>
     </View>
+    {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats.map( (chat, index) =>
       <TouchableOpacity
       key={index}
