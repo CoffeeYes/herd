@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, ScrollView, TextInput } from 'react-native';
+import { Text, View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto'
 
@@ -9,6 +9,7 @@ const Chat = ({ route, navigation }) => {
   const [otherMessages, setOtherMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
   const [ownPublicKey, setOwnPublicKey] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     AsyncStorage.getItem("contacts").then(result => {
@@ -17,7 +18,7 @@ const Chat = ({ route, navigation }) => {
       setContactInfo(result.find(contact => contact.name === route.params.username))
     });
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
-    loadMessages()
+    loadMessages().then( () => setLoading(false))
   },[])
 
   const loadMessages = async () => {
@@ -73,6 +74,7 @@ const Chat = ({ route, navigation }) => {
       <View style={{backgroundColor : "#e05e3f",paddingVertical : 15,paddingLeft : 10}}>
         <Text style={{color : "white",fontSize : 18}}>{route.params.username}</Text>
       </View>
+      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       <ScrollView contentContainerStyle={styles.messageContainer}>
         {messages.map( (message,index) =>
           <View

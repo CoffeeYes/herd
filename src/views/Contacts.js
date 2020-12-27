@@ -45,7 +45,7 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
 const Contacts = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     AsyncStorage.getItem("contacts")
     .then(contactList => {
@@ -60,11 +60,11 @@ const Contacts = ({ navigation }) => {
         <Text style={styles.headerText}>Contacts</Text>
         <TouchableOpacity
         onPress={() => navigation.navigate("addContact")}
-        style={{backgroundColor : "#EBB3A9",paddingVertical : 10,paddingHorizontal : 20}}>
+        style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
           <Text style={styles.headerText}>+</Text>
         </TouchableOpacity>
       </View>
-      {loading && <ActivityIndicator size="large" color="#EBB3A9"/>}
+      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       {contacts.map( (contact, index) =>
         <ContactItem
         key={index}
@@ -82,7 +82,7 @@ const styles = {
     justifyContent : "space-between",
     alignItems : "center",
     backgroundColor : "#e05e3f",
-    paddingLeft : 20
+    paddingLeft : 20,
   },
   headerText : {
     fontSize : 18,
