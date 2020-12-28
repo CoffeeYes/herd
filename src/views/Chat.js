@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Crypto from '../nativeWrapper/Crypto'
+import moment from 'moment';
+
+import Crypto from '../nativeWrapper/Crypto';
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([]);
@@ -35,7 +37,7 @@ const Chat = ({ route, navigation }) => {
           allMessages[message].text
         )
       }
-      setMessages(allMessages)
+      setMessages(allMessages.sort( (a,b) => a.timestamp > b.timestamp))
     }
   }
 
@@ -84,6 +86,7 @@ const Chat = ({ route, navigation }) => {
             {...styles.message,...styles.messageFromOther}}
           key={index}>
             <Text style={styles.messageText}>{message.text}</Text>
+            <Text style={styles.timestamp}>{moment(message.timestamp).format("HH:SS - DD.MM")}</Text>
           </View>
         )}
       </ScrollView>
@@ -114,6 +117,10 @@ const styles = {
   },
   messageText : {
     color : "#f5f5f5"
+  },
+  timestamp : {
+    fontWeight : "bold",
+    marginTop : 10
   },
   chatInput : {
     backgroundColor : "white",
