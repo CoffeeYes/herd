@@ -46,6 +46,7 @@ const App = ({ }) => {
             <Stack.Screen name="chat" component={Chat}/>
             <Stack.Screen name="contact" component={Contact}/>
             <Stack.Screen name="createcontact" component={CreateContact}/>
+            <Stack.Screen name="newChat" component={Contacts}/>
           </Stack.Navigator>
     </>
   );

@@ -30,6 +30,11 @@ const Chats = ({ navigation }) => {
       <Text style={{color : "white", fontSize : 18}}>
         Chats
       </Text>
+      <TouchableOpacity
+      onPress={() => navigation.navigate("newChat",{type : "newChat"})}
+      style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
+        <Text style={styles.headerText}>+</Text>
+      </TouchableOpacity>
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats.map( (chat, index) =>
@@ -60,8 +65,11 @@ const styles = {
     alignItems : "center",
     backgroundColor : "#e05e3f",
     paddingLeft : 20,
-    padding : 15
-  }
+  },
+  headerText : {
+    fontSize : 18,
+    color : "white"
+  },
 }
 
 export default Chats;

@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 
-const ContactItem = ({ navigation, contact, setContacts }) => {
+const ContactItem = ({ navigation, contact, setContacts, type }) => {
   const [allowDelete, setAllowDelete] = useState(false);
 
   const deleteContact = async name => {
@@ -24,7 +24,10 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
     onSwipeRight={() => setAllowDelete(false)}>
       <TouchableOpacity
       style={styles.contact}
-      onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
+      onPress={() => type === "contacts" ?
+        navigation.navigate("contact", {username : contact.name, key : contact.key}) 
+        :
+        navigation.navigate("chat",{username : contact.name})}
       onLongPress={() => setAllowDelete(true)}>
         <Image
         source={contact.image}
@@ -42,7 +45,7 @@ const ContactItem = ({ navigation, contact, setContacts }) => {
   )
 }
 
-const Contacts = ({ navigation }) => {
+const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -70,7 +73,8 @@ const Contacts = ({ navigation }) => {
         key={index}
         contact={contact}
         navigation={navigation}
-        setContacts={setContacts}/>
+        setContacts={setContacts}
+        type={route.params.type}/>
       )}
     </>
   )

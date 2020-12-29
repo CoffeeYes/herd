@@ -13,7 +13,7 @@ const Main = ({ navigation }) => {
       <>
         <ScrollView>
           {activePage === "contacts" &&
-            <Contacts navigation={navigation}/>
+            <Contacts navigation={navigation} route={{params : {type : "contacts"}}}/>
           }
           {activePage === "chats" &&
             <Chats navigation={navigation}/>
