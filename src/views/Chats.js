@@ -16,12 +16,14 @@ const Chats = ({ navigation }) => {
 
     //check storage for each contact to see if messages have been sent/received
     //and add them to contact list if so
-    contacts.forEach(async contact => {
+    var chatsWithMessages = []
+    await Promise.all(contacts.map(async contact => {
       const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
       if(chat) {
-        setChats([...chats,{name : contact.name}])
+        chatsWithMessages.push({name : contact.name})
       }
-    })
+    }))
+    setChats(chatsWithMessages)
   }
 
   return (
