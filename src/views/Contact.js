@@ -1,8 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useClipboard } from '@react-native-community/clipboard';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Contact = ({route, navigation}) => {
+  const [clipboardData, setClipboard] = useClipboard();
+  const [showCopied, setShowCopied] = useState(false);
+
+  const copyKeyToClipboard = async () => {
+    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"))
+    const contact = contacts.find(savedContact => savedContact.name === route.params.username)
+
+    if(contact) {
+      setClipboard(contact.key)
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false),500)
+    }
+  }
+
   return (
     <>
       <View style={styles.header}>
@@ -15,7 +31,13 @@ const Contact = ({route, navigation}) => {
       <ScrollView>
         <TextInput disabled="true" value={route.params.key} style={{alignSelf : "center"}}/>
 
-        <TouchableOpacity style={styles.button}>
+        {showCopied && <Text
+        style={{alignSelf : "center", fontWeight : "bold", fontSize : 18}}>
+        Copied!
+        </Text>}
+        <TouchableOpacity
+        style={styles.button}
+        onPress={copyKeyToClipboard}>
           <Text style={styles.buttonText}>Copy Key</Text>
         </TouchableOpacity>
 
