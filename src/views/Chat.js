@@ -37,7 +37,7 @@ const Chat = ({ route, navigation }) => {
           allMessages[message].text
         )
       }
-      setMessages(allMessages.sort( (a,b) => a.timestamp > b.timestamp))
+      setMessages(allMessages.sort( (a,b) => a.timestamp < b.timestamp))
     }
   }
 

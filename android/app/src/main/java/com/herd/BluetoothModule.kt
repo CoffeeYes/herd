@@ -10,7 +10,11 @@ import com.facebook.react.bridge.BaseActivityEventListener
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
+import android.bluetooth.BluetoothDevice
 import android.content.Intent
+import android.content.Context
+import android.content.IntentFilter 
+import android.content.BroadcastReceiver
 import android.app.Activity
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -20,9 +24,28 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private val BTReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context : Context, intent : Intent) {
+        val action : String? = intent.action
+        when(action) {
+          BluetoothDevice.ACTION_FOUND -> {
+                // Discovery has found a device. Get the BluetoothDevice
+                // object and its info from the Intent.
+                val device: BluetoothDevice =
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                val deviceName = device.name
+                val deviceHardwareAddress = device.address // MAC address
+          }
+        }
+      }
+    }
+
     init {
       reactContext.addActivityEventListener(activityListener)
+      val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+      reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
     }
+
     override fun getName(): String {
         return "BluetoothModule"
     }
@@ -39,6 +62,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
             throw Exception("Device Discovery could not be started")
+          }
+          else {
+
           }
         }
         else {
