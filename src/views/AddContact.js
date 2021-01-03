@@ -38,7 +38,7 @@ const AddContact = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-        onPress={() => Bluetooth.scanForDevices()}
+        onPress={() => navigation.navigate("BTDeviceList")}
         style={!!error ? styles.buttonDisabled : styles.button}
         disabled={!!error}>
           <Text style={styles.buttonText}>Start Scanning</Text>

@@ -28,6 +28,7 @@ import CreateContact from './src/views/CreateContact';
 import Splash from './src/views/Splash';
 import ChooseUsername from './src/views/ChooseUsername';
 import Main from './src/views/Main';
+import BTDeviceList from './src/views/BTDeviceList';
 
 const Stack = createStackNavigator()
 
@@ -47,6 +48,7 @@ const App = ({ }) => {
             <Stack.Screen name="contact" component={Contact}/>
             <Stack.Screen name="createcontact" component={CreateContact}/>
             <Stack.Screen name="newChat" component={Contacts}/>
+            <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
           </Stack.Navigator>
     </>
   );
