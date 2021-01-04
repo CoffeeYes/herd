@@ -58,7 +58,7 @@ const styles = {
     padding : 20,
     backgroundColor : "white",
     alignItems : "space-between",
-    borderBottomWidth : 1,
+    borderBottomWidth : 0.2,
     borderBottomColor : "#e05e3f"
   },
   header : {

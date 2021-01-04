@@ -25,7 +25,7 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
       <TouchableOpacity
       style={styles.contact}
       onPress={() => type === "contacts" ?
-        navigation.navigate("contact", {username : contact.name, key : contact.key}) 
+        navigation.navigate("contact", {username : contact.name, key : contact.key})
         :
         navigation.navigate("chat",{username : contact.name})}
       onLongPress={() => setAllowDelete(true)}>
@@ -94,7 +94,9 @@ const styles = {
   },
   contact : {
     backgroundColor : "white",
-    flexDirection : "row"
+    flexDirection : "row",
+    borderBottomColor : "#e05e3f",
+    borderBottomWidth : 0.2
   },
   contactText : {
     padding : 20

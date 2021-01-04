@@ -24,12 +24,14 @@ const styles = {
     padding : 20
   },
   BTList : {
-    backgroundColor : "white",
+    backgroundColor : "#D8D8D8",
     width : Dimensions.get("window").width,
+    padding : 10,
   },
   deviceContainer : {
     padding : 10,
-    borderBottomWidth : 0.2,
+    backgroundColor : "white",
+    marginTop : 2,
     borderBottomColor : "black"
   }
 }
