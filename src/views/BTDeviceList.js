@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
+  NativeEventEmitter } from 'react-native';
+import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const BTDeviceList = () => {
   const [deviceList, setDeviceList] = useState([1,2,3,4]);
+
+  useEffect(() => {
+    const eventEmitter = new NativeEventEmitter(Bluetooth);
+    eventEmitter.addListener("newBTDeviceFound",event => {
+      console.log(event)
+    })
+  },[])
+  
   return (
     <View style={styles.mainContainer}>
       <Text>Scanning...</Text>
@@ -25,7 +35,7 @@ const styles = {
   },
   BTList : {
     backgroundColor : "#D8D8D8",
-    width : Dimensions.get("window").width,
+    width : Dimensions.get("window").width - 40,
     padding : 10,
   },
   deviceContainer : {

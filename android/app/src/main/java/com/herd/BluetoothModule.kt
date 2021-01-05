@@ -7,13 +7,14 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.BaseActivityEventListener
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothDevice
 import android.content.Intent
 import android.content.Context
-import android.content.IntentFilter 
+import android.content.IntentFilter
 import android.content.BroadcastReceiver
 import android.app.Activity
 
@@ -35,6 +36,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                 val deviceName = device.name
                 val deviceHardwareAddress = device.address // MAC address
+                reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+                .emit("newBTDeviceFound","test")
           }
         }
       }
