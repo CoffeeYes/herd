@@ -34,14 +34,14 @@ const AddContact = ({ navigation }) => {
         <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("createcontact")}>
-          <Text style={styles.buttonText}>Import Key</Text>
+          <Text style={styles.buttonText}>Import Key </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
         onPress={() => navigation.navigate("BTDeviceList")}
         style={!!error ? styles.buttonDisabled : styles.button}
         disabled={!!error}>
-          <Text style={styles.buttonText}>Start Scanning</Text>
+          <Text style={styles.buttonText}>Start Scanning </Text>
         </TouchableOpacity>
 
       </View>
@@ -68,7 +68,8 @@ const styles = {
   },
   buttonText : {
     color : "white",
-    fontWeight : "bold"
+    fontWeight : "bold",
+    textAlign : "center"
   },
   buttonDisabled : {
     backgroundColor : "grey",

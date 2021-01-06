@@ -17,13 +17,15 @@ const Chats = ({ navigation }) => {
     //check storage for each contact to see if messages have been sent/received
     //and add them to contact list if so
     var chatsWithMessages = []
-    await Promise.all(contacts.map(async contact => {
-      const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
-      if(chat) {
-        chatsWithMessages.push({name : contact.name})
-      }
-    }))
-    setChats(chatsWithMessages)
+    if(contacts) {
+      await Promise.all(contacts.map(async contact => {
+        const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
+        if(chat) {
+          chatsWithMessages.push({name : contact.name})
+        }
+      }))
+      setChats(chatsWithMessages)
+    }
   }
 
   return (
@@ -35,7 +37,9 @@ const Chats = ({ navigation }) => {
       <TouchableOpacity
       onPress={() => navigation.navigate("newChat",{type : "newChat"})}
       style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
-        <Text style={styles.headerText}>+</Text>
+        <View>
+          <Text style={styles.headerText}>+</Text>
+        </View>
       </TouchableOpacity>
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}

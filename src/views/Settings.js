@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Text, TouchableOpacity, ScrollView, View } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto'
 
@@ -22,7 +22,7 @@ const Settings = ({ navigation }) => {
       <TouchableOpacity
       style={styles.button}
       onPress={copyKeyToClipboard}>
-        <Text style={styles.buttonText}>Copy your key</Text>
+        <Text style={styles.buttonText}> Copy your key </Text>
       </TouchableOpacity>
     </ScrollView>
   )
@@ -38,7 +38,8 @@ const styles ={
   },
   buttonText : {
     color : "white",
-    fontWeight : "bold"
+    fontWeight : "bold",
+    textAlign : "center"
   }
 }
 

@@ -12,7 +12,7 @@ const BTDeviceList = () => {
       console.log(event)
     })
   },[])
-  
+
   return (
     <View style={styles.mainContainer}>
       <Text>Scanning...</Text>
@@ -20,7 +20,7 @@ const BTDeviceList = () => {
       <ScrollView contentContainerStyle={styles.BTList}>
         {deviceList.map((device,index) =>
           <TouchableOpacity key={index} style={styles.deviceContainer}>
-            <Text>Device</Text>
+            <Text>Device </Text>
           </TouchableOpacity>
         )}
       </ScrollView>
