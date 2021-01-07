@@ -7,6 +7,8 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.BaseActivityEventListener
+import com.facebook.react.bridge.WritableMap
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 import android.bluetooth.BluetoothAdapter
@@ -36,8 +38,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                 val deviceName = device.name
                 val deviceHardwareAddress = device.address // MAC address
+
+                //create object to pass to javascript
+                val deviceObject : WritableMap = Arguments.createMap();
+                deviceObject.putString("name",deviceName);
+                deviceObject.putString("macAddress",deviceHardwareAddress);
+
+                //pass object to JS through event emitter
                 reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit("newBTDeviceFound","test")
+                .emit("newBTDeviceFound",deviceObject)
           }
         }
       }

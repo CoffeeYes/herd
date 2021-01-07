@@ -4,13 +4,17 @@ import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const BTDeviceList = () => {
-  const [deviceList, setDeviceList] = useState([1,2,3,4]);
+  const [deviceList, setDeviceList] = useState([]);
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    eventEmitter.addListener("newBTDeviceFound",event => {
-      console.log(event)
+    eventEmitter.addListener("newBTDeviceFound",device => {
+      setDeviceList([...deviceList,device]);
+      console.log(deviceList)
     })
+
+    const scanner = Bluetooth.scanForDevices();
+    return eventEmitter.removeListener("newBTDeviceFound")
   },[])
 
   return (
@@ -20,7 +24,8 @@ const BTDeviceList = () => {
       <ScrollView contentContainerStyle={styles.BTList}>
         {deviceList.map((device,index) =>
           <TouchableOpacity key={index} style={styles.deviceContainer}>
-            <Text>Device </Text>
+            <Text>{device.name || "Nameless Device"}</Text>
+            <Text>{device.macAddress}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
