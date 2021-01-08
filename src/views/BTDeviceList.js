@@ -8,13 +8,18 @@ const BTDeviceList = () => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    eventEmitter.addListener("newBTDeviceFound",device => {
-      setDeviceList([...deviceList,device]);
-      console.log(deviceList)
+    const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
+      if(!deviceList.find(existingDevice => existingDevice.macAddress === device.macAddress)) {
+        setDeviceList([...deviceList,device]);
+      }
     })
 
     const scanner = Bluetooth.scanForDevices();
-    return eventEmitter.removeListener("newBTDeviceFound")
+
+    //cleanup
+    return () => {
+      bluetoothListener.remove();
+    }
   },[])
 
   return (
