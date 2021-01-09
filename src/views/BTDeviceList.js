@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
   NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -6,12 +6,19 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 const BTDeviceList = () => {
   const [deviceList, setDeviceList] = useState([]);
 
+  const deviceRef = useRef(deviceList);
+
+  const updateDeviceList = newDevice => {
+    if(!deviceRef.current.find(existingDevice => existingDevice.macAddress === newDevice.macAddress)) {
+      deviceRef.current = [...deviceRef.current,newDevice];
+      setDeviceList(deviceRef.current);
+    }
+  }
+  
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
     const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
-      if(!deviceList.find(existingDevice => existingDevice.macAddress === device.macAddress)) {
-        setDeviceList([...deviceList,device]);
-      }
+      updateDeviceList(device);
     })
 
     const scanner = Bluetooth.scanForDevices();
