@@ -52,10 +52,29 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private val BTStateReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context : Context, intent : Intent) {
+        val action : String? = intent.action
+        when(action) {
+          BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTStateChange","DISCOVERY_STARTED")
+          }
+          BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTStateChange","DISCOVERY_FINISHED")
+          }
+        }
+      }
+    }
+
     init {
       reactContext.addActivityEventListener(activityListener)
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+      val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+      BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
+      reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
     }
 
     override fun getName(): String {
@@ -71,6 +90,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         if(adapter.isEnabled()) {
+          if(adapter.isDiscovering()) {
+            adapter.cancelDiscovery();
+          }
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
             throw Exception("Device Discovery could not be started")

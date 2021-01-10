@@ -5,8 +5,10 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const BTDeviceList = () => {
   const [deviceList, setDeviceList] = useState([]);
+  const [scanning, setScanning] = useState(true);
 
   const deviceRef = useRef(deviceList);
+  const scanningRef = useRef(scanning);
 
   const updateDeviceList = newDevice => {
     if(!deviceRef.current.find(existingDevice => existingDevice.macAddress === newDevice.macAddress)) {
@@ -14,11 +16,22 @@ const BTDeviceList = () => {
       setDeviceList(deviceRef.current);
     }
   }
-  
+
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
     const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
       updateDeviceList(device);
+    });
+    const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
+      console.log(state)
+      if(state === "DISCOVERY_STARTED") {
+        scanningRef.current = true;
+        setScanning(scanningRef.current);
+      }
+      else if (state === "DISCOVERY_FINISHED") {
+        scanningRef.current = false;
+        setScanning(scanningRef.current);
+      }
     })
 
     const scanner = Bluetooth.scanForDevices();
@@ -26,13 +39,14 @@ const BTDeviceList = () => {
     //cleanup
     return () => {
       bluetoothListener.remove();
+      scanStateChangeListener.remove();
     }
   },[])
 
   return (
     <View style={styles.mainContainer}>
       <Text>Scanning...</Text>
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      {scanning && <ActivityIndicator size="large" color="#e05e3f"/>}
       <ScrollView contentContainerStyle={styles.BTList}>
         {deviceList.map((device,index) =>
           <TouchableOpacity key={index} style={styles.deviceContainer}>
