@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, ScrollView, View, Modal } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
-import QRCode from 'react-native-qrcode-svg';
+import QRCodeModal from './QRCodeModal';
 
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
@@ -39,25 +39,8 @@ const Settings = ({ navigation }) => {
       onPress={showQRCode}>
         <Text style={styles.buttonText}> Show QR Code </Text>
       </TouchableOpacity>
-        <Modal
-        animationType="slide"
-        transparent={true}
-        visible={QRCodeVisible}>
-          <View style={styles.modalMainContainer}>
-            <View style={styles.modalContentContainer}>
-              <View style={styles.QRContainer}>
-                <QRCode
-                value={publicKey}
-                size={300}/>
-              </View>
-              <TouchableOpacity
-              style={styles.button}
-              onPress={() => setQRCodeVisible(false)}>
-              <Text style={styles.buttonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+
+      <QRCodeModal visible={QRCodeVisible} text={publicKey} setVisible={setQRCodeVisible}/>
 
     </ScrollView>
   )
@@ -75,18 +58,6 @@ const styles ={
     color : "white",
     fontWeight : "bold",
     textAlign : "center"
-  },
-  modalMainContainer : {
-    alignItems : "center",
-    justifyContent : "center",
-    flex : 1,
-    backgroundColor : "rgba(0,0,0,0.4)"
-  },
-  modalContentContainer : {
-    backgroundColor : "white",
-    borderRadius : 5,
-    padding : 20,
-    alignItems : "center"
   }
 }
 
