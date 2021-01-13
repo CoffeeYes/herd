@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
+import Crypto from '../nativeWrapper/Crypto';
+
+import QRCodeModal from './QRCodeModal'
 
 const AddContact = ({ navigation }) => {
   const [error,setError] = useState("");
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [publicKey, setPublicKey] = useState("");
 
   useEffect(() => {
+    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setPublicKey(key))
     const checkForBT = setInterval(async () => {
       let adapter = await Bluetooth.checkForBTAdapter();
       let enabled = await Bluetooth.checkBTEnabled();
@@ -31,6 +37,14 @@ const AddContact = ({ navigation }) => {
       <View style={styles.main}>
         <Text style={styles.error}>{error}</Text>
         <Text>Enable Bluetooth and place your phones next to each other!</Text>
+
+        <TouchableOpacity
+        onPress={() => navigation.navigate("BTDeviceList")}
+        style={!!error ? styles.buttonDisabled : styles.button}
+        disabled={!!error}>
+        <Text style={styles.buttonText}>Start Scanning </Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("createcontact")}>
@@ -38,12 +52,16 @@ const AddContact = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-        onPress={() => navigation.navigate("BTDeviceList")}
-        style={!!error ? styles.buttonDisabled : styles.button}
-        disabled={!!error}>
-          <Text style={styles.buttonText}>Start Scanning </Text>
+        onPress={() => setShowQRCode(true)}
+        style={styles.button}>
+          <Text style={styles.buttonText}>Show My QR Code</Text>
         </TouchableOpacity>
 
+        <QRCodeModal
+        visible={showQRCode}
+        setVisible={setShowQRCode}
+        text={publicKey}/>
+        
       </View>
     </>
   )
