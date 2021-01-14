@@ -57,11 +57,17 @@ const AddContact = ({ navigation }) => {
           <Text style={styles.buttonText}>Show My QR Code</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+        onPress={() => navigation.navigate("QRScanner")}
+        style={styles.button}>
+          <Text style={styles.buttonText}>Scan QR Code</Text>
+        </TouchableOpacity>
+
         <QRCodeModal
         visible={showQRCode}
         setVisible={setShowQRCode}
         text={publicKey}/>
-        
+
       </View>
     </>
   )
