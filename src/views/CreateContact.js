@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const CreateContact = ({navigation}) => {
+const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
   const [publicKey, setPublicKey] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    route?.params?.publicKey && setPublicKey(route.params.publicKey);
+  },[])
 
   const createContact = async () => {
     setError("");
@@ -49,7 +53,8 @@ const CreateContact = ({navigation}) => {
       placeholder="Public Key"
       onChangeText={key => setPublicKey(key)}
       style={styles.input}
-      defaultValue={""}/>
+      editable={!route?.params?.publicKey}
+      value={publicKey}/>
 
       <TouchableOpacity
       style={styles.button}

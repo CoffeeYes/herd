@@ -2,9 +2,16 @@ import React from 'react';
 import { Text } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 
-const QRScanner = () => {
+const QRScanner = ({ navigation }) => {
+
+  const handleRead = scanResult => {
+    const publicKey = scanResult?.data
+    navigation.navigate("createcontact", { publicKey : publicKey})
+  }
+  
   return (
-    <QRCodeScanner/>
+    <QRCodeScanner
+    onRead={handleRead}/>
   )
 }
 
