@@ -3,9 +3,13 @@ import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions
   NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
+import BTExchangeModal from './BTExchangeModal';
+
 const BTDeviceList = () => {
   const [deviceList, setDeviceList] = useState([]);
   const [scanning, setScanning] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [chosenDevice, setChosenDevice] = useState({});
 
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
@@ -43,18 +47,35 @@ const BTDeviceList = () => {
     }
   },[])
 
+  const handleDeviceClick = device => {
+    setChosenDevice(device);
+    setShowModal(true);
+  }
+
   return (
     <View style={styles.mainContainer}>
-      <Text>Scanning...</Text>
-      {scanning && <ActivityIndicator size="large" color="#e05e3f"/>}
+      {scanning &&
+      <View>
+        <Text>Scanning...</Text>
+        <ActivityIndicator size="large" color="#e05e3f"/>
+      </View>
+      }
       <ScrollView contentContainerStyle={styles.BTList}>
         {deviceList.map((device,index) =>
-          <TouchableOpacity key={index} style={styles.deviceContainer}>
+          <TouchableOpacity
+          key={index}
+          style={styles.deviceContainer}
+          onPress={ () => handleDeviceClick(device)}>
             <Text>{device.name || "Nameless Device"}</Text>
             <Text>{device.macAddress}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
+
+      <BTExchangeModal
+      visible={showModal}
+      setVisible={setShowModal}/>
+
     </View>
   )
 }
