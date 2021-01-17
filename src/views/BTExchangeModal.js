@@ -16,7 +16,7 @@ const BTExchangeModal = ({ visible, setVisible}) => {
           <TouchableOpacity
           style={styles.button}
           onPress={() => setVisible(false)}>
-          <Text style={styles.buttonText}>Close</Text>
+          <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
       </View>

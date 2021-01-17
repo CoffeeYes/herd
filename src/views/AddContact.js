@@ -34,41 +34,45 @@ const AddContact = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={{color : "white"}}>Add Contact</Text>
       </View>
-      <View style={styles.main}>
-        <Text style={styles.error}>{error}</Text>
-        <Text>Enable Bluetooth and place your phones next to each other!</Text>
+      <View style={styles.mainContainer}>
+        <View style={styles.row}>
 
-        <TouchableOpacity
-        onPress={() => navigation.navigate("BTDeviceList")}
-        style={!!error ? styles.buttonDisabled : styles.button}
-        disabled={!!error}>
-        <Text style={styles.buttonText}>Start Scanning </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+          onPress={() => navigation.navigate("BTDeviceList")}
+          style={{...styles.card,...styles.leftCard}}
+          disabled={!!error}>
+            <Text style={styles.cardText}>Start Scanning </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("createcontact")}>
-          <Text style={styles.buttonText}>Import Key </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+          style={{...styles.card,...styles.rightCard}}
+          onPress={() => navigation.navigate("createcontact")}>
+            <Text style={styles.cardText}>Import Key </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-        onPress={() => setShowQRCode(true)}
-        style={styles.button}>
-          <Text style={styles.buttonText}>Show My QR Code</Text>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-        onPress={() => navigation.navigate("QRScanner")}
-        style={styles.button}>
-          <Text style={styles.buttonText}>Scan QR Code</Text>
-        </TouchableOpacity>
+        <View style={styles.row}>
 
+          <TouchableOpacity
+          onPress={() => setShowQRCode(true)}
+          style={{...styles.card,...styles.leftCard}}>
+            <Text style={styles.cardText}>Show My QR Code</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+          onPress={() => navigation.navigate("QRScanner")}
+          style={{...styles.card,...styles.rightCard}}>
+            <Text style={styles.cardText}>Scan QR Code</Text>
+          </TouchableOpacity>
+
+        </View>
+
+      </View>
         <QRCodeModal
         visible={showQRCode}
         setVisible={setShowQRCode}
         text={publicKey}/>
-
-      </View>
     </>
   )
 }
@@ -78,35 +82,36 @@ const styles = {
     backgroundColor : "#E86252",
     padding : 15
   },
-  main : {
-    alignSelf : "center",
-    marginTop : "auto",
-    marginBottom : "auto"
-  },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    textAlign : "center"
-  },
-  buttonDisabled : {
-    backgroundColor : "grey",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5
+  mainContainer : {
+    padding : 20,
+    flex : 1
   },
   error : {
     color : "red",
     fontWeight : "bold",
     textAlign : "center",
     fontSize : 18
+  },
+  card : {
+    padding : 20,
+    flex : 1,
+    backgroundColor : "white",
+    borderRadius : 5,
+    alignItems : "center"
+  },
+  leftCard : {
+    marginRight : 5
+  },
+  rightCard : {
+    marginLeft : 5
+  },
+  cardText : {
+    color : "black"
+  },
+  row : {
+    flexDirection : "row",
+    marginTop : 10,
+    flex : 1
   }
 }
 
