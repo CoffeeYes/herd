@@ -35,7 +35,7 @@ const Chats = ({ navigation }) => {
         Chats
       </Text>
       <TouchableOpacity
-      onPress={() => navigation.navigate("newChat",{type : "newChat"})}
+      onPress={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}
       style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
         <View>
           <Text style={styles.headerText}>+</Text>

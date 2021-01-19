@@ -59,13 +59,13 @@ const Contacts = ({ route, navigation }) => {
 
   return (
     <>
-      <View style={styles.header}>
+      <View style={{...styles.header,paddingVertical : route.params.disableAddNew ? 15 : 0}}>
         <Text style={styles.headerText}>Contacts</Text>
-        <TouchableOpacity
+        {!route.params.disableAddNew && <TouchableOpacity
         onPress={() => navigation.navigate("addContact")}
         style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
           <Text style={styles.headerText}>+</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </View>
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       {contacts.map( (contact, index) =>
