@@ -44,6 +44,11 @@ const Contact = ({route, navigation}) => {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Share Contact</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {username : route.params.username})}>
+          <Text style={styles.buttonText}>Go To Chat</Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </>
   )
