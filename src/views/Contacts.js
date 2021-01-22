@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View, ActivityIndicator} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import GestureRecognizer, { swipeDirections } from 'react-native-swipe-gestures'
 
 const ContactItem = ({ navigation, contact, setContacts, type }) => {
   const [allowDelete, setAllowDelete] = useState(false);
@@ -19,16 +18,13 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
   }
 
   return (
-    <GestureRecognizer
-    onSwipeLeft={() => setAllowDelete(true)}
-    onSwipeRight={() => setAllowDelete(false)}>
       <TouchableOpacity
       style={styles.contact}
       onPress={() => type === "contacts" ?
         navigation.navigate("contact", {username : contact.name, key : contact.key})
         :
         navigation.navigate("chat",{username : contact.name})}
-      onLongPress={() => setAllowDelete(true)}>
+      onLongPress={() => setAllowDelete(!allowDelete)}>
         <Image
         source={contact.image}
         style={styles.image}/>
@@ -41,7 +37,6 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
           <Icon name="delete" size={24} style={{color : "black"}}/>
         </TouchableOpacity>}
       </TouchableOpacity>
-    </GestureRecognizer>
   )
 }
 
