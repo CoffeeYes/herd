@@ -135,4 +135,22 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         promise.resolve(true);
       }
     }
+
+    @ReactMethod
+    fun requestBTEnable() {
+      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      if(adapter === null) {
+        throw Exception("No BluetoothAdapter Found")
+      }
+      else {
+        if(!adapter.isEnabled()) {
+          val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+          val REQUEST_ENABLE_BT = 1
+          val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+          if(activity !== null) {
+            activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+          }
+        }
+      }
+    }
 }
