@@ -36,7 +36,7 @@ const Contact = ({route, navigation}) => {
     <>
       <View style={styles.header}>
         <Text style={styles.headerText}>{route.params.username}</Text>
-        <TouchableOpacity style={styles.editButton}>
+        <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("editContact", {username : route.params.username})}>
           <Icon name="edit" size={24} style={{color : "white"}}/>
         </TouchableOpacity>
       </View>
