@@ -4,9 +4,26 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import QRCodeModal from './QRCodeModal'
+
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showCopied, setShowCopied] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [contactKey, setContactKey] = useState("");
+
+  useEffect(() => {
+    loadKey();
+  },[])
+
+  const loadKey = async () => {
+    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+    const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+
+    if(contact) {
+      setContactKey(contact.key);
+    }
+  }
 
   const copyKeyToClipboard = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"))
@@ -31,6 +48,8 @@ const Contact = ({route, navigation}) => {
       })
     }
   }
+
+
 
   return (
     <>
@@ -61,6 +80,16 @@ const Contact = ({route, navigation}) => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {username : route.params.username})}>
           <Text style={styles.buttonText}>Go To Chat</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => setShowQRCode(true)}>
+          <Text style={styles.buttonText}>Show Contact's QR Code</Text>
+        </TouchableOpacity>
+
+        <QRCodeModal
+        visible={showQRCode}
+        setVisible={setShowQRCode}
+        text={contactKey}
+        />
 
       </ScrollView>
     </>
