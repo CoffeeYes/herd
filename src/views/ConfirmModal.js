@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity} from 'react-native';
+import { View, Text, Modal, TouchableOpacity, ActivityIndicator} from 'react-native';
 
-const ConfirmModal = ({ header, visible, setVisible, onConfirm}) => {
+const ConfirmModal = ({ header, visible, setVisible, onConfirm, loading}) => {
   return (
     <Modal
     animationType="slide"
@@ -10,6 +10,7 @@ const ConfirmModal = ({ header, visible, setVisible, onConfirm}) => {
       <View style={styles.modalMainContainer}>
         <View style={styles.modalContentContainer}>
           <Text>{header}</Text>
+          {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
           <View style={{flexDirection : "row"}}>
             <TouchableOpacity
             style={styles.button}

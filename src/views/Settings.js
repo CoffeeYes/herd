@@ -4,6 +4,7 @@ import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
@@ -11,6 +12,7 @@ const Settings = ({ navigation }) => {
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   const copyKeyToClipboard = () => {
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => {
@@ -27,7 +29,15 @@ const Settings = ({ navigation }) => {
   }
 
   const deleteAllChats = async () => {
+    setModalLoading(true);
+    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
 
+    contacts.map(async contact => {
+      await AsyncStorage.setItem(contact.name,JSON.stringify([]));
+    })
+
+    setModalLoading(false);
+    setShowDeleteModal(false);
   }
 
   return (
@@ -58,7 +68,8 @@ const Settings = ({ navigation }) => {
       visible={showDeleteModal}
       setVisible={setShowDeleteModal}
       onConfirm={deleteAllChats}
-      header={"Are you sure?"}/>
+      header={"Are you sure?"}
+      loading={modalLoading}/>
     </ScrollView>
   )
 }
