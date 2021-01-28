@@ -82,7 +82,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun scanForDevices(promise : Promise) {
+    fun scanForDevices() {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
 
       if(adapter === null) {
@@ -151,6 +151,20 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
           }
         }
+      }
+    }
+
+    @ReactMethod
+    fun requestBTMakeDiscoverable(duration : Int) {
+      val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+        putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, duration)
+      }
+      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+      if(activity === null) {
+        throw Exception("Activity is NULL")
+      }
+      else {
+        activity.startActivityForResult(discoverableIntent,2)
       }
     }
 }
