@@ -28,10 +28,11 @@ const CreateContact = ({ navigation, route}) => {
 
       //create new user if the username isnt taken
       if(!(contacts.find(user => user.name === username))) {
-        AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
+        await AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
           name : username,
           key : publicKey
         }]))
+        navigation.navigate("contacts", {disableAddNew : false});
       }
       else {
         setError("You Already have a contact with that username")
