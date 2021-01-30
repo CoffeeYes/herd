@@ -1,6 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+const ChatItem = ({name, navigation}) => {
+  const [showDelete, setShowDelete] = useState(false);
+  return (
+    <TouchableOpacity
+    style={{...styles.chat,padding : showDelete ? 0 : 20, paddingLeft : 20}}
+    onPress={() => navigation.navigate("chat", {username : name})}
+    onLongPress={() => setShowDelete(!showDelete)}>
+      <Text style={styles.chatText}>{name}</Text>
+      {showDelete &&
+      <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => deleteContact(contact.name)}>
+        <Icon name="delete" size={24} style={{color : "black"}}/>
+      </TouchableOpacity>}
+    </TouchableOpacity>
+  )
+}
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
@@ -44,12 +63,7 @@ const Chats = ({ navigation }) => {
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats.map( (chat, index) =>
-      <TouchableOpacity
-      key={index}
-      style={styles.chat}
-      onPress={() => navigation.navigate("chat", {username : chat.name})}>
-        <Text>{chat.name}</Text>
-      </TouchableOpacity>
+      <ChatItem name={chat.name} key={index} navigation={navigation}/>
     )}
     </>
   )
@@ -59,9 +73,9 @@ const styles = {
   chat : {
     flexDirection : "row",
     flex : 1,
-    padding : 20,
     backgroundColor : "white",
-    alignItems : "space-between",
+    alignItems : "center",
+    justifyContent : "space-between",
     borderBottomWidth : 0.2,
     borderBottomColor : "#e05e3f"
   },
@@ -75,6 +89,11 @@ const styles = {
   headerText : {
     fontSize : 18,
     color : "white"
+  },
+  deleteButton : {
+    backgroundColor : "#e05e3f",
+    padding : 13,
+    paddingVertical : 20
   },
 }
 
