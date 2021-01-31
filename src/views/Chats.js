@@ -3,8 +3,14 @@ import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ChatItem = ({name, navigation}) => {
+const ChatItem = ({name, navigation, reloadChats}) => {
   const [showDelete, setShowDelete] = useState(false);
+
+  const deleteChat = async name => {
+    await AsyncStorage.setItem(name,JSON.stringify([]));
+    reloadChats();
+  }
+
   return (
     <TouchableOpacity
     style={{...styles.chat,padding : showDelete ? 0 : 20, paddingLeft : 20}}
@@ -14,7 +20,7 @@ const ChatItem = ({name, navigation}) => {
       {showDelete &&
       <TouchableOpacity
       style={styles.deleteButton}
-      onPress={() => deleteContact(contact.name)}>
+      onPress={() => deleteChat(name)}>
         <Icon name="delete" size={24} style={{color : "black"}}/>
       </TouchableOpacity>}
     </TouchableOpacity>
@@ -39,7 +45,7 @@ const Chats = ({ navigation }) => {
     if(contacts) {
       await Promise.all(contacts.map(async contact => {
         const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
-        if(chat) {
+        if(chat.length > 0) {
           chatsWithMessages.push({name : contact.name})
         }
       }))
@@ -63,7 +69,7 @@ const Chats = ({ navigation }) => {
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats.map( (chat, index) =>
-      <ChatItem name={chat.name} key={index} navigation={navigation}/>
+      <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
     )}
     </>
   )
