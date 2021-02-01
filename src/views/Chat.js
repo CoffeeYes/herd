@@ -12,6 +12,7 @@ const Chat = ({ route, navigation }) => {
   const [contactInfo, setContactInfo] = useState({});
   const [ownPublicKey, setOwnPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
+  const [chatInput, setChatInput] = useState("");
 
   useEffect(() => {
     AsyncStorage.getItem("contacts").then(result => {
@@ -37,7 +38,7 @@ const Chat = ({ route, navigation }) => {
           allMessages[message].text
         )
       }
-      setMessages(allMessages.sort( (a,b) => a.timestamp < b.timestamp))
+      setMessages(allMessages.sort( (a,b) => a.timestamp > b.timestamp))
     }
   }
 
@@ -69,6 +70,8 @@ const Chat = ({ route, navigation }) => {
       route.params.username,
       JSON.stringify([...storedMessages,messageToAdd])
     )
+    await loadMessages();
+    setChatInput("");
   }
 
   return (
@@ -94,6 +97,8 @@ const Chat = ({ route, navigation }) => {
       <TextInput
       placeholder="Send a Message"
       style={styles.chatInput}
+      value={chatInput}
+      onChangeText={setChatInput}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
   )
