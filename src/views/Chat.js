@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
@@ -72,15 +72,18 @@ const Chat = ({ route, navigation }) => {
     )
     await loadMessages();
     setChatInput("");
+    scrollRef.current.scrollToEnd({animated : true})
   }
 
+  const scrollRef = useRef();
+
   return (
-    <View>
+    <View style={{flex : 1}}>
       <View style={{backgroundColor : "#e05e3f",paddingVertical : 15,paddingLeft : 10}}>
         <Text style={{color : "white",fontSize : 18}}>{route.params.username}</Text>
       </View>
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-      <ScrollView contentContainerStyle={styles.messageContainer}>
+      <ScrollView contentContainerStyle={styles.messageContainer} ref={scrollRef}>
         {messages.map( (message,index) =>
           <View
           style={message.from === ownPublicKey ?
@@ -117,7 +120,7 @@ const styles = {
   message : {
     padding : 20,
     width : "50%",
-    marginTop : 10,
+    marginVertical : 5,
     borderRadius : 10,
   },
   messageText : {
@@ -132,9 +135,6 @@ const styles = {
     marginTop : "auto",
     paddingLeft : 10
   },
-  messageContainer : {
-    height : "100%"
-  }
 }
 
 export default Chat;
