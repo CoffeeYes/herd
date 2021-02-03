@@ -26,7 +26,7 @@ const Chat = ({ route, navigation }) => {
 
   const loadMessages = async () => {
     var allMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
-
+    console.log(allMessages)
     if(allMessages) {
       //decrypt all message text payloads (sent and received) using private key
       for(var message in allMessages) {
@@ -43,6 +43,13 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
+
+    const plainText = {
+      to : contactInfo.key,
+      from : ownPublicKey,
+      text : message,
+      timestamp : Date.now()
+    }
 
     //encrypt the passed in message using the users own public key
     const newMessageEncrypted = await Crypto.encryptString(
@@ -70,7 +77,7 @@ const Chat = ({ route, navigation }) => {
       route.params.username,
       JSON.stringify([...storedMessages,messageToAdd])
     )
-    await loadMessages();
+    setMessages([...messages,plainText])
     setChatInput("");
     scrollRef.current.scrollToEnd({animated : true})
   }
@@ -83,7 +90,10 @@ const Chat = ({ route, navigation }) => {
         <Text style={{color : "white",fontSize : 18}}>{route.params.username}</Text>
       </View>
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-      <ScrollView contentContainerStyle={styles.messageContainer} ref={scrollRef}>
+      <ScrollView
+      contentContainerStyle={styles.messageContainer}
+      ref={scrollRef}
+      onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
         {messages.map( (message,index) =>
           <View
           style={message.from === ownPublicKey ?
@@ -92,7 +102,7 @@ const Chat = ({ route, navigation }) => {
             {...styles.message,...styles.messageFromOther}}
           key={index}>
             <Text style={styles.messageText}>{message.text}</Text>
-            <Text style={styles.timestamp}>{moment(message.timestamp).format("HH:SS - DD.MM")}</Text>
+            <Text style={styles.timestamp}>{moment(message.timestamp).format("HH:mm - DD.MM")}</Text>
           </View>
         )}
       </ScrollView>
