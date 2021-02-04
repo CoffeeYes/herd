@@ -7,8 +7,6 @@ import Crypto from '../nativeWrapper/Crypto';
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([]);
-  const [yourMessages, setYourMessages] = useState([]);
-  const [otherMessages, setOtherMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
   const [ownPublicKey, setOwnPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
@@ -25,20 +23,31 @@ const Chat = ({ route, navigation }) => {
   },[])
 
   const loadMessages = async () => {
-    var allMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
-    console.log(allMessages)
-    if(allMessages) {
+    var receivedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"))
+
+    console.log(receivedMessages)
+    if(receivedMessages) {
       //decrypt all message text payloads (sent and received) using private key
-      for(var message in allMessages) {
-        allMessages[message].text = await Crypto.decryptString(
+      for(var message in receivedMessages) {
+        receivedMessages[message].text = await Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
-          allMessages[message].text
+          receivedMessages[message].text
         )
       }
-      setMessages(allMessages.sort( (a,b) => a.timestamp > b.timestamp))
+      for(var message in sentMessages) {
+        sentMessages[message].text = await Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          sentMessages[message].text
+        )
+      }
+      setMessages([...receivedMessages,...sentMessages].sort( (a,b) => a.timestamp > b.timestamp))
     }
   }
 
@@ -68,13 +77,13 @@ const Chat = ({ route, navigation }) => {
     }
 
     //load the existing messages with this user and append our new message
-    var storedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    var storedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"));
     if(!storedMessages) {
       storedMessages = []
     }
     //store the new message array
     await AsyncStorage.setItem(
-      route.params.username,
+      route.params.username + "_sentCopy",
       JSON.stringify([...storedMessages,messageToAdd])
     )
     setMessages([...messages,plainText])

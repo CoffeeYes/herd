@@ -8,6 +8,7 @@ const ChatItem = ({name, navigation, reloadChats}) => {
 
   const deleteChat = async name => {
     await AsyncStorage.setItem(name,JSON.stringify([]));
+    await AsyncStorage.setItem(name + "_sentCopy", JSON.stringify([]))
     reloadChats();
   }
 
@@ -45,7 +46,8 @@ const Chats = ({ navigation }) => {
     if(contacts) {
       await Promise.all(contacts.map(async contact => {
         const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
-        if(chat.length > 0) {
+        const sentMessages = JSON.parse(await AsyncStorage.getItem(contact.name + "_sentCopy"));
+        if(chat.length > 0 || sentMessages.length > 0) {
           chatsWithMessages.push({name : contact.name})
         }
       }))
