@@ -24,9 +24,8 @@ const Chat = ({ route, navigation }) => {
 
   const loadMessages = async () => {
     var receivedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
-    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"))
+    var sentMessagesCopy = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"))
 
-    console.log(receivedMessages)
     if(receivedMessages) {
       //decrypt all message text payloads (sent and received) using private key
       for(var message in receivedMessages) {
@@ -38,21 +37,22 @@ const Chat = ({ route, navigation }) => {
           receivedMessages[message].text
         )
       }
-      for(var message in sentMessages) {
-        sentMessages[message].text = await Crypto.decryptString(
+      for(var message in sentMessagesCopy) {
+        sentMessagesCopy[message].text = await Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
-          sentMessages[message].text
+          sentMessagesCopy[message].text
         )
       }
-      setMessages([...receivedMessages,...sentMessages].sort( (a,b) => a.timestamp > b.timestamp))
+      setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
     }
   }
 
   const sendMessage = async message => {
 
+    //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
       from : ownPublicKey,
@@ -60,31 +60,41 @@ const Chat = ({ route, navigation }) => {
       timestamp : Date.now()
     }
 
+    //encrypt the message to be sent using the other users public key
+    const newMessageEncrypted = await Crypto.encryptStringWithKey(
+      contactInfo.key,
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      message
+    )
+
     //encrypt the passed in message using the users own public key
-    const newMessageEncrypted = await Crypto.encryptString(
+    const newMessageEncryptedCopy = await Crypto.encryptString(
       "herdPersonal",
       Crypto.algorithm.RSA,
       Crypto.blockMode.ECB,
       Crypto.padding.OAEP_SHA256_MGF1Padding,
       message
     )
+
     //create a message object with relevant metadata
-    const messageToAdd = {
+    const messageToAddCopy = {
       to : contactInfo.key,
       from : ownPublicKey,
-      text : newMessageEncrypted,
+      text : newMessageEncryptedCopy,
       timestamp : Date.now()
     }
 
     //load the existing messages with this user and append our new message
-    var storedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"));
-    if(!storedMessages) {
-      storedMessages = []
+    var sentMessagesCopy = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"));
+    if(!sentMessagesCopy) {
+      sentMessagesCopy = []
     }
     //store the new message array
     await AsyncStorage.setItem(
       route.params.username + "_sentCopy",
-      JSON.stringify([...storedMessages,messageToAdd])
+      JSON.stringify([...sentMessagesCopy,messageToAddCopy])
     )
     setMessages([...messages,plainText])
     setChatInput("");

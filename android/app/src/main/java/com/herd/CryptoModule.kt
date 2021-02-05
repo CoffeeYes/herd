@@ -168,6 +168,44 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       }
 
     @ReactMethod
+    fun encryptStringWithKey(
+        key : String,
+        algorithm : String,
+        blockMode : String,
+        padding : String,
+        stringToEncrypt : String,
+        promise : Promise
+    ) {
+      //create encryption type string to pass to cipher init
+      val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+
+      try {
+        //convert passed in public key string to bytes and format it as public key
+        val publicBytes = Base64.decode(key,Base64.DEFAULT);
+        val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
+        //init encryption cipher
+        val cipher : Cipher = Cipher.getInstance(encryptionType);
+        val cipherSpec = OAEPParameterSpec(
+          "SHA-256",
+          "MGF1",
+          MGF1ParameterSpec.SHA1,
+          PSource.PSpecified.DEFAULT
+        )
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+        //convert message to encrypt to bytes
+        val stringAsBytes = stringToEncrypt.toByteArray();
+        //encrypt message bytes
+        val encryptedBytes = cipher.doFinal(stringAsBytes);
+        //convert message bytes to base64 for javascript and resolve promise with string
+        val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
+        promise.resolve(encryptedStringBASE64);
+      }
+      catch(e : Exception) {
+        promise.resolve(e)
+      }
+    }
+
+    @ReactMethod
     fun decryptString(
       alias : String,
       algorithm : String,
