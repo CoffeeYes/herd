@@ -68,6 +68,16 @@ const Chat = ({ route, navigation }) => {
       Crypto.padding.OAEP_SHA256_MGF1Padding,
       message
     )
+    //store new message to be sent
+    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.username))
+    if(!sentMessages) {
+      sentMessages = []
+    }
+    await AsyncStorage.setItem(
+      route.params.username + "_sent",
+      JSON.stringify([...sentMessages,newMessageEncrypted])
+    )
+
 
     //encrypt the passed in message using the users own public key
     const newMessageEncryptedCopy = await Crypto.encryptString(
@@ -91,11 +101,12 @@ const Chat = ({ route, navigation }) => {
     if(!sentMessagesCopy) {
       sentMessagesCopy = []
     }
-    //store the new message array
+    //store the new copy
     await AsyncStorage.setItem(
       route.params.username + "_sentCopy",
       JSON.stringify([...sentMessagesCopy,messageToAddCopy])
     )
+
     setMessages([...messages,plainText])
     setChatInput("");
     scrollRef.current.scrollToEnd({animated : true})
