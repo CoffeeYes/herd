@@ -23,35 +23,49 @@ const Chat = ({ route, navigation }) => {
   },[])
 
   const loadMessages = async () => {
-    var receivedMessages = JSON.parse(await AsyncStorage.getItem(route.params.username));
-    var sentMessagesCopy = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"))
-
-    if(receivedMessages) {
-      //decrypt all message text payloads (sent and received) using private key
-      for(var message in receivedMessages) {
-        receivedMessages[message].text = await Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          receivedMessages[message].text
-        )
+    var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    //set default user structure
+    if(!userData) {
+      userData = {
+        sent : [],
+        received : [],
+        sentCopy : []
       }
-      for(var message in sentMessagesCopy) {
-        sentMessagesCopy[message].text = await Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          sentMessagesCopy[message].text
-        )
-      }
-      setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
     }
+    var receivedMessages = userData?.received;
+    var sentMessagesCopy = userData?.sentCopy;
+    //decrypt all message text payloads (sent and received) using private key
+    for(var message in receivedMessages) {
+      receivedMessages[message].text = await Crypto.decryptString(
+        "herdPersonal",
+        Crypto.algorithm.RSA,
+        Crypto.blockMode.ECB,
+        Crypto.padding.OAEP_SHA256_MGF1Padding,
+        receivedMessages[message].text
+      )
+    }
+    for(var message in sentMessagesCopy) {
+      sentMessagesCopy[message].text = await Crypto.decryptString(
+        "herdPersonal",
+        Crypto.algorithm.RSA,
+        Crypto.blockMode.ECB,
+        Crypto.padding.OAEP_SHA256_MGF1Padding,
+        sentMessagesCopy[message].text
+      )
+    }
+    setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
   }
 
   const sendMessage = async message => {
-
+    var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    //default userData if there is none
+    if(!userData) {
+      userData = {
+        sent : [],
+        received : [],
+        sentCopy : []
+      }
+    }
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
@@ -73,11 +87,7 @@ const Chat = ({ route, navigation }) => {
     if(!sentMessages) {
       sentMessages = []
     }
-    await AsyncStorage.setItem(
-      route.params.username + "_sent",
-      JSON.stringify([...sentMessages,newMessageEncrypted])
-    )
-
+    userData.sent.push(sentMessages);
 
     //encrypt the passed in message using the users own public key
     const newMessageEncryptedCopy = await Crypto.encryptString(
@@ -95,17 +105,8 @@ const Chat = ({ route, navigation }) => {
       text : newMessageEncryptedCopy,
       timestamp : Date.now()
     }
-
-    //load the existing messages with this user and append our new message
-    var sentMessagesCopy = JSON.parse(await AsyncStorage.getItem(route.params.username + "_sentCopy"));
-    if(!sentMessagesCopy) {
-      sentMessagesCopy = []
-    }
-    //store the new copy
-    await AsyncStorage.setItem(
-      route.params.username + "_sentCopy",
-      JSON.stringify([...sentMessagesCopy,messageToAddCopy])
-    )
+    userData.sentCopy.push(messageToAddCopy);
+    await AsyncStorage.setItem(route.params.username,JSON.stringify(userData))
 
     setMessages([...messages,plainText])
     setChatInput("");

@@ -45,9 +45,8 @@ const Chats = ({ navigation }) => {
     var chatsWithMessages = []
     if(contacts) {
       await Promise.all(contacts.map(async contact => {
-        const chat = JSON.parse(await AsyncStorage.getItem(contact.name));
-        const sentMessages = JSON.parse(await AsyncStorage.getItem(contact.name + "_sentCopy"));
-        if(chat?.length > 0 || sentMessages?.length > 0) {
+        const userData = JSON.parse(await AsyncStorage.getItem(contact.name));
+        if(userData?.received?.length > 0 || userData?.sentCopy?.length > 0) {
           chatsWithMessages.push({name : contact.name})
         }
       }))
