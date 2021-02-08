@@ -3,12 +3,16 @@ import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ChatItem = ({name, navigation, reloadChats}) => {
+const ChatItem = ({name, navigation, reloadChats, key}) => {
   const [showDelete, setShowDelete] = useState(false);
 
   const deleteChat = async name => {
-    await AsyncStorage.setItem(name,JSON.stringify([]));
-    await AsyncStorage.setItem(name + "_sentCopy", JSON.stringify([]))
+    await AsyncStorage.setItem(name,JSON.stringify({
+      sent : [],
+      received : [],
+      sentCopy :  []
+    }));
+    setShowDelete(false);
     reloadChats();
   }
 
@@ -16,7 +20,8 @@ const ChatItem = ({name, navigation, reloadChats}) => {
     <TouchableOpacity
     style={{...styles.chat,padding : showDelete ? 0 : 20, paddingLeft : 20}}
     onPress={() => navigation.navigate("chat", {username : name})}
-    onLongPress={() => setShowDelete(!showDelete)}>
+    onLongPress={() => setShowDelete(!showDelete)}
+    key={key}>
       <Text style={styles.chatText}>{name}</Text>
       {showDelete &&
       <TouchableOpacity
