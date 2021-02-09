@@ -32,7 +32,7 @@ const CreateContact = ({ navigation, route}) => {
           name : username,
           key : publicKey
         }]))
-        navigation.navigate("contacts", {disableAddNew : false});
+        navigation.navigate("main");
       }
       else {
         setError("You Already have a contact with that username")
