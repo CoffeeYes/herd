@@ -13,8 +13,7 @@ const CreateContact = ({ navigation, route}) => {
 
   const createContact = async () => {
     setError("");
-    console.log(username);
-    console.log(publicKey);
+
     if(username.trim() === "" || publicKey.trim() === "") {
       setError("Fields Cannot be empty")
     }

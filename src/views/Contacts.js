@@ -17,6 +17,8 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
     setContacts(contacts)
   }
 
+
+
   return (
       <TouchableOpacity
       style={styles.contact}
@@ -45,12 +47,23 @@ const Contacts = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    AsyncStorage.getItem("contacts")
-    .then(contactList => {
-      contactList && setContacts(JSON.parse(contactList))
-      setLoading(false);
-    })
+    loadContacts();
   },[])
+
+  useEffect(() => {
+    const focusListener = navigation.addListener('focus', () => {
+      loadContacts();
+    });
+
+    return focusListener;
+  },[navigation])
+
+  const loadContacts = async () => {
+    setLoading(true);
+    const storedContacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+    await setContacts(storedContacts)
+    setLoading(false);
+  }
 
   return (
     <>
