@@ -41,6 +41,15 @@ const Chats = ({ navigation }) => {
     loadContactsWithChats().then(() => setLoading(false))
   },[])
 
+  useEffect(() => {
+    const focusListener = navigation.addListener('focus', () => {
+      setLoading(true)
+      loadContactsWithChats().then(() => setLoading(false));
+    });
+
+    return focusListener;
+  },[navigation])
+
   const loadContactsWithChats = async () => {
     //load all contacts from storage
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
@@ -75,7 +84,7 @@ const Chats = ({ navigation }) => {
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats.map( (chat, index) =>
-      <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
+      <ChatItem name={chat.name} key={index} navigation={navigation}/>
     )}
     </>
   )

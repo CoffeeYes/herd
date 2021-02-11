@@ -25,15 +25,15 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async () => {
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
     //set default user structure
-    if(!userData) {
+    if(Object.keys(userData).length === 0) {
       userData = {
         sent : [],
         received : [],
         sentCopy : []
       }
     }
-    var receivedMessages = userData?.received;
-    var sentMessagesCopy = userData?.sentCopy;
+    var receivedMessages = userData.received;
+    var sentMessagesCopy = userData.sentCopy;
     //decrypt all message text payloads (sent and received) using private key
     for(var message in receivedMessages) {
       receivedMessages[message].text = await Crypto.decryptString(
@@ -59,7 +59,7 @@ const Chat = ({ route, navigation }) => {
   const sendMessage = async message => {
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
     //default userData if there is none
-    if(!userData) {
+    if(Object.keys(userData).length === 0) {
       userData = {
         sent : [],
         received : [],
