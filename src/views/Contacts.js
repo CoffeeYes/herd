@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ContactItem = ({ navigation, contact, setContacts, type }) => {
-  const [allowDelete, setAllowDelete] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
 
   const deleteContact = async name => {
     var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
@@ -17,8 +17,6 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
     setContacts(contacts)
   }
 
-
-
   return (
       <TouchableOpacity
       style={styles.contact}
@@ -26,16 +24,19 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
         navigation.navigate("contact", {username : contact.name, key : contact.key})
         :
         navigation.navigate("chat",{username : contact.name})}
-      onLongPress={() => setAllowDelete(!allowDelete)}>
+      onLongPress={() => setShowDelete(!showDelete)}>
         <Image
         source={contact.image}
         style={styles.image}/>
 
         <Text style={styles.contactText}>{contact.name}</Text>
-        {allowDelete &&
+        {showDelete &&
         <TouchableOpacity
         style={styles.deleteButton}
-        onPress={() => deleteContact(contact.name)}>
+        onPress={() => {
+          setShowDelete(false);
+          deleteContact(contact.name);
+        }}>
           <Icon name="delete" size={24} style={{color : "black"}}/>
         </TouchableOpacity>}
       </TouchableOpacity>

@@ -26,7 +26,10 @@ const ChatItem = ({name, navigation, reloadChats, key}) => {
       {showDelete &&
       <TouchableOpacity
       style={styles.deleteButton}
-      onPress={() => deleteChat(name)}>
+      onPress={() => {
+        setShowDelete(false);
+        deleteChat(name);
+      }}>
         <Icon name="delete" size={24} style={{color : "black"}}/>
       </TouchableOpacity>}
     </TouchableOpacity>
