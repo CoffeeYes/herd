@@ -77,7 +77,7 @@ const Contacts = ({ route, navigation }) => {
         </TouchableOpacity>}
       </View>
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-      {contacts.map( (contact, index) =>
+      {contacts?.map( (contact, index) =>
         <ContactItem
         key={index}
         contact={contact}

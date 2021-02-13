@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -18,6 +18,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Crypto from './src/nativeWrapper/Crypto.js'
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -35,10 +36,21 @@ import EditContact from './src/views/EditContact';
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
+
+  const [publicKey, setPublicKey] = useState("");
+
+  useEffect(() => {
+    loadOwnKey()
+  },[])
+
+  const loadOwnKey = async () => {
+    setPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
+  }
+  
   return (
     <>
           <Stack.Navigator
-          initialRouteName={AsyncStorage.getItem('@username') ? "main" : "splash"}
+          initialRouteName={publicKey ? "main" : "splash"}
           screenOptions={{headerShown : false}}>
             <Stack.Screen name="contacts" component={Contacts}/>
             <Stack.Screen name="addContact" component={AddContact}/>

@@ -115,7 +115,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       //val privateKey : PrivateKey = keyStore.getKey(alias, null) as PrivateKey;
       val publicKey = keyStore.getCertificate(alias)?.publicKey;
       if(publicKey === null) {
-        return promise.resolve("Public Key Not Found")
+        return promise.resolve(null)
       }
 
       val publicBytes : ByteArray = publicKey.getEncoded();

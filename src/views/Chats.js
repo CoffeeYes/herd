@@ -86,7 +86,7 @@ const Chats = ({ navigation }) => {
       </TouchableOpacity>
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-    {chats.map( (chat, index) =>
+    {chats?.map( (chat, index) =>
       <ChatItem name={chat.name} key={index} navigation={navigation}/>
     )}
     </>
