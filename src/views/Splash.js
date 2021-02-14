@@ -1,8 +1,15 @@
 import React from 'react';
 import { View, Text, Button } from 'react-native';
-import palette from '../assets/palette.js'
+import palette from '../assets/palette.js';
+import Crypto from '../nativeWrapper/Crypto';
 
 const Splash = ({ navigation }) => {
+
+  const setup = async () => {
+    await Crypto.generateRSAKeyPair('herdPersonal');
+    navigation.navigate('main')
+  }
+  
   return (
     <View style={{
       alignItems : "center",
@@ -15,7 +22,7 @@ const Splash = ({ navigation }) => {
       <Button
       title="Get Started"
       color={palette.secondary}
-      onPress={() => navigation.navigate('chooseUsername')}
+      onPress={setup}
       />
     </View>
   )

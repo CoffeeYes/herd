@@ -27,7 +27,6 @@ import Contact from './src/views/Contact';
 import AddContact from './src/views/AddContact';
 import CreateContact from './src/views/CreateContact';
 import Splash from './src/views/Splash';
-import ChooseUsername from './src/views/ChooseUsername';
 import Main from './src/views/Main';
 import BTDeviceList from './src/views/BTDeviceList';
 import QRScanner from './src/views/QRScanner';
@@ -46,7 +45,7 @@ const App = ({ }) => {
   const loadOwnKey = async () => {
     setPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
   }
-  
+
   return (
     <>
           <Stack.Navigator
@@ -56,7 +55,6 @@ const App = ({ }) => {
             <Stack.Screen name="addContact" component={AddContact}/>
             <Stack.Screen name="chats" component={Chats}/>
             <Stack.Screen name="splash" component={Splash}/>
-            <Stack.Screen name="chooseUsername" component={ChooseUsername}/>
             <Stack.Screen name="main" component={Main}/>
             <Stack.Screen name="chat" component={Chat}/>
             <Stack.Screen name="contact" component={Contact}/>
