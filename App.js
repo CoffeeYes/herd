@@ -17,6 +17,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import navigationRef from './src/NavigationRef.js'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from './src/nativeWrapper/Crypto.js'
 
@@ -36,20 +37,21 @@ const Stack = createStackNavigator()
 
 const App = ({ }) => {
 
-  const [publicKey, setPublicKey] = useState("");
-
   useEffect(() => {
     loadOwnKey()
   },[])
 
   const loadOwnKey = async () => {
-    setPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal")
+    if(!key) {
+      navigationRef.current.navigate("splash")
+    }
   }
 
   return (
     <>
           <Stack.Navigator
-          initialRouteName={publicKey ? "main" : "splash"}
+          initialRouteName="main"
           screenOptions={{headerShown : false}}>
             <Stack.Screen name="contacts" component={Contacts}/>
             <Stack.Screen name="addContact" component={AddContact}/>
