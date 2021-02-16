@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ChatItem = ({name, navigation, reloadChats, key}) => {
+const ChatItem = ({name, navigation, reloadChats}) => {
   const [showDelete, setShowDelete] = useState(false);
 
   const deleteChat = async name => {
@@ -20,8 +20,7 @@ const ChatItem = ({name, navigation, reloadChats, key}) => {
     <TouchableOpacity
     style={{...styles.chat,padding : showDelete ? 0 : 20, paddingLeft : 20}}
     onPress={() => navigation.navigate("chat", {username : name})}
-    onLongPress={() => setShowDelete(!showDelete)}
-    key={key}>
+    onLongPress={() => setShowDelete(!showDelete)}>
       <Text style={styles.chatText}>{name}</Text>
       {showDelete &&
       <TouchableOpacity
@@ -87,7 +86,7 @@ const Chats = ({ navigation }) => {
     </View>
     {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
     {chats?.map( (chat, index) =>
-      <ChatItem name={chat.name} key={index} navigation={navigation}/>
+      <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
     )}
     </>
   )
