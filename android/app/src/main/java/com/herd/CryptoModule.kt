@@ -103,7 +103,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         keyStore.deleteEntry(alias)
       }
       catch(e : GeneralSecurityException) {
-        return promise.resolve(e);
+        return promise.reject("Delete key error",e);
       }
       promise.resolve(null);
     }
@@ -162,7 +162,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
           return promise.resolve(encryptedStringBASE64);
         }
         catch(e : GeneralSecurityException) {
-          return promise.resolve(e)
+          return promise.reject("Encrypt string error",e)
         }
 
       }
@@ -201,7 +201,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         promise.resolve(encryptedStringBASE64);
       }
       catch(e : Exception) {
-        promise.resolve(e)
+        promise.reject("Encrypt string error",e)
       }
     }
 
@@ -247,7 +247,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
           return promise.resolve(String(decryptedString))
         }
         catch(e : GeneralSecurityException) {
-          return promise.resolve(e)
+          return promise.reject("Decrypt string error",e)
         }
       }
 }

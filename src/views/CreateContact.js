@@ -22,7 +22,7 @@ const CreateContact = ({ navigation, route}) => {
       //create empty contacts array and load it back
       if(!contacts) {
         await AsyncStorage.setItem("contacts",JSON.stringify([]));
-        contacts = await AsyncStorage.getItem("contacts");
+        contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
       }
 
       //create new user if the username isnt taken

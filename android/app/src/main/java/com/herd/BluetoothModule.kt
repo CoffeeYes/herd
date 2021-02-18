@@ -1,6 +1,5 @@
 package com.herd
 
-
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -82,11 +81,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun scanForDevices() {
+    fun scanForDevices(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
 
       if(adapter === null) {
-        throw Exception("No BluetoothAdapter Found")
+        promise.reject("No BluetoothAdapter Found");
       }
       else {
         if(adapter.isEnabled()) {
@@ -95,14 +94,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
-            throw Exception("Device Discovery could not be started")
+            promise.reject("Device Discovery could not be started")
           }
           else {
 
           }
         }
         else {
-          throw Exception("Bluetooth Adapter is disabled")
+          promise.reject("Bluetooth Adapter is disabled")
         }
       }
     }
@@ -112,7 +111,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
 
       if(adapter === null) {
-        throw Exception("No BluetoothAdapter Found")
+        promise.reject("No BluetoothAdapter Found")
       }
       else {
         if(adapter.isEnabled()) {
@@ -137,10 +136,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun requestBTEnable() {
+    fun requestBTEnable(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
       if(adapter === null) {
-        throw Exception("No BluetoothAdapter Found")
+        promise.reject("No BluetoothAdapter Found")
       }
       else {
         if(!adapter.isEnabled()) {
@@ -155,13 +154,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun requestBTMakeDiscoverable(duration : Int) {
+    fun requestBTMakeDiscoverable(duration : Int, promise : Promise) {
       val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
         putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, duration)
       }
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity === null) {
-        throw Exception("Activity is NULL")
+        promise.reject("Activity is NULL")
       }
       else {
         activity.startActivityForResult(discoverableIntent,2)
