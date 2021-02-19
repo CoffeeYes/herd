@@ -37,6 +37,7 @@ const styles = {
   buttonText : {
     color : "white",
     fontWeight : "bold",
+    fontFamily : "Open-Sans",
     textAlign : "center"
   },
   modalMainContainer : {

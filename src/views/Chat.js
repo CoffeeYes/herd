@@ -25,13 +25,14 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async () => {
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
     //set default user structure
-    if(Object.keys(userData).length === 0) {
+    if(!userData) {
       userData = {
         sent : [],
         received : [],
         sentCopy : []
       }
     }
+
     var receivedMessages = userData.received;
     var sentMessagesCopy = userData.sentCopy;
     //decrypt all message text payloads (sent and received) using private key

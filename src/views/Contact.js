@@ -126,7 +126,8 @@ const styles = {
   },
   buttonText : {
     color : "white",
-    fontWeight : "bold"
+    fontWeight : "bold",
+    fontFamily : "Open-Sans"
   }
 }
 

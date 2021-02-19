@@ -85,7 +85,8 @@ const styles ={
   buttonText : {
     color : "white",
     fontWeight : "bold",
-    textAlign : "center"
+    textAlign : "center",
+    fontFamily : "Open-Sans"
   }
 }
 
