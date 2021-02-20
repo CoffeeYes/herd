@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Crypto from '../nativeWrapper/Crypto'
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -18,6 +19,20 @@ const CreateContact = ({ navigation, route}) => {
       setError("Fields Cannot be empty")
     }
     else {
+      //test public key
+      try {
+        const encryptedTest = await Crypto.encryptStringWithKey(
+          publicKey,
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          "test"
+        )
+      }
+      catch(e) {
+        return setError("Invalid Public Key")
+      }
+
       var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
       //create empty contacts array and load it back
       if(!contacts) {
@@ -86,7 +101,8 @@ const styles = {
     color : "red",
     fontWeight : "bold",
     alignSelf : "center",
-    marginBottom : 10
+    marginBottom : 10,
+    fontFamily : "Open-Sans"
   }
 }
 
