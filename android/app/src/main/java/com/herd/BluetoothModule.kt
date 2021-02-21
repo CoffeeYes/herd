@@ -148,6 +148,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val activity : Activity? = getReactApplicationContext().getCurrentActivity();
           if(activity !== null) {
             activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+            promise.resolve("")
           }
         }
       }
@@ -164,6 +165,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         activity.startActivityForResult(discoverableIntent,2)
+        promise.resolve("")
       }
     }
 }

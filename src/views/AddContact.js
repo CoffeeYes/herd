@@ -30,6 +30,11 @@ const AddContact = ({ navigation }) => {
     return () => clearInterval(checkForBT);
   },[])
 
+  const requestBTPermissions = async () => {
+    console.log("test")
+    navigation.navigate("BTDeviceList")
+  }
+
   return (
     <>
       <View style={styles.header}>
@@ -39,7 +44,7 @@ const AddContact = ({ navigation }) => {
         <View style={styles.row}>
 
           <TouchableOpacity
-          onPress={() => navigation.navigate("BTDeviceList")}
+          onPress={requestBTPermissions}
           style={!!BTError ? {...styles.card,...styles.cardDisabled }: {...styles.card,...styles.leftCard}}
           disabled={!!BTError}>
             {!!BTError && <Text style={styles.error}>{BTError}</Text>}
