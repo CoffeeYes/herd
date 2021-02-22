@@ -22,7 +22,25 @@ import android.app.Activity
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private final val activityListener = object : BaseActivityEventListener() {
       override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+        //request bluetooth
+        if(requestCode == 1) {
+          if(resultCode == Activity.RESULT_OK) {
+            throw(Exception("RESULT OK"))
+          }
+          else {
+            //handle denied perms
+          }
+        }
 
+        //request make discoverable
+        if(requestCode == 2) {
+          if(resultCode == Activity.RESULT_OK) {
+            throw(Exception("RESULT OK"))
+          }
+          else {
+            //handle denied perms
+          }
+        }
       }
     }
 
