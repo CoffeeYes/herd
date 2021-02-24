@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const EditContact = ({ route }) => {
   const [name, setName] = useState(route.params.username)
@@ -41,23 +42,47 @@ const EditContact = ({ route }) => {
     <View>
       <Text>{error}</Text>
       <TextInput
-      style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+      style={styles.input}
       onChangeText={text => setName(text)}
       value={name}/>
 
       <TextInput
-      multiline
-      style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-      onChangeText={text => onChangeText(text)}
+      multiline={true}
+      style={styles.input}
+      onChangeText={text => setPublicKey(text)}
       value={publicKey}/>
 
       <TouchableOpacity
+      style={styles.button}
       onPress={save}>
-        <Text>Save</Text>
+        <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
     </View>
   )
+}
+
+const styles = {
+  button : {
+    backgroundColor : "#E86252",
+    padding : 10,
+    alignSelf : "center",
+    marginTop : 10,
+    borderRadius : 5
+  },
+  buttonText : {
+    color : "white",
+    fontWeight : "bold",
+    fontFamily : "Open-Sans",
+    textAlign : "center"
+  },
+  input : {
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom : 10,
+    width : Dimensions.get('window').width * 0.9,
+    alignSelf : "center"
+  }
 }
 
 export default EditContact;
