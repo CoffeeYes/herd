@@ -22,7 +22,7 @@ const CreateContact = ({ navigation, route}) => {
       //test public key
       try {
         const encryptedTest = await Crypto.encryptStringWithKey(
-          publicKey,
+          publicKey.trim(),
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
@@ -43,8 +43,8 @@ const CreateContact = ({ navigation, route}) => {
       //create new user if the username isnt taken
       if(!(contacts.find(user => user.name === username))) {
         await AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
-          name : username,
-          key : publicKey
+          name : username.trim(),
+          key : publicKey.trim()
         }]))
         navigation.navigate("main");
       }

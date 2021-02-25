@@ -25,12 +25,12 @@ const EditContact = ({ route }) => {
 
   const save = async () => {
     setError("");
-    if(savedContacts.find(contact => contact.name === name) && name !== route.params.username) {
+    if(savedContacts.find(contact => contact.name === name.trim()) && name.trim() !== route.params.username) {
       return setError("User already exists")
     }
     else {
       var oldContact = savedContacts.find(contact => contact.name === route.params.username);
-      var newContact = {...oldContact,name : name,key : publicKey};
+      var newContact = {...oldContact,name : name.trim(),key : publicKey.trim()};
       await AsyncStorage.setItem("contacts",JSON.stringify([
         ...savedContacts.filter(contact => contact.name !== route.params.username),
         newContact
