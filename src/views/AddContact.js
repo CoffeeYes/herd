@@ -27,12 +27,17 @@ const AddContact = ({ navigation }) => {
         setBTError("")
       }
     },200)
-    return () => clearInterval(checkForBT);
+
+    return () => {
+      clearInterval(checkForBT)
+    }
   },[])
 
   const requestBTPermissions = async () => {
-    console.log("test")
-    navigation.navigate("BTDeviceList")
+    const locationAllowed = await Bluetooth.checkLocationPermission();
+    if(!locationAllowed) {
+      Bluetooth.requestLocationPermissions();
+    }
   }
 
   return (

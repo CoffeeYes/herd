@@ -18,6 +18,10 @@ import android.content.Context
 import android.content.IntentFilter
 import android.content.BroadcastReceiver
 import android.app.Activity
+import android.Manifest.permission
+import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import android.content.pm.PackageManager
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private final val activityListener = object : BaseActivityEventListener() {
@@ -25,20 +29,24 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         //request bluetooth
         if(requestCode == 1) {
           if(resultCode == Activity.RESULT_OK) {
-            throw(Exception("RESULT OK"))
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTEnableResult","ACCEPTED")
           }
           else {
-            //handle denied perms
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTEnableResult","DENIED")
           }
         }
 
         //request make discoverable
         if(requestCode == 2) {
           if(resultCode == Activity.RESULT_OK) {
-            throw(Exception("RESULT OK"))
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTDiscoverableResult","ACCEPTED")
           }
           else {
-            //handle denied perms
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTDiscoverableResult","DENIED")
           }
         }
       }
@@ -184,6 +192,32 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       else {
         activity.startActivityForResult(discoverableIntent,2)
         promise.resolve("")
+      }
+    }
+
+    @ReactMethod
+    fun checkLocationPermission(promise : Promise) {
+      val backgroundLocationAllowed = ContextCompat.checkSelfPermission(
+        getReactApplicationContext(),
+        permission.ACCESS_BACKGROUND_LOCATION
+      )
+      if(backgroundLocationAllowed === PackageManager.PERMISSION_GRANTED) {
+        promise.resolve(true)
+      }
+      else {
+        promise.resolve(false)
+      }
+    }
+
+    @ReactMethod
+    fun requestLocationPermissions() {
+      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+      if(activity !== null) {
+        ActivityCompat.requestPermissions(
+          activity,
+          arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
+          3
+        )
       }
     }
 }
