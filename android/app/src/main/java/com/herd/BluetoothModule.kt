@@ -22,6 +22,7 @@ import android.Manifest.permission
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.location.LocationManager
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private final val activityListener = object : BaseActivityEventListener() {
@@ -219,5 +220,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           3
         )
       }
+    }
+
+    @ReactMethod
+    fun checkLocationEnabled(promise : Promise) {
+      val lm = getReactApplicationContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+      promise.resolve(lm.isLocationEnabled())
     }
 }
