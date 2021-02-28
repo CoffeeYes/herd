@@ -21,8 +21,12 @@ import android.app.Activity
 import android.Manifest.permission
 import androidx.core.content.ContextCompat
 import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AlertDialog
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.content.DialogInterface
+import android.R
+import android.provider.Settings
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private final val activityListener = object : BaseActivityEventListener() {
@@ -101,6 +105,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
+      reactContext.addActivityEventListener(activityListener)
     }
 
     override fun getName(): String {
@@ -226,5 +231,29 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun checkLocationEnabled(promise : Promise) {
       val lm = getReactApplicationContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager;
       promise.resolve(lm.isLocationEnabled())
+    }
+
+    @ReactMethod
+    fun requestLocationEnable(promise : Promise) {
+      /* val alertBuilder = AlertDialog.Builder(getReactApplicationContext(),R.style.Theme_Dialog);
+      alertBuilder.setMessage("Bluetooth scanning requires location, enable it now?")
+      .setPositiveButton("Yes",DialogInterface.OnClickListener {
+        dialog, id ->
+          promise.resolve(true);
+      })
+      .setNegativeButton("No",DialogInterface.OnClickListener {
+        dialog, id ->
+          promise.resolve(false);
+      })
+      alertBuilder.create();
+      alertBuilder.show(); */
+      val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+      if(activity !== null) {
+        activity.startActivity(intent)
+      }
+      else {
+        promise.reject("Activity is NULL");
+      }
     }
 }
