@@ -13,31 +13,28 @@ const AddContact = ({ navigation }) => {
 
   useEffect(() => {
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => setPublicKey(key))
-    const checkForBT = setInterval(async () => {
-      let adapter = await Bluetooth.checkForBTAdapter();
-      let enabled = await Bluetooth.checkBTEnabled();
 
-      if(!adapter) {
-        return setBTError("No Bluetooth Adapters Found");
-      }
-      else if(!enabled) {
-        setBTError("Bluetooth is not enabled")
-      }
-      else {
-        setBTError("")
-      }
-    },200)
-
-    return () => {
-      clearInterval(checkForBT)
-    }
+    initialBTCheck();
   },[])
 
-  const requestBTPermissions = async () => {
-    const locationAllowed = await Bluetooth.checkLocationPermission();
-    if(!locationAllowed) {
-      Bluetooth.requestLocationPermissions();
+  const initialBTCheck = async () => {
+    let adapter = await Bluetooth.checkForBTAdapter();
+
+    if(!adapter) {
+      return setBTError("No Bluetooth Adapters Found");
     }
+  }
+
+  const requestBTPermissions = async () => {
+    const btEnabled = await Bluetooth.checkBTEnabled();
+    if(!btEnabled) {
+      await Bluetooth.requestBTEnable();
+    }
+
+    // const locationAllowed = await Bluetooth.checkLocationPermission();
+    // if(!locationAllowed) {
+    //   Bluetooth.requestLocationPermissions();
+    // }
   }
 
   return (
