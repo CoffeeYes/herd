@@ -105,7 +105,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
-      reactContext.addActivityEventListener(activityListener)
     }
 
     override fun getName(): String {
