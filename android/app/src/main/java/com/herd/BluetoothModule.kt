@@ -28,33 +28,36 @@ import android.content.DialogInterface
 import android.R
 import android.provider.Settings
 
-class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    private final val activityListener = object : BaseActivityEventListener() {
-      override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
-        //request bluetooth
-        if(requestCode == 1) {
-          if(resultCode == Activity.RESULT_OK) {
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTEnableResult","ACCEPTED")
-          }
-          else {
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTEnableResult","DENIED")
-          }
-        }
+class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
-        //request make discoverable
-        if(requestCode == 2) {
-          if(resultCode == Activity.RESULT_OK) {
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTDiscoverableResult","ACCEPTED")
-          }
-          else {
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTDiscoverableResult","DENIED")
-          }
+    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+      //request bluetooth
+      if(requestCode == 1) {
+        if(resultCode == Activity.RESULT_OK) {
+          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTEnableResult","ACCEPTED") */
+        }
+        else {
+          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTEnableResult","DENIED") */
         }
       }
+
+      //request make discoverable
+      if(requestCode == 2) {
+        if(resultCode == Activity.RESULT_OK) {
+          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTDiscoverableResult","ACCEPTED") */
+        }
+        else {
+          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTDiscoverableResult","DENIED") */
+        }
+      }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+
     }
 
     private val BTReceiver = object : BroadcastReceiver() {
@@ -99,7 +102,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     init {
-      reactContext.addActivityEventListener(activityListener)
+      /* reactContext.addActivityEventListener(activityListener) */
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
       val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
