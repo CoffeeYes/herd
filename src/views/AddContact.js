@@ -27,8 +27,15 @@ const AddContact = ({ navigation }) => {
 
   const requestBTPermissions = async () => {
     const btEnabled = await Bluetooth.checkBTEnabled();
+    const locationAllowed = await Bluetooth.checkLocationPermission();
     if(!btEnabled) {
-      await Bluetooth.requestBTEnable();
+      Bluetooth.requestBTEnable()
+    }
+    else if (!locationAllowed) {
+      const locationRequest = await Bluetooth.requestLocationPermissions();
+    }
+    else {
+      navigation.navigate("BTDeviceList");
     }
 
     // const locationAllowed = await Bluetooth.checkLocationPermission();

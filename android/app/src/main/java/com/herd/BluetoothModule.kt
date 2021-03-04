@@ -30,16 +30,17 @@ import android.provider.Settings
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
-    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+    var bluetoothEnabledPromise : Promise? = null;
+    var locationPermissionPromise : Promise? = null;
+
+    override public fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
       //request bluetooth
       if(requestCode == 1) {
         if(resultCode == Activity.RESULT_OK) {
-          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTEnableResult","ACCEPTED") */
+          bluetoothEnabledPromise?.resolve(true);
         }
         else {
-          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTEnableResult","DENIED") */
+          bluetoothEnabledPromise?.resolve(false);
         }
       }
 
@@ -54,6 +55,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           .emit("BTDiscoverableResult","DENIED") */
         }
       }
+
+      if(requestCode == 3) {
+        locationPermissionPromise?.resolve(resultCode)
+      }
+
+      bluetoothEnabledPromise = null;
+      locationPermissionPromise = null;
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -181,8 +189,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val REQUEST_ENABLE_BT = 1
           val activity : Activity? = getReactApplicationContext().getCurrentActivity();
           if(activity !== null) {
+            bluetoothEnabledPromise = promise;
             activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
-            promise.resolve("")
           }
         }
       }
@@ -252,7 +260,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity !== null) {
-        activity.startActivity(intent)
+        activity.startActivityForResult(intent,3);
+        locationPermissionPromise = promise
       }
       else {
         promise.reject("Activity is NULL");
