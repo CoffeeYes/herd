@@ -26,6 +26,7 @@ const BTDeviceList = () => {
     const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
       updateDeviceList(device);
     });
+
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
       console.log(state)
       if(state === "DISCOVERY_STARTED") {
@@ -47,7 +48,8 @@ const BTDeviceList = () => {
     }
   },[])
 
-  const handleDeviceClick = device => {
+  const handleDeviceClick = async device => {
+    await Bluetooth.cancelScanForDevices();
     setChosenDevice(device);
     setShowModal(true);
   }

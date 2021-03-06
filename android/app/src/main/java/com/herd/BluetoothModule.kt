@@ -149,6 +149,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
+    fun cancelScanForDevices(promise : Promise) {
+      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+
+      if(adapter === null) {
+        promise.reject("No BluetoothAdapter Found");
+      }
+      else {
+        if(adapter.isEnabled() && adapter.isDiscovering()) {
+          adapter.cancelDiscovery()
+          promise.resolve(true);
+        }
+      }
+    }
+
+    @ReactMethod
     fun checkBTEnabled(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
 
