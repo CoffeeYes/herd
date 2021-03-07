@@ -13,6 +13,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothSocket
+import android.bluetooth.BluetoothServerSocket
 import android.content.Intent
 import android.content.Context
 import android.content.IntentFilter
@@ -27,6 +29,8 @@ import android.location.LocationManager
 import android.content.DialogInterface
 import android.R
 import android.provider.Settings
+
+import java.util.UUID
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
@@ -280,6 +284,24 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         promise.reject("Activity is NULL");
+      }
+    }
+
+    @ReactMethod
+    fun listenAsServer(promise : Promise) {
+      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
+      val adapter = BluetoothAdapter.getDefaultAdapter();
+
+      val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+
+      //start listening for requests
+      var connectionSocket : BluetoothSocket? = null;
+
+      try {
+        connectionSocket = serverSocket?.accept();
+      }
+      catch(e : Exception) {
+        promise.reject("Error listening for BT requests",e)
       }
     }
 }
