@@ -304,4 +304,24 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         promise.reject("Error listening for BT requests",e)
       }
     }
+
+    @ReactMethod
+    fun connectAsClient(device : BluetoothDevice, promise : Promise) {
+      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
+
+      var clientSocket : BluetoothSocket? = null;
+
+      if(device === null) {
+        promise.reject("Device is null");
+      }
+      else {
+        try {
+          clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
+          promise.resolve("");
+        }
+        catch(e : Exception) {
+          promise.reject("Error creating client socket",e)
+        }
+      }
+    }
 }
