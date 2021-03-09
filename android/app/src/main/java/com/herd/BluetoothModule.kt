@@ -287,21 +287,50 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    @ReactMethod
-    fun listenAsServer(promise : Promise) {
+    private inner class createBTServerThread : Thread() {
       val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
-
-      val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
-
-      //start listening for requests
       var connectionSocket : BluetoothSocket? = null;
 
+      override fun run() {
+        var shouldLoop = true
+        val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+        while (shouldLoop) {
+            connectionSocket = try {
+                serverSocket?.accept()
+            } catch (e: Exception) {
+                shouldLoop = false
+                throw(e);
+                null
+            }
+            connectionSocket?.also {
+                serverSocket?.close()
+                shouldLoop = false
+            }
+        }
+
+        /* try {
+          val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+          connectionSocket = serverSocket?.accept();
+        }
+        catch(e : Exception) {
+          throw(e);
+        } */
+      }
+
+      public fun cancel() {
+        connectionSocket?.close()
+      }
+    }
+
+    private var BTServerThread : Thread? = null;
+    @ReactMethod
+    fun listenAsServer(promise : Promise) {
       try {
-        connectionSocket = serverSocket?.accept();
+        BTServerThread = createBTServerThread()
       }
       catch(e : Exception) {
-        promise.reject("Error listening for BT requests",e)
+        promise.reject("Error creating thread for BT requests",e)
       }
     }
 
