@@ -287,14 +287,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private inner class createBTServerThread : Thread() {
+    private inner class createBTServerThread() : Thread() {
       val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
       var connectionSocket : BluetoothSocket? = null;
 
-      override fun run() {
-        var shouldLoop = true
-        val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+      @Volatile var shouldLoop = true
+      val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+      public override fun run() {
         while (shouldLoop) {
             connectionSocket = try {
                 serverSocket?.accept()
@@ -308,29 +308,44 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 shouldLoop = false
             }
         }
-
-        /* try {
-          val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
-          connectionSocket = serverSocket?.accept();
-        }
-        catch(e : Exception) {
-          throw(e);
-        } */
       }
 
       public fun cancel() {
-        connectionSocket?.close()
+        connectionSocket?.close();
+        shouldLoop = false;
       }
+
     }
 
-    private var BTServerThread : Thread? = null;
+    private var BTServerThread : createBTServerThread = createBTServerThread();
     @ReactMethod
     fun listenAsServer(promise : Promise) {
       try {
-        BTServerThread = createBTServerThread()
+        BTServerThread.start();
+        if(BTServerThread.isAlive() === false) {
+          throw("Thread is dead" as Throwable)
+        }
+        promise.resolve(true);
       }
       catch(e : Exception) {
         promise.reject("Error creating thread for BT requests",e)
+      }
+    }
+
+    @ReactMethod
+    fun cancelListenAsServer(promise : Promise) {
+      try {
+        val alive : Boolean = BTServerThread.isAlive();
+        if(alive === true) {
+            BTServerThread.cancel();
+            promise.resolve(true);
+        }
+        else {
+          promise.resolve(false);
+        }
+      }
+      catch(e : Exception) {
+        promise.reject("Error cancelling server thread",e)
       }
     }
 
