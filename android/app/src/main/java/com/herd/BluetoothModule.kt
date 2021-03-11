@@ -293,8 +293,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       var connectionSocket : BluetoothSocket? = null;
 
       @Volatile var shouldLoop = true
-      val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
       public override fun run() {
+        val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
         while (shouldLoop) {
             connectionSocket = try {
                 serverSocket?.accept()

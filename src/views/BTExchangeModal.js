@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
+import Bluetooth from '../nativeWrapper/Bluetooth';
 
 const BTExchangeModal = ({ visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device")
+
+  const cancel = async () => {
+    await Bluetooth.cancelListenAsServer();
+    setVisible(false);
+  }
+
   return (
     <Modal
     animationType="slide"
@@ -15,7 +22,7 @@ const BTExchangeModal = ({ visible, setVisible}) => {
           <Text>{activityText}</Text>
           <TouchableOpacity
           style={styles.button}
-          onPress={() => setVisible(false)}>
+          onPress={cancel}>
           <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -35,7 +42,8 @@ const styles = {
   buttonText : {
     color : "white",
     fontWeight : "bold",
-    textAlign : "center"
+    textAlign : "center",
+    fontFamily : "Open-Sans"
   },
   modalMainContainer : {
     alignItems : "center",

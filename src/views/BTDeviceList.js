@@ -51,11 +51,6 @@ const BTDeviceList = () => {
   const handleDeviceClick = async device => {
     await Bluetooth.cancelScanForDevices();
     const server = await Bluetooth.listenAsServer();
-    console.log(server);
-    setTimeout(async () => {
-      const cancelServer = await Bluetooth.cancelListenAsServer();
-      console.log(cancelServer)
-    },3000)
     setChosenDevice(device);
     setShowModal(true);
   }
