@@ -317,6 +317,29 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     }
 
+    private inner class createBTClientThread(deviceAddress : String) : Thread() {
+      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
+      val adapter = BluetoothAdapter.getDefaultAdapter();
+      var clientSocket : BluetoothSocket? = null;
+      val device = adapter?.getRemoteDevice(deviceAddress);
+
+      public override fun run() {
+        // Cancel discovery because it otherwise slows down the connection.
+        adapter.cancelDiscovery()
+        clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
+
+        clientSocket?.use { socket ->
+          socket.connect();
+
+          //TODO do work with connected socket in seperate thread
+        }
+      }
+
+      fun cancel() {
+        clientSocket?.close()
+      }
+    }
+
     private var BTServerThread : createBTServerThread = createBTServerThread();
     @ReactMethod
     fun listenAsServer(promise : Promise) {
@@ -349,23 +372,27 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private var BTClientThread : createBTClientThread? = null
+
     @ReactMethod
-    fun connectAsClient(device : BluetoothDevice, promise : Promise) {
-      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
-
-      var clientSocket : BluetoothSocket? = null;
-
-      if(device === null) {
-        promise.reject("Device is null");
+    fun connectAsClient(device : String, promise : Promise) {
+      try {
+        BTClientThread = createBTClientThread(device);
+        promise.resolve(true);
       }
-      else {
-        try {
-          clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
-          promise.resolve("");
-        }
-        catch(e : Exception) {
-          promise.reject("Error creating client socket",e)
-        }
+      catch(e : Exception) {
+        promise.reject("Error connecting as client",e)
+      }
+    }
+
+    @ReactMethod
+    fun cancelConnectAsClient(promise : Promise) {
+      try {
+        BTClientThread?.cancel();
+        promise.resolve(true);
+      }
+      catch(e : Exception) {
+        promise.reject("Error cancelling BT client thread",e)
       }
     }
 }

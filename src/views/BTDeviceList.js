@@ -51,6 +51,7 @@ const BTDeviceList = () => {
   const handleDeviceClick = async device => {
     await Bluetooth.cancelScanForDevices();
     const server = await Bluetooth.listenAsServer();
+    const client = await Bluetooth.connectAsClient(device.macAddress);
     setChosenDevice(device);
     setShowModal(true);
   }
