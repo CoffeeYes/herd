@@ -56,6 +56,10 @@ const BTDeviceList = () => {
     setShowModal(true);
   }
 
+  const restartScan = async () => {
+    await Bluetooth.scanForDevices();
+  }
+
   return (
     <View style={styles.mainContainer}>
       {scanning &&
@@ -75,6 +79,12 @@ const BTDeviceList = () => {
           </TouchableOpacity>
         )}
       </ScrollView>
+
+      <TouchableOpacity
+      style={styles.button}
+      onPress={restartScan}>
+        <Text style={styles.buttonText}>Re-scan</Text>
+      </TouchableOpacity>
 
       <BTExchangeModal
       visible={showModal}
@@ -99,6 +109,19 @@ const styles = {
     backgroundColor : "white",
     marginTop : 2,
     borderBottomColor : "black"
+  },
+  button : {
+    backgroundColor : "#E86252",
+    padding : 10,
+    alignSelf : "center",
+    marginTop : 10,
+    borderRadius : 5
+  },
+  buttonText : {
+    color : "white",
+    fontWeight : "bold",
+    textAlign : "center",
+    fontFamily : "Open-Sans"
   }
 }
 
