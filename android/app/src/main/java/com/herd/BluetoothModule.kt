@@ -162,8 +162,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       else {
         if(adapter.isEnabled() && adapter.isDiscovering()) {
           adapter.cancelDiscovery()
-          promise.resolve(true);
         }
+        promise.resolve(true);
       }
     }
 
@@ -340,14 +340,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private var BTServerThread : createBTServerThread = createBTServerThread();
+    private var BTServerThread : createBTServerThread? = null;
     @ReactMethod
     fun listenAsServer(promise : Promise) {
       try {
-        BTServerThread.start();
-        if(BTServerThread.isAlive() === false) {
-          throw("Thread is dead" as Throwable)
-        }
+        BTServerThread = createBTServerThread();
+        BTServerThread?.start();
         promise.resolve(true);
       }
       catch(e : Exception) {
@@ -358,14 +356,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun cancelListenAsServer(promise : Promise) {
       try {
-        val alive : Boolean = BTServerThread.isAlive();
+        val alive : Boolean? = BTServerThread?.isAlive();
         if(alive === true) {
-            BTServerThread.cancel();
-            promise.resolve(true);
+            BTServerThread?.cancel();
         }
-        else {
-          promise.resolve(false);
-        }
+        promise.resolve(true);
       }
       catch(e : Exception) {
         promise.reject("Error cancelling server thread",e)
