@@ -31,6 +31,8 @@ import android.R
 import android.provider.Settings
 
 import java.util.UUID
+import java.io.InputStream
+import java.io.OutputStream
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
@@ -304,6 +306,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 null
             }
             connectionSocket?.also {
+                manageBTServerConnection(it)
                 serverSocket?.close()
                 shouldLoop = false
             }
@@ -332,11 +335,32 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           socket.connect();
 
           //TODO do work with connected socket in seperate thread
+          manageBTClientConnection(socket);
         }
       }
 
       fun cancel() {
         clientSocket?.close()
+      }
+    }
+
+    private fun manageBTServerConnection(socket : BluetoothSocket) {
+      val inputStream : InputStream = socket.getInputStream();
+      val outputStream : OutputStream = socket.getOutputStream();
+    }
+
+    private fun manageBTClientConnection(socket : BluetoothSocket) {
+      val inputStream : InputStream = socket.getInputStream();
+      val outputStream : OutputStream = socket.getOutputStream();
+      Thread {
+        var shouldRun = true;
+        while(shouldRun) {
+          var data : ByteArray = ByteArray(1024);
+          inputStream.read(data);
+          if(data.size > 0) {
+            shouldRun = false;
+          }
+        }
       }
     }
 
