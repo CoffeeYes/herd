@@ -29,13 +29,14 @@ import android.location.LocationManager
 import android.content.DialogInterface
 import android.R
 import android.provider.Settings
+import android.util.Log
 
 import java.util.UUID
 import java.io.InputStream
 import java.io.OutputStream
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
-
+    private final val TAG : String = "BluetoothModule";
     var bluetoothEnabledPromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
 
@@ -341,6 +342,44 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       fun cancel() {
         clientSocket?.close()
+      }
+    }
+
+    private inner class BTConnectionThread(private val socket : BluetoothSocket) : Thread() {
+      private val inputStream : InputStream = socket.inputStream;
+      private val outputStream : OutputStream = socket.outputStream;
+      private val buffer : ByteArray = ByteArray(1024);
+
+      override fun run() {
+          var numBytes: Int;
+
+          // Keep listening to the InputStream until an exception occurs.
+          while (true) {
+              // Read from the InputStream.
+              numBytes = try {
+                  inputStream.read(buffer)
+              } catch (e: Exception) {
+                  Log.d(TAG, "Input stream was disconnected", e)
+                  break
+              }
+          }
+      }
+
+      fun write(bytes: ByteArray) {
+          try {
+              outputStream.write(bytes)
+          } catch (e: Exception) {
+              Log.e(TAG, "Error occurred when sending data", e)
+          }
+      }
+
+      fun cancel() {
+        try {
+          socket.close()
+        }
+        catch(e : Exception) {
+          Log.e(TAG, "Could not close BT connection socket",e)
+        }
       }
     }
 
