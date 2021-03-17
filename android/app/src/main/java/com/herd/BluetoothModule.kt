@@ -30,6 +30,8 @@ import android.content.DialogInterface
 import android.R
 import android.provider.Settings
 import android.util.Log
+import android.os.Handler
+import android.os.Message
 
 import java.util.UUID
 import java.io.InputStream
@@ -37,6 +39,12 @@ import java.io.OutputStream
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
     private final val TAG : String = "BluetoothModule";
+    val context = reactContext
+
+    private final val MESSAGE_READ: Int = 0
+    private final val MESSAGE_WRITE: Int = 1
+    private final val MESSAGE_TOAST: Int = 2
+
     var bluetoothEnabledPromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
 
@@ -116,6 +124,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private val messageHandler : Handler = Handler();
+
     init {
       /* reactContext.addActivityEventListener(activityListener) */
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -123,6 +133,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
+    }
+
+    fun handleMessage(msg : Message) {
+      context.getJSModule(RCTDeviceEventEmitter::class.java)
+      .emit("NEW_MESSAGE","received")
     }
 
     override fun getName(): String {
@@ -345,7 +360,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private inner class BTConnectionThread(private val socket : BluetoothSocket) : Thread() {
+    private inner class BTConnectionThread(private val socket : BluetoothSocket, handler : Handler) : Thread() {
       private val inputStream : InputStream = socket.inputStream;
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(1024);
