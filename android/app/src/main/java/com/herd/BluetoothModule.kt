@@ -31,6 +31,7 @@ import android.R
 import android.provider.Settings
 import android.util.Log
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 
 import java.util.UUID
@@ -124,7 +125,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private val messageHandler : Handler = Handler();
+    private val messageHandler = object : Handler(Looper.getMainLooper()) {
+
+      override fun handleMessage(msg : Message) {
+        context.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit("NEW_MESSAGE","received")
+      }
+    }
 
     init {
       /* reactContext.addActivityEventListener(activityListener) */
@@ -133,11 +140,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
-    }
-
-    fun handleMessage(msg : Message) {
-      context.getJSModule(RCTDeviceEventEmitter::class.java)
-      .emit("NEW_MESSAGE","received")
     }
 
     override fun getName(): String {
@@ -305,6 +307,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private var connectionThread : BTConnectionThread? = null;
+
     private inner class createBTServerThread() : Thread() {
       val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
@@ -322,7 +326,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 null
             }
             connectionSocket?.also {
-                manageBTServerConnection(it)
+                /* manageBTServerConnection(it) */
+                connectionThread = BTConnectionThread(it, messageHandler)
+                connectionThread?.start();
                 serverSocket?.close()
                 shouldLoop = false
             }
@@ -351,7 +357,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           socket.connect();
 
           //TODO do work with connected socket in seperate thread
-          manageBTClientConnection(socket);
+          /* manageBTClientConnection(socket); */
+          connectionThread = BTConnectionThread(socket, messageHandler);
+          connectionThread?.start();
         }
       }
 
@@ -395,6 +403,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         catch(e : Exception) {
           Log.e(TAG, "Could not close BT connection socket",e)
         }
+      }
+    }
+
+    @ReactMethod
+    fun writeToBTConnection(value : String, promise : Promise) {
+      try {
+        val stringBytes : ByteArray = value.toByteArray();
+        connectionThread?.write(stringBytes);
+        promise.resolve(true);
+      }
+      catch(e : Exception) {
+        promise.reject("Error writing to connection",e)
       }
     }
 
