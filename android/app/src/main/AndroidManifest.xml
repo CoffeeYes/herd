@@ -28,6 +28,11 @@
         </intent-filter>
       </activity>
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+      <service
+        android:name="HerdBackgroundService"
+        android:exported="false"
+        android:description="@string/background_service_description">
+      </service>
     </application>
 
 </manifest>
