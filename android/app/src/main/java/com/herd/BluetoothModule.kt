@@ -42,9 +42,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private final val TAG : String = "BluetoothModule";
     val context = reactContext
 
-    private final val MESSAGE_READ: Int = 0
-    private final val MESSAGE_WRITE: Int = 1
-    private final val MESSAGE_TOAST: Int = 2
+    private val MESSAGE_READ: Int = 0
+    private val MESSAGE_WRITE: Int = 1
+    private val MESSAGE_TOAST: Int = 2
 
     var bluetoothEnabledPromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
@@ -129,7 +129,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       override fun handleMessage(msg : Message) {
         context.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit("NEW_MESSAGE","received")
+        .emit("NEW_MESSAGE",msg.toString())
       }
     }
 
@@ -368,7 +368,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private inner class BTConnectionThread(private val socket : BluetoothSocket, handler : Handler) : Thread() {
+    private inner class BTConnectionThread(private val socket : BluetoothSocket, private val handler : Handler) : Thread() {
       private val inputStream : InputStream = socket.inputStream;
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(1024);
@@ -385,6 +385,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                   Log.d(TAG, "Input stream was disconnected", e)
                   break
               }
+
+              val readMsg = handler.obtainMessage(
+                        MESSAGE_READ, numBytes, -1,
+                        buffer)
+              readMsg.sendToTarget();
           }
       }
 
