@@ -47,6 +47,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val MESSAGE_TOAST: Int = 2
 
     var bluetoothEnabledPromise : Promise? = null;
+    var bluetoothDiscoverablePromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
 
     override public fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
@@ -63,12 +64,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       //request make discoverable
       if(requestCode == 2) {
         if(resultCode == Activity.RESULT_OK) {
-          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTDiscoverableResult","ACCEPTED") */
+          bluetoothDiscoverablePromise?.resolve(true);
         }
         else {
-          /* reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTDiscoverableResult","DENIED") */
+          bluetoothDiscoverablePromise?.resolve(false)
         }
       }
 
@@ -245,8 +244,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         promise.reject("Activity is NULL")
       }
       else {
+        bluetoothDiscoverablePromise = promise;
         activity.startActivityForResult(discoverableIntent,2)
-        promise.resolve("")
       }
     }
 

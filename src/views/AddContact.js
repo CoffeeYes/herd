@@ -39,6 +39,7 @@ const AddContact = ({ navigation }) => {
       const locationEnableRequest = await Bluetooth.requestLocationEnable();
     }
     else {
+      Bluetooth.requestBTMakeDiscoverable(60);
       navigation.navigate("BTDeviceList");
     }
 
