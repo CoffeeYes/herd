@@ -50,7 +50,43 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     var bluetoothDiscoverablePromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
 
-    override public fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+    override fun getName(): String {
+        return "BluetoothModule"
+    }
+
+    //anonymous inner function to override class functions
+    /* private final val activityListener = object : BaseActivityEventListener() {
+      override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+        //request bluetooth
+        if(requestCode == 1) {
+          if(resultCode == Activity.RESULT_OK) {
+            bluetoothEnabledPromise?.resolve(true);
+          }
+          else {
+            bluetoothEnabledPromise?.resolve(false);
+          }
+        }
+
+        //request make discoverable
+        if(requestCode == 2) {
+          if(resultCode == Activity.RESULT_OK) {
+            bluetoothDiscoverablePromise?.resolve(true);
+          }
+          else {
+            bluetoothDiscoverablePromise?.resolve(false)
+          }
+        }
+
+        if(requestCode == 3) {
+          locationPermissionPromise?.resolve(resultCode)
+        }
+
+        bluetoothEnabledPromise = null;
+        locationPermissionPromise = null;
+      }
+    } */
+
+    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
       //request bluetooth
       if(requestCode == 1) {
         if(resultCode == Activity.RESULT_OK) {
@@ -79,8 +115,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       locationPermissionPromise = null;
     }
 
-    override fun onNewIntent(intent: Intent) {
-
+    override fun onNewIntent(intent : Intent) {
+      
     }
 
     private val BTReceiver = object : BroadcastReceiver() {
@@ -141,10 +177,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
     }
 
-    override fun getName(): String {
-        return "BluetoothModule"
-    }
-
     @ReactMethod
     fun scanForDevices(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
@@ -162,7 +194,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             promise.reject("Device Discovery could not be started")
           }
           else {
-
+            promise.resolve(true);
           }
         }
         else {
@@ -227,8 +259,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val REQUEST_ENABLE_BT = 1
           val activity : Activity? = getReactApplicationContext().getCurrentActivity();
           if(activity !== null) {
-            bluetoothEnabledPromise = promise;
-            activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+            try {
+              bluetoothEnabledPromise = promise;
+              activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+            }
+            catch(e : Exception) {
+              promise.reject("Error starting BT Enable Activity",e)
+            }
+          }
+          else {
+            promise.reject("Activity is NULL")
           }
         }
       }
