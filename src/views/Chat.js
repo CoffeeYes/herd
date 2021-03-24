@@ -45,6 +45,7 @@ const Chat = ({ route, navigation }) => {
         receivedMessages[message].text
       )
     }
+
     for(var message in sentMessagesCopy) {
       sentMessagesCopy[message].text = await Crypto.decryptString(
         "herdPersonal",
@@ -54,13 +55,14 @@ const Chat = ({ route, navigation }) => {
         sentMessagesCopy[message].text
       )
     }
+
     setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
   }
 
   const sendMessage = async message => {
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
     //default userData if there is none
-    if(Object.keys(userData).length === 0) {
+    if(!userData) {
       userData = {
         sent : [],
         received : [],
