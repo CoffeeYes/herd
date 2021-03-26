@@ -86,7 +86,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     } */
 
-    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
       //request bluetooth
       if(requestCode == 1) {
         if(resultCode == Activity.RESULT_OK) {
@@ -116,7 +116,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     override fun onNewIntent(intent : Intent) {
-      
+
     }
 
     private val BTReceiver = object : BroadcastReceiver() {
@@ -170,6 +170,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     init {
       /* reactContext.addActivityEventListener(activityListener) */
+      reactContext.addActivityEventListener(this);
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
       val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);

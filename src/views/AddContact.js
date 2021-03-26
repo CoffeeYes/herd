@@ -30,7 +30,7 @@ const AddContact = ({ navigation }) => {
     const locationAllowed = await Bluetooth.checkLocationPermission();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
     if(!btEnabled) {
-      Bluetooth.requestBTEnable()
+      await Bluetooth.requestBTEnable()
     }
     else if (!locationAllowed) {
       const locationRequest = await Bluetooth.requestLocationPermissions();
@@ -39,7 +39,7 @@ const AddContact = ({ navigation }) => {
       const locationEnableRequest = await Bluetooth.requestLocationEnable();
     }
     else {
-      Bluetooth.requestBTMakeDiscoverable(60);
+      await Bluetooth.requestBTMakeDiscoverable(60);
       navigation.navigate("BTDeviceList");
     }
 
