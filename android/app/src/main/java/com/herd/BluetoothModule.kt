@@ -38,7 +38,7 @@ import java.util.UUID
 import java.io.InputStream
 import java.io.OutputStream
 
-class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), ActivityEventListener {
+class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     private final val TAG : String = "BluetoothModule";
     val context = reactContext
 
@@ -48,6 +48,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
+    var bluetoothDiscoverableDuration : Int? = null;
     var locationPermissionPromise : Promise? = null;
 
     override fun getName(): String {
@@ -55,8 +56,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     //anonymous inner function to override class functions
-    /* private final val activityListener = object : BaseActivityEventListener() {
-      override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent) {
+    private final val activityListener = object : BaseActivityEventListener() {
+      override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
         //request bluetooth
         if(requestCode == 1) {
           if(resultCode == Activity.RESULT_OK) {
@@ -69,7 +70,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         //request make discoverable
         if(requestCode == 2) {
-          if(resultCode == Activity.RESULT_OK) {
+          //result code is equal to the requested duration when "yes", RESULT_CANCELLED when "no"
+          if(resultCode == bluetoothDiscoverableDuration) {
             bluetoothDiscoverablePromise?.resolve(true);
           }
           else {
@@ -84,39 +86,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bluetoothEnabledPromise = null;
         locationPermissionPromise = null;
       }
-    } */
-
-    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
-      //request bluetooth
-      if(requestCode == 1) {
-        if(resultCode == Activity.RESULT_OK) {
-          bluetoothEnabledPromise?.resolve(true);
-        }
-        else {
-          bluetoothEnabledPromise?.resolve(false);
-        }
-      }
-
-      //request make discoverable
-      if(requestCode == 2) {
-        if(resultCode == Activity.RESULT_OK) {
-          bluetoothDiscoverablePromise?.resolve(true);
-        }
-        else {
-          bluetoothDiscoverablePromise?.resolve(false)
-        }
-      }
-
-      if(requestCode == 3) {
-        locationPermissionPromise?.resolve(resultCode)
-      }
-
-      bluetoothEnabledPromise = null;
-      locationPermissionPromise = null;
-    }
-
-    override fun onNewIntent(intent : Intent) {
-
     }
 
     private val BTReceiver = object : BroadcastReceiver() {
@@ -169,8 +138,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     init {
-      /* reactContext.addActivityEventListener(activityListener) */
-      reactContext.addActivityEventListener(this);
+      reactContext.addActivityEventListener(activityListener);
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
       val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
@@ -277,6 +245,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun requestBTMakeDiscoverable(duration : Int, promise : Promise) {
+      bluetoothDiscoverableDuration = duration;
+
       val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
         putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, duration)
       }
