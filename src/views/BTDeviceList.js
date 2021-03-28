@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
   NativeEventEmitter } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
 import BTExchangeModal from './BTExchangeModal';
@@ -47,6 +48,12 @@ const BTDeviceList = () => {
       scanStateChangeListener.remove();
     }
   },[])
+
+  //cancel bluetooth scan when user unfocuses this component
+  useFocusEffect(useCallback(() => {
+    return async () => await Bluetooth.cancelScanForDevices();
+  },[])
+  )
 
   const handleDeviceClick = async device => {
     await Bluetooth.cancelScanForDevices();
