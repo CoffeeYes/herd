@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 const QRCodeModal = ({ visible, text, setVisible }) => {
@@ -50,7 +50,9 @@ const styles = {
     backgroundColor : "white",
     borderRadius : 5,
     padding : 20,
-    alignItems : "center"
+    alignItems : "center",
+    maxWidth : Dimensions.get('window').width * 0.8,
+    maxHeight : Dimensions.get('window').height * 0.8
   }
 }
 

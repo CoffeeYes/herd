@@ -63,9 +63,9 @@ const Contact = ({route, navigation}) => {
       <ScrollView>
         <TextInput
         multiline
-        disabled
+        editable={false}
         value={route.params.key}
-        style={{alignSelf : "center",flex : 1}}/>
+        style={{alignSelf : "center",flex : 1, color : "black"}}/>
 
         {showCopied && <Text
         style={{alignSelf : "center", fontWeight : "bold", fontSize : 18}}>
