@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Share } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from './Header'
 
 import QRCodeModal from './QRCodeModal'
 
@@ -53,12 +54,10 @@ const Contact = ({route, navigation}) => {
 
   return (
     <>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>{route.params.username}</Text>
-        <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("editContact", {username : route.params.username})}>
-          <Icon name="edit" size={24} style={{color : "white"}}/>
-        </TouchableOpacity>
-      </View>
+      <Header
+      title={route.params.username}
+      rightButtonIcon="edit"
+      rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 
       <ScrollView>
         <TextInput

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View, ActivityIndicator} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Header from './Header';
 
 const ContactItem = ({ navigation, contact, setContacts, type }) => {
   const [showDelete, setShowDelete] = useState(false);
@@ -68,15 +69,14 @@ const Contacts = ({ route, navigation }) => {
 
   return (
     <>
-      <View style={{...styles.header,paddingVertical : route.params.disableAddNew ? 15 : 0}}>
-        <Text style={styles.headerText}>Contacts</Text>
-        {!route.params.disableAddNew && <TouchableOpacity
-        onPress={() => navigation.navigate("addContact")}
-        style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
-          <Text style={styles.headerText}>+</Text>
-        </TouchableOpacity>}
-      </View>
+      <Header
+      title="Contacts"
+      {...(!route.params.disableAddNew && {rightButtonIcon : "add"})}
+      rightButtonOnClick={() => navigation.navigate("addContact")}
+      allowGoBack={route.params.disableAddNew}/>
+
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
+
       {contacts?.map( (contact, index) =>
         <ContactItem
         key={index}

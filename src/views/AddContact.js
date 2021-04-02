@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
+import Header from './Header'
 
 import QRCodeModal from './QRCodeModal'
 
@@ -51,9 +52,8 @@ const AddContact = ({ navigation }) => {
 
   return (
     <>
-      <View style={styles.header}>
-        <Text style={{color : "white"}}>Add Contact</Text>
-      </View>
+      <Header allowGoBack title="Add Contact" />
+      
       <View style={styles.mainContainer}>
         <View style={styles.row}>
 
