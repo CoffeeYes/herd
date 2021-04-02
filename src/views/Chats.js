@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Header from './Header'
 
 const ChatItem = ({name, navigation, reloadChats}) => {
   const [showDelete, setShowDelete] = useState(false);
@@ -72,22 +73,16 @@ const Chats = ({ navigation }) => {
 
   return (
     <>
-    <View style={styles.header}>
-      <Text style={{color : "white", fontSize : 18}}>
-        Chats
-      </Text>
-      <TouchableOpacity
-      onPress={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}
-      style={{backgroundColor : "#EBB3A9",paddingVertical : 15,paddingHorizontal : 20}}>
-        <View>
-          <Text style={styles.headerText}>+</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-    {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-    {chats?.map( (chat, index) =>
-      <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
-    )}
+      <Header
+      title="Chats"
+      rightButtonIcon="add"
+      rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
+
+      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
+
+      {chats?.map( (chat, index) =>
+        <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
+      )}
     </>
   )
 }
