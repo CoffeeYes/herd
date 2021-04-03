@@ -10,7 +10,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick }) => 
     paddingVertical : rightButtonIcon && rightButtonIcon.length > 0 ? 0 : 15}}>
       {allowGoBack &&
       <TouchableOpacity onPress={() => navigationRef.current.goBack()}>
-        <Icon name="arrow-back" size={24} style={{color : "blue"}}/>
+        <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
       </TouchableOpacity>}
 
       <Text style={styles.title}>{title}</Text>

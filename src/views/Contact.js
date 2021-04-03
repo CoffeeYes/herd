@@ -56,6 +56,7 @@ const Contact = ({route, navigation}) => {
     <>
       <Header
       title={route.params.username}
+      allowGoBack
       rightButtonIcon="edit"
       rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 

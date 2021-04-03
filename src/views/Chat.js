@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Text, View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import Header from './Header';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -120,9 +121,7 @@ const Chat = ({ route, navigation }) => {
 
   return (
     <View style={{flex : 1}}>
-      <View style={{backgroundColor : "#e05e3f",paddingVertical : 15,paddingLeft : 10}}>
-        <Text style={{color : "white",fontSize : 18}}>{route.params.username}</Text>
-      </View>
+      <Header title={route.params.username} allowGoBack />
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       <ScrollView
       contentContainerStyle={styles.messageContainer}
