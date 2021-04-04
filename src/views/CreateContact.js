@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Crypto from '../nativeWrapper/Crypto'
+import Crypto from '../nativeWrapper/Crypto';
+import Header from './Header'
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -55,29 +56,33 @@ const CreateContact = ({ navigation, route}) => {
   }
 
   return (
-    <View style={{padding : 20}}>
-      <Text style={styles.error}>{error}</Text>
+    <View>
+      <Header title="Create Contact" allowGoBack/>
+      
+      <View style={{padding : 20}}>
+        <Text style={styles.error}>{error}</Text>
 
-      <TextInput
-      placeholder="Name"
-      onChangeText={name => setUsername(name)}
-      defaultValue={""}
-      style={styles.input}/>
+        <TextInput
+        placeholder="Name"
+        onChangeText={name => setUsername(name)}
+        defaultValue={""}
+        style={styles.input}/>
 
-      <TextInput
-      placeholder="Public Key"
-      onChangeText={key => setPublicKey(key)}
-      style={styles.input}
-      editable={!route?.params?.publicKey}
-      value={publicKey}/>
+        <TextInput
+        placeholder="Public Key"
+        onChangeText={key => setPublicKey(key)}
+        style={styles.input}
+        editable={!route?.params?.publicKey}
+        value={publicKey}/>
 
-      <TouchableOpacity
-      style={styles.button}
-      onPress={() => createContact()}>
-        <Text style={styles.buttonText}>Import</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+        style={styles.button}
+        onPress={() => createContact()}>
+          <Text style={styles.buttonText}>Import</Text>
+        </TouchableOpacity>
 
-    </View>
+      </View>
+  </View>
   )
 }
 

@@ -5,6 +5,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Header from './Header'
 
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
@@ -41,36 +42,39 @@ const Settings = ({ navigation }) => {
   }
 
   return (
-    <ScrollView>
-      {showSnackbar &&
-      <Text style={{alignSelf : "center",fontSize : 18, fontWeight : "bold"}}>Copied!</Text>}
-      <TouchableOpacity
-      style={styles.button}
-      onPress={copyKeyToClipboard}>
-        <Text style={styles.buttonText}> Copy your key </Text>
-      </TouchableOpacity>
+    <View>
+      <Header title="Settings"/>
+      <ScrollView>
+        {showSnackbar &&
+        <Text style={{alignSelf : "center",fontSize : 18, fontWeight : "bold"}}>Copied!</Text>}
+        <TouchableOpacity
+        style={styles.button}
+        onPress={copyKeyToClipboard}>
+          <Text style={styles.buttonText}> Copy your key </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-      style={styles.button}
-      onPress={showQRCode}>
-        <Text style={styles.buttonText}> Show QR Code </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+        style={styles.button}
+        onPress={showQRCode}>
+          <Text style={styles.buttonText}> Show QR Code </Text>
+        </TouchableOpacity>
 
-      <QRCodeModal visible={QRCodeVisible} text={publicKey} setVisible={setQRCodeVisible}/>
+        <QRCodeModal visible={QRCodeVisible} text={publicKey} setVisible={setQRCodeVisible}/>
 
-      <TouchableOpacity
-      style={{...styles.button,backgroundColor : "red"}}
-      onPress={() => setShowDeleteModal(true)}>
-        <Text style={styles.buttonText}> Delete All Chats </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+        style={{...styles.button,backgroundColor : "red"}}
+        onPress={() => setShowDeleteModal(true)}>
+          <Text style={styles.buttonText}> Delete All Chats </Text>
+        </TouchableOpacity>
 
-      <ConfirmModal
-      visible={showDeleteModal}
-      setVisible={setShowDeleteModal}
-      onConfirm={deleteAllChats}
-      header={"Are you sure?"}
-      loading={modalLoading}/>
-    </ScrollView>
+        <ConfirmModal
+        visible={showDeleteModal}
+        setVisible={setShowDeleteModal}
+        onConfirm={deleteAllChats}
+        header={"Are you sure?"}
+        loading={modalLoading}/>
+      </ScrollView>
+    </View>
   )
 }
 
