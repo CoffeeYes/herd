@@ -1,7 +1,6 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
-import Header from './Header'
 
 const QRScanner = ({ navigation }) => {
 
@@ -13,8 +12,30 @@ const QRScanner = ({ navigation }) => {
   return (
     <QRCodeScanner
     onRead={handleRead}
-    topContent={<Header title="QR Code Scanner" allowGoBack/>}/>
+    bottomContent={
+      <TouchableOpacity
+      style={styles.button}
+      onPress={() => navigation.goBack()}>
+        <Text style={styles.buttonText}>Cancel</Text>
+      </TouchableOpacity>
+    }/>
   )
+}
+
+const styles = {
+  button : {
+    backgroundColor : "#E86252",
+    padding : 10,
+    alignSelf : "center",
+    marginTop : 10,
+    borderRadius : 5
+  },
+  buttonText : {
+    color : "white",
+    fontWeight : "bold",
+    fontFamily : "Open-Sans",
+    textAlign : "center"
+  },
 }
 
 export default QRScanner;
