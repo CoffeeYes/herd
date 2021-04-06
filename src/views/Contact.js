@@ -61,12 +61,6 @@ const Contact = ({route, navigation}) => {
       rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 
       <ScrollView>
-        <TextInput
-        multiline
-        editable={false}
-        value={route.params.key}
-        style={{alignSelf : "center",flex : 1, color : "black"}}/>
-
         {showCopied && <Text
         style={{alignSelf : "center", fontWeight : "bold", fontSize : 18}}>
         Copied!

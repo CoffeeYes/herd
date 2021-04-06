@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-nativ
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const EditContact = ({ route }) => {
+const EditContact = ({ route, navigation }) => {
   const [name, setName] = useState(route.params.username)
   const [publicKey, setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
@@ -35,6 +35,7 @@ const EditContact = ({ route }) => {
         ...savedContacts.filter(contact => contact.name !== route.params.username),
         newContact
       ]))
+      navigation.goBack();
     }
   }
 
