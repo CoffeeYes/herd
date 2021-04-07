@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from './Header';
 
 
 const EditContact = ({ route, navigation }) => {
@@ -40,30 +41,40 @@ const EditContact = ({ route, navigation }) => {
   }
 
   return (
-    <View>
-      <Text>{error}</Text>
-      <TextInput
-      style={styles.input}
-      onChangeText={text => setName(text)}
-      value={name}/>
+    <>
+      <Header title="Edit Contact" allowGoBack/>
+      <View style={styles.container}>
+        <Text>{error}</Text>
 
-      <TextInput
-      multiline={true}
-      style={styles.input}
-      onChangeText={text => setPublicKey(text)}
-      value={publicKey}/>
+        <Text style={styles.inputTitle}>Name</Text>
+        <TextInput
+        style={styles.input}
+        onChangeText={text => setName(text)}
+        value={name}/>
 
-      <TouchableOpacity
-      style={styles.button}
-      onPress={save}>
-        <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
+        <Text style={styles.inputTitle}>Public Key</Text>
+        <TextInput
+        multiline={true}
+        style={styles.input}
+        onChangeText={text => setPublicKey(text)}
+        value={publicKey}/>
 
-    </View>
+        <TouchableOpacity
+        style={styles.button}
+        onPress={save}>
+          <Text style={styles.buttonText}>Save</Text>
+        </TouchableOpacity>
+
+      </View>
+    </>
   )
 }
 
 const styles = {
+  container : {
+    padding : 20,
+    alignItems : "flex-start"
+  },
   button : {
     backgroundColor : "#E86252",
     padding : 10,
@@ -82,7 +93,12 @@ const styles = {
     borderWidth: 1,
     marginBottom : 10,
     width : Dimensions.get('window').width * 0.9,
-    alignSelf : "center"
+    alignSelf : "center",
+    padding : 10
+  },
+  inputTitle : {
+    fontWeight : "bold",
+    marginBottom : 5
   }
 }
 
