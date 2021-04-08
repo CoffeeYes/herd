@@ -94,7 +94,9 @@ const styles = {
     marginBottom : 10,
     width : Dimensions.get('window').width * 0.9,
     alignSelf : "center",
-    padding : 10
+    padding : 10,
+    backgroundColor : "white",
+    borderRadius : 5
   },
   inputTitle : {
     fontWeight : "bold",
