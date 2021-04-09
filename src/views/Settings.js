@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Text, TouchableOpacity, ScrollView, View, Modal } from 'react-native';
+import { Text, TouchableOpacity, ScrollView, View, Modal, Switch } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import Header from './Header'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from './Header';
 
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
@@ -14,6 +14,7 @@ const Settings = ({ navigation }) => {
   const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+  const [backgroundTransfer, setBackgroundTransfer] = useState(false);
 
   const copyKeyToClipboard = () => {
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => {
@@ -44,6 +45,22 @@ const Settings = ({ navigation }) => {
   return (
     <View>
       <Header title="Settings"/>
+
+      <View style={{alignSelf : "center",alignItems : "center"}}>
+        {!backgroundTransfer &&
+        <Text style={styles.warning}>
+        WARNING : if you disable background transfer your messages
+        will not be transmitted
+        </Text>}
+        <Text>Background Transfers</Text>
+        <Switch
+        onValueChange={() => setBackgroundTransfer(!backgroundTransfer)}
+        value={backgroundTransfer}
+        trackColor={{ false: "#767577", true: "#E86252" }}
+        thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
+        ios_backgroundColor="#E86252"/>
+      </View>
+
       <ScrollView>
         {showSnackbar &&
         <Text style={{alignSelf : "center",fontSize : 18, fontWeight : "bold"}}>Copied!</Text>}
@@ -91,6 +108,10 @@ const styles ={
     fontWeight : "bold",
     textAlign : "center",
     fontFamily : "Open-Sans"
+  },
+  warning : {
+    color : "red",
+    maxWidth : 300
   }
 }
 
