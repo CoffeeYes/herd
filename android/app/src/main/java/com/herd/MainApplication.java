@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.herd.CryptoPackage;
 import com.herd.BluetoothPackage;
+import com.herd.ServiceInterfacePackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
           // packages.add(new MyReactNativePackage());
           packages.add(new CryptoPackage());
           packages.add(new BluetoothPackage());
+          packages.add(new ServiceInterfacePackage());
           return packages;
         }
 

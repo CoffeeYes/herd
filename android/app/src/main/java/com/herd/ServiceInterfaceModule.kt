@@ -12,4 +12,14 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   override fun getName(): String {
       return "ServiceInterfaceModule"
   }
+
+  @ReactMethod
+  fun enableService() {
+
+  }
+
+  @ReactMethod
+  fun disableService() {
+    
+  }
 }

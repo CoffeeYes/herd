@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Text, TouchableOpacity, ScrollView, View, Modal, Switch } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -42,6 +43,16 @@ const Settings = ({ navigation }) => {
     setShowDeleteModal(false);
   }
 
+  const toggleBackgroundTransfer = value => {
+    setBackgroundTransfer(!backgroundTransfer)
+    if(value) {
+      ServiceInterface.enableService();
+    }
+    else {
+      ServiceInterface.disableService();
+    }
+  }
+
   return (
     <View>
       <Header title="Settings"/>
@@ -49,12 +60,12 @@ const Settings = ({ navigation }) => {
       <View style={{alignSelf : "center",alignItems : "center"}}>
         {!backgroundTransfer &&
         <Text style={styles.warning}>
-        WARNING : if you disable background transfer your messages
+        WARNING : if you disable background transfers your messages
         will not be transmitted
         </Text>}
         <Text>Background Transfers</Text>
         <Switch
-        onValueChange={() => setBackgroundTransfer(!backgroundTransfer)}
+        onValueChange={toggleBackgroundTransfer}
         value={backgroundTransfer}
         trackColor={{ false: "#767577", true: "#E86252" }}
         thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
