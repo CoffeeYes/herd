@@ -7,7 +7,14 @@ import com.facebook.react.bridge.Promise
 
 import com.herd.HerdBackgroundService
 
+import android.app.Service
+import android.content.Intent
+import android.content.Context
+import android.app.Activity
+import android.os.Bundle
+
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+  val context = reactContext
 
   override fun getName(): String {
       return "ServiceInterfaceModule"
@@ -15,11 +22,15 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   @ReactMethod
   fun enableService() {
-
+    val activity : Activity? = context.getCurrentActivity();
+    val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    context.startService(serviceIntent);
   }
 
   @ReactMethod
   fun disableService() {
-    
+    val activity : Activity? = context.getCurrentActivity();
+    val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    context.stopService(serviceIntent);
   }
 }
