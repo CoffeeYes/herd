@@ -12,47 +12,15 @@ import android.bluetooth.le.ScanResult
 import android.os.Handler
 
 class HerdBackgroundService : Service() {
-  private val TAG = "HerdBackgroundService"
+  private val TAG = "HerdBackgroundService";
+  var bluetoothAdapter : BluetoothAdapter? = null;
 
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
       try {
-        val bluetoothAdapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter === null) {
           throw("No Bluetooth Adapter Found" as Exception);
-        }
-        else {
-          val BLEScanner : BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner;
-          var scanning = false;
-          val handler = Handler();
-
-          val SCAN_PERIOD : Long = 10000;
-
-          val leScanCallback: ScanCallback = object : ScanCallback() {
-              override fun onScanResult(callbackType: Int, result: ScanResult) {
-                  super.onScanResult(callbackType, result);
-
-                  //perform actions related to finding a device
-              }
-          }
-
-          fun scanLeDevice() {
-              BLEScanner?.let { scanner ->
-                  if (!scanning) { // Stops scanning after a pre-defined scan period.
-                      handler.postDelayed({
-                          scanning = false
-                          scanner.stopScan(leScanCallback)
-                      }, SCAN_PERIOD)
-                      scanning = true
-                      scanner.startScan(leScanCallback)
-                  } else {
-                      scanning = false
-                      scanner.stopScan(leScanCallback)
-                  }
-              }
-          }
-
-          scanLeDevice();
         }
       }
       catch(e : Exception) {
@@ -60,8 +28,39 @@ class HerdBackgroundService : Service() {
       }
   }
 
+  val leScanCallback: ScanCallback = object : ScanCallback() {
+      override fun onScanResult(callbackType: Int, result: ScanResult) {
+          super.onScanResult(callbackType, result);
+          Log.i(TAG, "BLE Scan Result Callback Invoked")
+          //perform actions related to finding a device
+      }
+  }
+
+  fun scanLeDevice() {
+      val BLEScanner : BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner;
+      var scanning = false;
+      val handler = Handler();
+
+      val SCAN_PERIOD : Long = 10000;
+
+      BLEScanner?.let { scanner ->
+          if (!scanning) { // Stops scanning after a pre-defined scan period.
+              handler.postDelayed({
+                  scanning = false
+                  scanner.stopScan(leScanCallback)
+              }, SCAN_PERIOD)
+              scanning = true
+              scanner.startScan(leScanCallback)
+          } else {
+              scanning = false
+              scanner.stopScan(leScanCallback)
+          }
+      }
+  }
+
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
+        scanLeDevice();
         return Service.START_STICKY
     }
 
