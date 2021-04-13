@@ -11,6 +11,10 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.os.Handler
 
+import android.app.Notification
+import android.app.PendingIntent
+import android.R.drawable
+
 class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
   var bluetoothAdapter : BluetoothAdapter? = null;
@@ -22,6 +26,19 @@ class HerdBackgroundService : Service() {
         if(bluetoothAdapter === null) {
           throw("No Bluetooth Adapter Found" as Exception);
         }
+
+        val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
+            PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        }
+
+        val notification : Notification = Notification.Builder(this)
+        .setContentTitle("Herd Background Service")
+        .setContentText("Herd is Running in the background in order to transfer messages")
+        .setContentIntent(pendingIntent)
+        .setSmallIcon(1)
+        .build()
+
+        startForeground(5,notification)
       }
       catch(e : Exception) {
         Log.e(TAG, "Error creating background service",e)
