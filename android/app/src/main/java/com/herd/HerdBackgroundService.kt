@@ -31,11 +31,11 @@ class HerdBackgroundService : Service() {
             PendingIntent.getActivity(this, 0, notificationIntent, 0)
         }
 
-        val notification : Notification = Notification.Builder(this)
+        val notification : Notification = Notification.Builder(this,"Herd")
         .setContentTitle("Herd Background Service")
         .setContentText("Herd is Running in the background in order to transfer messages")
         .setContentIntent(pendingIntent)
-        .setSmallIcon(1)
+        .setSmallIcon(R.mipmap.ic_launcher)
         .build()
 
         startForeground(5,notification)
