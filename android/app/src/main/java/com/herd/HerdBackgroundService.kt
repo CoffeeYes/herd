@@ -12,6 +12,8 @@ import android.bluetooth.le.ScanResult
 import android.os.Handler
 
 import android.app.Notification
+import android.app.NotificationManager
+import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.R.drawable
 
@@ -31,14 +33,35 @@ class HerdBackgroundService : Service() {
             PendingIntent.getActivity(this, 0, notificationIntent, 0)
         }
 
-        val notification : Notification = Notification.Builder(this,"Herd")
+        //create notification channel
+        val CHANNEL_ID = "HerdServiceChannel"
+        val name = "Herd Service Channel"
+        val descriptionText = "Herd Background Service"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+        val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
+        mChannel.description = descriptionText
+        // Register the channel with the system; you can't change the importance
+        // or other notification behaviors after this
+        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(mChannel)
+
+        //create notification
+        val notification : Notification = Notification.Builder(this,CHANNEL_ID)
+        .setOngoing(true)
         .setContentTitle("Herd Background Service")
         .setContentText("Herd is Running in the background in order to transfer messages")
         .setContentIntent(pendingIntent)
         .setSmallIcon(R.mipmap.ic_launcher)
+        .setPriority(NotificationManager.IMPORTANCE_MIN)
+        .setCategory(Notification.CATEGORY_SERVICE)
         .build()
 
-        startForeground(5,notification)
+        try {
+          startForeground(5,notification)
+        }
+        catch(e : Exception) {
+          Log.e(TAG, "Error starting service in foreground")
+        }
       }
       catch(e : Exception) {
         Log.e(TAG, "Error creating background service",e)
