@@ -21,6 +21,10 @@ class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
   var bluetoothAdapter : BluetoothAdapter? = null;
 
+  companion object {
+    var running : Boolean = false;
+  }
+
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
       try {
@@ -101,6 +105,7 @@ class HerdBackgroundService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
         scanLeDevice();
+        running = true;
         return Service.START_STICKY
     }
 
@@ -111,5 +116,6 @@ class HerdBackgroundService : Service() {
 
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
+      running = false;
   }
 }

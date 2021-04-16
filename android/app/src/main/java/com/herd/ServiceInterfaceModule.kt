@@ -11,6 +11,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.Context
 import android.app.Activity
+import android.app.ActivityManager
 import android.os.Bundle
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -32,5 +33,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     context.stopService(serviceIntent);
+  }
+
+  @ReactMethod
+  fun isRunning() : Boolean {
+    return HerdBackgroundService.running;
   }
 }
