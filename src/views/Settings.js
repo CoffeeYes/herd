@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, ScrollView, View, Modal, Switch } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
@@ -43,7 +43,7 @@ const Settings = ({ navigation }) => {
     setShowDeleteModal(false);
   }
 
-  const toggleBackgroundTransfer = value => {
+  const toggleBackgroundTransfer = async value => {
     setBackgroundTransfer(!backgroundTransfer)
     if(value) {
       ServiceInterface.enableService();
@@ -52,6 +52,10 @@ const Settings = ({ navigation }) => {
       ServiceInterface.disableService();
     }
   }
+
+  useEffect(() => {
+    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+  },[])
 
   return (
     <View>

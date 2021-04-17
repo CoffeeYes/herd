@@ -36,7 +36,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun isRunning() : Boolean {
-    return HerdBackgroundService.running;
+  fun isRunning(promise : Promise) {
+    promise.resolve(HerdBackgroundService.running);
   }
 }
