@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, ScrollView, View, Modal, Switch } from 'react-n
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
+import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -44,11 +45,25 @@ const Settings = ({ navigation }) => {
   }
 
   const toggleBackgroundTransfer = async value => {
-    setBackgroundTransfer(!backgroundTransfer)
     if(value) {
-      ServiceInterface.enableService();
+      var btEnabled = await Bluetooth.checkBTEnabled();
+      var locationEnabled = await Bluetooth.checkLocationEnabled();
+
+      if(!btEnabled) {
+        btEnabled = await Bluetooth.requestBTEnable();
+      }
+
+      if(!locationEnabled) {
+        isLocationEnabled = await Bluetooth.requestLocationEnable();
+      }
+
+      if(btEnabled && locationEnabled) {
+        setBackgroundTransfer(true);
+        ServiceInterface.enableService();
+      }
     }
     else {
+      setBackgroundTransfer(false);
       ServiceInterface.disableService();
     }
   }
