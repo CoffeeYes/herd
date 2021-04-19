@@ -19,7 +19,8 @@ import android.R.drawable
 
 class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
-  var bluetoothAdapter : BluetoothAdapter? = null;
+  private var bluetoothAdapter : BluetoothAdapter? = null;
+  private var BLEScanner : BluetoothLeScanner? = null;
 
   companion object {
     var running : Boolean = false;
@@ -31,6 +32,11 @@ class HerdBackgroundService : Service() {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter === null) {
           throw("No Bluetooth Adapter Found" as Exception);
+        }
+
+        BLEScanner = bluetoothAdapter?.bluetoothLeScanner;
+        if(BLEScanner === null) {
+          throw("No BLE Scanner Found" as Exception);
         }
 
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
@@ -81,13 +87,12 @@ class HerdBackgroundService : Service() {
   }
 
   fun scanLeDevice() {
-      val BLEScanner : BluetoothLeScanner? = bluetoothAdapter?.bluetoothLeScanner;
-      var scanning = false;
+      /* var scanning = false;
       val handler = Handler();
 
-      val SCAN_PERIOD : Long = 10000;
+      val SCAN_PERIOD : Long = 10000; */
 
-      BLEScanner?.let { scanner ->
+      /* BLEScanner?.let { scanner ->
           if (!scanning) { // Stops scanning after a pre-defined scan period.
               handler.postDelayed({
                   scanning = false
@@ -99,7 +104,8 @@ class HerdBackgroundService : Service() {
               scanning = false
               scanner.stopScan(leScanCallback)
           }
-      }
+      } */
+      BLEScanner?.startScan(leScanCallback);
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -116,6 +122,7 @@ class HerdBackgroundService : Service() {
 
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
+      BLEScanner?.stopScan(leScanCallback)
       running = false;
   }
 }
