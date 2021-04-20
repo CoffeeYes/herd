@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, ScrollView, View, Modal, Switch } from 'react-native';
+import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -54,7 +54,14 @@ const Settings = ({ navigation }) => {
       }
 
       if(!locationEnabled) {
-        isLocationEnabled = await Bluetooth.requestLocationEnable();
+        Alert.alert(
+          "Location",
+          "Location is required to run in the background, enable it now?",
+          [
+            {text : "No"},
+            {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
+          ]
+        )
       }
 
       if(btEnabled && locationEnabled) {

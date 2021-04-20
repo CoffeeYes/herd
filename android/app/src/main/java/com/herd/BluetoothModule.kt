@@ -27,7 +27,7 @@ import androidx.appcompat.app.AlertDialog
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.content.DialogInterface
-import android.R
+import com.herd.R
 import android.provider.Settings
 import android.util.Log
 import android.os.Handler
@@ -294,18 +294,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun requestLocationEnable(promise : Promise) {
-      /* val alertBuilder = AlertDialog.Builder(getReactApplicationContext(),R.style.Theme_Dialog);
-      alertBuilder.setMessage("Bluetooth scanning requires location, enable it now?")
-      .setPositiveButton("Yes",DialogInterface.OnClickListener {
-        dialog, id ->
-          promise.resolve(true);
-      })
-      .setNegativeButton("No",DialogInterface.OnClickListener {
-        dialog, id ->
-          promise.resolve(false);
-      })
-      alertBuilder.create();
-      alertBuilder.show(); */
       val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity !== null) {
