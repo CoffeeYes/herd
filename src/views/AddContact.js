@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
@@ -37,6 +37,14 @@ const AddContact = ({ navigation }) => {
       const locationRequest = await Bluetooth.requestLocationPermissions();
     }
     else if (!locationEnabled) {
+      Alert.alert(
+        "Location",
+        "Location is required to run in the background, enable it now?",
+        [
+          {text : "No"},
+          {text : "Yes", onPress : async () => await Bluetooth.requestLocationEnable()}
+        ]
+      )
       const locationEnableRequest = await Bluetooth.requestLocationEnable();
     }
     else {
@@ -53,7 +61,7 @@ const AddContact = ({ navigation }) => {
   return (
     <>
       <Header allowGoBack title="Add Contact" />
-      
+
       <View style={styles.mainContainer}>
         <View style={styles.row}>
 
