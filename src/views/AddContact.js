@@ -33,10 +33,10 @@ const AddContact = ({ navigation }) => {
     if(!btEnabled) {
       await Bluetooth.requestBTEnable()
     }
-    else if (!locationAllowed) {
+    if (!locationAllowed) {
       const locationRequest = await Bluetooth.requestLocationPermissions();
     }
-    else if (!locationEnabled) {
+    if (!locationEnabled) {
       Alert.alert(
         "Location",
         "Location is required to run in the background, enable it now?",
@@ -45,7 +45,6 @@ const AddContact = ({ navigation }) => {
           {text : "Yes", onPress : async () => await Bluetooth.requestLocationEnable()}
         ]
       )
-      const locationEnableRequest = await Bluetooth.requestLocationEnable();
     }
     else {
       await Bluetooth.requestBTMakeDiscoverable(60) &&
