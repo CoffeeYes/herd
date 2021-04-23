@@ -11,6 +11,7 @@ const BTDeviceList = () => {
   const [scanning, setScanning] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
+  const [error, setError] = useState("");
 
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
@@ -64,7 +65,16 @@ const BTDeviceList = () => {
   }
 
   const restartScan = async () => {
-    await Bluetooth.scanForDevices();
+    const btEnabled = await Bluetooth.checkBTEnabled();
+    const locationEnabled = await Bluetooth.checkLocationEnabled();
+
+    if (!btEnabled || ! locationEnabled) {
+      return setError("Bluetooth and Location must be enabled to scan for devices")
+    }
+    else {
+      setError("");
+      await Bluetooth.scanForDevices();
+    }
   }
 
   return (
@@ -74,6 +84,9 @@ const BTDeviceList = () => {
         <Text>Scanning...</Text>
         <ActivityIndicator size="large" color="#e05e3f"/>
       </View>
+      }
+      {error.length > 0 &&
+      <Text style={styles.error}>{error}</Text>
       }
       <ScrollView contentContainerStyle={styles.BTList}>
         {deviceList.map((device,index) =>
@@ -129,6 +142,10 @@ const styles = {
     fontWeight : "bold",
     textAlign : "center",
     fontFamily : "Open-Sans"
+  },
+  error : {
+    color : "red",
+    fontWeight : "bold"
   }
 }
 
