@@ -9,7 +9,12 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanSettings
+import android.bluetooth.BluetoothDevice
 import android.os.Handler
+import android.os.ParcelUuid
+import java.util.UUID
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -21,6 +26,7 @@ class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
   private var bluetoothAdapter : BluetoothAdapter? = null;
   private var BLEScanner : BluetoothLeScanner? = null;
+  private final val serviceUUID = ParcelUuid(UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa"));
 
   companion object {
     var running : Boolean = false;
@@ -31,12 +37,12 @@ class HerdBackgroundService : Service() {
       try {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter === null) {
-          throw("No Bluetooth Adapter Found" as Exception);
+          throw Exception("No Bluetooth Adapter Found");
         }
 
         BLEScanner = bluetoothAdapter?.bluetoothLeScanner;
         if(BLEScanner === null) {
-          throw("No BLE Scanner Found" as Exception);
+          throw Exception("No BLE Scanner Found");
         }
 
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
@@ -83,6 +89,11 @@ class HerdBackgroundService : Service() {
           super.onScanResult(callbackType, result);
           Log.i(TAG, "BLE Scan Result Callback Invoked")
           //perform actions related to finding a device
+          val device : BluetoothDevice = result.getDevice();
+          val name = device.getName();
+          val address = device.getAddress();
+          Log.i(TAG, "device name : " + name);
+          Log.i(TAG, "device Address : " + address);
       }
   }
 
@@ -105,7 +116,15 @@ class HerdBackgroundService : Service() {
               scanner.stopScan(leScanCallback)
           }
       } */
-      BLEScanner?.startScan(leScanCallback);
+      val filter = ScanFilter.Builder()
+      .setServiceUuid(serviceUUID)
+      .build()
+
+      val settings = ScanSettings.Builder()
+      .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+      .build()
+
+      BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
