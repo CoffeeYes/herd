@@ -95,10 +95,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           BluetoothDevice.ACTION_FOUND -> {
                 // Discovery has found a device. Get the BluetoothDevice
                 // object and its info from the Intent.
-                val device: BluetoothDevice =
+                val device: BluetoothDevice? =
                         intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                val deviceName = device.name
-                val deviceHardwareAddress = device.address // MAC address
+                val deviceName = device?.name
+                val deviceHardwareAddress = device?.address // MAC address
 
                 //create object to pass to javascript
                 val deviceObject : WritableMap = Arguments.createMap();
@@ -321,7 +321,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             } catch (e: Exception) {
                 shouldLoop = false
                 throw(e);
-                null
             }
             connectionSocket?.also {
                 /* manageBTServerConnection(it) */
@@ -458,7 +457,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun cancelListenAsServer(promise : Promise) {
       try {
         val alive : Boolean? = BTServerThread?.isAlive();
-        if(alive === true) {
+        if(alive != null && alive === true) {
             BTServerThread?.cancel();
         }
         promise.resolve(true);

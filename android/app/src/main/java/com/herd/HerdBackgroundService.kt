@@ -68,7 +68,6 @@ class HerdBackgroundService : Service() {
         .setContentText("Herd is Running in the background in order to transfer messages")
         .setContentIntent(pendingIntent)
         .setSmallIcon(R.mipmap.ic_launcher)
-        .setPriority(NotificationManager.IMPORTANCE_MIN)
         .setCategory(Notification.CATEGORY_SERVICE)
         .build()
 
