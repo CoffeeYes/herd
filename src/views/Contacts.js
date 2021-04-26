@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, Image, View, ActivityIndicator} from 'react-native';
+import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
@@ -26,10 +26,15 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
         :
         navigation.navigate("chat",{username : contact.name})}
       onLongPress={() => setShowDelete(!showDelete)}>
-        <Image
-        source={contact.image}
-        style={styles.image}/>
-
+        <View style={styles.imageContainer}>
+          {contact.image ?
+          <Image
+          source={contact.image}
+          style={styles.image}/>
+          :
+          <Icon name="contact-page" size={24} style={styles.image}/>
+          }
+        </View>
         <Text style={styles.contactText}>{contact.name}</Text>
         {showDelete &&
         <TouchableOpacity
@@ -113,6 +118,19 @@ const styles = {
   image : {
     borderRadius : 50,
     overflow : "hidden",
+    alignSelf : "center"
+  },
+  imageContainer : {
+    borderWidth : 1,
+    borderColor : "grey",
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
+    marginLeft : 10,
+    borderRadius : Dimensions.get("window").width * 0.05,
+    alignItems : "center",
+    justifyContent : "center",
+    overflow : "hidden",
+    alignSelf : "center"
   },
   deleteButton : {
     backgroundColor : "#e05e3f",
