@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Share } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Share, Image, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,6 +12,7 @@ const Contact = ({route, navigation}) => {
   const [showCopied, setShowCopied] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [contactKey, setContactKey] = useState("");
+  const [contactImage, setContactImage] = useState("");
 
   useEffect(() => {
     loadKey();
@@ -23,6 +24,9 @@ const Contact = ({route, navigation}) => {
 
     if(contact) {
       setContactKey(contact.key);
+      if(contact.image) {
+        setContactImage(contact.image);
+      }
     }
   }
 
@@ -61,6 +65,16 @@ const Contact = ({route, navigation}) => {
       rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 
       <ScrollView>
+        <View style={styles.imageContainer}>
+          {contactImage ?
+          <Image
+          source={contactImage}
+          style={styles.image}/>
+          :
+          <Icon name="contact-page" size={64} style={styles.image}/>
+          }
+        </View>
+
         {showCopied && <Text
         style={{alignSelf : "center", fontWeight : "bold", fontSize : 18}}>
         Copied!
@@ -122,6 +136,16 @@ const styles = {
     color : "white",
     fontWeight : "bold",
     fontFamily : "Open-Sans"
+  },
+  imageContainer : {
+    alignSelf : "center",
+    width : Dimensions.get("window").width * 0.4,
+    height : Dimensions.get("window").width * 0.4,
+    borderRadius : Dimensions.get("window").width * 0.2,
+    borderWidth : 1,
+    borderColor : "grey",
+    alignItems : "center",
+    justifyContent : "center",
   }
 }
 
