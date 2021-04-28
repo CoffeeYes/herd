@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 
@@ -8,6 +9,7 @@ const EditContact = ({ route, navigation }) => {
   const [name, setName] = useState(route.params.username)
   const [publicKey, setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
+  const [contactImage, setContactImage] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -45,6 +47,18 @@ const EditContact = ({ route, navigation }) => {
       <Header title="Edit Contact" allowGoBack/>
       <View style={styles.container}>
         <Text>{error}</Text>
+
+        <TouchableOpacity style={{alignSelf : "center"}}>
+          <View style={styles.imageContainer}>
+            {contactImage ?
+            <Image
+            source={contactImage}
+            style={styles.image}/>
+            :
+            <Icon name="contact-page" size={64} style={styles.image}/>
+            }
+          </View>
+        </TouchableOpacity>
 
         <Text style={styles.inputTitle}>Name</Text>
         <TextInput
@@ -101,6 +115,16 @@ const styles = {
   inputTitle : {
     fontWeight : "bold",
     marginBottom : 5
+  },
+  imageContainer : {
+    alignSelf : "center",
+    width : Dimensions.get("window").width * 0.4,
+    height : Dimensions.get("window").width * 0.4,
+    borderRadius : Dimensions.get("window").width * 0.2,
+    borderWidth : 1,
+    borderColor : "grey",
+    alignItems : "center",
+    justifyContent : "center",
   }
 }
 
