@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-nativ
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
+import {launchImageLibrary} from 'react-native-image-picker';
 
 
 const EditContact = ({ route, navigation }) => {
@@ -42,13 +43,22 @@ const EditContact = ({ route, navigation }) => {
     }
   }
 
+  const editImage = async () => {
+    const options = {
+      mediaType : 'photo'
+    }
+    launchImageLibrary({},response => {
+      
+    });
+  }
+
   return (
     <>
       <Header title="Edit Contact" allowGoBack/>
       <View style={styles.container}>
         <Text>{error}</Text>
 
-        <TouchableOpacity style={{alignSelf : "center"}}>
+        <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
             {contactImage ?
             <Image
