@@ -34,7 +34,7 @@ const EditContact = ({ route, navigation }) => {
     }
     else {
       var oldContact = savedContacts.find(contact => contact.name === route.params.username);
-      var newContact = {...oldContact,name : name.trim(),key : publicKey.trim()};
+      var newContact = {...oldContact,name : name.trim(),key : publicKey.trim(), image : contactImage};
       await AsyncStorage.setItem("contacts",JSON.stringify([
         ...savedContacts.filter(contact => contact.name !== route.params.username),
         newContact
@@ -44,11 +44,17 @@ const EditContact = ({ route, navigation }) => {
   }
 
   const editImage = async () => {
+    setError("");
     const options = {
       mediaType : 'photo'
     }
     launchImageLibrary({},response => {
-      
+      if(response.errorCode) {
+        setError(response.errorMessage)
+      }
+      else {
+        setContactImage(response.uri);
+      }
     });
   }
 
