@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
@@ -24,6 +24,7 @@ const EditContact = ({ route, navigation }) => {
 
     if(contact) {
       setPublicKey(contact.key);
+      setContactImage(contact.image);
     }
   }
 
@@ -46,14 +47,15 @@ const EditContact = ({ route, navigation }) => {
   const editImage = async () => {
     setError("");
     const options = {
-      mediaType : 'photo'
+      mediaType : 'photo',
+      includeBase64 : true
     }
-    launchImageLibrary({},response => {
+    launchImageLibrary(options,response => {
       if(response.errorCode) {
         setError(response.errorMessage)
       }
-      else {
-        setContactImage(response.uri);
+      else if(!response.didCancel) {
+        setContactImage(response.base64);
       }
     });
   }
@@ -68,7 +70,7 @@ const EditContact = ({ route, navigation }) => {
           <View style={styles.imageContainer}>
             {contactImage ?
             <Image
-            source={contactImage}
+            source={{uri : "data:image/png;base64," + contactImage}}
             style={styles.image}/>
             :
             <Icon name="contact-page" size={64} style={styles.image}/>
@@ -141,6 +143,11 @@ const styles = {
     borderColor : "grey",
     alignItems : "center",
     justifyContent : "center",
+    overflow : "hidden"
+  },
+  image : {
+    width : Dimensions.get("window").width * 0.4,
+    height : Dimensions.get("window").width * 0.4,
   }
 }
 
