@@ -64,11 +64,11 @@ const Contact = ({route, navigation}) => {
       rightButtonIcon="edit"
       rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 
-      <ScrollView>
+      <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={styles.imageContainer}>
           {contactImage ?
           <Image
-          source={contactImage}
+          source={{uri : contactImage}}
           style={styles.image}/>
           :
           <Icon name="contact-page" size={64} style={styles.image}/>
@@ -146,6 +146,11 @@ const styles = {
     borderColor : "grey",
     alignItems : "center",
     justifyContent : "center",
+    overflow : "hidden"
+  },
+  image : {
+    width : Dimensions.get("window").width * 0.4,
+    height : Dimensions.get("window").width * 0.4,
   }
 }
 

@@ -55,7 +55,7 @@ const EditContact = ({ route, navigation }) => {
         setError(response.errorMessage)
       }
       else if(!response.didCancel) {
-        setContactImage(response.base64);
+        setContactImage("data:" + response.type + ";base64," + response.base64);
       }
     });
   }
@@ -70,7 +70,7 @@ const EditContact = ({ route, navigation }) => {
           <View style={styles.imageContainer}>
             {contactImage ?
             <Image
-            source={{uri : "data:image/png;base64," + contactImage}}
+            source={{uri : contactImage}}
             style={styles.image}/>
             :
             <Icon name="contact-page" size={64} style={styles.image}/>

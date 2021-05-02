@@ -29,7 +29,7 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
         <View style={styles.imageContainer}>
           {contact.image ?
           <Image
-          source={contact.image}
+          source={{uri : contact.image}}
           style={styles.image}/>
           :
           <Icon name="contact-page" size={24} style={styles.image}/>
@@ -131,6 +131,10 @@ const styles = {
     justifyContent : "center",
     overflow : "hidden",
     alignSelf : "center"
+  },
+  image : {
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
   },
   deleteButton : {
     backgroundColor : "#e05e3f",
