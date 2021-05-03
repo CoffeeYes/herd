@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, Image } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
@@ -59,6 +59,41 @@ const EditContact = ({ route, navigation }) => {
       }
     });
   }
+
+  useEffect(() => {
+    navigation.addListener('beforeRemove', async (e) => {
+      const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+      setSavedContacts(contacts);
+      const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+
+      if(contact) {
+        const unsavedChanges = (
+          contact.image != contactImage ||
+          contact.name != name ||
+          contact.key != publicKey
+        )
+
+        if(unsavedChanges) {
+          e.preventDefault();
+          console.log("changed image")
+          Alert.alert(
+            'Discard changes?',
+            'You have unsaved changes. Are you sure to discard them and leave the screen?',
+            [
+              { text: "Don't leave", style: 'cancel', onPress: () => {} },
+              {
+                text: 'Discard',
+                style: 'destructive',
+                // If the user confirmed, then we dispatch the action we blocked earlier
+                // This will continue the action that had triggered the removal of the screen
+                onPress: () => navigation.dispatch(e.data.action),
+              },
+            ]
+          );
+        }
+      }
+    })
+  },[navigation])
 
   return (
     <>
