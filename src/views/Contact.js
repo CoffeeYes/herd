@@ -71,7 +71,7 @@ const Contact = ({route, navigation}) => {
           source={{uri : contactImage}}
           style={styles.image}/>
           :
-          <Icon name="contact-page" size={64} style={styles.image}/>
+          <Icon name="contact-page" size={64} style={styles.icon}/>
           }
         </View>
 

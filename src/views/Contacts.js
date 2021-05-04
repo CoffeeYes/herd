@@ -32,7 +32,7 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
           source={{uri : contact.image}}
           style={styles.image}/>
           :
-          <Icon name="contact-page" size={24} style={styles.image}/>
+          <Icon name="contact-page" size={24} style={styles.icon}/>
           }
         </View>
         <Text style={styles.contactText}>{contact.name}</Text>
@@ -127,10 +127,10 @@ const styles = {
     height : Dimensions.get("window").width * 0.1,
     marginLeft : 10,
     borderRadius : Dimensions.get("window").width * 0.05,
-    alignItems : "center",
-    justifyContent : "center",
     overflow : "hidden",
-    alignSelf : "center"
+    alignSelf : "center",
+    alignItems : "center",
+    justifyContent : "center"
   },
   image : {
     width : Dimensions.get("window").width * 0.1,
