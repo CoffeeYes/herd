@@ -80,9 +80,10 @@ const Contacts = ({ route, navigation }) => {
       rightButtonOnClick={() => navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>
 
-      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-
-      {contacts?.map( (contact, index) =>
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
+      contacts?.map( (contact, index) =>
         <ContactItem
         key={index}
         contact={contact}

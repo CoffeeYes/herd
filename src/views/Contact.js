@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Share, Image, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, Share,
+         Image, Dimensions , ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,9 +14,9 @@ const Contact = ({route, navigation}) => {
   const [showQRCode, setShowQRCode] = useState(false);
   const [contactKey, setContactKey] = useState("");
   const [contactImage, setContactImage] = useState("");
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    loadKey();
+    loadKey().then(() => setLoading(false))
   },[])
 
   const loadKey = async () => {
@@ -64,6 +65,9 @@ const Contact = ({route, navigation}) => {
       rightButtonIcon="edit"
       rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
 
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={styles.imageContainer}>
           {contactImage ?
@@ -103,7 +107,7 @@ const Contact = ({route, navigation}) => {
         text={contactKey}
         />
 
-      </ScrollView>
+      </ScrollView>}
     </>
   )
 }

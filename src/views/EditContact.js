@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
+         ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
@@ -12,9 +13,10 @@ const EditContact = ({ route, navigation }) => {
   const [savedContacts,setSavedContacts] = useState([]);
   const [contactImage, setContactImage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadContactInfo()
+    loadContactInfo().then(() => setLoading(false));
   },[])
 
   const loadContactInfo = async () => {
@@ -98,6 +100,9 @@ const EditContact = ({ route, navigation }) => {
   return (
     <>
       <Header title="Edit Contact" allowGoBack/>
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
       <View style={styles.container}>
         <Text>{error}</Text>
 
@@ -132,7 +137,7 @@ const EditContact = ({ route, navigation }) => {
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
 
-      </View>
+      </View>}
     </>
   )
 }
