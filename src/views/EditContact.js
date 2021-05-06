@@ -63,7 +63,8 @@ const EditContact = ({ route, navigation }) => {
   }
 
   useEffect(() => {
-    navigation.addListener('beforeRemove', async (e) => {
+    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
+      e.preventDefault();
       const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
       setSavedContacts(contacts);
       const contact = contacts.find(savedContact => savedContact.name === route.params.username);
@@ -76,8 +77,6 @@ const EditContact = ({ route, navigation }) => {
         )
 
         if(unsavedChanges) {
-          e.preventDefault();
-          console.log("changed image")
           Alert.alert(
             'Discard changes?',
             'You have unsaved changes. Are you sure to discard them and leave the screen?',
@@ -93,8 +92,13 @@ const EditContact = ({ route, navigation }) => {
             ]
           );
         }
+        else {
+          navigation.dispatch(e.data.action);
+        }
       }
     })
+
+    return beforeGoingBack;
   },[navigation])
 
   return (
