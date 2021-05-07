@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -8,12 +8,30 @@ import {launchImageLibrary} from 'react-native-image-picker';
 
 
 const EditContact = ({ route, navigation }) => {
-  const [name, setName] = useState(route.params.username)
-  const [publicKey, setPublicKey] = useState("");
+  const [name, _setName] = useState(route.params.username)
+  const [publicKey, _setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
-  const [contactImage, setContactImage] = useState("");
+  const [contactImage, _setContactImage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const nameRef = useRef();
+  const keyRef = useRef();
+  const imageRef = useRef();
+
+  //refs for accessing state in event listeners, used to prevent discarding unsaved changes
+  const setPublicKey = data => {
+    keyRef.current = data;
+    _setPublicKey(data)
+  }
+  const setName = data => {
+    nameRef.current = data;
+    _setName(data)
+  }
+  const setContactImage = data => {
+    imageRef.current = data;
+    _setContactImage(data)
+  }
 
   useEffect(() => {
     loadContactInfo().then(() => setLoading(false));
@@ -25,6 +43,7 @@ const EditContact = ({ route, navigation }) => {
     const contact = contacts.find(savedContact => savedContact.name === route.params.username);
 
     if(contact) {
+      setName(contact.name)
       setPublicKey(contact.key);
       setContactImage(contact.image);
     }
@@ -62,18 +81,19 @@ const EditContact = ({ route, navigation }) => {
     });
   }
 
+
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
       const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-      setSavedContacts(contacts);
       const contact = contacts.find(savedContact => savedContact.name === route.params.username);
 
       if(contact) {
+
         const unsavedChanges = (
-          contact.image != contactImage ||
-          contact.name != name ||
-          contact.key != publicKey
+          contact.name != nameRef.current ||
+          contact.key != keyRef.current ||
+          contact.image != imageRef.current
         )
 
         if(unsavedChanges) {
