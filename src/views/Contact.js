@@ -132,9 +132,11 @@ const styles = {
   button : {
     backgroundColor : "#E86252",
     padding : 10,
-    alignSelf : "center",
     marginTop : 10,
-    borderRadius : 5
+    borderRadius : 5,
+    alignSelf : "center",
+    alignItems : "center",
+    width : Dimensions.get("window").width * 0.3
   },
   buttonText : {
     color : "white",
@@ -150,7 +152,8 @@ const styles = {
     borderColor : "grey",
     alignItems : "center",
     justifyContent : "center",
-    overflow : "hidden"
+    overflow : "hidden",
+    backgroundColor : "white"
   },
   image : {
     width : Dimensions.get("window").width * 0.4,
