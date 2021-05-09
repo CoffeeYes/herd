@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header'
 
-const ChatItem = ({name, navigation, reloadChats}) => {
+const ChatItem = ({name, navigation, reloadChats, image}) => {
   const [showDelete, setShowDelete] = useState(false);
 
   const deleteChat = async name => {
@@ -19,10 +19,20 @@ const ChatItem = ({name, navigation, reloadChats}) => {
 
   return (
     <TouchableOpacity
-    style={{...styles.chat,padding : showDelete ? 0 : 20, paddingLeft : 20}}
+    style={{...styles.chat,paddingVertical : showDelete ? 0 : 10, paddingLeft : 20}}
     onPress={() => navigation.navigate("chat", {username : name})}
     onLongPress={() => setShowDelete(!showDelete)}>
+      <View style={styles.imageContainer}>
+        {image ?
+        <Image
+        source={{uri : image}}
+        style={styles.image}/>
+        :
+        <Icon name="contact-page" size={24} style={styles.icon}/>
+        }
+      </View>
       <Text style={styles.chatText}>{name}</Text>
+
       {showDelete &&
       <TouchableOpacity
       style={styles.deleteButton}
@@ -32,6 +42,7 @@ const ChatItem = ({name, navigation, reloadChats}) => {
       }}>
         <Icon name="delete" size={24} style={{color : "black"}}/>
       </TouchableOpacity>}
+
     </TouchableOpacity>
   )
 }
@@ -64,7 +75,7 @@ const Chats = ({ navigation }) => {
       await Promise.all(contacts.map(async contact => {
         const userData = JSON.parse(await AsyncStorage.getItem(contact.name));
         if(userData?.received?.length > 0 || userData?.sentCopy?.length > 0) {
-          chatsWithMessages.push({name : contact.name})
+          chatsWithMessages.push({name : contact.name,image : contact.image})
         }
       }))
       setChats(chatsWithMessages)
@@ -81,7 +92,12 @@ const Chats = ({ navigation }) => {
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
 
       {chats?.map( (chat, index) =>
-        <ChatItem name={chat.name} key={index} navigation={navigation} reloadChats={loadContactsWithChats}/>
+        <ChatItem
+        name={chat.name}
+        key={index}
+        navigation={navigation}
+        reloadChats={loadContactsWithChats}
+        image={chat.image}/>
       )}
     </>
   )
@@ -93,7 +109,7 @@ const styles = {
     flex : 1,
     backgroundColor : "white",
     alignItems : "center",
-    justifyContent : "space-between",
+    justifyContent : "flex-start",
     borderBottomWidth : 0.2,
     borderBottomColor : "#e05e3f"
   },
@@ -111,7 +127,24 @@ const styles = {
   deleteButton : {
     backgroundColor : "#e05e3f",
     padding : 13,
-    paddingVertical : 20
+    paddingVertical : 20,
+    marginLeft : "auto"
+  },
+  imageContainer : {
+    borderWidth : 1,
+    borderColor : "grey",
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
+    marginRight : 10,
+    borderRadius : Dimensions.get("window").width * 0.05,
+    overflow : "hidden",
+    alignSelf : "center",
+    alignItems : "center",
+    justifyContent : "center"
+  },
+  image : {
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
   },
 }
 

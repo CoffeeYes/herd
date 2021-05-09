@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Dimensions, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
@@ -70,6 +70,7 @@ const CreateContact = ({ navigation, route}) => {
         setError(response.errorMessage)
       }
       else if(!response.didCancel) {
+        console.log("data:" + response.type + ";base64," + response.base64)
         setContactImage("data:" + response.type + ";base64," + response.base64);
       }
     });
