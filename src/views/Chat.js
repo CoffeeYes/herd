@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import { Text, View, ScrollView, TextInput, ActivityIndicator,Image, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import Header from './Header';
@@ -121,8 +121,20 @@ const Chat = ({ route, navigation }) => {
 
   return (
     <View style={{flex : 1}}>
-      <Header title={route.params.username} allowGoBack />
+      <Header
+      title={route.params.username}
+      allowGoBack
+      preText={
+        contactInfo.image &&
+        <View style={styles.imageContainer}>
+          <Image
+          source={{uri : contactInfo.image}}
+          style={styles.image}/>
+        </View>
+      }/>
+
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
+
       <ScrollView
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
@@ -177,6 +189,23 @@ const styles = {
     backgroundColor : "white",
     marginTop : "auto",
     paddingLeft : 10
+  },
+  imageContainer : {
+    borderWidth : 1,
+    borderColor : "grey",
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
+    marginLeft : 10,
+    borderRadius : Dimensions.get("window").width * 0.05,
+    overflow : "hidden",
+    alignSelf : "center",
+    alignItems : "center",
+    justifyContent : "center",
+    marginRight : 20
+  },
+  image : {
+    width : Dimensions.get("window").width * 0.1,
+    height : Dimensions.get("window").width * 0.1,
   },
 }
 
