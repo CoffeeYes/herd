@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions} fro
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
+import ContactImage from './ContactImage';
 
 const ContactItem = ({ navigation, contact, setContacts, type }) => {
   const [showDelete, setShowDelete] = useState(false);
@@ -27,13 +28,11 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
         navigation.navigate("chat",{username : contact.name})}
       onLongPress={() => setShowDelete(!showDelete)}>
         <View style={styles.imageContainer}>
-          {contact.image ?
-          <Image
-          source={{uri : contact.image}}
-          style={styles.image}/>
-          :
-          <Icon name="contact-page" size={24} style={styles.icon}/>
-          }
+          <ContactImage
+          contactName={contact.name}
+          iconSize={24}
+          imageWidth={Dimensions.get("window").width * 0.1}
+          imageHeight={Dimensions.get("window").height * 0.1}/>
         </View>
         <Text style={styles.contactText}>{contact.name}</Text>
         {showDelete &&

@@ -4,7 +4,8 @@ import { View, Text, TouchableOpacity, ScrollView, TextInput, Share,
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Header from './Header'
+import Header from './Header';
+import ContactImage from './ContactImage';
 
 import QRCodeModal from './QRCodeModal'
 
@@ -70,13 +71,11 @@ const Contact = ({route, navigation}) => {
       :
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={styles.imageContainer}>
-          {contactImage ?
-          <Image
-          source={{uri : contactImage}}
-          style={styles.image}/>
-          :
-          <Icon name="contact-page" size={64} style={styles.icon}/>
-          }
+          <ContactImage
+          contactName={route.params.username}
+          iconSize={64}
+          imageWidth={Dimensions.get("window").width * 0.4}
+          imageHeight={Dimensions.get("window").height * 0.4}/>
         </View>
 
         {showCopied && <Text

@@ -5,6 +5,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import {launchImageLibrary} from 'react-native-image-picker';
+import ContactImage from './ContactImage';
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -85,14 +86,12 @@ const CreateContact = ({ navigation, route}) => {
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
-            {contactImage ?
-            <Image
-            source={{uri : contactImage}}
-            style={styles.image}/>
-            :
-            <Icon name="contact-page" size={64} style={styles.icon}/>
-            }
-          </View>
+            <ContactImage
+            contactName={""}
+            iconSize={64}
+            imageWidth={Dimensions.get("window").width * 0.4}
+            imageHeight={Dimensions.get("window").height * 0.4}/>
+            </View>
         </TouchableOpacity>
 
         <TextInput

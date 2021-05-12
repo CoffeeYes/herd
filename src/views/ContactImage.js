@@ -3,7 +3,7 @@ import { Image, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ContactImage = ({ contactName, size, imageWidth, imageHeight }) => {
+const ContactImage = ({ contactName, iconSize, imageWidth, imageHeight }) => {
   const [imageURI, setImageURI] = useState("");
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const ContactImage = ({ contactName, size, imageWidth, imageHeight }) => {
       source={{uri : imageURI}}
       style={{width : imageWidth, height : imageHeight}}/>
       :
-      <Icon name="contact-page" size={24} style={styles.icon}/>
+      <Icon name="contact-page" size={iconSize}/>
       }
     </>
   )

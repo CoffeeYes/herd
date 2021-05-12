@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
+import ContactImage from './ContactImage';
 
 
 const EditContact = ({ route, navigation }) => {
@@ -132,13 +133,11 @@ const EditContact = ({ route, navigation }) => {
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
-            {contactImage ?
-            <Image
-            source={{uri : contactImage}}
-            style={styles.image}/>
-            :
-            <Icon name="contact-page" size={64} style={styles.icon}/>
-            }
+            <ContactImage
+            contactName={route.params.username}
+            iconSize={64}
+            imageWidth={Dimensions.get("window").width * 0.4}
+            imageHeight={Dimensions.get("window").height * 0.4}/>
           </View>
         </TouchableOpacity>
 
