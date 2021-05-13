@@ -72,7 +72,7 @@ const Contact = ({route, navigation}) => {
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={styles.imageContainer}>
           <ContactImage
-          contactName={route.params.username}
+          imageURI={contactImage}
           iconSize={64}
           imageWidth={Dimensions.get("window").width * 0.4}
           imageHeight={Dimensions.get("window").height * 0.4}/>
@@ -154,10 +154,6 @@ const styles = {
     overflow : "hidden",
     backgroundColor : "white"
   },
-  image : {
-    width : Dimensions.get("window").width * 0.4,
-    height : Dimensions.get("window").width * 0.4,
-  }
 }
 
 export default Contact;

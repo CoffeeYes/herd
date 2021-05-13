@@ -29,7 +29,7 @@ const ContactItem = ({ navigation, contact, setContacts, type }) => {
       onLongPress={() => setShowDelete(!showDelete)}>
         <View style={styles.imageContainer}>
           <ContactImage
-          contactName={contact.name}
+          imageURI={contact.image}
           iconSize={24}
           imageWidth={Dimensions.get("window").width * 0.1}
           imageHeight={Dimensions.get("window").height * 0.1}/>
@@ -131,10 +131,6 @@ const styles = {
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center"
-  },
-  image : {
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
   },
   deleteButton : {
     backgroundColor : "#e05e3f",

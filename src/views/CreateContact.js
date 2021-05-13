@@ -87,7 +87,7 @@ const CreateContact = ({ navigation, route}) => {
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
             <ContactImage
-            contactName={""}
+            imageURI={contactImage}
             iconSize={64}
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
@@ -154,10 +154,6 @@ const styles = {
     backgroundColor : "white",
     marginBottom : 20
   },
-  image : {
-    width : Dimensions.get("window").width * 0.4,
-    height : Dimensions.get("window").width * 0.4,
-  }
 }
 
 export default CreateContact;

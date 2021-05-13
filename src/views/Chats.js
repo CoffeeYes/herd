@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Header from './Header'
+import Header from './Header';
+import ContactImage from './ContactImage'
 
 const ChatItem = ({name, navigation, reloadChats, image}) => {
   const [showDelete, setShowDelete] = useState(false);
@@ -23,13 +24,11 @@ const ChatItem = ({name, navigation, reloadChats, image}) => {
     onPress={() => navigation.navigate("chat", {username : name})}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={styles.imageContainer}>
-        {image ?
-        <Image
-        source={{uri : image}}
-        style={styles.image}/>
-        :
-        <Icon name="contact-page" size={24} style={styles.icon}/>
-        }
+        <ContactImage
+        imageURI={image}
+        iconSize={24}
+        imageWidth={Dimensions.get("window").width * 0.1}
+        imageHeight={Dimensions.get("window").height * 0.1}/>
       </View>
       <Text style={styles.chatText}>{name}</Text>
 
@@ -141,11 +140,7 @@ const styles = {
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center"
-  },
-  image : {
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
-  },
+  }
 }
 
 export default Chats;

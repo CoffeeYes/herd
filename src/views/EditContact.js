@@ -134,7 +134,7 @@ const EditContact = ({ route, navigation }) => {
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
             <ContactImage
-            contactName={route.params.username}
+            imageURI={contactImage}
             iconSize={64}
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
@@ -209,10 +209,6 @@ const styles = {
     overflow : "hidden",
     backgroundColor : "white"
   },
-  image : {
-    width : Dimensions.get("window").width * 0.4,
-    height : Dimensions.get("window").width * 0.4,
-  }
 }
 
 export default EditContact;
