@@ -4,8 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
 import Icon from 'react-native-vector-icons/MaterialIcons'
-import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
+import {launchImageLibrary} from 'react-native-image-picker';
+import 'react-native-get-random-values';
+import { v4 as uuidv4 } from 'uuid';
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -45,12 +47,19 @@ const CreateContact = ({ navigation, route}) => {
         contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
       }
 
+      //generate new unique uuid for the contact
+      var id = uuidv4();
+      while(contacts.find(user => user.id === id) != undefined) {
+        id = uuidv4();
+      }
+
       //create new user if the username isnt taken
       if(!(contacts.find(user => user.name === username))) {
         await AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
           name : username.trim(),
           key : publicKey.trim(),
-          image : contactImage
+          image : contactImage,
+          id : id
         }]))
         navigation.navigate("main");
       }

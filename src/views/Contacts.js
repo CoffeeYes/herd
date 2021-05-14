@@ -113,7 +113,8 @@ const styles = {
     borderBottomWidth : 0.2
   },
   contactText : {
-    padding : 20
+    padding : 20,
+    paddingLeft : 10
   },
   image : {
     borderRadius : 50,

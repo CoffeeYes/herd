@@ -20,7 +20,7 @@ const ChatItem = ({name, navigation, reloadChats, image}) => {
 
   return (
     <TouchableOpacity
-    style={{...styles.chat,paddingVertical : showDelete ? 0 : 10, paddingLeft : 20}}
+    style={{...styles.chat,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10}}
     onPress={() => navigation.navigate("chat", {username : name})}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={styles.imageContainer}>
