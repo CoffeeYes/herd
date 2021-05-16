@@ -125,7 +125,7 @@ const Chat = ({ route, navigation }) => {
       title={route.params.username}
       allowGoBack
       preText={
-        contactInfo.image &&
+        contactInfo.image?.length > 0 &&
         <View style={styles.imageContainer}>
           <Image
           source={{uri : contactInfo.image}}
