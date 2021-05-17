@@ -3,48 +3,8 @@ import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } fr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
-import ContactImage from './ContactImage'
-
-const ChatItem = ({name, navigation, reloadChats, image}) => {
-  const [showDelete, setShowDelete] = useState(false);
-
-  const deleteChat = async name => {
-    await AsyncStorage.setItem(name,JSON.stringify({
-      sent : [],
-      received : [],
-      sentCopy :  []
-    }));
-    setShowDelete(false);
-    reloadChats();
-  }
-
-  return (
-    <TouchableOpacity
-    style={{...styles.chat,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10}}
-    onPress={() => navigation.navigate("chat", {username : name})}
-    onLongPress={() => setShowDelete(!showDelete)}>
-      <View style={styles.imageContainer}>
-        <ContactImage
-        imageURI={image}
-        iconSize={24}
-        imageWidth={Dimensions.get("window").width * 0.1}
-        imageHeight={Dimensions.get("window").height * 0.1}/>
-      </View>
-      <Text style={styles.chatText}>{name}</Text>
-
-      {showDelete &&
-      <TouchableOpacity
-      style={styles.deleteButton}
-      onPress={() => {
-        setShowDelete(false);
-        deleteChat(name);
-      }}>
-        <Icon name="delete" size={24} style={{color : "black"}}/>
-      </TouchableOpacity>}
-
-    </TouchableOpacity>
-  )
-}
+import ContactImage from './ContactImage';
+import ListItem from './ListItem'
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
@@ -81,6 +41,15 @@ const Chats = ({ navigation }) => {
     }
   }
 
+  const deleteChat = async name => {
+    await AsyncStorage.setItem(name,JSON.stringify({
+      sent : [],
+      received : [],
+      sentCopy :  []
+    }));
+    loadContactsWithChats();
+  }
+
   return (
     <>
       <Header
@@ -91,12 +60,13 @@ const Chats = ({ navigation }) => {
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
 
       {chats?.map( (chat, index) =>
-        <ChatItem
+        <ListItem
         name={chat.name}
         key={index}
         navigation={navigation}
-        reloadChats={loadContactsWithChats}
-        image={chat.image}/>
+        image={chat.image}
+        deleteItem={name => deleteChat(name)}
+        />
       )}
     </>
   )
