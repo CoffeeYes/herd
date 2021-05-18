@@ -3,13 +3,13 @@ import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } fr
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 
-const ListItem = ({ name, image, deleteItem, navigation }) => {
+const ListItem = ({ name, image, deleteItem, onPress }) => {
   const [showDelete, setShowDelete ] = useState(false);
 
   return (
     <TouchableOpacity
     style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10}}
-    onPress={() => navigation.navigate("chat", {username : name})}
+    onPress={onPress}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={styles.imageContainer}>
         <ContactImage

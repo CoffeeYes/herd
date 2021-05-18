@@ -1,52 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
-import ContactImage from './ContactImage';
-
-const ContactItem = ({ navigation, contact, setContacts, type }) => {
-  const [showDelete, setShowDelete] = useState(false);
-
-  const deleteContact = async name => {
-    var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    for(var i = 0; i < contacts.length; i++) {
-      if(contacts[i].name === name) {
-        contacts.splice(i,1);
-      }
-    }
-    await AsyncStorage.setItem("contacts",JSON.stringify(contacts));
-    setContacts(contacts)
-  }
-
-  return (
-      <TouchableOpacity
-      style={styles.contact}
-      onPress={() => type === "contacts" ?
-        navigation.navigate("contact", {username : contact.name, key : contact.key})
-        :
-        navigation.navigate("chat",{username : contact.name})}
-      onLongPress={() => setShowDelete(!showDelete)}>
-        <View style={styles.imageContainer}>
-          <ContactImage
-          imageURI={contact.image}
-          iconSize={24}
-          imageWidth={Dimensions.get("window").width * 0.1}
-          imageHeight={Dimensions.get("window").height * 0.1}/>
-        </View>
-        <Text style={styles.contactText}>{contact.name}</Text>
-        {showDelete &&
-        <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => {
-          setShowDelete(false);
-          deleteContact(contact.name);
-        }}>
-          <Icon name="delete" size={24} style={{color : "black"}}/>
-        </TouchableOpacity>}
-      </TouchableOpacity>
-  )
-}
+import ListItem from './ListItem'
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -71,6 +27,17 @@ const Contacts = ({ route, navigation }) => {
     setLoading(false);
   }
 
+  const deleteContact = async name => {
+    var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+    for(var i = 0; i < contacts.length; i++) {
+      if(contacts[i].name === name) {
+        contacts.splice(i,1);
+      }
+    }
+    await AsyncStorage.setItem("contacts",JSON.stringify(contacts));
+    setContacts(contacts)
+  }
+
   return (
     <>
       <Header
@@ -83,12 +50,14 @@ const Contacts = ({ route, navigation }) => {
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
       contacts?.map( (contact, index) =>
-        <ContactItem
+        <ListItem
+        name={contact.name}
         key={index}
-        contact={contact}
         navigation={navigation}
-        setContacts={setContacts}
-        type={route.params.type}/>
+        image={contact.image}
+        onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
+        deleteItem={name => deleteContact(name)}
+        />
       )}
     </>
   )

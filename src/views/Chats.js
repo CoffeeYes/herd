@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
-import ContactImage from './ContactImage';
 import ListItem from './ListItem'
 
 const Chats = ({ navigation }) => {
@@ -65,6 +63,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
+        onPress={() => navigation.navigate("chat", {username : chat.name})}
         deleteItem={name => deleteChat(name)}
         />
       )}
@@ -92,24 +91,6 @@ const styles = {
   headerText : {
     fontSize : 18,
     color : "white"
-  },
-  deleteButton : {
-    backgroundColor : "#e05e3f",
-    padding : 13,
-    paddingVertical : 20,
-    marginLeft : "auto"
-  },
-  imageContainer : {
-    borderWidth : 1,
-    borderColor : "grey",
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
-    marginRight : 10,
-    borderRadius : Dimensions.get("window").width * 0.05,
-    overflow : "hidden",
-    alignSelf : "center",
-    alignItems : "center",
-    justifyContent : "center"
   }
 }
 
