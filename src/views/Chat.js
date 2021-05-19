@@ -124,6 +124,10 @@ const Chat = ({ route, navigation }) => {
       <Header
       title={route.params.username}
       allowGoBack
+      onTextTouch={() => navigation.navigate("contact", {
+        username : contactInfo.name,
+        key : contactInfo.key
+      })}
       preText={
         contactInfo.image?.length > 0 &&
         <View style={styles.imageContainer}>

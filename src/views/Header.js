@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'
 
-const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText }) => {
+const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextTouch }) => {
   return (
     <View style={{
     ...styles.container,
@@ -13,8 +13,18 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
       </TouchableOpacity>}
 
-      {preText}
-      <Text style={styles.title}>{title}</Text>
+      {onTextTouch ?
+        <TouchableOpacity onPress={onTextTouch} style={styles.pressContainer}>
+          {preText}
+          <Text style={styles.title}>{title}</Text>
+        </TouchableOpacity>
+        :
+        <>
+          {preText}
+          <Text style={styles.title}>{title}</Text>
+        </>
+      }
+
 
       {rightButtonIcon && rightButtonIcon.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
@@ -43,6 +53,9 @@ const styles = {
     backgroundColor : "#EBB3A9",
     paddingVertical : 15,
     paddingHorizontal : Dimensions.get("window").width * 0.05
+  },
+  pressContainer : {
+    marginRight : "auto",
   }
 }
 
