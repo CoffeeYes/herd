@@ -5,13 +5,11 @@ import navigationRef from '../NavigationRef'
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextTouch }) => {
   return (
-    <View style={{
-    ...styles.container,
-    paddingVertical : rightButtonIcon && rightButtonIcon.length > 0 ? 0 : 15}}>
+    <View style={styles.container}>
       {allowGoBack &&
-      <TouchableOpacity onPress={() => navigationRef.current.goBack()}>
-        <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
-      </TouchableOpacity>}
+        <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
+          <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
+        </TouchableOpacity>}
 
       {onTextTouch ?
         <TouchableOpacity onPress={onTextTouch} style={styles.pressContainer}>
@@ -42,20 +40,24 @@ const styles = {
     justifyContent : "space-between",
     alignItems : "center",
     backgroundColor : "#e05e3f",
-    paddingLeft : 20,
+    paddingLeft : 10,
+    height : Dimensions.get("window").height * 0.075
   },
   title : {
     color : "white",
     fontSize : 18,
-    marginRight : "auto"
   },
   rightButton : {
     backgroundColor : "#EBB3A9",
-    paddingVertical : 15,
+    height : "100%",
+    alignItems : "center",
+    justifyContent : "center",
     paddingHorizontal : Dimensions.get("window").width * 0.05
   },
   pressContainer : {
-    marginRight : "auto",
+    width : "100%",
+    height : "100%",
+    justifyContent : "center"
   }
 }
 
