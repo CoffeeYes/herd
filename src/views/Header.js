@@ -46,6 +46,7 @@ const styles = {
   title : {
     color : "white",
     fontSize : 18,
+    marginRight : "auto"
   },
   rightButton : {
     backgroundColor : "#EBB3A9",

@@ -41,7 +41,8 @@ const BTDeviceList = () => {
       }
     })
 
-    const scanner = Bluetooth.scanForDevices();
+    const scanner = Bluetooth.scanForDevices()
+    .catch(e => setError("Something went wrong, please try again"))
 
     //cleanup
     return () => {
