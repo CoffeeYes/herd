@@ -266,8 +266,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         getReactApplicationContext(),
         permission.ACCESS_BACKGROUND_LOCATION
       )
-      if(backgroundLocationAllowed === PackageManager.PERMISSION_GRANTED) {
-        promise.resolve(true)
+      val fineLocationAllowed = ContextCompat.checkSelfPermission(
+        getReactApplicationContext(),
+        permission.ACCESS_FINE_LOCATION
+      )
+
+      if(backgroundLocationAllowed === PackageManager.PERMISSION_GRANTED &&
+        fineLocationAllowed === PackageManager.PERMISSION_GRANTED) {
+          promise.resolve(true)
       }
       else {
         promise.resolve(false)
@@ -275,12 +281,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun requestLocationPermissions() {
+    fun requestLocationPermissions(promise : Promise) {
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity !== null) {
+        locationPermissionPromise = promise;
         ActivityCompat.requestPermissions(
           activity,
-          arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
+          arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_FINE_LOCATION),
           3
         )
       }
