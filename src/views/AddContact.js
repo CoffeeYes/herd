@@ -27,6 +27,7 @@ const AddContact = ({ navigation }) => {
   }
 
   const requestBTPermissions = async () => {
+    setBTError("");
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationAllowed = await Bluetooth.checkLocationPermission();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
@@ -34,7 +35,8 @@ const AddContact = ({ navigation }) => {
       await Bluetooth.requestBTEnable()
     }
     if (!locationAllowed) {
-      const locationRequest = await Bluetooth.requestLocationPermissions();
+      const locationRequest = Bluetooth.requestLocationPermissions();
+      if(!locationAllowed) { return setBTError("You must enable location permissions for Herd in settings")}
     }
     if (!locationEnabled) {
       Alert.alert(
