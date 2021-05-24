@@ -113,6 +113,12 @@ const Settings = ({ navigation }) => {
           <Text style={styles.buttonText}> Show QR Code </Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate("customise")}>
+          <Text style={styles.buttonText}> Customise </Text>
+        </TouchableOpacity>
+
         <QRCodeModal visible={QRCodeVisible} text={publicKey} setVisible={setQRCodeVisible}/>
 
         <TouchableOpacity

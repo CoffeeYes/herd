@@ -32,6 +32,7 @@ import Main from './src/views/Main';
 import BTDeviceList from './src/views/BTDeviceList';
 import QRScanner from './src/views/QRScanner';
 import EditContact from './src/views/EditContact';
+import Customise from './src/views/Customise';
 
 const Stack = createStackNavigator()
 
@@ -65,6 +66,7 @@ const App = ({ }) => {
             <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
             <Stack.Screen name="QRScanner" component={QRScanner}/>
             <Stack.Screen name="editContact" component={EditContact}/>
+            <Stack.Screen name="customise" component={Customise}/>
           </Stack.Navigator>
     </>
   );
