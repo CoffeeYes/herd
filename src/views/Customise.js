@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, Dimensions } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
+import ColorChoice from './ColorChoice'
 
 const Customise = ({ }) => {
   const [sentBoxColor, setSentBoxColor] = useState("");
@@ -13,31 +14,38 @@ const Customise = ({ }) => {
       <View style={styles.messagesContainer}>
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
-          <Text style={{...styles.messageText, color : sentTextColor}}>Hello</Text>
+          <Text style={{...styles.messageText, color : sentTextColor || "black"}}>Hello</Text>
           <Text style={styles.timestamp}>12:20 - 15.01</Text>
         </View>
 
         <View
         style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
-          <Text style={{...styles.messageText,color : receivedTextColor}}>Goodbye</Text>
+          <Text style={{...styles.messageText,color : receivedTextColor || "black"}}>Goodbye</Text>
           <Text style={styles.timestamp}>12:21 - 15.01</Text>
         </View>
       </View>
 
-      <View style={styles.colorPickerContainer}>
-        <ColorPicker
-        style={styles.colorPicker}
-        onColorChange={color => setSentBoxColor(fromHsv(color))}/>
-      </View>
-      <ColorPicker
-      color={sentTextColor}
-      onColorSelected={color => setSentTextColor(color)}/>
-      <ColorPicker
-      color={receivedBoxColor}
-      onColorSelected={color => setReceivedBoxColor(color)}/>
-      <ColorPicker
-      color={receivedTextColor}
-      onColorSelected={color => setReceivedTextColor(color)}/>
+      <ColorChoice
+        title={"Sent Box Color"}
+        color={sentBoxColor}
+        setColor={setSentBoxColor}
+      />
+      <ColorChoice
+        title={"Sent Text Color"}
+        color={sentTextColor}
+        setColor={setSentTextColor}
+      />
+      <ColorChoice
+        title={"Received Box Color"}
+        color={receivedBoxColor}
+        setColor={setReceivedBoxColor}
+      />
+      <ColorChoice
+        title={"Received Text Color"}
+        color={receivedTextColor}
+        setColor={setReceivedTextColor}
+      />
+
     </ScrollView>
   )
 }
