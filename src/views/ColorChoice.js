@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons'
 
 const ColorChoice = ({ title, style, setColor }) => {
   const [open, setOpen] = useState(false);
@@ -12,7 +13,8 @@ const ColorChoice = ({ title, style, setColor }) => {
     <TouchableOpacity
     style={styles.tab}
     onPress={() => setOpen(!open)}>
-      <Text>{title}</Text>
+      <Text style={styles.title}>{title}</Text>
+      <Icon style={styles.icon} name="expand-less" size={24}/>
     </TouchableOpacity>
     <View style={styles.colorPickerContainer}>
       <ColorPicker
@@ -25,7 +27,8 @@ const ColorChoice = ({ title, style, setColor }) => {
     <TouchableOpacity
     onPress={() => setOpen(!open)}
     style={styles.tab}>
-      <Text>{title}</Text>
+      <Text style={{...styles.title,fontWeight : "bold"}}>{title}</Text>
+      <Icon style={styles.icon} name="expand-more" size={24}/>
     </TouchableOpacity>}
     </>
   )
@@ -45,6 +48,14 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     backgroundColor : "white",
-    paddingVertical : 20
+    paddingVertical : 20,
+    flexDirection : "row"
+  },
+  title : {
+    marginLeft : "auto",
+    marginRight : "auto"
+  },
+  icon : {
+    marginRight : 10
   }
 }

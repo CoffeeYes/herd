@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ScrollView, View, Text, Dimensions } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import ColorChoice from './ColorChoice'
+import Header from './Header'
 
 const Customise = ({ }) => {
   const [sentBoxColor, setSentBoxColor] = useState("");
@@ -11,6 +12,8 @@ const Customise = ({ }) => {
 
   return (
     <ScrollView>
+      <Header title="Customise" allowGoBack/>
+
       <View style={styles.messagesContainer}>
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
@@ -30,16 +33,19 @@ const Customise = ({ }) => {
         color={sentBoxColor}
         setColor={setSentBoxColor}
       />
+
       <ColorChoice
         title={"Sent Text Color"}
         color={sentTextColor}
         setColor={setSentTextColor}
       />
+
       <ColorChoice
         title={"Received Box Color"}
         color={receivedBoxColor}
         setColor={setReceivedBoxColor}
       />
+
       <ColorChoice
         title={"Received Text Color"}
         color={receivedTextColor}
