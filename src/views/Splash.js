@@ -2,13 +2,27 @@ import React, { useState } from 'react';
 import { View, Text, Button, Platform, Dimensions } from 'react-native';
 import palette from '../assets/palette.js';
 import Crypto from '../nativeWrapper/Crypto';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Splash = ({ navigation }) => {
   const [textWidth, setTextWidth] = useState(100);
 
   const setup = async () => {
+    //generate keys
     await Crypto.generateRSAKeyPair('herdPersonal');
-    navigation.navigate('main')
+
+    //set default styling
+    const style = {
+      sentBoxColor : "#c6c6c6",
+      sentTextColor : "#f5f5f5",
+      receivedBoxColor : "#E86252",
+      receivedTextColor : "#f5f5f5"
+    }
+
+    await AsyncStorage.setItem("styles",JSON.stringify(style))
+
+    navigation.navigate('main');
+
   }
 
   return (
