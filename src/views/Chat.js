@@ -12,6 +12,7 @@ const Chat = ({ route, navigation }) => {
   const [ownPublicKey, setOwnPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
+  const [customStyle, setCustomStyle] = useState({});
 
   useEffect(() => {
     AsyncStorage.getItem("contacts").then(result => {
@@ -20,7 +21,8 @@ const Chat = ({ route, navigation }) => {
       setContactInfo(result.find(contact => contact.name === route.params.username))
     });
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
-    loadMessages().then( () => setLoading(false))
+    loadMessages().then( () => setLoading(false));
+    loadStyles();
   },[])
 
   const loadMessages = async () => {
@@ -58,6 +60,11 @@ const Chat = ({ route, navigation }) => {
     }
 
     setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
+  }
+
+  const loadStyles = async () => {
+    const style = JSON.parse(await AsyncStorage.getItem("styles"));
+    setCustomStyle(style)
   }
 
   const sendMessage = async message => {
@@ -146,11 +153,16 @@ const Chat = ({ route, navigation }) => {
         {messages.map( (message,index) =>
           <View
           style={message.from === ownPublicKey ?
-            {...styles.message,...styles.messageFromYou}
+            {...styles.message,...styles.messageFromYou, backgroundColor : customStyle.sentBoxColor}
             :
-            {...styles.message,...styles.messageFromOther}}
+            {...styles.message,...styles.messageFromOther, backgroundColor : customStyle.receivedBoxColor}}
           key={index}>
-            <Text style={styles.messageText}>{message.text}</Text>
+            <Text
+            style={{
+              ...styles.messageText,
+              color : message.from === ownPublicKey ? customStyle.sentTextColor : customStyle.receivedTextColor}}>
+              {message.text}
+            </Text>
             <Text style={styles.timestamp}>{moment(message.timestamp).format("HH:mm - DD.MM")}</Text>
           </View>
         )}
