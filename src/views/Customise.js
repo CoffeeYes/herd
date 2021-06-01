@@ -10,6 +10,7 @@ const Customise = ({ }) => {
   const [sentTextColor, setSentTextColor] = useState("");
   const [receivedBoxColor, setReceivedBoxColor] = useState("");
   const [receivedTextColor, setReceivedTextColor] = useState("");
+  const [activeItem, setActiveItem] = useState("sentBox");
 
   useEffect(() => {
     loadStyles();
@@ -61,29 +62,57 @@ const Customise = ({ }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+        style={{...styles.button, marginRight : 10}}
+        onPress={() => setActiveItem("sentBox")}>
+          <Text style={styles.buttonText}>Sent Box</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        style={{...styles.button, marginRight : 10}}
+        onPress={() => setActiveItem("sentText")}>
+          <Text style={styles.buttonText}>Sent Text</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        style={{...styles.button, marginRight : 10}}
+        onPress={() => setActiveItem("receivedBox")}>
+          <Text style={styles.buttonText}>Received Box</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        style={{...styles.button, marginRight : 10}}
+        onPress={() => setActiveItem("receivedText")}>
+          <Text style={styles.buttonText}>Received Text</Text>
+        </TouchableOpacity>
+
+      </View>
+
+      {activeItem === "sentBox" &&
       <ColorChoice
         title={"Sent Box Color"}
         color={sentBoxColor}
         setColor={setSentBoxColor}
-      />
+      />}
 
+      {activeItem === "sentText" &&
       <ColorChoice
         title={"Sent Text Color"}
         color={sentTextColor}
         setColor={setSentTextColor}
-      />
+      />}
 
+      {activeItem === "receivedBox" &&
       <ColorChoice
         title={"Received Box Color"}
         color={receivedBoxColor}
         setColor={setReceivedBoxColor}
-      />
+      />}
 
+      {activeItem === "receivedText" &&
       <ColorChoice
         title={"Received Text Color"}
         color={receivedTextColor}
         setColor={setReceivedTextColor}
-      />
+      />}
 
     </ScrollView>
   )
@@ -127,5 +156,8 @@ const styles = {
     fontWeight : "bold",
     textAlign : "center"
   },
+  buttonRow : {
+    flexDirection : "row",
+  }
 }
 export default Customise;
