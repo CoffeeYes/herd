@@ -62,26 +62,26 @@ const Customise = ({ }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
-      <View style={styles.buttonRow}>
+      <View style={styles.tabRow}>
         <TouchableOpacity
-        style={{...styles.button, marginRight : 10}}
+        style={{...styles.tabItem,backgroundColor : activeItem === "sentBox" ? "grey" : "white"}}
         onPress={() => setActiveItem("sentBox")}>
-          <Text style={styles.buttonText}>Sent Box</Text>
+          <Text style={styles.tabText}>Sent Box</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.button, marginRight : 10}}
+        style={{...styles.tabItem,backgroundColor : activeItem === "sentText" ? "grey" : "white"}}
         onPress={() => setActiveItem("sentText")}>
-          <Text style={styles.buttonText}>Sent Text</Text>
+          <Text style={styles.tabText}>Sent Text</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.button, marginRight : 10}}
+        style={{...styles.tabItem,backgroundColor : activeItem === "receivedBox" ? "grey" : "white"}}
         onPress={() => setActiveItem("receivedBox")}>
-          <Text style={styles.buttonText}>Received Box</Text>
+          <Text style={styles.tabText}>Received Box</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.button, marginRight : 10}}
+        style={{...styles.tabItem,backgroundColor : activeItem === "receivedText" ? "grey" : "white"}}
         onPress={() => setActiveItem("receivedText")}>
-          <Text style={styles.buttonText}>Received Text</Text>
+          <Text style={styles.tabText}>Received Text</Text>
         </TouchableOpacity>
 
       </View>
@@ -156,8 +156,22 @@ const styles = {
     fontWeight : "bold",
     textAlign : "center"
   },
-  buttonRow : {
+  tabRow : {
     flexDirection : "row",
+    backgroundColor : "white",
+    justifyContent : "space-around"
+  },
+  tabItem : {
+    borderRightWidth : 1,
+    borderRightColor : "black",
+    padding : 10
+  },
+  activeTabItem : {
+    backgroundColor : "grey"
+  },
+  tabText : {
+    color : "black",
+    fontWeight : "bold"
   }
 }
 export default Customise;
