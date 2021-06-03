@@ -11,6 +11,7 @@ const Customise = ({ }) => {
   const [receivedBoxColor, setReceivedBoxColor] = useState("");
   const [receivedTextColor, setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState("sentBox");
+  const [tabWidth, setTabWidth] = useState(0);
 
   useEffect(() => {
     loadStyles();
@@ -62,24 +63,24 @@ const Customise = ({ }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
-      <View style={styles.tabRow}>
+      <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
         <TouchableOpacity
-        style={{...styles.tabItem,backgroundColor : activeItem === "sentBox" ? "grey" : "white"}}
+        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentBox" ? "#EBB3A9" : "white"}}
         onPress={() => setActiveItem("sentBox")}>
           <Text style={styles.tabText}>Sent Box</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.tabItem,backgroundColor : activeItem === "sentText" ? "grey" : "white"}}
+        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentText" ? "#EBB3A9" : "white"}}
         onPress={() => setActiveItem("sentText")}>
           <Text style={styles.tabText}>Sent Text</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.tabItem,backgroundColor : activeItem === "receivedBox" ? "grey" : "white"}}
+        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedBox" ? "#EBB3A9" : "white"}}
         onPress={() => setActiveItem("receivedBox")}>
           <Text style={styles.tabText}>Received Box</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        style={{...styles.tabItem,backgroundColor : activeItem === "receivedText" ? "grey" : "white"}}
+        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
         onPress={() => setActiveItem("receivedText")}>
           <Text style={styles.tabText}>Received Text</Text>
         </TouchableOpacity>
