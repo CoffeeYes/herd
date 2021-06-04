@@ -63,57 +63,59 @@ const Customise = ({ }) => {
         <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
 
-      <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
-        <TouchableOpacity
-        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentBox" ? "#EBB3A9" : "white"}}
-        onPress={() => setActiveItem("sentBox")}>
-          <Text style={styles.tabText}>Sent Box</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentText" ? "#EBB3A9" : "white"}}
-        onPress={() => setActiveItem("sentText")}>
-          <Text style={styles.tabText}>Sent Text</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedBox" ? "#EBB3A9" : "white"}}
-        onPress={() => setActiveItem("receivedBox")}>
-          <Text style={styles.tabText}>Received Box</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
-        onPress={() => setActiveItem("receivedText")}>
-          <Text style={styles.tabText}>Received Text</Text>
-        </TouchableOpacity>
+      <View style={styles.colorChoiceContainer}>
+        <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
+          <TouchableOpacity
+          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentBox" ? "#EBB3A9" : "white"}}
+          onPress={() => setActiveItem("sentBox")}>
+            <Text style={styles.tabText}>Sent Box</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentText" ? "#EBB3A9" : "white"}}
+          onPress={() => setActiveItem("sentText")}>
+            <Text style={styles.tabText}>Sent Text</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedBox" ? "#EBB3A9" : "white"}}
+          onPress={() => setActiveItem("receivedBox")}>
+            <Text style={styles.tabText}>Received Box</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
+          onPress={() => setActiveItem("receivedText")}>
+            <Text style={styles.tabText}>Received Text</Text>
+          </TouchableOpacity>
 
+        </View>
+
+        {activeItem === "sentBox" &&
+        <ColorChoice
+          title={"Sent Box Color"}
+          defaultColor={toHsv(sentBoxColor)}
+          setColor={setSentBoxColor}
+        />}
+
+        {activeItem === "sentText" &&
+        <ColorChoice
+          title={"Sent Text Color"}
+          defaultColor={toHsv(sentTextColor)}
+          setColor={setSentTextColor}
+        />}
+
+        {activeItem === "receivedBox" &&
+        <ColorChoice
+          title={"Received Box Color"}
+          defaultColor={toHsv(receivedBoxColor)}
+          setColor={setReceivedBoxColor}
+        />}
+
+        {activeItem === "receivedText" &&
+        <ColorChoice
+          title={"Received Text Color"}
+          defaultColor={toHsv(receivedTextColor)}
+          setColor={setReceivedTextColor}
+        />}
       </View>
-
-      {activeItem === "sentBox" &&
-      <ColorChoice
-        title={"Sent Box Color"}
-        color={sentBoxColor}
-        setColor={setSentBoxColor}
-      />}
-
-      {activeItem === "sentText" &&
-      <ColorChoice
-        title={"Sent Text Color"}
-        color={sentTextColor}
-        setColor={setSentTextColor}
-      />}
-
-      {activeItem === "receivedBox" &&
-      <ColorChoice
-        title={"Received Box Color"}
-        color={receivedBoxColor}
-        setColor={setReceivedBoxColor}
-      />}
-
-      {activeItem === "receivedText" &&
-      <ColorChoice
-        title={"Received Text Color"}
-        color={receivedTextColor}
-        setColor={setReceivedTextColor}
-      />}
 
     </ScrollView>
   )
@@ -157,15 +159,23 @@ const styles = {
     fontWeight : "bold",
     textAlign : "center"
   },
+  colorChoiceContainer : {
+    backgroundColor : "white",
+    marginHorizontal : 10,
+    borderRadius : 5
+  },
   tabRow : {
     flexDirection : "row",
-    backgroundColor : "white",
-    justifyContent : "space-around"
+    justifyContent : "space-around",
+    borderBottomWidth : 1,
+    borderBottomColor : "grey"
   },
   tabItem : {
     borderRightWidth : 1,
     borderRightColor : "black",
-    padding : 10
+    padding : 10,
+    alignItems : "center",
+    justifyContent : "center"
   },
   activeTabItem : {
     backgroundColor : "grey"
