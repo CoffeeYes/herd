@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert } from 'react-native';
+import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert, Dimensions } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -144,7 +144,8 @@ const styles ={
     padding : 10,
     alignSelf : "center",
     marginTop : 10,
-    borderRadius : 5
+    borderRadius : 5,
+    width : Dimensions.get("window").width * 0.3
   },
   buttonText : {
     color : "white",

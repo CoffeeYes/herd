@@ -81,7 +81,11 @@ const Customise = ({ }) => {
             <Text style={styles.tabText}>Received Box</Text>
           </TouchableOpacity>
           <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
+          style={{
+            ...styles.tabItem,
+            width : tabWidth,
+            borderRightWidth : 0,
+            backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
           onPress={() => setActiveItem("receivedText")}>
             <Text style={styles.tabText}>Received Text</Text>
           </TouchableOpacity>
@@ -172,7 +176,7 @@ const styles = {
   },
   tabItem : {
     borderRightWidth : 1,
-    borderRightColor : "black",
+    borderRightColor : "grey",
     padding : 10,
     alignItems : "center",
     justifyContent : "center"
