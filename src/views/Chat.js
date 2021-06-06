@@ -130,6 +130,8 @@ const Chat = ({ route, navigation }) => {
     <View style={{flex : 1}}>
       <Header
       title={route.params.username}
+      touchStyle={{backgroundColor : "#f46758"}}
+      textStyle={{marginLeft : 10}}
       allowGoBack
       onTextTouch={() => navigation.navigate("contact", {
         username : contactInfo.name,

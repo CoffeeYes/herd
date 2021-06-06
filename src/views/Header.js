@@ -3,23 +3,24 @@ import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'
 
-const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextTouch }) => {
+const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
+                  onTextTouch, touchStyle, containerStyle, textStyle }) => {
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
         <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
           <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
         </TouchableOpacity>}
 
       {onTextTouch ?
-        <TouchableOpacity onPress={onTextTouch} style={styles.pressContainer}>
+        <TouchableOpacity onPress={onTextTouch} style={{...styles.pressContainer,...touchStyle}}>
           {preText}
-          <Text style={styles.title}>{title}</Text>
+          <Text style={{...styles.title,...textStyle}}>{title}</Text>
         </TouchableOpacity>
         :
         <>
           {preText}
-          <Text style={styles.title}>{title}</Text>
+          <Text style={{...styles.title,...textStyle}}>{title}</Text>
         </>
       }
 
