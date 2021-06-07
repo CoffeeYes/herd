@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Share,
-         Image, Dimensions , ActivityIndicator} from 'react-native';
+         Image, Dimensions , ActivityIndicator, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,6 +16,9 @@ const Contact = ({route, navigation}) => {
   const [contactKey, setContactKey] = useState("");
   const [contactImage, setContactImage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showLargeImage, setShowLargeImage] = useState(false);
+
+
   useEffect(() => {
     loadKey().then(() => setLoading(false))
   },[])
@@ -56,8 +59,6 @@ const Contact = ({route, navigation}) => {
     }
   }
 
-
-
   return (
     <>
       <Header
@@ -71,11 +72,13 @@ const Contact = ({route, navigation}) => {
       :
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={styles.imageContainer}>
-          <ContactImage
-          imageURI={contactImage}
-          iconSize={64}
-          imageWidth={Dimensions.get("window").width * 0.4}
-          imageHeight={Dimensions.get("window").height * 0.4}/>
+          <TouchableOpacity onPress={() => contactImage != "" && setShowLargeImage(true)}>
+            <ContactImage
+            imageURI={contactImage}
+            iconSize={64}
+            imageWidth={Dimensions.get("window").width * 0.4}
+            imageHeight={Dimensions.get("window").height * 0.4}/>
+          </TouchableOpacity>
         </View>
 
         {showCopied && <Text
@@ -106,6 +109,20 @@ const Contact = ({route, navigation}) => {
         text={contactKey}
         />
 
+        {showLargeImage &&
+          <Modal
+          animationType="slide"
+          transparent={true}
+          visible={visible}>
+            <View style={styles.modalMainContainer}>
+              <View style={styles.modalContentContainer}>
+              <Image
+              source={{uri : contactImage}}
+              style={{width : Dimensions.get("window").width * 0.8, height : Dimensions.get("window").height * 0.8}}/>
+              </View>
+            </View>
+          </Modal>
+        }
       </ScrollView>}
     </>
   )
