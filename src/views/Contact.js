@@ -109,20 +109,18 @@ const Contact = ({route, navigation}) => {
         text={contactKey}
         />
 
-        {showLargeImage &&
-          <Modal
-          animationType="slide"
-          transparent={true}
-          visible={visible}>
-            <View style={styles.modalMainContainer}>
-              <View style={styles.modalContentContainer}>
-              <Image
-              source={{uri : contactImage}}
-              style={{width : Dimensions.get("window").width * 0.8, height : Dimensions.get("window").height * 0.8}}/>
-              </View>
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showLargeImage}>
+          <TouchableOpacity style={styles.modalMainContainer} onPress={() => setShowLargeImage(false)}>
+            <View style={styles.modalContentContainer}>
+            <Image
+            source={{uri : contactImage}}
+            style={{width : Dimensions.get("window").width * 0.8, height : Dimensions.get("window").height * 0.8}}/>
             </View>
-          </Modal>
-        }
+          </TouchableOpacity>
+        </Modal>
       </ScrollView>}
     </>
   )
@@ -171,6 +169,19 @@ const styles = {
     overflow : "hidden",
     backgroundColor : "white"
   },
+  modalMainContainer : {
+    alignItems : "center",
+    justifyContent : "center",
+    flex : 1,
+    backgroundColor : "rgba(0,0,0,0.4)"
+  },
+  modalContentContainer : {
+    backgroundColor : "white",
+    borderRadius : 5,
+    alignItems : "center",
+    maxWidth : Dimensions.get('window').width * 0.8,
+    maxHeight : Dimensions.get('window').height * 0.8
+  }
 }
 
 export default Contact;
