@@ -119,6 +119,7 @@ const Contact = ({route, navigation}) => {
         <Modal
         animationType="slide"
         transparent={true}
+        onRequestClose={() => setShowLargeImage(false)}
         visible={showLargeImage}>
           <TouchableOpacity style={styles.modalMainContainer} onPress={() => setShowLargeImage(false)}>
             <View style={styles.modalContentContainer}>
