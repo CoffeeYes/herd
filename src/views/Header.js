@@ -59,7 +59,9 @@ const styles = {
   pressContainer : {
     width : "100%",
     height : "100%",
-    justifyContent : "center"
+    justifyContent : "center",
+    flexDirection : "row",
+    alignItems : "center"
   }
 }
 
