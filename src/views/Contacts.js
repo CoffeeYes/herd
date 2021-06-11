@@ -55,7 +55,11 @@ const Contacts = ({ route, navigation }) => {
         key={index}
         navigation={navigation}
         image={contact.image}
-        onPress={() => navigation.navigate("contact", {username : contact.name, key : contact.key})}
+        onPress={() => route.params.type === "newChat" ?
+          navigation.navigate("chat", {username : contact.name})
+          :
+          navigation.navigate("contact", {username : contact.name, key : contact.key})
+        }
         deleteItem={name => deleteContact(name)}
         />
       )}
