@@ -20,10 +20,19 @@ const Contact = ({route, navigation}) => {
 
 
   useEffect(() => {
-    loadKey().then(() => setLoading(false))
+    loadContact().then(() => setLoading(false))
   },[])
 
-  const loadKey = async () => {
+  useEffect(() => {
+    const focusListener = navigation.addListener('focus', () => {
+      setLoading(true)
+      loadContact().then(() => setLoading(false));
+    });
+
+    return focusListener;
+  },[navigation])
+
+  const loadContact = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
     const contact = contacts.find(savedContact => savedContact.name === route.params.username);
 
