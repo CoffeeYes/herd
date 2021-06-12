@@ -37,7 +37,6 @@ const ListItem = ({ name, image, deleteItem, onPress }) => {
 const styles = {
   listItem : {
     flexDirection : "row",
-    flex : 1,
     backgroundColor : "white",
     alignItems : "center",
     justifyContent : "flex-start",
