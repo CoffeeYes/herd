@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
@@ -12,9 +12,11 @@ const Customise = ({ }) => {
   const [receivedTextColor, setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState("sentBox");
   const [tabWidth, setTabWidth] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    loadStyles();
+    loadStyles().then(() => setLoading(false));
   },[])
 
   const loadStyles = async () => {
@@ -29,6 +31,7 @@ const Customise = ({ }) => {
   }
 
   const saveStyles = async () => {
+    setLoading(true);
     const style = {
       sentBoxColor : sentBoxColor,
       sentTextColor : sentTextColor,
@@ -37,12 +40,19 @@ const Customise = ({ }) => {
     }
 
     await AsyncStorage.setItem("styles",JSON.stringify(style))
+    setLoading(false);
+    setSaved(true);
+    setTimeout(() => {
+      setSaved(false)
+    },500)
   }
 
   return (
     <ScrollView>
       <Header title="Customise" allowGoBack/>
 
+      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
+      {saved && <Text style={{textAlign : "center"}}>Saved!</Text>}
       <View style={styles.messagesContainer}>
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
