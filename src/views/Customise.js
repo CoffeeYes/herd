@@ -13,7 +13,7 @@ const Customise = ({ }) => {
   const [activeItem, setActiveItem] = useState("sentBox");
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [saved, setSaved] = useState(false);
+  const [saveButtonText, setSaveButtonText] = useState("Save");
 
   useEffect(() => {
     loadStyles().then(() => setLoading(false));
@@ -41,9 +41,9 @@ const Customise = ({ }) => {
 
     await AsyncStorage.setItem("styles",JSON.stringify(style))
     setLoading(false);
-    setSaved(true);
+    setSaveButtonText("Saved!");
     setTimeout(() => {
-      setSaved(false)
+      setSaveButtonText("Save")
     },500)
   }
 
@@ -52,7 +52,6 @@ const Customise = ({ }) => {
       <Header title="Customise" allowGoBack/>
 
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-      {saved && <Text style={{textAlign : "center"}}>Saved!</Text>}
       <View style={styles.messagesContainer}>
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
@@ -70,7 +69,7 @@ const Customise = ({ }) => {
       <TouchableOpacity
       style={{...styles.button,marginBottom : 10}}
       onPress={saveStyles}>
-        <Text style={styles.buttonText}>Save</Text>
+        <Text style={styles.buttonText}>{saveButtonText}</Text>
       </TouchableOpacity>
 
       <View style={styles.colorChoiceContainer}>
