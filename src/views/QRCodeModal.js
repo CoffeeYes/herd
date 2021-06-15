@@ -4,26 +4,25 @@ import QRCode from 'react-native-qrcode-svg';
 
 const QRCodeModal = ({ visible, text, setVisible }) => {
   return (
+
     <Modal
     animationType="slide"
     transparent={true}
     onRequestClose={() => setVisible(false)}
     visible={visible}>
-      <View style={styles.modalMainContainer}>
+      <TouchableOpacity
+      style={styles.modalMainContainer}
+      onPress={() => setVisible(false)}>
         <View style={styles.modalContentContainer}>
           <View style={styles.QRContainer}>
             <QRCode
             value={text}
             size={300}/>
           </View>
-          <TouchableOpacity
-          style={styles.button}
-          onPress={() => setVisible(false)}>
-          <Text style={styles.buttonText}>Close</Text>
-          </TouchableOpacity>
         </View>
-      </View>
+      </TouchableOpacity>
     </Modal>
+
   )
 }
 
