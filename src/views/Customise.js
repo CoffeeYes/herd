@@ -1,19 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
 
-const Customise = ({ }) => {
-  const [sentBoxColor, setSentBoxColor] = useState("");
-  const [sentTextColor, setSentTextColor] = useState("");
-  const [receivedBoxColor, setReceivedBoxColor] = useState("");
-  const [receivedTextColor, setReceivedTextColor] = useState("");
+const Customise = ({ navigation }) => {
+  const [sentBoxColor, _setSentBoxColor] = useState("");
+  const [sentTextColor, _setSentTextColor] = useState("");
+  const [receivedBoxColor, _setReceivedBoxColor] = useState("");
+  const [receivedTextColor, _setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState("sentBox");
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saveButtonText, setSaveButtonText] = useState("Save");
+
+
+  sentBoxColorRef = useRef();
+  sentTextColorRef = useRef();
+  receivedBoxColorRef = useRef();
+  receivedTextColorRef = useRef();
+
+  const setSentBoxColor = data => {
+    sentBoxColorRef.current = data
+    _setSentBoxColor(data)
+  }
+  const setSentTextColor = data => {
+    sentTextColorRef.current = data
+    _setSentTextColor(data)
+  }
+  const setReceivedBoxColor = data => {
+    receivedBoxColorRef.current = data
+    _setReceivedBoxColor(data)
+  }
+  const setReceivedTextColor = data => {
+    receivedTextColorRef.current = data
+    _setReceivedBoxColor(data)
+  }
 
   useEffect(() => {
     loadStyles().then(() => setLoading(false));
@@ -46,6 +69,42 @@ const Customise = ({ }) => {
       setSaveButtonText("Save")
     },500)
   }
+
+  useEffect(() => {
+    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
+      e.preventDefault();
+      const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+
+      const unsavedChanges = (
+        sentBoxColor != styles.sentBoxColor ||
+        sentTextColor != styles.sentTextColor ||
+        receivedBoxColor != styles.receivedBoxColor ||
+        receivedTextColor != styles.receivedTextColor
+      )
+
+      if(unsavedChanges) {
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure to discard them and leave the screen?',
+          [
+            { text: "Don't leave", style: 'cancel', onPress: () => {} },
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+          ]
+        );
+      }
+      else {
+        navigation.dispatch(e.data.action);
+      }
+  })
+
+    return beforeGoingBack;
+  },[navigation])
 
   return (
     <ScrollView>
