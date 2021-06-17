@@ -1,6 +1,7 @@
 import React from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import CameraMarker from './CameraMarker';
 
 const QRScanner = ({ navigation }) => {
 
@@ -11,7 +12,9 @@ const QRScanner = ({ navigation }) => {
 
   return (
     <QRCodeScanner
+    showMarker
     onRead={handleRead}
+    customMarker={<CameraMarker borderWidth={5} borderColor="white"/>}
     bottomContent={
       <TouchableOpacity
       style={styles.button}
@@ -35,7 +38,7 @@ const styles = {
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
-  },
+  }
 }
 
 export default QRScanner;
