@@ -76,10 +76,10 @@ const Customise = ({ navigation }) => {
       const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
       const unsavedChanges = (
-        sentBoxColor != styles.sentBoxColor ||
-        sentTextColor != styles.sentTextColor ||
-        receivedBoxColor != styles.receivedBoxColor ||
-        receivedTextColor != styles.receivedTextColor
+        sentBoxColorRef.current != styles.sentBoxColor ||
+        sentTextColorRef.current != styles.sentTextColor ||
+        receivedBoxColorRef.current != styles.receivedBoxColor ||
+        receivedTextColorRef.current != styles.receivedTextColor
       )
 
       if(unsavedChanges) {
