@@ -107,7 +107,7 @@ const Customise = ({ navigation }) => {
   },[navigation])
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={{paddingBottom : 10}}>
       <Header title="Customise" allowGoBack/>
 
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
@@ -211,13 +211,6 @@ const styles = {
   },
   messagesContainer : {
     flex : 1
-  },
-  colorPickerContainer : {
-    alignItems : "center"
-  },
-  colorPicker : {
-    width : Dimensions.get("window").width * 0.8,
-    height : Dimensions.get("window").height * 0.5
   },
   button : {
     backgroundColor : "#E86252",

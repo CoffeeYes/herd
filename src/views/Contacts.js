@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions} from 'react-native';
+import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem'
@@ -49,20 +49,22 @@ const Contacts = ({ route, navigation }) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
-      contacts?.map( (contact, index) =>
-        <ListItem
-        name={contact.name}
-        key={index}
-        navigation={navigation}
-        image={contact.image}
-        onPress={() => route.params.type === "newChat" ?
-          navigation.navigate("chat", {username : contact.name})
-          :
-          navigation.navigate("contact", {username : contact.name, key : contact.key})
-        }
-        deleteItem={name => deleteContact(name)}
-        />
-      )}
+      <ScrollView>
+        {contacts?.map( (contact, index) =>
+          <ListItem
+          name={contact.name}
+          key={index}
+          navigation={navigation}
+          image={contact.image}
+          onPress={() => route.params.type === "newChat" ?
+            navigation.navigate("chat", {username : contact.name})
+            :
+            navigation.navigate("contact", {username : contact.name, key : contact.key})
+          }
+          deleteItem={name => deleteContact(name)}
+          />
+        )}
+      </ScrollView>}
     </>
   )
 }
