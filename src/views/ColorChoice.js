@@ -20,7 +20,8 @@ export default ColorChoice
 
 const styles = {
   colorPickerContainer : {
-    alignItems : "center"
+    alignItems : "center",
+    paddingBottom : 10
   },
   colorPicker : {
     width : Dimensions.get("window").width * 0.8,

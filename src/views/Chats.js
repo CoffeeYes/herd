@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
+import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem'
@@ -56,7 +56,7 @@ const Chats = ({ navigation }) => {
       rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
 
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-
+      <ScrollView>
       {chats?.map( (chat, index) =>
         <ListItem
         name={chat.name}
@@ -67,6 +67,7 @@ const Chats = ({ navigation }) => {
         deleteItem={name => deleteChat(name)}
         />
       )}
+      </ScrollView>
     </>
   )
 }
