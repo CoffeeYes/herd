@@ -58,7 +58,7 @@ const Contacts = ({ route, navigation }) => {
         onPress={() => route.params.type === "newChat" ?
           navigation.navigate("chat", {username : contact.name})
           :
-          navigation.navigate("contact", {username : contact.name, key : contact.key})
+          navigation.navigate("contact", {id : contact.id})
         }
         deleteItem={name => deleteContact(name)}
         />

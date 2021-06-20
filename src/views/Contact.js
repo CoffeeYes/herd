@@ -13,6 +13,7 @@ const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showCopied, setShowCopied] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [contactName, setContactName] = useState("");
   const [contactKey, setContactKey] = useState("");
   const [contactImage, setContactImage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -34,10 +35,11 @@ const Contact = ({route, navigation}) => {
 
   const loadContact = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+    const contact = contacts.find(savedContact => savedContact.id === route.params.id);
 
     if(contact) {
       setContactKey(contact.key);
+      setContactName(contact.name);
       if(contact.image) {
         setContactImage(contact.image);
       }
@@ -46,7 +48,7 @@ const Contact = ({route, navigation}) => {
 
   const copyKeyToClipboard = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"))
-    const contact = contacts.find(savedContact => savedContact.name === route.params.username)
+    const contact = contacts.find(savedContact => savedContact.id === route.params.id)
 
     if(contact) {
       setClipboard(contact.key)
@@ -57,7 +59,7 @@ const Contact = ({route, navigation}) => {
 
   const shareContact = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+    const contact = contacts.find(savedContact => savedContact.id === route.params.id);
 
     if(contact) {
       const key = contact.key
@@ -71,10 +73,10 @@ const Contact = ({route, navigation}) => {
   return (
     <>
       <Header
-      title={route.params.username}
+      title={contactName}
       allowGoBack
       rightButtonIcon="edit"
-      rightButtonOnClick={() => navigation.navigate("editContact", {username : route.params.username})}/>
+      rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>

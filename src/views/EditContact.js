@@ -9,7 +9,7 @@ import ContactImage from './ContactImage';
 
 
 const EditContact = ({ route, navigation }) => {
-  const [name, _setName] = useState(route.params.username)
+  const [name, _setName] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
   const [contactImage, _setContactImage] = useState("");
@@ -41,7 +41,7 @@ const EditContact = ({ route, navigation }) => {
   const loadContactInfo = async () => {
     const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
     setSavedContacts(contacts);
-    const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+    const contact = contacts.find(savedContact => savedContact.id === route.params.id);
 
     if(contact) {
       setName(contact.name)
@@ -52,18 +52,12 @@ const EditContact = ({ route, navigation }) => {
 
   const save = async () => {
     setError("");
-    if(savedContacts.find(contact => contact.name === name.trim()) && name.trim() !== route.params.username) {
-      return setError("User already exists")
-    }
-    else {
-      var oldContact = savedContacts.find(contact => contact.name === route.params.username);
-      var newContact = {...oldContact,name : name.trim(),key : publicKey.trim(), image : contactImage};
-      await AsyncStorage.setItem("contacts",JSON.stringify([
-        ...savedContacts.filter(contact => contact.name !== route.params.username),
-        newContact
-      ]))
-      navigation.goBack();
-    }
+    var oldContact = savedContacts.find(contact => contact.id === route.params.id);
+    var newContact = {...oldContact,name : name.trim(),key : publicKey.trim(), image : contactImage};
+    await AsyncStorage.setItem("contacts",JSON.stringify([
+      ...savedContacts.filter(contact => contact.id !== route.params.id),
+      newContact
+    ]))
   }
 
   const editImage = async () => {
