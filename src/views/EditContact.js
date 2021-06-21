@@ -81,7 +81,7 @@ const EditContact = ({ route, navigation }) => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
       const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-      const contact = contacts.find(savedContact => savedContact.name === route.params.username);
+      const contact = contacts.find(savedContact => savedContact.id === route.params.id);
 
       if(contact) {
 
