@@ -4,6 +4,7 @@ import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
+import SaveButton from './SaveButton'
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -54,7 +55,6 @@ const Customise = ({ navigation }) => {
   }
 
   const saveStyles = async () => {
-    setLoading(true);
     const style = {
       sentBoxColor : sentBoxColor,
       sentTextColor : sentTextColor,
@@ -62,12 +62,7 @@ const Customise = ({ navigation }) => {
       receivedTextColor : receivedTextColor
     }
 
-    await AsyncStorage.setItem("styles",JSON.stringify(style))
-    setLoading(false);
-    setSaveButtonText("Saved!");
-    setTimeout(() => {
-      setSaveButtonText("Save")
-    },500)
+    return await AsyncStorage.setItem("styles",JSON.stringify(style))
   }
 
   useEffect(() => {
@@ -124,12 +119,6 @@ const Customise = ({ navigation }) => {
           <Text style={styles.timestamp}>12:21 - 15.01</Text>
         </View>
       </View>
-
-      <TouchableOpacity
-      style={{...styles.button,marginBottom : 10}}
-      onPress={saveStyles}>
-        <Text style={styles.buttonText}>{saveButtonText}</Text>
-      </TouchableOpacity>
 
       <View style={styles.colorChoiceContainer}>
         <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
@@ -188,6 +177,8 @@ const Customise = ({ navigation }) => {
           setColor={setReceivedTextColor}
         />}
       </View>
+
+      <SaveButton saveFunction={saveStyles}/>
 
     </ScrollView>
   )
