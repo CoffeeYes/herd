@@ -134,8 +134,7 @@ const Chat = ({ route, navigation }) => {
       textStyle={{marginLeft : 10}}
       allowGoBack
       onTextTouch={() => navigation.navigate("contact", {
-        username : contactInfo.name,
-        key : contactInfo.key
+        id : contactInfo.id
       })}
       preText={
         contactInfo.image?.length > 0 &&
