@@ -27,10 +27,10 @@ const Contacts = ({ route, navigation }) => {
     setLoading(false);
   }
 
-  const deleteContact = async name => {
+  const deleteContact = async id => {
     var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
     for(var i = 0; i < contacts.length; i++) {
-      if(contacts[i].name === name) {
+      if(contacts[i].id === id) {
         contacts.splice(i,1);
       }
     }
@@ -61,7 +61,7 @@ const Contacts = ({ route, navigation }) => {
             :
             navigation.navigate("contact", {id : contact.id})
           }
-          deleteItem={name => deleteContact(name)}
+          deleteItem={() => deleteContact(contact.id)}
           />
         )}
       </ScrollView>}
