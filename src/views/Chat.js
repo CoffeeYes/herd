@@ -18,7 +18,7 @@ const Chat = ({ route, navigation }) => {
     AsyncStorage.getItem("contacts").then(result => {
       result = JSON.parse(result);
       result &&
-      setContactInfo(result.find(contact => contact.name === route.params.username))
+      setContactInfo(result.find(contact => contact.id === route.params.contactID))
     });
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
     loadMessages().then( () => setLoading(false));
@@ -26,7 +26,7 @@ const Chat = ({ route, navigation }) => {
   },[])
 
   const loadMessages = async () => {
-    var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
     //set default user structure
     if(!userData) {
       userData = {
@@ -68,7 +68,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
-    var userData = JSON.parse(await AsyncStorage.getItem(route.params.username));
+    var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
     //default userData if there is none
     if(!userData) {
       userData = {
@@ -94,7 +94,7 @@ const Chat = ({ route, navigation }) => {
       message
     )
     //store new message to be sent
-    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.username))
+    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.contactID))
     if(!sentMessages) {
       sentMessages = []
     }
@@ -117,7 +117,7 @@ const Chat = ({ route, navigation }) => {
       timestamp : Date.now()
     }
     userData.sentCopy.push(messageToAddCopy);
-    await AsyncStorage.setItem(route.params.username,JSON.stringify(userData))
+    await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData))
 
     setMessages([...messages,plainText])
     setChatInput("");
@@ -129,7 +129,7 @@ const Chat = ({ route, navigation }) => {
   return (
     <View style={{flex : 1}}>
       <Header
-      title={route.params.username}
+      title={contactInfo?.name}
       touchStyle={{backgroundColor : "#f46758"}}
       textStyle={{marginLeft : 10}}
       allowGoBack
@@ -137,7 +137,7 @@ const Chat = ({ route, navigation }) => {
         id : contactInfo.id
       })}
       preText={
-        contactInfo.image?.length > 0 &&
+        contactInfo?.image?.length > 0 &&
         <View style={styles.imageContainer}>
           <Image
           source={{uri : contactInfo.image}}

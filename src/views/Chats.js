@@ -30,9 +30,9 @@ const Chats = ({ navigation }) => {
     var chatsWithMessages = []
     if(contacts) {
       await Promise.all(contacts.map(async contact => {
-        const userData = JSON.parse(await AsyncStorage.getItem(contact.name));
+        const userData = JSON.parse(await AsyncStorage.getItem(contact.id));
         if(userData?.received?.length > 0 || userData?.sentCopy?.length > 0) {
-          chatsWithMessages.push({name : contact.name,image : contact.image})
+          chatsWithMessages.push({name : contact.name,image : contact.image, contactID : contact.id})
         }
       }))
       setChats(chatsWithMessages)
@@ -63,7 +63,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        onPress={() => navigation.navigate("chat", {username : chat.name})}
+        onPress={() => navigation.navigate("chat", {contactID : chat.contactID})}
         deleteItem={name => deleteChat(name)}
         />
       )}

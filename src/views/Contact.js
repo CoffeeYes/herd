@@ -13,6 +13,7 @@ const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showCopied, setShowCopied] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [contactID, setContactID] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactKey, setContactKey] = useState("");
   const [contactImage, setContactImage] = useState("");
@@ -40,6 +41,7 @@ const Contact = ({route, navigation}) => {
     if(contact) {
       setContactKey(contact.key);
       setContactName(contact.name);
+      setContactID(contact.id)
       if(contact.image) {
         setContactImage(contact.image);
       }
@@ -113,7 +115,7 @@ const Contact = ({route, navigation}) => {
           <Text style={styles.buttonText}>Share Contact</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {username : route.params.username})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {contactID : contactID})}>
           <Text style={styles.buttonText}>Go To Chat</Text>
         </TouchableOpacity>
 
