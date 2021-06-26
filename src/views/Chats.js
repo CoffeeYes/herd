@@ -39,8 +39,8 @@ const Chats = ({ navigation }) => {
     }
   }
 
-  const deleteChat = async name => {
-    await AsyncStorage.setItem(name,JSON.stringify({
+  const deleteChat = async contactID => {
+    await AsyncStorage.setItem(contactID,JSON.stringify({
       sent : [],
       received : [],
       sentCopy :  []
@@ -64,7 +64,7 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         onPress={() => navigation.navigate("chat", {contactID : chat.contactID})}
-        deleteItem={name => deleteChat(name)}
+        deleteItem={() => deleteChat(chat.contactID)}
         />
       )}
       </ScrollView>
