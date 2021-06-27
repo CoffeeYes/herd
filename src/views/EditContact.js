@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
+import SaveButton from './SaveButton'
 
 
 const EditContact = ({ route, navigation }) => {
@@ -96,7 +97,6 @@ const EditContact = ({ route, navigation }) => {
             'Discard changes?',
             'You have unsaved changes. Are you sure to discard them and leave the screen?',
             [
-              { text: "Don't leave", style: 'cancel', onPress: () => {} },
               {
                 text: 'Discard',
                 style: 'destructive',
@@ -104,6 +104,7 @@ const EditContact = ({ route, navigation }) => {
                 // This will continue the action that had triggered the removal of the screen
                 onPress: () => navigation.dispatch(e.data.action),
               },
+              { text: "Stay", style: 'cancel', onPress: () => {} },
             ]
           );
         }
@@ -148,12 +149,7 @@ const EditContact = ({ route, navigation }) => {
         onChangeText={text => setPublicKey(text)}
         value={publicKey}/>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={save}>
-          <Text style={styles.buttonText}>Save</Text>
-        </TouchableOpacity>
-
+        <SaveButton saveFunction={save}/>
       </View>}
     </>
   )

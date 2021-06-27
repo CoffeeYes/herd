@@ -82,7 +82,6 @@ const Customise = ({ navigation }) => {
           'Discard changes?',
           'You have unsaved changes. Are you sure to discard them and leave the screen?',
           [
-            { text: "Don't leave", style: 'cancel', onPress: () => {} },
             {
               text: 'Discard',
               style: 'destructive',
@@ -90,6 +89,7 @@ const Customise = ({ navigation }) => {
               // This will continue the action that had triggered the removal of the screen
               onPress: () => navigation.dispatch(e.data.action),
             },
+            { text: "Stay", style: 'cancel', onPress: () => {} },
           ]
         );
       }
