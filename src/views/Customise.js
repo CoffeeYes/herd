@@ -36,7 +36,7 @@ const Customise = ({ navigation }) => {
   }
   const setReceivedTextColor = data => {
     receivedTextColorRef.current = data
-    _setReceivedBoxColor(data)
+    _setReceivedTextColor(data)
   }
 
   useEffect(() => {
@@ -100,6 +100,19 @@ const Customise = ({ navigation }) => {
 
     return beforeGoingBack;
   },[navigation])
+
+  const restoreDefault = async () => {
+    //set default styling
+    const style = {
+      sentBoxColor : "#c6c6c6",
+      sentTextColor : "#f5f5f5",
+      receivedBoxColor : "#E86252",
+      receivedTextColor : "#f5f5f5"
+    }
+
+    await AsyncStorage.setItem("styles",JSON.stringify(style));
+    loadStyles();
+  }
 
   return (
     <ScrollView contentContainerStyle={{paddingBottom : 10}}>
@@ -178,7 +191,14 @@ const Customise = ({ navigation }) => {
         />}
       </View>
 
-      <SaveButton saveFunction={saveStyles}/>
+      <View style={styles.buttonRow}>
+        <SaveButton saveFunction={saveStyles}/>
+        <TouchableOpacity
+        onPress={restoreDefault}
+        style={{...styles.button,marginLeft : 10}}>
+          <Text style={styles.buttonText}>Restore Default</Text>
+        </TouchableOpacity>
+      </View>
 
     </ScrollView>
   )
@@ -207,7 +227,6 @@ const styles = {
     backgroundColor : "#E86252",
     padding : 10,
     alignSelf : "center",
-    marginTop : 10,
     borderRadius : 5
   },
   buttonText : {
@@ -239,6 +258,11 @@ const styles = {
   tabText : {
     color : "black",
     fontWeight : "bold"
+  },
+  buttonRow : {
+    flexDirection : "row",
+    justifyContent : "center",
+    alignItems : "center"
   }
 }
 export default Customise;
