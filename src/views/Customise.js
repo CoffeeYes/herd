@@ -115,8 +115,9 @@ const Customise = ({ navigation }) => {
   }
 
   return (
+    <>
+    <Header title="Customise" allowGoBack/>
     <ScrollView contentContainerStyle={{paddingBottom : 10}}>
-      <Header title="Customise" allowGoBack/>
 
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       <View style={styles.messagesContainer}>
@@ -201,6 +202,7 @@ const Customise = ({ navigation }) => {
       </View>
 
     </ScrollView>
+    </>
   )
 }
 

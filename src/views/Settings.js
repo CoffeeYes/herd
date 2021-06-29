@@ -80,8 +80,9 @@ const Settings = ({ navigation }) => {
   },[])
 
   return (
+    <>
+    <Header title="Settings"/>
     <View>
-      <Header title="Settings"/>
 
       <View style={{alignSelf : "center",alignItems : "center"}}>
         {!backgroundTransfer &&
@@ -135,6 +136,7 @@ const Settings = ({ navigation }) => {
         loading={modalLoading}/>
       </ScrollView>
     </View>
+    </>
   )
 }
 

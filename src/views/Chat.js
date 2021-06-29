@@ -127,23 +127,24 @@ const Chat = ({ route, navigation }) => {
   const scrollRef = useRef();
 
   return (
+    <>
+    <Header
+    title={contactInfo?.name}
+    touchStyle={{backgroundColor : "#f46758"}}
+    textStyle={{marginLeft : 10}}
+    allowGoBack
+    onTextTouch={() => navigation.navigate("contact", {
+      id : contactInfo.id
+    })}
+    preText={
+      contactInfo?.image?.length > 0 &&
+      <View style={styles.imageContainer}>
+      <Image
+      source={{uri : contactInfo.image}}
+      style={styles.image}/>
+      </View>
+    }/>
     <View style={{flex : 1}}>
-      <Header
-      title={contactInfo?.name}
-      touchStyle={{backgroundColor : "#f46758"}}
-      textStyle={{marginLeft : 10}}
-      allowGoBack
-      onTextTouch={() => navigation.navigate("contact", {
-        id : contactInfo.id
-      })}
-      preText={
-        contactInfo?.image?.length > 0 &&
-        <View style={styles.imageContainer}>
-          <Image
-          source={{uri : contactInfo.image}}
-          style={styles.image}/>
-        </View>
-      }/>
 
       {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
 
@@ -176,6 +177,7 @@ const Chat = ({ route, navigation }) => {
       onChangeText={setChatInput}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
+    </>
   )
 }
 
