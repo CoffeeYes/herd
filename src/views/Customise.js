@@ -109,9 +109,24 @@ const Customise = ({ navigation }) => {
       receivedBoxColor : "#E86252",
       receivedTextColor : "#f5f5f5"
     }
-
-    await AsyncStorage.setItem("styles",JSON.stringify(style));
-    loadStyles();
+    
+    Alert.alert(
+      'Discard you sure you want to restore default styles?',
+      '',
+      [
+        { text: "Go Back", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Restore',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            await AsyncStorage.setItem("styles",JSON.stringify(style));
+            loadStyles();
+          },
+        },
+      ]
+    );
   }
 
   return (
