@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView} from 'react-native';
+import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem'
@@ -28,14 +28,29 @@ const Contacts = ({ route, navigation }) => {
   }
 
   const deleteContact = async id => {
-    var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    for(var i = 0; i < contacts.length; i++) {
-      if(contacts[i].id === id) {
-        contacts.splice(i,1);
-      }
-    }
-    await AsyncStorage.setItem("contacts",JSON.stringify(contacts));
-    setContacts(contacts)
+    Alert.alert(
+      'Are you sure ?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+            for(var i = 0; i < contacts.length; i++) {
+              if(contacts[i].id === id) {
+                contacts.splice(i,1);
+              }
+            }
+            await AsyncStorage.setItem("contacts",JSON.stringify(contacts));
+            setContacts(contacts)
+          },
+        },
+      ]
+    );
   }
 
   return (

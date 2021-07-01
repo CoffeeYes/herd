@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, ScrollView } from 'react-native';
+import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem'
@@ -40,12 +40,28 @@ const Chats = ({ navigation }) => {
   }
 
   const deleteChat = async contactID => {
-    await AsyncStorage.setItem(contactID,JSON.stringify({
-      sent : [],
-      received : [],
-      sentCopy :  []
-    }));
-    loadContactsWithChats();
+    Alert.alert(
+      'Are you sure ?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            await AsyncStorage.setItem(contactID,JSON.stringify({
+              sent : [],
+              received : [],
+              sentCopy :  []
+            }));
+            loadContactsWithChats();
+          },
+        },
+      ]
+    );
+
   }
 
   return (
