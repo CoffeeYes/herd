@@ -165,7 +165,11 @@ const Chat = ({ route, navigation }) => {
               color : message.from === ownPublicKey ? customStyle.sentTextColor : customStyle.receivedTextColor}}>
               {message.text}
             </Text>
-            <Text style={styles.timestamp}>{moment(message.timestamp).format("HH:mm - DD.MM")}</Text>
+            <Text style={{
+            ...styles.timestamp,
+            color : message.from === ownPublicKey ? customStyle.sentTextColor : customStyle.receivedTextColo}}>
+              {moment(message.timestamp).format("HH:mm - DD.MM")}
+            </Text>
           </View>
         )}
       </ScrollView>
