@@ -15,7 +15,6 @@ const Settings = ({ navigation }) => {
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [modalLoading, setModalLoading] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
 
   const copyKeyToClipboard = () => {
@@ -33,15 +32,27 @@ const Settings = ({ navigation }) => {
   }
 
   const deleteAllChats = async () => {
-    setModalLoading(true);
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
+    Alert.alert(
+      'Discard you sure you want to delete all chats?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
 
-    contacts.map(async contact => {
-      await AsyncStorage.setItem(contact.name,JSON.stringify([]));
-    })
+            contacts.map(async contact => {
+              await AsyncStorage.setItem(contact.id,JSON.stringify([]));
+            })
+          },
+        },
+      ]
+    );
 
-    setModalLoading(false);
-    setShowDeleteModal(false);
   }
 
   const toggleBackgroundTransfer = async value => {
@@ -124,16 +135,10 @@ const Settings = ({ navigation }) => {
 
         <TouchableOpacity
         style={{...styles.button,backgroundColor : "red"}}
-        onPress={() => setShowDeleteModal(true)}>
+        onPress={deleteAllChats}>
           <Text style={styles.buttonText}> Delete All Chats </Text>
         </TouchableOpacity>
 
-        <ConfirmModal
-        visible={showDeleteModal}
-        setVisible={setShowDeleteModal}
-        onConfirm={deleteAllChats}
-        header={"Are you sure?"}
-        loading={modalLoading}/>
       </ScrollView>
     </View>
     </>
