@@ -39,26 +39,31 @@ const Chat = ({ route, navigation }) => {
     var receivedMessages = userData.received;
     var sentMessagesCopy = userData.sentCopy;
     //decrypt all message text payloads (sent and received) using private key
-    for(var message in receivedMessages) {
-      receivedMessages[message].text = await Crypto.decryptString(
-        "herdPersonal",
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        receivedMessages[message].text
-      )
+    if(receivedMessages.length > 0) {
+      for(var message in receivedMessages) {
+        receivedMessages[message].text = await Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          receivedMessages[message].text
+        )
+      }
     }
 
-    for(var message in sentMessagesCopy) {
-      sentMessagesCopy[message].text = await Crypto.decryptString(
-        "herdPersonal",
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        sentMessagesCopy[message].text
-      )
+    if(sentMessagesCopy.length > 0) {
+      for(var message in sentMessagesCopy) {
+        sentMessagesCopy[message].text = await Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          sentMessagesCopy[message].text
+        )
+      }
     }
 
+    (receivedMessages.length > 0 || sentMessagesCopy.length > 0) &&
     setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
   }
 

@@ -46,7 +46,11 @@ const Settings = ({ navigation }) => {
             const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
 
             contacts.map(async contact => {
-              await AsyncStorage.setItem(contact.id,JSON.stringify([]));
+              await AsyncStorage.setItem(contact.id,JSON.stringify({
+                sent : [],
+                received : [],
+                sentCopy : []
+              }));
             })
           },
         },
