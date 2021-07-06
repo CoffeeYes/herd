@@ -59,6 +59,25 @@ const Settings = ({ navigation }) => {
 
   }
 
+  const deleteAllContacts = async() => {
+    Alert.alert(
+      'Discard you sure you want to delete all Contacts?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            await AsyncStorage.setItem("contacts",JSON.stringify([]));
+          },
+        },
+      ]
+    );
+  }
+
   const toggleBackgroundTransfer = async value => {
     if(value) {
       var btEnabled = await Bluetooth.checkBTEnabled();
@@ -141,6 +160,11 @@ const Settings = ({ navigation }) => {
         style={{...styles.button,backgroundColor : "red"}}
         onPress={deleteAllChats}>
           <Text style={styles.buttonText}> Delete All Chats </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+        style={{...styles.button,backgroundColor : "red"}}
+        onPress={deleteAllContacts}>
+          <Text style={styles.buttonText}> Delete All Contacts </Text>
         </TouchableOpacity>
 
       </ScrollView>
