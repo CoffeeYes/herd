@@ -237,6 +237,10 @@ const styles = {
     marginVertical : 5,
     borderRadius : 10,
   },
+  timestamp : {
+    fontWeight : "bold",
+    marginTop : 10
+  },
   messagesContainer : {
     flex : 1
   },
