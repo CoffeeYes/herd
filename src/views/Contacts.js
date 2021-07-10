@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
-import ListItem from './ListItem'
+import ListItem from './ListItem';
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
