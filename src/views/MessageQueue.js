@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text } from 'react-native';
+import { View, ScrollView, Text, Dimensions } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -32,7 +32,7 @@ const MessageQueue = ({}) => {
       )
       allMessages[message].toContactName = contacts.find(contact => contact.key === allMessages[message].to)?.name
     }
-    setMessages(allMessages);
+    setMessages(allMessages.sort((a,b) => a.timestamp > b.timestamp));
   }
 
   return (
@@ -42,8 +42,8 @@ const MessageQueue = ({}) => {
       title="Message Queue"/>
 
       <ScrollView>
-        {messages.map(message =>
-          <View style={styles.messageItem}>
+        {messages.map((message,index) =>
+          <View style={styles.messageItem} key={index}>
             <Text style={styles.messageTo}>To: {message.toContactName}</Text>
             <Text style={styles.messageText}>{message.text}</Text>
           </View>
@@ -60,13 +60,13 @@ const styles = {
     borderBottomColor : "black",
     padding : 20,
     backgroundColor : "white",
-    justifyContent : "space-between"
   },
   messageTo : {
     fontWeight : "bold",
     marginRight : 10
   },
   messageText : {
+    width : Dimensions.get('window').width * 0.7,
   }
 }
 export default MessageQueue;
