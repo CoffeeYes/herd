@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TextInput, ActivityIndicator,Image, Dimensions } from 'react-native';
+import { Text, View, ScrollView, TextInput, ActivityIndicator,Image, Dimensions, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import Header from './Header';
+import ChatBubble from './ChatBubble';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -129,6 +130,10 @@ const Chat = ({ route, navigation }) => {
     scrollRef.current.scrollToEnd({animated : true})
   }
 
+  const longPressMessage = () => {
+
+  }
+
   const scrollRef = useRef();
 
   return (
@@ -158,24 +163,12 @@ const Chat = ({ route, navigation }) => {
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
         {messages.map( (message,index) =>
-          <View
-          style={message.from === ownPublicKey ?
-            {...styles.message,...styles.messageFromYou, backgroundColor : customStyle.sentBoxColor}
-            :
-            {...styles.message,...styles.messageFromOther, backgroundColor : customStyle.receivedBoxColor}}
-          key={index}>
-            <Text
-            style={{
-              ...styles.messageText,
-              color : message.from === ownPublicKey ? customStyle.sentTextColor : customStyle.receivedTextColor}}>
-              {message.text}
-            </Text>
-            <Text style={{
-            ...styles.timestamp,
-            color : message.from === ownPublicKey ? customStyle.sentTextColor : customStyle.receivedTextColo}}>
-              {moment(message.timestamp).format("HH:mm - DD.MM")}
-            </Text>
-          </View>
+          <ChatBubble
+          text={message.text}
+          timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
+          messageFrom={message.from === ownPublicKey}
+          customStyle={customStyle}
+          />
         )}
       </ScrollView>
 
@@ -191,28 +184,6 @@ const Chat = ({ route, navigation }) => {
 }
 
 const styles = {
-  messageFromOther : {
-    backgroundColor : "#E86252",
-    marginLeft : 5
-  },
-  messageFromYou : {
-    backgroundColor : "#c6c6c6",
-    alignSelf : "flex-end",
-    marginRight : 5
-  },
-  message : {
-    padding : 20,
-    width : "50%",
-    marginVertical : 5,
-    borderRadius : 10,
-  },
-  messageText : {
-    color : "#f5f5f5"
-  },
-  timestamp : {
-    fontWeight : "bold",
-    marginTop : 10
-  },
   chatInput : {
     backgroundColor : "white",
     marginTop : "auto",
