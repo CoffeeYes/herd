@@ -19,16 +19,15 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle }) => {
     <TouchableOpacity
     onLongPress={() => setHighlighted(true)}
     style={messageFrom ?
-      {...styles.message,...styles.messageFromYou, backgroundColor : highlighted ?
-        invertColor(customStyle.sentBoxColor)
-        :
-        customStyle.sentBoxColor
-      }
+      {...styles.message,
+       ...styles.messageFromYou,
+       backgroundColor : customStyle.sentBoxColor,
+       ...(highlighted && {...styles.highlighted})}
       :
-      {...styles.message,...styles.messageFromOther, backgroundColor : highlighted ?
-        invertColor(customStyle.sentBoxColor)
-        :
-        customStyle.sentBoxColor}}>
+      {...styles.message,
+       ...styles.messageFromOther,
+       backgroundColor : customStyle.receivedBoxColor,
+       ...(highlighted && {...styles.highlighted})}}>
       <Text
       style={{
         ...styles.messageText,
@@ -47,7 +46,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle }) => {
 const styles = {
   messageFromOther : {
     backgroundColor : "#E86252",
-    marginLeft : 5
+    marginLeft : 5,
   },
   messageFromYou : {
     backgroundColor : "#c6c6c6",
@@ -67,6 +66,11 @@ const styles = {
     fontWeight : "bold",
     marginTop : 10
   },
+  highlighted : {
+    borderWidth : 2,
+    borderColor : "black",
+    borderStyle : "dotted"
+  }
 }
 
 export default ChatBubble
