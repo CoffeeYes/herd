@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 
-const ChatBubble = ({ text, timestamp, messageFrom, customStyle }) => {
+const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
+                      highlightedMessages, setHighlightedMessages }) => {
   const [highlighted, setHighlighted] = useState(false);
 
   const invertColor = color => {
@@ -15,9 +16,23 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle }) => {
     return temp;
   }
 
+  const highlight = () => {
+    setHighlighted(true);
+    highlightedMessages.indexOf(identifier) === -1 &&
+    setHighlightedMessages([...highlightedMessages,identifier])
+  }
+
+  const unhighlight = () => {
+    if(highlighted) {
+      setHighlighted(false)
+      setHighlightedMessages([...highlightedMessages].filter(item => item !== identifier))  
+    }
+  }
+
   return (
     <TouchableOpacity
-    onLongPress={() => setHighlighted(true)}
+    onLongPress={highlight}
+    onPress={unhighlight}
     style={messageFrom ?
       {...styles.message,
        ...styles.messageFromYou,

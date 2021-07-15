@@ -14,6 +14,7 @@ const Chat = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
   const [customStyle, setCustomStyle] = useState({});
+  const [highlightedMessages, setHighlightedMessages] = useState([]);
 
   useEffect(() => {
     AsyncStorage.getItem("contacts").then(result => {
@@ -167,7 +168,11 @@ const Chat = ({ route, navigation }) => {
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
+          key={index}
+          identifier={index}
           customStyle={customStyle}
+          highlightedMessages={highlightedMessages}
+          setHighlightedMessages={setHighlightedMessages}
           />
         )}
       </ScrollView>
