@@ -57,7 +57,7 @@ const styles = {
     paddingHorizontal : Dimensions.get("window").width * 0.05
   },
   pressContainer : {
-    width : "100%",
+    flex : 1,
     height : "100%",
     justifyContent : "center",
     flexDirection : "row",

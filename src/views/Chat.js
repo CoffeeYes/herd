@@ -131,10 +131,6 @@ const Chat = ({ route, navigation }) => {
     scrollRef.current.scrollToEnd({animated : true})
   }
 
-  const longPressMessage = () => {
-
-  }
-
   const scrollRef = useRef();
 
   return (
@@ -143,6 +139,8 @@ const Chat = ({ route, navigation }) => {
     title={contactInfo?.name}
     touchStyle={{backgroundColor : "#f46758"}}
     textStyle={{marginLeft : 10}}
+    rightButtonIcon={highlightedMessages.length > 0 && "delete"}
+    rightButtonOnClick={() => {}}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {
       id : contactInfo.id
