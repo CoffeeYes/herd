@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TextInput, ActivityIndicator,Image, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, View, ScrollView, TextInput, ActivityIndicator,
+         Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
+import { v4 as uuidv4 } from 'uuid';
+
 import Header from './Header';
 import ChatBubble from './ChatBubble';
 
@@ -84,12 +87,18 @@ const Chat = ({ route, navigation }) => {
         sentCopy : []
       }
     }
+    //generate new unique uuid for the message
+    var id = uuidv4();
+    while(userData.sent.find(message => message.id === id) != undefined) {
+      id = uuidv4();
+    }
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
       from : ownPublicKey,
       text : message,
-      timestamp : Date.now()
+      timestamp : Date.now(),
+      id : id
     }
 
     //encrypt the message to be sent using the other users public key
@@ -121,7 +130,8 @@ const Chat = ({ route, navigation }) => {
       to : contactInfo.key,
       from : ownPublicKey,
       text : newMessageEncryptedCopy,
-      timestamp : Date.now()
+      timestamp : Date.now(),
+      id : id
     }
     userData.sentCopy.push(messageToAddCopy);
     await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData))
@@ -129,6 +139,35 @@ const Chat = ({ route, navigation }) => {
     setMessages([...messages,plainText])
     setChatInput("");
     scrollRef.current.scrollToEnd({animated : true})
+  }
+
+  const deleteMessages = () => {
+    Alert.alert(
+      'Are you sure you want to delete these messages?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
+            var sentMessages = userData.sent;
+            var sentMessagesCopy = userData.sentCopy;
+            sentMessagesCopy = sentMessagesCopy.filter(message => highlightedMessages.indexOf(message.id) === -1 );
+            sentMessages = sentMessages.filter(message => highlightedMessages.indexOf(message.id) === -1 );
+
+            userData.sent = sentMessages;
+            userData.sentCopy = sentMessagesCopy;
+            await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
+            loadMessages();
+            setHighlightedMessages([]);
+          },
+        },
+      ]
+    );
   }
 
   const scrollRef = useRef();
@@ -140,7 +179,7 @@ const Chat = ({ route, navigation }) => {
     touchStyle={{backgroundColor : "#f46758"}}
     textStyle={{marginLeft : 10}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
-    rightButtonOnClick={() => {}}
+    rightButtonOnClick={deleteMessages}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {
       id : contactInfo.id
@@ -167,7 +206,7 @@ const Chat = ({ route, navigation }) => {
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
           key={index}
-          identifier={index}
+          identifier={message.id}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
           setHighlightedMessages={setHighlightedMessages}
