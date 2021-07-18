@@ -28,7 +28,7 @@ const Chat = ({ route, navigation }) => {
     Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
     loadMessages().then( () => setLoading(false));
     loadStyles();
-  },[])
+  },[]);
 
   const loadMessages = async () => {
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
@@ -200,12 +200,12 @@ const Chat = ({ route, navigation }) => {
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
-        {messages.map( (message,index) =>
+        {messages.map( message =>
           <ChatBubble
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
-          key={index}
+          key={message.id}
           identifier={message.id}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
