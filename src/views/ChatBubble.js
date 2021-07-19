@@ -25,14 +25,14 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
   const unhighlight = () => {
     if(highlighted) {
       setHighlighted(false)
-      setHighlightedMessages([...highlightedMessages].filter(item => item !== identifier))  
+      setHighlightedMessages([...highlightedMessages].filter(item => item !== identifier))
     }
   }
 
   return (
     <TouchableOpacity
     onLongPress={highlight}
-    onPress={unhighlight}
+    onPress={() => highlighted ? unhighlight() : highlightedMessages.length > 0 && highlight()}
     style={messageFrom ?
       {...styles.message,
        ...styles.messageFromYou,
