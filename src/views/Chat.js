@@ -158,11 +158,11 @@ const Chat = ({ route, navigation }) => {
             var sentMessagesCopy = userData.sentCopy;
             sentMessagesCopy = sentMessagesCopy.filter(message => highlightedMessages.indexOf(message.id) === -1 );
             sentMessages = sentMessages.filter(message => highlightedMessages.indexOf(message.id) === -1 );
+            setMessages(messages.filter(message => highlightedMessages.indexOf(message.id) === -1))
 
             userData.sent = sentMessages;
             userData.sentCopy = sentMessagesCopy;
             await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
-            loadMessages();
             setHighlightedMessages([]);
           },
         },
