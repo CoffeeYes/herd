@@ -18,6 +18,7 @@ const Chat = ({ route, navigation }) => {
   const [chatInput, setChatInput] = useState("");
   const [customStyle, setCustomStyle] = useState({});
   const [highlightedMessages, setHighlightedMessages] = useState([]);
+  const [inputDisabled, setInputDisabled] = useState(false);
 
   useEffect(() => {
     AsyncStorage.getItem("contacts").then(result => {
@@ -78,6 +79,20 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
+    setInputDisabled(true);
+    //plaintext copy of the message to immediatly append to chat state
+    const plainText = {
+      to : contactInfo.key,
+      from : ownPublicKey,
+      text : message,
+      timestamp : Date.now(),
+      id : id
+    }
+
+    setMessages([...messages,plainText])
+    setChatInput("");
+    scrollRef.current.scrollToEnd({animated : true})
+
     var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
     //default userData if there is none
     if(!userData) {
@@ -91,14 +106,6 @@ const Chat = ({ route, navigation }) => {
     var id = uuidv4();
     while(userData.sent.find(message => message.id === id) != undefined) {
       id = uuidv4();
-    }
-    //plaintext copy of the message to immediatly append to chat state
-    const plainText = {
-      to : contactInfo.key,
-      from : ownPublicKey,
-      text : message,
-      timestamp : Date.now(),
-      id : id
     }
 
     //encrypt the message to be sent using the other users public key
@@ -134,11 +141,8 @@ const Chat = ({ route, navigation }) => {
       id : id
     }
     userData.sentCopy.push(messageToAddCopy);
-    await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData))
-
-    setMessages([...messages,plainText])
-    setChatInput("");
-    scrollRef.current.scrollToEnd({animated : true})
+    await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
+    setInputDisabled(false);
   }
 
   const deleteMessages = () => {
@@ -218,6 +222,7 @@ const Chat = ({ route, navigation }) => {
       placeholder="Send a Message"
       style={styles.chatInput}
       value={chatInput}
+      editable={!inputDisabled}
       onChangeText={setChatInput}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
