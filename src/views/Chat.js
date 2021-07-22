@@ -4,11 +4,13 @@ import { Text, View, ScrollView, TextInput, ActivityIndicator,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
+import Realm from 'realm';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
 
 import Crypto from '../nativeWrapper/Crypto';
+import Schemas from '../Schemas'
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([]);
@@ -143,6 +145,25 @@ const Chat = ({ route, navigation }) => {
     userData.sentCopy.push(messageToAddCopy);
     await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
     setInputDisabled(false);
+    try {
+      const realm = await Realm.open({
+        path : "Messages",
+        schema: [Schemas.MessageSchema],
+      });
+      realm.write(() => {
+        // Assign a newly-created instance to the variable.
+        realm.create("Message",{
+          _id : Realm.BSON.ObjectId(),
+          to : contactInfo.key,
+          from : ownPublicKey,
+          text : newMessageEncryptedCopy,
+          timestamp : Date.now(),
+        })
+      });
+
+    } catch (err) {
+      console.error("Failed to open the realm", err.message);
+    }
   }
 
   const deleteMessages = () => {
