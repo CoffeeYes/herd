@@ -9,6 +9,16 @@ const Schemas = {
       text : 'string',
       timestamp : 'int'
     }
+  },
+  ContactSchema : {
+    name : 'Contact',
+    primaryKey : "_id",
+    properties : {
+      _id : 'objectId',
+      key : 'string',
+      name : 'string',
+      image : 'string'
+    }
   }
 }
 

@@ -27,52 +27,60 @@ const Chat = ({ route, navigation }) => {
       result = JSON.parse(result);
       result &&
       setContactInfo(result.find(contact => contact.id === route.params.contactID))
+      const contact = result?.find(contact => contact.id === route.params.contactID)
+      Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
+      loadMessages(contact.key).then( () => setLoading(false));
+      loadStyles();
     });
-    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
-    loadMessages().then( () => setLoading(false));
-    loadStyles();
   },[]);
 
-  const loadMessages = async () => {
-    var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
-    //set default user structure
-    if(!userData) {
-      userData = {
-        sent : [],
-        received : [],
-        sentCopy : []
-      }
+  const loadMessages = async (key) => {
+    var sentMessagesCopy;
+    var receivedMessages;
+    try {
+      const messageCopyRealm = await Realm.open({
+        path : "MessagesCopy",
+        schema: [Schemas.MessageSchema],
+      });
+      sentMessagesCopy = await messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'");
+      const messageReceivedRealm = await Realm.open({
+        path : "MessagesReceived",
+        schema: [Schemas.MessageSchema],
+      });
+      receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'");
+    }
+    catch(error) {
+      console.log("Error opening Realms : " + error)
     }
 
-    var receivedMessages = userData.received;
-    var sentMessagesCopy = userData.sentCopy;
-    //decrypt all message text payloads (sent and received) using private key
+    var initialReceivedMessages = [];
     if(receivedMessages.length > 0) {
       for(var message in receivedMessages) {
-        receivedMessages[message].text = await Crypto.decryptString(
+        const decrypted = Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
           receivedMessages[message].text
         )
+        initialReceivedMessages.push({...receivedMessages[message],text : decrypted});
       }
     }
 
+    var initialSentMessages = [];
     if(sentMessagesCopy.length > 0) {
       for(var message in sentMessagesCopy) {
-        sentMessagesCopy[message].text = await Crypto.decryptString(
+        const decrypted = await Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
           sentMessagesCopy[message].text
         )
+        initialSentMessages.push({...sentMessagesCopy[message],text : decrypted})
       }
     }
-
-    (receivedMessages.length > 0 || sentMessagesCopy.length > 0) &&
-    setMessages([...receivedMessages,...sentMessagesCopy].sort( (a,b) => a.timestamp > b.timestamp))
+    setMessages([...initialSentMessages,...receivedMessages].sort( (a,b) => a.timestamp > b.timestamp))
   }
 
   const loadStyles = async () => {
@@ -146,13 +154,13 @@ const Chat = ({ route, navigation }) => {
     await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
     setInputDisabled(false);
     try {
-      const realm = await Realm.open({
-        path : "Messages",
+      const messageCopyRealm = await Realm.open({
+        path : "MessagesCopy",
         schema: [Schemas.MessageSchema],
       });
-      realm.write(() => {
+      messageCopyRealm.write(() => {
         // Assign a newly-created instance to the variable.
-        realm.create("Message",{
+        messageCopyRealm.create("Message",{
           _id : Realm.BSON.ObjectId(),
           to : contactInfo.key,
           from : ownPublicKey,
@@ -160,9 +168,23 @@ const Chat = ({ route, navigation }) => {
           timestamp : Date.now(),
         })
       });
+      const messageSentRealm = await Realm.open({
+        path : "MessagesSent",
+        schema: [Schemas.MessageSchema],
+      });
+      messageSentRealm.write(() => {
+        // Assign a newly-created instance to the variable.
+        messageSentRealm.create("Message",{
+          _id : Realm.BSON.ObjectId(),
+          to : contactInfo.key,
+          from : ownPublicKey,
+          text : newMessageEncrypted,
+          timestamp : Date.now(),
+        })
+      });
 
     } catch (err) {
-      console.error("Failed to open the realm", err.message);
+      console.error("Failed to open the messageCopyRealm", err.message);
     }
   }
 
@@ -225,12 +247,12 @@ const Chat = ({ route, navigation }) => {
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
-        {messages.map( message =>
+        {messages.map( (message,index) =>
           <ChatBubble
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
-          key={message.id}
+          key={index}
           identifier={message.id}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
