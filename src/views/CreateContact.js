@@ -8,6 +8,8 @@ import ContactImage from './ContactImage';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
+import Realm from 'realm';
+import Schemas from '../Schemas'
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -38,6 +40,26 @@ const CreateContact = ({ navigation, route}) => {
       }
       catch(e) {
         return setError("Invalid Public Key")
+      }
+
+      try {
+        const contactsRealm = await Realm.open({
+          path : "contacts",
+          schema : [Schemas.ContactSchema]
+        })
+
+        contactsRealm.write(() => {
+          // Assign a newly-created instance to the variable.
+          contactsRealm.create("Contact",{
+            _id : Realm.BSON.ObjectId(),
+            key : publicKey,
+            name : username,
+            image : contactImage
+          })
+        });
+      }
+      catch(error) {
+        console.log("Error opening Contacts Realm : " + error)
       }
 
       var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
