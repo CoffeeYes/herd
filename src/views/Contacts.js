@@ -3,6 +3,8 @@ import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, Scr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
+import Realm from 'realm';
+import Schemas from '../Schemas'
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -22,8 +24,18 @@ const Contacts = ({ route, navigation }) => {
 
   const loadContacts = async () => {
     setLoading(true);
-    const storedContacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    await setContacts(storedContacts)
+
+    try {
+      const contactsRealm = await Realm.open({
+        path : 'contacts',
+        schema : [Schemas.ContactSchema]
+      });
+      const contacts = contactsRealm.objects('Contact');
+      setContacts(contacts)
+    }
+    catch(error) {
+      console.log("Error opening contacts realm : " + error)
+    }
     setLoading(false);
   }
 

@@ -61,33 +61,6 @@ const CreateContact = ({ navigation, route}) => {
       catch(error) {
         console.log("Error opening Contacts Realm : " + error)
       }
-
-      var contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-      //create empty contacts array and load it back
-      if(!contacts) {
-        await AsyncStorage.setItem("contacts",JSON.stringify([]));
-        contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-      }
-
-      //generate new unique uuid for the contact
-      var id = uuidv4();
-      while(contacts.find(user => user.id === id) != undefined) {
-        id = uuidv4();
-      }
-
-      //create new user if the username isnt taken
-      if(!(contacts.find(user => user.name === username))) {
-        await AsyncStorage.setItem("contacts",JSON.stringify([...contacts,{
-          name : username.trim(),
-          key : publicKey.trim(),
-          image : contactImage,
-          id : id
-        }]))
-        navigation.navigate("main");
-      }
-      else {
-        setError("You Already have a contact with that username")
-      }
     }
   }
 
