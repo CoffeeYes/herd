@@ -48,7 +48,7 @@ const CreateContact = ({ navigation, route}) => {
           schema : [Schemas.ContactSchema]
         })
 
-        contactsRealm.write(() => {
+        await contactsRealm.write(() => {
           // Assign a newly-created instance to the variable.
           contactsRealm.create("Contact",{
             _id : Realm.BSON.ObjectId(),
@@ -57,6 +57,7 @@ const CreateContact = ({ navigation, route}) => {
             image : contactImage
           })
         });
+        navigation.navigate('main');
       }
       catch(error) {
         console.log("Error opening Contacts Realm : " + error)

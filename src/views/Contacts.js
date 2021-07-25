@@ -86,7 +86,7 @@ const Contacts = ({ route, navigation }) => {
           onPress={() => route.params.type === "newChat" ?
             navigation.navigate("chat", {contactID : contact.id})
             :
-            navigation.navigate("contact", {id : contact.id})
+            navigation.navigate("contact", {id : Realm.BSON.ObjectId(contact._id[1])})
           }
           deleteItem={() => deleteContact(contact.id)}
           />

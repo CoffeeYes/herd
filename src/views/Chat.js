@@ -22,32 +22,34 @@ const Chat = ({ route, navigation }) => {
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
 
+  const { ObjectId } = Realm.BSON
+
   useEffect(() => {
-    AsyncStorage.getItem("contacts").then(result => {
-      result = JSON.parse(result);
-      result &&
-      setContactInfo(result.find(contact => contact.id === route.params.contactID))
-      const contact = result?.find(contact => contact.id === route.params.contactID)
-      Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
-      loadMessages(contact.key).then( () => setLoading(false));
-      loadStyles();
-    });
+    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
+    loadMessages();
+    setLoading(false);
   },[]);
 
   const loadMessages = async (key) => {
     var sentMessagesCopy;
     var receivedMessages;
     try {
+      const contactsRealm = await Realm.open({
+        path : 'contacts',
+        schema : [Schemas.ContactSchema]
+      })
+      const contact = contactsRealm.objectForPrimaryKey("Contact",ObjectId(route.params.contactID));
+      setContactInfo({...contact});
       const messageCopyRealm = await Realm.open({
         path : "MessagesCopy",
         schema: [Schemas.MessageSchema],
       });
-      sentMessagesCopy = await messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'");
+      sentMessagesCopy = await messageCopyRealm.objects("Message")?.filtered("to = " + "'" + contact.key + "'");
       const messageReceivedRealm = await Realm.open({
         path : "MessagesReceived",
         schema: [Schemas.MessageSchema],
       });
-      receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'");
+      receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + contact.key + "'");
     }
     catch(error) {
       console.log("Error opening Realms : " + error)
@@ -80,7 +82,7 @@ const Chat = ({ route, navigation }) => {
         initialSentMessages.push({...sentMessagesCopy[message],text : decrypted})
       }
     }
-    setMessages([...initialSentMessages,...receivedMessages].sort( (a,b) => a.timestamp > b.timestamp))
+    setMessages([...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp))
   }
 
   const loadStyles = async () => {

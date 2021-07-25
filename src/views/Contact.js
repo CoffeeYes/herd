@@ -6,6 +6,8 @@ import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ContactImage from './ContactImage';
+import Realm from 'realm';
+import Schemas from '../Schemas'
 
 import QRCodeModal from './QRCodeModal'
 
@@ -35,16 +37,23 @@ const Contact = ({route, navigation}) => {
   },[navigation])
 
   const loadContact = async () => {
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    const contact = contacts.find(savedContact => savedContact.id === route.params.id);
-
-    if(contact) {
-      setContactKey(contact.key);
-      setContactName(contact.name);
-      setContactID(contact.id)
-      if(contact.image) {
-        setContactImage(contact.image);
+    try {
+      const contactsRealm = await Realm.open({
+        path : 'contacts',
+        schema : [Schemas.ContactSchema]
+      })
+      const contact = contactsRealm.objectForPrimaryKey("Contact",route.params.id);
+      if(contact) {
+        setContactKey(contact.key);
+        setContactName(contact.name);
+        setContactID(contact._id[1])
+        if(contact.image) {
+          setContactImage(contact.image);
+        }
       }
+    }
+    catch(error) {
+      console.log("Error opening contacts realm : " + error)
     }
   }
 
