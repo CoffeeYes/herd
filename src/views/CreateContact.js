@@ -8,8 +8,7 @@ import ContactImage from './ContactImage';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import Realm from 'realm';
-import Schemas from '../Schemas'
+import { createContact } from '../realm/contactRealm'
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -21,7 +20,7 @@ const CreateContact = ({ navigation, route}) => {
     route?.params?.publicKey && setPublicKey(route.params.publicKey);
   },[])
 
-  const createContact = async () => {
+  const createNewContact = async () => {
     setError("");
 
     if(username.trim() === "" || publicKey.trim() === "") {
@@ -42,26 +41,13 @@ const CreateContact = ({ navigation, route}) => {
         return setError("Invalid Public Key")
       }
 
-      try {
-        const contactsRealm = await Realm.open({
-          path : "contacts",
-          schema : [Schemas.ContactSchema]
-        })
-
-        await contactsRealm.write(() => {
-          // Assign a newly-created instance to the variable.
-          contactsRealm.create("Contact",{
-            _id : Realm.BSON.ObjectId(),
-            key : publicKey,
-            name : username,
-            image : contactImage
-          })
-        });
-        navigation.navigate('main');
+      const newContact = {
+        key : publicKey,
+        name : username,
+        image : contactImage
       }
-      catch(error) {
-        console.log("Error opening Contacts Realm : " + error)
-      }
+      createContact(newContact);
+      navigation.navigate('main');
     }
   }
 
@@ -114,7 +100,7 @@ const CreateContact = ({ navigation, route}) => {
 
         <TouchableOpacity
         style={styles.button}
-        onPress={() => createContact()}>
+        onPress={() => createNewContact()}>
           <Text style={styles.buttonText}>Import</Text>
         </TouchableOpacity>
 

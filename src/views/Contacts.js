@@ -5,11 +5,12 @@ import Header from './Header';
 import ListItem from './ListItem';
 import Realm from 'realm';
 import Schemas from '../Schemas';
-import { cloneDeep } from 'lodash';
+import { getAllContacts, deleteContact } from '../realm/contactRealm'
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     loadContacts();
@@ -19,34 +20,16 @@ const Contacts = ({ route, navigation }) => {
     const focusListener = navigation.addListener('focus', () => {
       loadContacts();
     });
-
     return focusListener;
   },[navigation])
 
   const loadContacts = async () => {
     setLoading(true);
-
-    try {
-      const contactsRealm = await Realm.open({
-        path : 'contacts',
-        schema : [Schemas.ContactSchema]
-      });
-      const contacts = contactsRealm.objects('Contact');
-
-      //create a deepclone of the realm data so that we can perform operations on it directly in state
-      var contactsDeepClone = [];
-      for(var item in contacts) {
-        contactsDeepClone.push(cloneDeep(contacts[item]));
-      }
-      setContacts(contactsDeepClone);
-    }
-    catch(error) {
-      console.log("Error opening contacts realm : " + error)
-    }
+    setContacts(getAllContacts());
     setLoading(false);
   }
 
-  const deleteContact = async index => {
+  const onPressDelete = async index => {
     Alert.alert(
       'Are you sure ?',
       '',
@@ -57,15 +40,9 @@ const Contacts = ({ route, navigation }) => {
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            const contactsRealm = await Realm.open({
-              path : 'contacts',
-              schema : [Schemas.ContactSchema]
-            })
-            contactsRealm.write(async () => {
-              await contactsRealm.delete(contacts[index]);
-              setContacts([...contacts].splice(index,1));
-            })
+          onPress: () => {
+            deleteContact(contacts[index]);
+            setContacts(getAllContacts());
           },
         },
       ]
@@ -95,7 +72,7 @@ const Contacts = ({ route, navigation }) => {
             :
             navigation.navigate("contact", {id : Realm.BSON.ObjectId(contact._id[1])})
           }
-          deleteItem={() => deleteContact(index)}
+          deleteItem={() => onPressDelete(index)}
           />
         )}
       </ScrollView>}
