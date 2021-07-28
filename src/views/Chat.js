@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import Realm from 'realm';
+import { getMessagesWithContact } from '../realm/chatRealm'
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -40,49 +41,13 @@ const Chat = ({ route, navigation }) => {
       })
       const contact = contactsRealm.objectForPrimaryKey("Contact",ObjectId(route.params.contactID));
       setContactInfo({...contact});
-      const messageCopyRealm = await Realm.open({
-        path : "MessagesCopy",
-        schema: [Schemas.MessageSchema],
-      });
-      sentMessagesCopy = await messageCopyRealm.objects("Message")?.filtered("to = " + "'" + contact.key + "'");
-      const messageReceivedRealm = await Realm.open({
-        path : "MessagesReceived",
-        schema: [Schemas.MessageSchema],
-      });
-      receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + contact.key + "'");
+      setMessages(await getMessagesWithContact(contact.key))
     }
     catch(error) {
       console.log("Error opening Realms : " + error)
     }
 
-    var initialReceivedMessages = [];
-    if(receivedMessages.length > 0) {
-      for(var message in receivedMessages) {
-        const decrypted = Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          receivedMessages[message].text
-        )
-        initialReceivedMessages.push({...receivedMessages[message],text : decrypted});
-      }
-    }
 
-    var initialSentMessages = [];
-    if(sentMessagesCopy.length > 0) {
-      for(var message in sentMessagesCopy) {
-        const decrypted = await Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          sentMessagesCopy[message].text
-        )
-        initialSentMessages.push({...sentMessagesCopy[message],text : decrypted})
-      }
-    }
-    setMessages([...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp))
   }
 
   const loadStyles = async () => {
