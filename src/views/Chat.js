@@ -5,7 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import Realm from 'realm';
-import { getMessagesWithContact } from '../realm/chatRealm'
+import { getMessagesWithContact } from '../realm/chatRealm';
+import { getContactById } from '../realm/contactRealm'
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -35,11 +36,7 @@ const Chat = ({ route, navigation }) => {
     var sentMessagesCopy;
     var receivedMessages;
     try {
-      const contactsRealm = await Realm.open({
-        path : 'contacts',
-        schema : [Schemas.ContactSchema]
-      })
-      const contact = contactsRealm.objectForPrimaryKey("Contact",ObjectId(route.params.contactID));
+      const contact = getContactById(ObjectId(route.params.contactID))
       setContactInfo({...contact});
       setMessages(await getMessagesWithContact(contact.key))
     }

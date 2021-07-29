@@ -22,8 +22,13 @@ const createContact = object => {
   })
 }
 
+const getContactById = id => {
+  return contactsRealm.objectForPrimaryKey("Contact",id);
+}
+
 export {
   getAllContacts,
   deleteContact,
-  createContact
+  createContact,
+  getContactById
 }
