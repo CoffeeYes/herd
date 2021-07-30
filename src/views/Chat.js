@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import Realm from 'realm';
-import { getMessagesWithContact } from '../realm/chatRealm';
+import { getMessagesWithContact, sendMessageToContact } from '../realm/chatRealm';
 import { getContactById } from '../realm/contactRealm'
 
 import Header from './Header';
@@ -27,24 +27,20 @@ const Chat = ({ route, navigation }) => {
   const { ObjectId } = Realm.BSON
 
   useEffect(() => {
-    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
-    loadMessages();
-    setLoading(false);
+    (async () => {
+      Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
+      await loadMessages();
+      await loadStyles();
+      setLoading(false);
+    })()
   },[]);
 
   const loadMessages = async (key) => {
     var sentMessagesCopy;
     var receivedMessages;
-    try {
-      const contact = getContactById(ObjectId(route.params.contactID))
-      setContactInfo({...contact});
-      setMessages(await getMessagesWithContact(contact.key))
-    }
-    catch(error) {
-      console.log("Error opening Realms : " + error)
-    }
-
-
+    const contact = getContactById(ObjectId(route.params.contactID))
+    setContactInfo({...contact});
+    setMessages(await getMessagesWithContact(contact.key))
   }
 
   const loadStyles = async () => {
@@ -67,21 +63,6 @@ const Chat = ({ route, navigation }) => {
     setChatInput("");
     scrollRef.current.scrollToEnd({animated : true})
 
-    var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
-    //default userData if there is none
-    if(!userData) {
-      userData = {
-        sent : [],
-        received : [],
-        sentCopy : []
-      }
-    }
-    //generate new unique uuid for the message
-    var id = uuidv4();
-    while(userData.sent.find(message => message.id === id) != undefined) {
-      id = uuidv4();
-    }
-
     //encrypt the message to be sent using the other users public key
     const newMessageEncrypted = await Crypto.encryptStringWithKey(
       contactInfo.key,
@@ -90,12 +71,6 @@ const Chat = ({ route, navigation }) => {
       Crypto.padding.OAEP_SHA256_MGF1Padding,
       message
     )
-    //store new message to be sent
-    var sentMessages = JSON.parse(await AsyncStorage.getItem(route.params.contactID))
-    if(!sentMessages) {
-      sentMessages = []
-    }
-    userData.sent.push(sentMessages);
 
     //encrypt the passed in message using the users own public key
     const newMessageEncryptedCopy = await Crypto.encryptString(
@@ -107,49 +82,14 @@ const Chat = ({ route, navigation }) => {
     )
 
     //create a message object with relevant metadata
-    const messageToAddCopy = {
+    const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      text : newMessageEncryptedCopy,
-      timestamp : Date.now(),
-      id : id
+      id : id,
+      timestamp : Date.now()
     }
-    userData.sentCopy.push(messageToAddCopy);
-    await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
+    sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
     setInputDisabled(false);
-    try {
-      const messageCopyRealm = await Realm.open({
-        path : "MessagesCopy",
-        schema: [Schemas.MessageSchema],
-      });
-      messageCopyRealm.write(() => {
-        // Assign a newly-created instance to the variable.
-        messageCopyRealm.create("Message",{
-          _id : Realm.BSON.ObjectId(),
-          to : contactInfo.key,
-          from : ownPublicKey,
-          text : newMessageEncryptedCopy,
-          timestamp : Date.now(),
-        })
-      });
-      const messageSentRealm = await Realm.open({
-        path : "MessagesSent",
-        schema: [Schemas.MessageSchema],
-      });
-      messageSentRealm.write(() => {
-        // Assign a newly-created instance to the variable.
-        messageSentRealm.create("Message",{
-          _id : Realm.BSON.ObjectId(),
-          to : contactInfo.key,
-          from : ownPublicKey,
-          text : newMessageEncrypted,
-          timestamp : Date.now(),
-        })
-      });
-
-    } catch (err) {
-      console.error("Failed to open the messageCopyRealm", err.message);
-    }
   }
 
   const deleteMessages = () => {

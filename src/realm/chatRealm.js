@@ -12,6 +12,11 @@ const messageReceivedRealm = new Realm({
   schema: [Schemas.MessageSchema],
 });
 
+const messageSentRealm = new Realm({
+  path : "MessagesSent",
+  schema : [Schemas.MessageSchema]
+})
+
 const getMessagesWithContact = async key => {
   const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'");
   const receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'");
@@ -47,6 +52,26 @@ const getMessagesWithContact = async key => {
   return [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
 }
 
+const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
+
+  messageCopyRealm.write(() => {
+    messageCopyRealm.create("Message",{
+      ...metaData,
+      _id : Realm.BSON.ObjectId(),
+      text : selfEncryptedCopy,
+    })
+  });
+
+  messageSentRealm.write(() => {
+    messageSentRealm.create("Message",{
+      ...metaData,
+      _id : Realm.BSON.ObjectId(),
+      text : encrypted,
+    })
+  });
+}
+
 export {
-  getMessagesWithContact
+  getMessagesWithContact,
+  sendMessageToContact
 }
