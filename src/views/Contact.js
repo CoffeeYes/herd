@@ -42,7 +42,7 @@ const Contact = ({route, navigation}) => {
         path : 'contacts',
         schema : [Schemas.ContactSchema]
       })
-      const contact = contactsRealm.objectForPrimaryKey("Contact",route.params.id);
+      const contact = contactsRealm.objectForPrimaryKey("Contact",Realm.BSON.ObjectId(route.params.id));
       if(contact) {
         setContactKey(contact.key);
         setContactName(contact.name);
