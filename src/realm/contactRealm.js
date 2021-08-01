@@ -26,9 +26,14 @@ const getContactById = id => {
   return contactsRealm.objectForPrimaryKey("Contact",id);
 }
 
+const getContactsByKey = keys => {
+  return contactsRealm.objects('Contact').filtered("Contact.to IN " + keys);
+}
+
 export {
   getAllContacts,
   deleteContact,
   createContact,
-  getContactById
+  getContactById,
+  getContactsByKey
 }

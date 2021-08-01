@@ -1,6 +1,7 @@
 import Realm from 'realm';
 import Schemas from '../Schemas';
 import Crypto from '../nativeWrapper/Crypto';
+import { getContactsByKey } from './contactRealm'
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -71,7 +72,19 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   });
 }
 
+const getContactsWithChats = () => {
+  const sentMessages = messageCopyRealm.objects('Message');
+  const receivedMessages = messageReceivedRealm.objects('Message');
+  var keys = [];
+
+  sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
+  receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
+
+  getContactsByKey(keys);
+}
+
 export {
   getMessagesWithContact,
-  sendMessageToContact
+  sendMessageToContact,
+  getContactsWithChats
 }
