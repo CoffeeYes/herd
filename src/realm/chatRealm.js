@@ -80,7 +80,7 @@ const getContactsWithChats = () => {
   sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
 
-  getContactsByKey(keys);
+  return getContactsByKey(keys);
 }
 
 export {

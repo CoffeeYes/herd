@@ -2,41 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
-import ListItem from './ListItem'
+import ListItem from './ListItem';
+import { getContactsWithChats } from '../realm/chatRealm'
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadContactsWithChats().then(() => setLoading(false))
+    loadContactsWithChats();
   },[])
 
   useEffect(() => {
     const focusListener = navigation.addListener('focus', () => {
-      setLoading(true)
-      loadContactsWithChats().then(() => setLoading(false));
+      loadContactsWithChats();
     });
 
     return focusListener;
   },[navigation])
 
-  const loadContactsWithChats = async () => {
-    //load all contacts from storage
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-
-    //check storage for each contact to see if messages have been sent/received
-    //and add them to contact list if so
-    var chatsWithMessages = []
-    if(contacts) {
-      await Promise.all(contacts.map(async contact => {
-        const userData = JSON.parse(await AsyncStorage.getItem(contact.id));
-        if(userData?.received?.length > 0 || userData?.sentCopy?.length > 0) {
-          chatsWithMessages.push({name : contact.name,image : contact.image, contactID : contact.id})
-        }
-      }))
-      setChats(chatsWithMessages)
-    }
+  const loadContactsWithChats = () => {
+    setLoading(true);
+    setChats(getContactsWithChats());
+    setLoading(false);
   }
 
   const deleteChat = async contactID => {
