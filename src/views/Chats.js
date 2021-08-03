@@ -67,7 +67,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        onPress={() => navigation.navigate("chat", {contactID : chat.contactID})}
+        onPress={() => navigation.navigate("chat", {contactID : chat._id[1]})}
         deleteItem={() => deleteChat(chat.contactID)}
         />
       )}
