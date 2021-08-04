@@ -83,8 +83,15 @@ const getContactsWithChats = () => {
   return getContactsByKey(keys);
 }
 
+const closeChatRealm = () => {
+  messageCopyRealm.close();
+  messageReceivedRealm.close();
+  messageSentRealm.close();
+}
+
 export {
   getMessagesWithContact,
   sendMessageToContact,
-  getContactsWithChats
+  getContactsWithChats,
+  closeChatRealm
 }

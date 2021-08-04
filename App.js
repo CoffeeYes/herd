@@ -17,9 +17,12 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
-import navigationRef from './src/NavigationRef.js'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Crypto from './src/nativeWrapper/Crypto.js'
+
+import navigationRef from './src/NavigationRef.js'
+import Crypto from './src/nativeWrapper/Crypto.js';
+import { closeChatRealm } from './src/realm/chatRealm';
+import { closeContactRealm } from './src/realm/contactRealm';
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -41,6 +44,12 @@ const App = ({ }) => {
 
   useEffect(() => {
     loadOwnKey()
+
+    return () => {
+      closeChatRealm();
+      closeContactRealm();
+      console.log("unmount")
+    }
   },[])
 
   const loadOwnKey = async () => {

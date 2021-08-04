@@ -31,10 +31,15 @@ const getContactsByKey = keys => {
   return contactsRealm.objects('Contact').filtered(keyQuery);
 }
 
+const closeContactRealm = () => {
+  contactRealm.close();
+}
+
 export {
   getAllContacts,
   deleteContact,
   createContact,
   getContactById,
-  getContactsByKey
+  getContactsByKey,
+  closeContactRealm
 }
