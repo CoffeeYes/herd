@@ -133,7 +133,7 @@ const Chat = ({ route, navigation }) => {
     rightButtonOnClick={deleteMessages}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {
-      id : contactInfo.id
+      id : contactInfo._id[1]
     })}
     preText={
       contactInfo?.image?.length > 0 &&
