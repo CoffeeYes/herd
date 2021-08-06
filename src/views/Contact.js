@@ -9,7 +9,8 @@ import ContactImage from './ContactImage';
 import Realm from 'realm';
 import Schemas from '../Schemas'
 
-import QRCodeModal from './QRCodeModal'
+import QRCodeModal from './QRCodeModal';
+import { getContactById } from '../realm/contactRealm';
 
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
@@ -37,23 +38,14 @@ const Contact = ({route, navigation}) => {
   },[navigation])
 
   const loadContact = async () => {
-    try {
-      const contactsRealm = await Realm.open({
-        path : 'contacts',
-        schema : [Schemas.ContactSchema]
-      })
-      const contact = contactsRealm.objectForPrimaryKey("Contact",Realm.BSON.ObjectId(route.params.id));
-      if(contact) {
-        setContactKey(contact.key);
-        setContactName(contact.name);
-        setContactID(contact._id[1])
-        if(contact.image) {
-          setContactImage(contact.image);
-        }
+    const contact = getContactById(Realm.BSON.ObjectId(route.params.id));
+    if(contact) {
+      setContactKey(contact.key);
+      setContactName(contact.name);
+      setContactID(contact._id[1])
+      if(contact.image) {
+        setContactImage(contact.image);
       }
-    }
-    catch(error) {
-      console.log("Error opening contacts realm : " + error)
     }
   }
 
