@@ -23,7 +23,8 @@ const createContact = object => {
 }
 
 const getContactById = id => {
-  return contactsRealm.objectForPrimaryKey("Contact",id);
+  let oid = Realm.BSON.ObjectId(id)
+  return contactsRealm.objectForPrimaryKey("Contact",oid);
 }
 
 const getContactsByKey = keys => {
@@ -32,7 +33,7 @@ const getContactsByKey = keys => {
 }
 
 const closeContactRealm = () => {
-  contactRealm.close();
+  contactsRealm.close();
 }
 
 export {

@@ -38,7 +38,7 @@ const Contact = ({route, navigation}) => {
   },[navigation])
 
   const loadContact = async () => {
-    const contact = getContactById(Realm.BSON.ObjectId(route.params.id));
+    const contact = getContactById(route.params.id);
     if(contact) {
       setContactKey(contact.key);
       setContactName(contact.name);
@@ -50,14 +50,9 @@ const Contact = ({route, navigation}) => {
   }
 
   const copyKeyToClipboard = async () => {
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"))
-    const contact = contacts.find(savedContact => savedContact.id === route.params.id)
-
-    if(contact) {
-      setClipboard(contact.key)
-      setShowCopied(true);
-      setTimeout(() => setShowCopied(false),500)
-    }
+    setClipboard(contactKey)
+    setShowCopied(true);
+    setTimeout(() => setShowCopied(false),500)
   }
 
   const shareContact = async () => {

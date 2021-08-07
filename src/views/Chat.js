@@ -24,8 +24,6 @@ const Chat = ({ route, navigation }) => {
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
 
-  const { ObjectId } = Realm.BSON
-
   useEffect(() => {
     (async () => {
       Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
@@ -38,7 +36,7 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async (key) => {
     var sentMessagesCopy;
     var receivedMessages;
-    const contact = getContactById(ObjectId(route.params.contactID))
+    const contact = getContactById(route.params.contactID)
     setContactInfo({...contact});
     setMessages(await getMessagesWithContact(contact.key))
   }
