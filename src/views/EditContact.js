@@ -8,7 +8,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import SaveButton from './SaveButton'
 
-import { getContactById } from '../realm/contactRealm'
+import { getContactById, editContact } from '../realm/contactRealm'
 
 
 const EditContact = ({ route, navigation }) => {
@@ -53,12 +53,7 @@ const EditContact = ({ route, navigation }) => {
 
   const save = async () => {
     setError("");
-    var oldContact = savedContacts.find(contact => contact.id === route.params.id);
-    var newContact = {...oldContact,name : name.trim(),key : publicKey.trim(), image : contactImage};
-    await AsyncStorage.setItem("contacts",JSON.stringify([
-      ...savedContacts.filter(contact => contact.id !== route.params.id),
-      newContact
-    ]))
+    editContact(route.params.id, {name : name, key : publicKey, image : contactImage})
   }
 
   const editImage = async () => {

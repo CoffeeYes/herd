@@ -32,6 +32,15 @@ const getContactsByKey = keys => {
   return contactsRealm.objects('Contact').filtered(keyQuery);
 }
 
+const editContact = (id, values) => {
+  const contact = getContactById(Realm.BSON.ObjectId(id));
+  contactsRealm.write(() => {
+    contact.name = values.name;
+    contact.key = values.key;
+    contact.image = values.image;
+  })
+}
+
 const closeContactRealm = () => {
   contactsRealm.close();
 }
@@ -42,5 +51,6 @@ export {
   createContact,
   getContactById,
   getContactsByKey,
+  editContact,
   closeContactRealm
 }

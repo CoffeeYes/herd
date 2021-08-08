@@ -48,7 +48,6 @@ const App = ({ }) => {
     return () => {
       closeChatRealm();
       closeContactRealm();
-      console.log("unmount")
     }
   },[])
 
