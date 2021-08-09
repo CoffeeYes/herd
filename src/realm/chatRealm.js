@@ -79,8 +79,12 @@ const getContactsWithChats = () => {
 
   sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
-
-  return getContactsByKey(keys);
+  if(keys.length > 0) {
+    return getContactsByKey(keys);
+  }
+  else {
+    return []
+  }
 }
 
 const closeChatRealm = () => {
