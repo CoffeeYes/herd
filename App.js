@@ -21,8 +21,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import navigationRef from './src/NavigationRef.js'
 import Crypto from './src/nativeWrapper/Crypto.js';
-import { closeChatRealm } from './src/realm/chatRealm';
-import { closeContactRealm } from './src/realm/contactRealm';
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -44,11 +42,6 @@ const App = ({ }) => {
 
   useEffect(() => {
     loadOwnKey()
-
-    return () => {
-      closeChatRealm();
-      closeContactRealm();
-    }
   },[])
 
   const loadOwnKey = async () => {

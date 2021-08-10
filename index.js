@@ -2,16 +2,24 @@ import 'react-native-gesture-handler';
 /**
  * @format
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import { NavigationContainer } from '@react-navigation/native';
-import navigationRef from './src/NavigationRef'
+import navigationRef from './src/NavigationRef';
+import { closeChatRealm } from './src/realm/chatRealm';
+import { closeContactRealm } from './src/realm/contactRealm';
 
 const Index = () => {
+  useEffect(() => {
+    return () => {
+      closeChatRealm();
+      closeContactRealm();
+    }
+  },[])
   return (
-    <NavigationContainer ref={navigationRef}> 
+    <NavigationContainer ref={navigationRef}>
       <App/>
     </NavigationContainer>
   )
