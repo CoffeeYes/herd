@@ -76,11 +76,9 @@ const EditContact = ({ route, navigation }) => {
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
-      const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-      const contact = contacts.find(savedContact => savedContact.id === route.params.id);
-
+      const contact = getContactById(route.params.id);
+      
       if(contact) {
-
         const unsavedChanges = (
           contact.name != nameRef.current ||
           contact.key != keyRef.current ||
