@@ -48,6 +48,8 @@ const Chat = ({ route, navigation }) => {
 
   const sendMessage = async message => {
     setInputDisabled(true);
+
+    let id = Realm.BSON.ObjectId();
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
