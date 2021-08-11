@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, Scr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getContactsWithChats } from '../realm/chatRealm'
+import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm'
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
@@ -27,7 +27,7 @@ const Chats = ({ navigation }) => {
     setLoading(false);
   }
 
-  const deleteChat = async contactID => {
+  const deleteChat = async key => {
     Alert.alert(
       'Are you sure ?',
       '',
@@ -39,11 +39,7 @@ const Chats = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            await AsyncStorage.setItem(contactID,JSON.stringify({
-              sent : [],
-              received : [],
-              sentCopy :  []
-            }));
+            deleteChatFromRealm(key)
             loadContactsWithChats();
           },
         },
@@ -68,7 +64,7 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         onPress={() => navigation.navigate("chat", {contactID : chat._id[1]})}
-        deleteItem={() => deleteChat(chat.contactID)}
+        deleteItem={() => deleteChat(chat.key)}
         />
       )}
       </ScrollView>
