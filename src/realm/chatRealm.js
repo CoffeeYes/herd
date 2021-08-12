@@ -88,10 +88,9 @@ const getContactsWithChats = () => {
 }
 
 const deleteChat = key => {
-  console.log(key)
   const sentMessagesToDelete = messageSentRealm.objects('Message').filtered("to = " + "'" + key + "'");
   const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filtered("to = " + "'" + key + "'");
-  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("to = " + "'" + key + "'");
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("from = " + "'" + key + "'");
 
   messageSentRealm.write(() => {
     sentMessagesToDelete.map(message => messageSentRealm.delete(message))
@@ -101,6 +100,18 @@ const deleteChat = key => {
   })
   messageReceivedRealm.write(() => {
     receivedMessagesToDelete.map(message => messageReceivedRealm.delete(message))
+  })
+}
+
+const deleteAllChats = () => {
+  messageSentRealm.write(() => {
+    messageSentRealm.deleteAll();
+  })
+  messageCopyRealm.write(() => {
+    messageCopyRealm.deleteAll();
+  })
+  messageReceivedRealm.write(() => {
+    messageReceivedRealm.deleteAll();
   })
 }
 
@@ -114,6 +125,7 @@ export {
   getMessagesWithContact,
   sendMessageToContact,
   getContactsWithChats,
+  deleteChat,
+  deleteAllChats,
   closeChatRealm,
-  deleteChat
 }

@@ -9,6 +9,8 @@ import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 
+import { deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm'
+
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
   const [showSnackbar, setShowSnackbar] = useState(false);
@@ -42,16 +44,8 @@ const Settings = ({ navigation }) => {
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-
-            contacts.map(async contact => {
-              await AsyncStorage.setItem(contact.id,JSON.stringify({
-                sent : [],
-                received : [],
-                sentCopy : []
-              }));
-            })
+          onPress: () => {
+            deleteAllChatsFromRealm()
           },
         },
       ]
