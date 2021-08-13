@@ -41,6 +41,10 @@ const editContact = (id, values) => {
   })
 }
 
+const deleteAllContacts = () => {
+  contactsRealm.write(() => contactsRealm.deleteAll())
+}
+
 const closeContactRealm = () => {
   contactsRealm.close();
 }
@@ -52,5 +56,6 @@ export {
   getContactById,
   getContactsByKey,
   editContact,
+  deleteAllContacts,
   closeContactRealm
 }
