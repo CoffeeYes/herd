@@ -5,7 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import Realm from 'realm';
-import { getMessagesWithContact, sendMessageToContact } from '../realm/chatRealm';
+import {
+  getMessagesWithContact,
+  sendMessageToContact,
+  deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { getContactById } from '../realm/contactRealm'
 
 import Header from './Header';
@@ -26,7 +29,7 @@ const Chat = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key))
+      setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
       await loadMessages();
       await loadStyles();
       setLoading(false);
@@ -56,7 +59,7 @@ const Chat = ({ route, navigation }) => {
       from : ownPublicKey,
       text : message,
       timestamp : Date.now(),
-      id : id
+      _id : id
     }
 
     setMessages([...messages,plainText])
@@ -85,7 +88,7 @@ const Chat = ({ route, navigation }) => {
     const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      id : id,
+      _id : id,
       timestamp : Date.now()
     }
     sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
@@ -104,16 +107,7 @@ const Chat = ({ route, navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            var userData = JSON.parse(await AsyncStorage.getItem(route.params.contactID));
-            var sentMessages = userData.sent;
-            var sentMessagesCopy = userData.sentCopy;
-            sentMessagesCopy = sentMessagesCopy.filter(message => highlightedMessages.indexOf(message.id) === -1 );
-            sentMessages = sentMessages.filter(message => highlightedMessages.indexOf(message.id) === -1 );
-            setMessages(messages.filter(message => highlightedMessages.indexOf(message.id) === -1))
-
-            userData.sent = sentMessages;
-            userData.sentCopy = sentMessagesCopy;
-            await AsyncStorage.setItem(route.params.contactID,JSON.stringify(userData));
+            deleteMessagesFromRealm(highlightedMessages)
             setHighlightedMessages([]);
           },
         },
@@ -157,7 +151,7 @@ const Chat = ({ route, navigation }) => {
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
           key={index}
-          identifier={message.id}
+          identifier={message._id[1]}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
           setHighlightedMessages={setHighlightedMessages}

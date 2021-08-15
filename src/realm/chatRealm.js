@@ -115,6 +115,14 @@ const deleteAllChats = () => {
   })
 }
 
+const deleteMessages = messages => {
+  var messagesToDelete = [];
+  messagesToDelete = messages.map(id => messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
+  messageCopyRealm.write(() => {
+    messageCopyRealm.delete(messagesToDelete)
+  })
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -127,5 +135,6 @@ export {
   getContactsWithChats,
   deleteChat,
   deleteAllChats,
+  deleteMessages,
   closeChatRealm,
 }
