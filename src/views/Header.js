@@ -42,7 +42,7 @@ const styles = {
     alignItems : "center",
     backgroundColor : "#e05e3f",
     paddingLeft : 10,
-    height : Dimensions.get("window").height * 0.075
+    height : Dimensions.get("window").height * 0.085
   },
   title : {
     color : "white",
