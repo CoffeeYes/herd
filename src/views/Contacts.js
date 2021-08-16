@@ -68,7 +68,7 @@ const Contacts = ({ route, navigation }) => {
           navigation={navigation}
           image={contact.image}
           onPress={() => route.params.type === "newChat" ?
-            navigation.navigate("chat", {contactID : contact.id})
+            navigation.navigate("chat", {contactID : contact._id[1]})
             :
             navigation.navigate("contact", {id : contact._id[1]})
           }
