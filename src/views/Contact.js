@@ -56,16 +56,10 @@ const Contact = ({route, navigation}) => {
   }
 
   const shareContact = async () => {
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    const contact = contacts.find(savedContact => savedContact.id === route.params.id);
-
-    if(contact) {
-      const key = contact.key
-      const shared = await Share.share({
-        title : "I'd like to share my Herd Contact with you!",
-        message : key
-      })
-    }
+    const shared = await Share.share({
+      title : "I'd like to share my Herd Contact with you!",
+      message : contactKey
+    })
   }
 
   return (
