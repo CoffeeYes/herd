@@ -7,14 +7,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ContactImage from './ContactImage';
 import Realm from 'realm';
-import Schemas from '../Schemas'
+import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
+import FlashTextButton from './FlashTextButton'
 import { getContactById } from '../realm/contactRealm';
 
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
-  const [showCopied, setShowCopied] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [contactID, setContactID] = useState("");
   const [contactName, setContactName] = useState("");
@@ -51,8 +51,6 @@ const Contact = ({route, navigation}) => {
 
   const copyKeyToClipboard = async () => {
     setClipboard(contactKey)
-    setShowCopied(true);
-    setTimeout(() => setShowCopied(false),500)
   }
 
   const shareContact = async () => {
@@ -91,15 +89,12 @@ const Contact = ({route, navigation}) => {
           imageHeight={Dimensions.get("window").height * 0.4}/>}
         </View>
 
-        {showCopied && <Text
-        style={{alignSelf : "center", fontWeight : "bold", fontSize : 18}}>
-        Copied!
-        </Text>}
-        <TouchableOpacity
-        style={styles.button}
-        onPress={copyKeyToClipboard}>
-          <Text style={styles.buttonText}>Copy Key</Text>
-        </TouchableOpacity>
+        <FlashTextButton
+        normalText="Copy Key"
+        flashText="Copied!"
+        timeout={500}
+        onPress={copyKeyToClipboard}
+        buttonStyle={styles.button}/>
 
         <TouchableOpacity style={styles.button} onPress={shareContact}>
           <Text style={styles.buttonText}>Share Contact</Text>
