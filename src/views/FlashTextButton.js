@@ -28,7 +28,6 @@ const styles = {
     backgroundColor : "#E86252",
     padding : 10,
     alignSelf : "center",
-    marginTop : 10,
     borderRadius : 5
   },
   buttonText : {

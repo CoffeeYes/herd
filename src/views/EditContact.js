@@ -6,7 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
-import SaveButton from './SaveButton'
 
 import { getContactById, editContact } from '../realm/contactRealm'
 
@@ -77,7 +76,7 @@ const EditContact = ({ route, navigation }) => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
       const contact = getContactById(route.params.id);
-      
+
       if(contact) {
         const unsavedChanges = (
           contact.name != nameRef.current ||
@@ -142,7 +141,13 @@ const EditContact = ({ route, navigation }) => {
         onChangeText={text => setPublicKey(text)}
         value={publicKey}/>
 
-        <SaveButton saveFunction={save}/>
+        <FlashTextButton
+        normalText="Save"
+        flashText="Saved!"
+        onPress={save}
+        timeout={500}
+        buttonStyle={styles.button}
+        textStyle={styles.buttonText}/>
       </View>}
     </>
   )

@@ -4,7 +4,7 @@ import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
-import SaveButton from './SaveButton'
+import FlashTextButton from './FlashTextButton';
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -14,13 +14,12 @@ const Customise = ({ navigation }) => {
   const [activeItem, setActiveItem] = useState("sentBox");
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [saveButtonText, setSaveButtonText] = useState("Save");
 
 
-  sentBoxColorRef = useRef();
-  sentTextColorRef = useRef();
-  receivedBoxColorRef = useRef();
-  receivedTextColorRef = useRef();
+  const sentBoxColorRef = useRef();
+  const sentTextColorRef = useRef();
+  const receivedBoxColorRef = useRef();
+  const receivedTextColorRef = useRef();
 
   const setSentBoxColor = data => {
     sentBoxColorRef.current = data
@@ -208,7 +207,14 @@ const Customise = ({ navigation }) => {
       </View>
 
       <View style={styles.buttonRow}>
-        <SaveButton saveFunction={saveStyles}/>
+        <FlashTextButton
+        normalText="Save"
+        flashText="Saved!"
+        onPress={saveStyles}
+        timeout={500}
+        buttonStyle={styles.button}
+        textStyle={styles.buttonText}/>
+
         <TouchableOpacity
         onPress={restoreDefault}
         style={{...styles.button,marginLeft : 10}}>
@@ -283,7 +289,8 @@ const styles = {
   buttonRow : {
     flexDirection : "row",
     justifyContent : "center",
-    alignItems : "center"
+    alignItems : "center",
+    marginTop : 10
   }
 }
 export default Customise;
