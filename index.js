@@ -14,8 +14,10 @@ import { closeContactRealm } from './src/realm/contactRealm';
 const Index = () => {
   useEffect(() => {
     return () => {
-      closeChatRealm();
-      closeContactRealm();
+      if(__DEV__) {
+        closeChatRealm();
+        closeContactRealm();
+      }
     }
   },[])
   return (

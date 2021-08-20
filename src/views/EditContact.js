@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
+import FlashTextButton from './FlashTextButton'
 
 import { getContactById, editContact } from '../realm/contactRealm'
 
