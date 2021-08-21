@@ -161,7 +161,7 @@ const Chat = ({ route, navigation }) => {
 
       <TextInput
       placeholder="Send a Message"
-      style={styles.chatInput}
+      style={{...styles.chatInput,backgroundColor : inputDisabled ? "#c6c6c6" : "white"}}
       value={chatInput}
       editable={!inputDisabled}
       onChangeText={setChatInput}
