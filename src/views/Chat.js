@@ -107,8 +107,11 @@ const Chat = ({ route, navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
+            setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages)
             setHighlightedMessages([]);
+            setMessages(await getMessagesWithContact(contactInfo.key));
+            setInputDisabled(false);
           },
         },
       ]
@@ -150,7 +153,7 @@ const Chat = ({ route, navigation }) => {
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
-          key={index}
+          key={message._id[1]}
           identifier={message._id[1]}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
