@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
-         ActivityIndicator } from 'react-native';
+         ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
@@ -116,7 +116,7 @@ const EditContact = ({ route, navigation }) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
@@ -149,7 +149,7 @@ const EditContact = ({ route, navigation }) => {
         timeout={500}
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
-      </View>}
+      </ScrollView>}
     </>
   )
 }
