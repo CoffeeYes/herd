@@ -8,24 +8,20 @@ import QRCodeModal from './QRCodeModal';
 import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
+import FlashTextButton from './FlashTextButton';
 
 import { deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
-  const [showSnackbar, setShowSnackbar] = useState(false);
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
 
-  const copyKeyToClipboard = () => {
-    Crypto.loadKeyFromKeystore("herdPersonal").then(key => {
-      setClipboard(key)
-      setShowSnackbar(true);
-      setTimeout(() => {setShowSnackbar(false)},500)
-    })
+  const copyKeyToClipboard = async () => {
+    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
   }
 
   const showQRCode = async () => {
@@ -129,13 +125,13 @@ const Settings = ({ navigation }) => {
       </View>
 
       <ScrollView>
-        {showSnackbar &&
-        <Text style={{alignSelf : "center",fontSize : 18, fontWeight : "bold"}}>Copied!</Text>}
-        <TouchableOpacity
-        style={styles.button}
-        onPress={copyKeyToClipboard}>
-          <Text style={styles.buttonText}> Copy your key </Text>
-        </TouchableOpacity>
+
+        <FlashTextButton
+        normalText="Copy Your Key"
+        flashText="Copied!"
+        timeout={500}
+        onPress={copyKeyToClipboard}
+        buttonStyle={styles.button}/>
 
         <TouchableOpacity
         style={styles.button}
