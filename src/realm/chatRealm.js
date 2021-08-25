@@ -123,6 +123,13 @@ const deleteMessages = messages => {
   })
 }
 
+const getMessageQueue = () => {
+  const sentMessages = messageSentRealm.objects('Message')
+  const receivedMessages= messageReceivedRealm.objects('Message')
+
+  return [...sentMessages,...receivedMessages].sort((a,b) => a.timestamp > b.timestamp)
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
