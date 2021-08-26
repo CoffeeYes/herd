@@ -1,38 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getMessageQueue } from '../realm/chatRealm';
 
 import Crypto from '../nativeWrapper/Crypto';
 
 const MessageQueue = ({}) => {
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadMessages();
+    setLoading(false);
   },[])
 
-  const loadMessages = async () => {
-    const contacts = JSON.parse(await AsyncStorage.getItem("contacts"));
-    var allMessages = [];
-    //compile all messages into one array
-    for(var contact in contacts) {
-      const currentMessages = JSON.parse(await AsyncStorage.getItem(contacts[contact].id)).sentCopy;
-      allMessages = [...allMessages,...currentMessages];
-    }
-
-    //decrypt message text and add contact name to messages
-    for(var message in allMessages) {
-      allMessages[message].text = await Crypto.decryptString(
-        "herdPersonal",
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        allMessages[message].text
-      )
-      allMessages[message].toContactName = contacts.find(contact => contact.key === allMessages[message].to)?.name
-    }
-    setMessages(allMessages.sort((a,b) => a.timestamp > b.timestamp));
+  const loadMessages = () => {
+    const messageQueue = getMessageQueue();
+    setMessages(messageQueue)
   }
 
   return (
@@ -41,6 +26,9 @@ const MessageQueue = ({}) => {
       allowGoBack
       title="Message Queue"/>
 
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
       <ScrollView>
         {messages.map((message,index) =>
           <View style={styles.messageItem} key={index}>
@@ -48,7 +36,7 @@ const MessageQueue = ({}) => {
             <Text style={styles.messageText}>{message.text}</Text>
           </View>
         )}
-      </ScrollView>
+      </ScrollView>}
     </View>
   )
 }

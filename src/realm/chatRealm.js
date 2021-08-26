@@ -1,7 +1,8 @@
 import Realm from 'realm';
 import Schemas from '../Schemas';
 import Crypto from '../nativeWrapper/Crypto';
-import { getContactsByKey } from './contactRealm'
+import { getContactsByKey } from './contactRealm';
+import { cloneDeep } from 'lodash'
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -125,9 +126,15 @@ const deleteMessages = messages => {
 
 const getMessageQueue = () => {
   const sentMessages = messageSentRealm.objects('Message')
-  const receivedMessages= messageReceivedRealm.objects('Message')
+  const receivedMessages= messageReceivedRealm.objects('Message');
 
-  return [...sentMessages,...receivedMessages].sort((a,b) => a.timestamp > b.timestamp)
+  var sentMessagesCopy = [];
+  var receivedMessagesCopy = [];
+
+  sentMessages.map(message => sentMessagesCopy.push({...message}));
+  receivedMessages.map(message => receivedMessageCopy.push({...message}));
+
+  return [...sentMessagesCopy,...receivedMessagesCopy]
 }
 
 const closeChatRealm = () => {
@@ -143,5 +150,6 @@ export {
   deleteChat,
   deleteAllChats,
   deleteMessages,
+  getMessageQueue,
   closeChatRealm,
 }
