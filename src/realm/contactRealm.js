@@ -1,5 +1,7 @@
 import Realm from 'realm';
 import Schemas from '../Schemas';
+import { deleteChat } from './chatRealm';
+import { cloneDeep } from 'lodash';
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -11,6 +13,7 @@ const getAllContacts = () => {
 }
 
 const deleteContact = object => {
+  deleteChat(object.key);
   contactsRealm.write(() => {
     contactsRealm.delete(object);
   })

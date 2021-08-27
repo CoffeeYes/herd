@@ -94,13 +94,13 @@ const deleteChat = key => {
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("from = " + "'" + key + "'");
 
   messageSentRealm.write(() => {
-    sentMessagesToDelete.map(message => messageSentRealm.delete(message))
+    sentMessagesToDelete.map(message => message && messageSentRealm.delete(message))
   })
   messageCopyRealm.write(() => {
-    sentMessagesToDeleteCopy.map(message => messageCopyRealm.delete(message))
+    sentMessagesToDeleteCopy.map(message => message && messageCopyRealm.delete(message))
   })
   messageReceivedRealm.write(() => {
-    receivedMessagesToDelete.map(message => messageReceivedRealm.delete(message))
+    receivedMessagesToDelete.map(message => message && messageReceivedRealm.delete(message))
   })
 }
 
