@@ -13,14 +13,6 @@ import { closeChatRealm } from './src/realm/chatRealm';
 import { closeContactRealm } from './src/realm/contactRealm';
 
 const Index = () => {
-  useEffect(() => {
-    return () => {
-      if(__DEV__) {
-        closeChatRealm();
-        closeContactRealm();
-      }
-    }
-  },[])
   return (
     <NavigationContainer ref={navigationRef}>
       <App/>

@@ -9,6 +9,8 @@ import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import { closeChatRealm } from '../realm/chatRealm';
+import { closeContactRealm } from '../realm/contactRealm';
 
 import { deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
@@ -163,6 +165,17 @@ const Settings = ({ navigation }) => {
         onPress={deleteAllContacts}>
           <Text style={styles.buttonText}> Delete All Contacts </Text>
         </TouchableOpacity>
+
+        {__DEV__ &&
+          <TouchableOpacity
+          style={{...styles.button,backgroundColor : "red"}}
+          onPress={() => {
+            closeChatRealm();
+            closeContactRealm();
+          }}>
+            <Text style={styles.buttonText}>Close Realm</Text>
+          </TouchableOpacity>
+        }
 
       </ScrollView>
     </View>
