@@ -42,7 +42,7 @@ const Contacts = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             deleteContact(contacts[index]);
-            setContacts(getAllContacts());
+            loadContacts();
           },
         },
       ]
@@ -68,9 +68,9 @@ const Contacts = ({ route, navigation }) => {
           navigation={navigation}
           image={contact.image}
           onPress={() => route.params.type === "newChat" ?
-            navigation.navigate("chat", {contactID : contact._id[1]})
+            navigation.navigate("chat", {contactID : typeof JSON.parse(JSON.stringify(contact))._id  === 'string' ? contact._id : contact._id[1]})
             :
-            navigation.navigate("contact", {id : contact._id[1]})
+            navigation.navigate("contact", {id : typeof JSON.parse(JSON.stringify(contact))._id === 'string' ? contact._id : contact._id[1]})
           }
           deleteItem={() => onPressDelete(index)}
           />

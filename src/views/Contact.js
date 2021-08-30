@@ -47,6 +47,9 @@ const Contact = ({route, navigation}) => {
         setContactImage(contact.image);
       }
     }
+    else  {
+      setContactName(route.params.id + "TEST") 
+    }
   }
 
   const copyKeyToClipboard = async () => {

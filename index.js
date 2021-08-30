@@ -9,8 +9,6 @@ import App from './App';
 import {name as appName} from './app.json';
 import { NavigationContainer } from '@react-navigation/native';
 import navigationRef from './src/NavigationRef';
-import { closeChatRealm } from './src/realm/chatRealm';
-import { closeContactRealm } from './src/realm/contactRealm';
 
 const Index = () => {
   return (
