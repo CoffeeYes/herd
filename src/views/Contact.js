@@ -47,9 +47,6 @@ const Contact = ({route, navigation}) => {
         setContactImage(contact.image);
       }
     }
-    else  {
-      setContactName(route.params.id + "TEST") 
-    }
   }
 
   const copyKeyToClipboard = async () => {
@@ -103,7 +100,7 @@ const Contact = ({route, navigation}) => {
           <Text style={styles.buttonText}>Share Contact</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {contactID : contactID})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {contactID : route.params.id})}>
           <Text style={styles.buttonText}>Go To Chat</Text>
         </TouchableOpacity>
 

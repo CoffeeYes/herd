@@ -52,18 +52,13 @@ const Chat = ({ route, navigation }) => {
   const sendMessage = async message => {
     setInputDisabled(true);
 
-    let id = Realm.BSON.ObjectId();
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
       from : ownPublicKey,
       text : message,
       timestamp : Date.now(),
-      _id : id
     }
-
-    setMessages([...messages,plainText])
-    setChatInput("");
     scrollRef.current.scrollToEnd({animated : true})
 
     //encrypt the message to be sent using the other users public key
@@ -88,10 +83,12 @@ const Chat = ({ route, navigation }) => {
     const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      _id : id,
       timestamp : Date.now()
     }
-    sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
+    //add message to UI
+    let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
+    setMessages([...messages,{...plainText,_id : messageID}])
+    setChatInput("");
     setInputDisabled(false);
   }
 
@@ -153,8 +150,8 @@ const Chat = ({ route, navigation }) => {
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
-          key={message._id[1]}
-          identifier={message._id[1]}
+          key={JSON.parse(JSON.stringify(message))._id}
+          identifier={JSON.parse(JSON.stringify(message))._id}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
           setHighlightedMessages={setHighlightedMessages}

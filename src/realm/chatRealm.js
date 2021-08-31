@@ -56,10 +56,12 @@ const getMessagesWithContact = async key => {
 
 const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 
+  const messageID = Realm.BSON.ObjectId();
+
   messageCopyRealm.write(() => {
     messageCopyRealm.create("Message",{
       ...metaData,
-      _id : Realm.BSON.ObjectId(),
+      _id : messageID,
       text : selfEncryptedCopy,
     })
   });
@@ -71,6 +73,8 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
       text : encrypted,
     })
   });
+
+  return messageID;
 }
 
 const getContactsWithChats = () => {
