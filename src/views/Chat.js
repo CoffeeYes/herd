@@ -36,11 +36,9 @@ const Chat = ({ route, navigation }) => {
     })()
   },[]);
 
-  const loadMessages = async (key) => {
-    var sentMessagesCopy;
-    var receivedMessages;
+  const loadMessages = async () => {
     const contact = getContactById(route.params.contactID)
-    setContactInfo({...contact});
+    setContactInfo(contact);
     setMessages(await getMessagesWithContact(contact.key))
   }
 
@@ -120,7 +118,7 @@ const Chat = ({ route, navigation }) => {
   return (
     <>
     <Header
-    title={contactInfo?.name}
+    title={contactInfo.name}
     touchStyle={{backgroundColor : "#f46758"}}
     textStyle={{marginLeft : 10}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}

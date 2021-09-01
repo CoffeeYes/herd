@@ -26,6 +26,7 @@ const getMessagesWithContact = async key => {
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
+      const currentMessage = JSON.parse(JSON.stringify(receivedMessages[message]))
       const decrypted = await Crypto.decryptString(
         "herdPersonal",
         Crypto.algorithm.RSA,
@@ -33,13 +34,14 @@ const getMessagesWithContact = async key => {
         Crypto.padding.OAEP_SHA256_MGF1Padding,
         receivedMessages[message].text
       )
-      initialReceivedMessages.push({...receivedMessages[message],text : decrypted});
+      initialReceivedMessages.push({...currentMessage,text : decrypted});
     }
   }
 
   var initialSentMessages = [];
   if(sentMessagesCopy.length > 0) {
     for(var message in sentMessagesCopy) {
+      const currentMessage = JSON.parse(JSON.stringify(sentMessagesCopy[message]))
       const decrypted = await Crypto.decryptString(
         "herdPersonal",
         Crypto.algorithm.RSA,
@@ -47,10 +49,9 @@ const getMessagesWithContact = async key => {
         Crypto.padding.OAEP_SHA256_MGF1Padding,
         sentMessagesCopy[message].text
       )
-      initialSentMessages.push({...sentMessagesCopy[message],text : decrypted})
+      initialSentMessages.push({...currentMessage,text : decrypted});
     }
   }
-
   return [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
 }
 
