@@ -63,7 +63,11 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        onPress={() => navigation.navigate("chat", {contactID : chat._id[1]})}
+        onPress={() => navigation.navigate("chat", {contactID : typeof JSON.parse(JSON.stringify(chat))._id === "string" ?
+          JSON.parse(JSON.stringify(chat))._id
+          :
+          chat._id[1]})
+        }
         deleteItem={() => deleteChat(chat.key)}
         />
       )}
