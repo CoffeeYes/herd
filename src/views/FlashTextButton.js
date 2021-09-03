@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {Text, TouchableOpacity } from 'react-native';
 
 const FlashTextButton = ({ onPress, flashText, normalText,
-                           timeout, buttonStyle, textStyle }) => {
+                           timeout, buttonStyle, textStyle, disabled }) => {
 
   const [buttonText, setButtonText] = useState(normalText)
 
@@ -16,7 +16,8 @@ const FlashTextButton = ({ onPress, flashText, normalText,
 
   return (
     <TouchableOpacity
-    style={{...styles.button,...buttonStyle}}
+    disabled={disabled}
+    style={disabled ? {...styles.button,...buttonStyle,backgroundColor : "grey"} : {...styles.button,...buttonStyle}}
     onPress={onButtonPress}>
       <Text style={{...styles.buttonText,...textStyle}}>{buttonText}</Text>
     </TouchableOpacity>

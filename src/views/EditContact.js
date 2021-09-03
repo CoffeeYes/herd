@@ -15,6 +15,7 @@ const EditContact = ({ route, navigation }) => {
   const [name, _setName] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
+  const [originalContact, setOriginalContact] = useState({});
   const [contactImage, _setContactImage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -43,7 +44,7 @@ const EditContact = ({ route, navigation }) => {
 
   const loadContactInfo = async () => {
     const contact = getContactById(route.params.id)
-
+    setOriginalContact(contact);
     if(contact) {
       setName(contact.name)
       setPublicKey(contact.key);
@@ -147,6 +148,11 @@ const EditContact = ({ route, navigation }) => {
         flashText="Saved!"
         onPress={save}
         timeout={500}
+        disabled={
+          name === originalContact.name &&
+          publicKey === originalContact.key &&
+          contactImage === originalContact.image
+        }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
       </ScrollView>}
