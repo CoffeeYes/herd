@@ -5,7 +5,8 @@ import Header from './Header';
 import ListItem from './ListItem';
 import Realm from 'realm';
 import Schemas from '../Schemas';
-import { getAllContacts, deleteContact } from '../realm/contactRealm'
+import { getAllContacts, deleteContact } from '../realm/contactRealm';
+import { parseRealmID } from '../realm/helper'
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -68,9 +69,9 @@ const Contacts = ({ route, navigation }) => {
           navigation={navigation}
           image={contact.image}
           onPress={() => route.params.type === "newChat" ?
-            navigation.navigate("chat", {contactID : typeof JSON.parse(JSON.stringify(contact))._id  === 'string' ? JSON.parse(JSON.stringify(contact))._id : contact._id[1]})
+            navigation.navigate("chat", {contactID : parseRealmID(contact)})
             :
-            navigation.navigate("contact", {id : typeof JSON.parse(JSON.stringify(contact))._id === 'string' ? JSON.parse(JSON.stringify(contact))._id : contact._id[1]})
+            navigation.navigate("contact", {id : parseRealmID(contact)})
           }
           deleteItem={() => onPressDelete(index)}
           />

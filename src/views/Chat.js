@@ -9,7 +9,8 @@ import {
   getMessagesWithContact,
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
-import { getContactById } from '../realm/contactRealm'
+import { getContactById } from '../realm/contactRealm';
+import { parseRealmID } from '../realm/helper';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -124,9 +125,7 @@ const Chat = ({ route, navigation }) => {
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
     rightButtonOnClick={deleteMessages}
     allowGoBack
-    onTextTouch={() => navigation.navigate("contact", {
-      id : contactInfo._id[1] || JSON.parse(JSON.stringify(contactInfo))._id
-    })}
+    onTextTouch={() => navigation.navigate("contact", {id : parseRealmID(contactInfo)})}
     preText={
       contactInfo?.image?.length > 0 &&
       <View style={styles.imageContainer}>
@@ -148,8 +147,8 @@ const Chat = ({ route, navigation }) => {
           text={message.text}
           timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
           messageFrom={message.from === ownPublicKey}
-          key={JSON.parse(JSON.stringify(message))._id}
-          identifier={JSON.parse(JSON.stringify(message))._id}
+          key={parseRealmID(message)}
+          identifier={parseRealmID(message)}
           customStyle={customStyle}
           highlightedMessages={highlightedMessages}
           setHighlightedMessages={setHighlightedMessages}

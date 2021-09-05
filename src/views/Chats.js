@@ -3,7 +3,8 @@ import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, Scr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm'
+import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
+import { parseRealmID } from '../realm/helper'
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
@@ -63,10 +64,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        onPress={() => navigation.navigate("chat", {contactID : typeof JSON.parse(JSON.stringify(chat))._id === "string" ?
-          JSON.parse(JSON.stringify(chat))._id
-          :
-          chat._id[1]})
+        onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
         }
         deleteItem={() => deleteChat(chat.key)}
         />
