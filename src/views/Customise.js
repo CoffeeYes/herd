@@ -14,6 +14,7 @@ const Customise = ({ navigation }) => {
   const [activeItem, setActiveItem] = useState("sentBox");
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [originalStyles, setOriginalStyles] = useState({});
 
 
   const sentBoxColorRef = useRef();
@@ -50,6 +51,7 @@ const Customise = ({ navigation }) => {
       setSentTextColor(styles.sentTextColor);
       setReceivedBoxColor(styles.receivedBoxColor);
       setReceivedTextColor(styles.receivedTextColor);
+      setOriginalStyles(styles)
     }
   }
 
@@ -212,6 +214,12 @@ const Customise = ({ navigation }) => {
         flashText="Saved!"
         onPress={saveStyles}
         timeout={500}
+        disabled={
+          sentBoxColor === originalStyles.sentBoxColor &&
+          sentTextColor === originalStyles.sentTextColor &&
+          receivedBoxColor === originalStyles.receivedBoxColor &&
+          receivedTextColor === originalStyles.receivedTextColor
+        }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
 

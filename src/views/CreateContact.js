@@ -5,10 +5,11 @@ import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import ContactImage from './ContactImage';
+import FlashTextButton from './FlashTextButton';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { createContact } from '../realm/contactRealm'
+import { createContact } from '../realm/contactRealm';
 
 const CreateContact = ({ navigation, route}) => {
   const [username, setUsername] = useState("");
@@ -98,11 +99,14 @@ const CreateContact = ({ navigation, route}) => {
         editable={!route?.params?.publicKey}
         value={publicKey}/>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => createNewContact()}>
-          <Text style={styles.buttonText}>Import</Text>
-        </TouchableOpacity>
+        <FlashTextButton
+        timeout={0}
+        flashText="Import"
+        normalText="Import"
+        buttonStyle={styles.button}
+        textStyle={styles.buttonText}
+        onPress={createNewContact}
+        disabled={username.length === 0 || publicKey.length === 0}/>
 
       </View>
   </View>
