@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions, Image } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
@@ -12,10 +12,29 @@ import { v4 as uuidv4 } from 'uuid';
 import { createContact } from '../realm/contactRealm';
 
 const CreateContact = ({ navigation, route}) => {
-  const [username, setUsername] = useState("");
-  const [publicKey, setPublicKey] = useState("");
+  const [username, _setUsername] = useState("");
+  const [publicKey, _setPublicKey] = useState("");
   const [error, setError] = useState("");
-  const [contactImage, setContactImage] = useState("");
+  const [contactImage, _setContactImage] = useState("");
+
+  const usernameRef = useRef();
+  const publicKeyRef = useRef();
+  const imageRef = useRef();
+
+  const setUsername = value => {
+    usernameRef.current = value;
+    _setUsername(value);
+  }
+
+  const setPublicKey = value => {
+    publicKeyRef.current = value;
+    _setPublicKey(value);
+  }
+
+  const setContactImage = value => {
+    imageRef.current = value;
+    _setContactImage(value);
+  }
 
   useEffect(() => {
     route?.params?.publicKey && setPublicKey(route.params.publicKey);
@@ -69,6 +88,40 @@ const CreateContact = ({ navigation, route}) => {
     });
   }
 
+  useEffect(() => {
+    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
+      e.preventDefault();
+
+      const unsavedChanges = (
+        usernameRef.current.trim() != "" ||
+        publicKeyRef.current.trim() != "" ||
+        imageRef.current.trim() != ""
+      )
+
+      if(unsavedChanges) {
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure you want to discard them ?',
+          [
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+            { text: "Stay", style: 'cancel', onPress: () => {} },
+          ]
+        );
+      }
+      else {
+        navigation.dispatch(e.data.action);
+      }
+    })
+
+    return beforeGoingBack;
+  },[navigation])
+
   return (
     <View>
       <Header title="Create Contact" allowGoBack/>
@@ -106,7 +159,7 @@ const CreateContact = ({ navigation, route}) => {
         buttonStyle={styles.button}
         textStyle={styles.buttonText}
         onPress={createNewContact}
-        disabled={username.length === 0 || publicKey.length === 0}/>
+        disabled={username.trim().length === 0 || publicKey.trim().length === 0}/>
 
       </View>
   </View>
