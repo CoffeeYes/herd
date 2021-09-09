@@ -52,9 +52,11 @@ const EditContact = ({ route, navigation }) => {
     }
   }
 
-  const save = async () => {
+  const save = () => {
     setError("");
-    editContact(route.params.id, {name : name, key : publicKey, image : contactImage})
+    const newInfo = {name : name, key : publicKey, image : contactImage};
+    editContact(route.params.id, newInfo);
+    setOriginalContact(newInfo)
   }
 
   const editImage = async () => {

@@ -63,6 +63,7 @@ const Customise = ({ navigation }) => {
       receivedTextColor : receivedTextColor
     }
 
+    setOriginalStyles(style)
     return await AsyncStorage.setItem("styles",JSON.stringify(style))
   }
 
