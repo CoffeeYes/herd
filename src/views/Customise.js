@@ -224,11 +224,20 @@ const Customise = ({ navigation }) => {
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
 
-        <TouchableOpacity
+        <FlashTextButton
+        normalText="Restore Default"
+        flashText="Restore Default"
         onPress={restoreDefault}
-        style={{...styles.button,marginLeft : 10}}>
-          <Text style={styles.buttonText}>Restore Default</Text>
-        </TouchableOpacity>
+        timeout={0}
+        disabled={
+          sentBoxColor === "#c6c6c6" &&
+          sentTextColor === "#f5f5f5" &&
+          receivedBoxColor === "#E86252" &&
+          receivedTextColor === "#f5f5f5"
+        }
+        buttonStyle={{...styles.button,marginLeft : 10}}
+        textStyle={styles.buttonText}/>
+
       </View>
 
     </ScrollView>

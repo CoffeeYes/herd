@@ -67,6 +67,9 @@ const CreateContact = ({ navigation, route}) => {
         image : contactImage
       }
       createContact(newContact);
+      setUsername("");
+      setPublicKey("");
+      setContactImage("");
       navigation.navigate('main');
     }
   }

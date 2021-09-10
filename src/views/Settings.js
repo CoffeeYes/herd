@@ -65,6 +65,7 @@ const Settings = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             deleteAllContactsFromRealm();
+            deleteAllChatsFromRealm();
           },
         },
       ]
