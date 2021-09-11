@@ -9,7 +9,7 @@ import FlashTextButton from './FlashTextButton';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { createContact } from '../realm/contactRealm';
+import { createContact, getContactsByKey } from '../realm/contactRealm';
 
 const CreateContact = ({ navigation, route}) => {
   const [username, _setUsername] = useState("");
@@ -59,6 +59,12 @@ const CreateContact = ({ navigation, route}) => {
       }
       catch(e) {
         return setError("Invalid Public Key")
+      }
+
+      //check for duplicate contacts
+      const contactExists = getContactsByKey([publicKey]);
+      if(contactExists != "") {
+        return setError("A contact with this key already exists")
       }
 
       const newContact = {
