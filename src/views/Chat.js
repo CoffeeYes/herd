@@ -162,6 +162,7 @@ const Chat = ({ route, navigation }) => {
       value={chatInput}
       editable={!inputDisabled}
       onChangeText={setChatInput}
+      multiline
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
     </>

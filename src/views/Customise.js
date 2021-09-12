@@ -141,13 +141,13 @@ const Customise = ({ navigation }) => {
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
           <Text style={{...styles.messageText, color : sentTextColor || "black"}}>Hello</Text>
-          <Text style={{...styles.timestamp,color : sentTextColor }}>12:20 - 15.01</Text>
+          <Text style={{...styles.timestamp,color : sentTextColor || "black"}}>12:20 - 15.01</Text>
         </View>
 
         <View
         style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
           <Text style={{...styles.messageText,color : receivedTextColor || "black"}}>Goodbye</Text>
-          <Text style={{...styles.timestamp,color : receivedTextColor }}>12:21 - 15.01</Text>
+          <Text style={{...styles.timestamp,color : receivedTextColor || "black"}}>12:21 - 15.01</Text>
         </View>
       </View>
 
