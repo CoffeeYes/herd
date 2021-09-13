@@ -3,6 +3,7 @@ import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-nat
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageQueue } from '../realm/chatRealm';
+import { getContactsByKey } from '../realm/contactRealm';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -17,6 +18,13 @@ const MessageQueue = ({}) => {
 
   const loadMessages = () => {
     const messageQueue = getMessageQueue();
+    var contactKeys = [];
+    //get unique public keys from messages
+    contactKeys = messageQueue.map(message => contactKeys.indexOf(message.to) === -1 && message.to);
+    //find relevant contacts based on public keys
+    const contacts = getContactsByKey(contactKeys);
+    //add contact names to messages using matching contact and message public key 
+    messageQueue.map(message => message.toContactName = contacts.find(contact => message.to === contact.key)?.name)
     setMessages(messageQueue)
   }
 
@@ -33,7 +41,6 @@ const MessageQueue = ({}) => {
         {messages.map((message,index) =>
           <View style={styles.messageItem} key={index}>
             <Text style={styles.messageTo}>To: {message.toContactName}</Text>
-            <Text style={styles.messageText}>{message.text}</Text>
           </View>
         )}
       </ScrollView>}
