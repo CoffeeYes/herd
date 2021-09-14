@@ -9,12 +9,13 @@
     "rebuild": "cd android && gradlew clean && cd .. && react-native run-android",
     "test": "jest",
     "lint": "eslint .",
-    "run-relase" : "react-native run-android --variant=release"
+    "run-relase": "react-native run-android --variant=release"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.15.7",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/masked-view": "^0.1.11",
+    "@react-native-community/slider": "^4.1.6",
     "@react-navigation/native": "^5.9.8",
     "@react-navigation/stack": "^5.14.9",
     "fbjs": "^3.0.0",

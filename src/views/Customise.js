@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import Slider from '@react-native-community/slider'
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -15,6 +16,7 @@ const Customise = ({ navigation }) => {
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
+  const [fontSize, setFontSize] = useState(24);
 
 
   const sentBoxColorRef = useRef();
@@ -140,15 +142,24 @@ const Customise = ({ navigation }) => {
       <View style={styles.messagesContainer}>
         <View
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
-          <Text style={{...styles.messageText, color : sentTextColor || "black"}}>Hello</Text>
+          <Text style={{...styles.messageText, color : sentTextColor || "black", fontSize : fontSize}}>Hello</Text>
           <Text style={{...styles.timestamp,color : sentTextColor || "black"}}>12:20 - 15.01</Text>
         </View>
 
         <View
         style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
-          <Text style={{...styles.messageText,color : receivedTextColor || "black"}}>Goodbye</Text>
+          <Text style={{...styles.messageText,color : receivedTextColor || "black", fontSize : fontSize}}>Goodbye</Text>
           <Text style={{...styles.timestamp,color : receivedTextColor || "black"}}>12:21 - 15.01</Text>
         </View>
+      </View>
+
+      <View style={{alignItems : "center"}}>
+        <Text> Text Size </Text>
+        <Slider
+        style={{width : "100%"}}
+        onValueChange={val => setFontSize(Math.round(val))}
+        minimumValue={24}
+        maximumValue={48}/>
       </View>
 
       <View style={styles.colorChoiceContainer}>
