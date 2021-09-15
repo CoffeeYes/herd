@@ -16,13 +16,14 @@ const Customise = ({ navigation }) => {
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
-  const [fontSize, setFontSize] = useState(24);
+  const [fontSize, _setFontSize] = useState(14);
 
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
   const receivedBoxColorRef = useRef();
   const receivedTextColorRef = useRef();
+  const fontSizeRef = useRef();
 
   const setSentBoxColor = data => {
     sentBoxColorRef.current = data
@@ -41,6 +42,11 @@ const Customise = ({ navigation }) => {
     _setReceivedTextColor(data)
   }
 
+  const setFontSize = data => {
+    fontSizeRef.current = data;
+    _setFontSize(data)
+  }
+
   useEffect(() => {
     loadStyles().then(() => setLoading(false));
   },[])
@@ -53,6 +59,7 @@ const Customise = ({ navigation }) => {
       setSentTextColor(styles.sentTextColor);
       setReceivedBoxColor(styles.receivedBoxColor);
       setReceivedTextColor(styles.receivedTextColor);
+      setFontSize(styles.fontSize)
       setOriginalStyles(styles)
     }
   }
@@ -62,7 +69,8 @@ const Customise = ({ navigation }) => {
       sentBoxColor : sentBoxColor,
       sentTextColor : sentTextColor,
       receivedBoxColor : receivedBoxColor,
-      receivedTextColor : receivedTextColor
+      receivedTextColor : receivedTextColor,
+      fontSize : fontSize
     }
 
     setOriginalStyles(style)
@@ -78,7 +86,8 @@ const Customise = ({ navigation }) => {
         sentBoxColorRef.current != styles.sentBoxColor ||
         sentTextColorRef.current != styles.sentTextColor ||
         receivedBoxColorRef.current != styles.receivedBoxColor ||
-        receivedTextColorRef.current != styles.receivedTextColor
+        receivedTextColorRef.current != styles.receivedTextColor ||
+        fontSizeRef.current != styles.fontSize
       )
 
       if(unsavedChanges) {
@@ -158,8 +167,9 @@ const Customise = ({ navigation }) => {
         <Slider
         style={{width : "100%"}}
         onValueChange={val => setFontSize(Math.round(val))}
-        minimumValue={24}
-        maximumValue={48}/>
+        value={fontSize}
+        minimumValue={14}
+        maximumValue={24}/>
       </View>
 
       <View style={styles.colorChoiceContainer}>
@@ -230,7 +240,8 @@ const Customise = ({ navigation }) => {
           sentBoxColor === originalStyles.sentBoxColor &&
           sentTextColor === originalStyles.sentTextColor &&
           receivedBoxColor === originalStyles.receivedBoxColor &&
-          receivedTextColor === originalStyles.receivedTextColor
+          receivedTextColor === originalStyles.receivedTextColor &&
+          fontSize === originalStyles.fontSize
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>

@@ -16,7 +16,8 @@ const Splash = ({ navigation }) => {
       sentBoxColor : "#c6c6c6",
       sentTextColor : "#f5f5f5",
       receivedBoxColor : "#E86252",
-      receivedTextColor : "#f5f5f5"
+      receivedTextColor : "#f5f5f5",
+      fontSize : 14
     }
 
     await AsyncStorage.setItem("styles",JSON.stringify(style))
