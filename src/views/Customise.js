@@ -162,14 +162,23 @@ const Customise = ({ navigation }) => {
         </View>
       </View>
 
-      <View style={{alignItems : "center"}}>
-        <Text> Text Size </Text>
+      <View style={{
+        alignItems : "center",
+        flexDirection : "row",
+        marginHorizontal : 10,
+        backgroundColor : "white",
+        marginBottom : 10
+      }}>
         <Slider
-        style={{width : "100%"}}
+        style={{flex : 1}}
         onValueChange={val => setFontSize(Math.round(val))}
         value={fontSize}
         minimumValue={14}
         maximumValue={24}/>
+        <View style={{alignItems : "center"}}>
+          <Text style={{fontWeight : "bold"}}> Font Size </Text>
+          <Text>{fontSize}</Text>
+        </View>
       </View>
 
       <View style={styles.colorChoiceContainer}>
