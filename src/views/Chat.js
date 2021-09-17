@@ -49,6 +49,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
+    if(message.trim() === "") return;
     setInputDisabled(true);
 
     //plaintext copy of the message to immediatly append to chat state
@@ -162,7 +163,9 @@ const Chat = ({ route, navigation }) => {
       value={chatInput}
       editable={!inputDisabled}
       onChangeText={setChatInput}
-      multiline
+      multiline={true}
+      blurOnSubmit={true}
+      onKeyPress={({nativeEvent}) => nativeEvent.key === "Enter" && this.submit()}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
     </>
