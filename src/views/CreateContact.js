@@ -38,6 +38,9 @@ const CreateContact = ({ navigation, route}) => {
 
   useEffect(() => {
     route?.params?.publicKey && setPublicKey(route.params.publicKey);
+    usernameRef.current = "";
+    publicKeyRef.current = "";
+    imageRef.current = "";
   },[])
 
   const createNewContact = async () => {
@@ -91,7 +94,6 @@ const CreateContact = ({ navigation, route}) => {
         setError(response.errorMessage)
       }
       else if(!response.didCancel) {
-        console.log("data:" + response.type + ";base64," + response.base64)
         setContactImage("data:" + response.type + ";base64," + response.base64);
       }
     });
