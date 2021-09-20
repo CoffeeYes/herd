@@ -120,7 +120,8 @@ const Customise = ({ navigation }) => {
       sentBoxColor : "#c6c6c6",
       sentTextColor : "#f5f5f5",
       receivedBoxColor : "#E86252",
-      receivedTextColor : "#f5f5f5"
+      receivedTextColor : "#f5f5f5",
+      fontSize : 14
     }
 
     Alert.alert(
@@ -264,7 +265,8 @@ const Customise = ({ navigation }) => {
           sentBoxColor === "#c6c6c6" &&
           sentTextColor === "#f5f5f5" &&
           receivedBoxColor === "#E86252" &&
-          receivedTextColor === "#f5f5f5"
+          receivedTextColor === "#f5f5f5" &&
+          fontSize === 14
         }
         buttonStyle={{...styles.button,marginLeft : 10}}
         textStyle={styles.buttonText}/>
