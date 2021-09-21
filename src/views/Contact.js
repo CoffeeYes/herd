@@ -112,6 +112,7 @@ const Contact = ({route, navigation}) => {
         visible={showQRCode}
         setVisible={setShowQRCode}
         text={contactKey}
+        title={contactName}
         />
 
         <Modal
