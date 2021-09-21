@@ -14,9 +14,10 @@ const QRCodeModal = ({ visible, text, setVisible, title }) => {
       style={styles.modalMainContainer}
       onPress={() => setVisible(false)}>
         <View style={styles.modalContentContainer}>
+          {title &&
           <View style={styles.header}>
             <Text style={styles.title}>{title}</Text>
-          </View>
+          </View>}
           <View style={styles.QRContainer}>
             <QRCode
             value={text}

@@ -137,8 +137,9 @@ const Chat = ({ route, navigation }) => {
     }/>
     <View style={{flex : 1}}>
 
-      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
       <ScrollView
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
@@ -155,7 +156,7 @@ const Chat = ({ route, navigation }) => {
           setHighlightedMessages={setHighlightedMessages}
           />
         )}
-      </ScrollView>
+      </ScrollView>}
 
       <TextInput
       placeholder="Send a Message"
