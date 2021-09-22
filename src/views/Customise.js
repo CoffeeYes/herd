@@ -163,24 +163,7 @@ const Customise = ({ navigation }) => {
         </View>
       </View>
 
-      <View style={{
-        alignItems : "center",
-        flexDirection : "row",
-        marginHorizontal : 10,
-        backgroundColor : "white",
-        marginBottom : 10
-      }}>
-        <Slider
-        style={{flex : 1}}
-        onValueChange={val => setFontSize(Math.round(val))}
-        value={fontSize}
-        minimumValue={14}
-        maximumValue={24}/>
-        <View style={{alignItems : "center"}}>
-          <Text style={{fontWeight : "bold"}}> Font Size </Text>
-          <Text>{fontSize}</Text>
-        </View>
-      </View>
+
 
       <View style={styles.colorChoiceContainer}>
         <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
@@ -209,6 +192,25 @@ const Customise = ({ navigation }) => {
             <Text style={styles.tabText}>Received Text</Text>
           </TouchableOpacity>
 
+        </View>
+
+        <View style={{
+          alignItems : "center",
+          flexDirection : "row",
+          marginHorizontal : 10,
+          backgroundColor : "white",
+          marginVertical : 20
+        }}>
+          <Slider
+          style={{flex : 1}}
+          onValueChange={val => setFontSize(Math.round(val))}
+          value={fontSize}
+          minimumValue={14}
+          maximumValue={24}/>
+          <View style={{alignItems : "center"}}>
+            <Text style={{fontWeight : "bold"}}> Font Size </Text>
+            <Text>{fontSize}</Text>
+          </View>
         </View>
 
         {activeItem === "sentBox" &&
