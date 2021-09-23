@@ -47,12 +47,16 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
       style={{
         ...styles.messageText,
         color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-        fontSize : customStyle.fontSize}}>
+        fontSize : customStyle.fontSize
+      }}>
         {text}
       </Text>
-      <Text style={{
+      <Text
+      style={{
       ...styles.timestamp,
-      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor}}>
+      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
+      fontSize : customStyle.fontSize
+      }}>
         {timestamp}
       </Text>
     </TouchableOpacity>
