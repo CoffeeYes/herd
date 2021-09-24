@@ -130,7 +130,7 @@ const deleteMessages = messages => {
 }
 
 const getMessageQueue = () => {
-  const sentMessages = messageSentRealm.objects('Message')
+  const sentMessages = messageCopyRealm.objects('Message')
   const receivedMessages= messageReceivedRealm.objects('Message');
 
   var sentMessagesCopy = [];
