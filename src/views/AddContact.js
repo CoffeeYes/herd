@@ -106,6 +106,7 @@ const AddContact = ({ navigation }) => {
         <QRCodeModal
         visible={showQRCode}
         setVisible={setShowQRCode}
+        title="My Key"
         text={publicKey}/>
     </>
   )

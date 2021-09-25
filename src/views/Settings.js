@@ -154,7 +154,11 @@ const Settings = ({ navigation }) => {
           <Text style={styles.buttonText}> Message Queue </Text>
         </TouchableOpacity>
 
-        <QRCodeModal visible={QRCodeVisible} text={publicKey} setVisible={setQRCodeVisible}/>
+        <QRCodeModal
+        visible={QRCodeVisible}
+        text={publicKey}
+        title="My Key"
+        setVisible={setQRCodeVisible}/>
 
         <TouchableOpacity
         style={{...styles.button,backgroundColor : "red"}}
