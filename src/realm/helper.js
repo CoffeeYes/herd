@@ -1,14 +1,17 @@
 const parseRealmID = object => {
   try {
-    if (typeof JSON.parse(JSON.stringify(object))._id === 'string') {
-      return JSON.parse(JSON.stringify(object))._id
+    const copy = {...object};
+    const parsedCopy = JSON.parse(JSON.stringify(object))
+    if (typeof parsedCopy._id === 'string') {
+      return parsedCopy._id
     }
     else {
-      return object._id[1]
+      return copy._id[1]
     }
   }
   catch(e) {
     console.log("Error parsing realm ID : " + e)
+    console.log(object)
   }
 }
 
