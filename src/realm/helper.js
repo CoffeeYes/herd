@@ -1,12 +1,10 @@
 const parseRealmID = object => {
   try {
-    const copy = {...object};
-    const parsedCopy = JSON.parse(JSON.stringify(object))
-    if (typeof parsedCopy._id === 'string') {
-      return parsedCopy._id
+    if(object._id[1]) {
+      return object._id[1];
     }
     else {
-      return copy._id[1]
+      return object._id;
     }
   }
   catch(e) {
