@@ -27,6 +27,7 @@ const Chat = ({ route, navigation }) => {
   const [customStyle, setCustomStyle] = useState({});
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
+  const [messageDays, setMessageDays] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -40,7 +41,15 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async () => {
     const contact = getContactById(route.params.contactID)
     setContactInfo(contact);
-    setMessages(await getMessagesWithContact(contact.key))
+    const messages = await getMessagesWithContact(contact.key)
+    var dates = [];
+    for(var message in messages) {
+      let messageDate = moment(messages[message].timestamp).format("DD/MM");
+      dates.indexOf(messageDate) === -1 &&
+      dates.push(messageDate)
+    }
+    setMessageDays(dates)
+    setMessages(messages)
   }
 
   const loadStyles = async () => {
@@ -144,17 +153,22 @@ const Chat = ({ route, navigation }) => {
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
-        {messages.map( (message,index) =>
-          <ChatBubble
-          text={message.text}
-          timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
-          messageFrom={message.from === ownPublicKey}
-          key={parseRealmID(message)}
-          identifier={parseRealmID(message)}
-          customStyle={customStyle}
-          highlightedMessages={highlightedMessages}
-          setHighlightedMessages={setHighlightedMessages}
-          />
+        {messageDays.map(day =>
+          <>
+            <Text style={styles.messageDay}>{day}</Text>
+            {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
+              <ChatBubble
+              text={message.text}
+              timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
+              messageFrom={message.from === ownPublicKey}
+              key={parseRealmID(message)}
+              identifier={parseRealmID(message)}
+              customStyle={customStyle}
+              highlightedMessages={highlightedMessages}
+              setHighlightedMessages={setHighlightedMessages}
+              />
+            )}
+          </>
         )}
       </ScrollView>}
 
@@ -200,6 +214,9 @@ const styles = {
     width : Dimensions.get("window").width * 0.1,
     height : Dimensions.get("window").width * 0.1,
   },
+  messageDay : {
+    alignSelf : "center"
+  }
 }
 
 export default Chat;
