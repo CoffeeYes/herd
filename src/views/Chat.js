@@ -153,8 +153,8 @@ const Chat = ({ route, navigation }) => {
       contentContainerStyle={styles.messageContainer}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
-        {messageDays.map(day =>
-          <>
+        {messageDays.map((day,index) =>
+          <View key={index}>
             <Text style={styles.messageDay}>{day}</Text>
             {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
               <ChatBubble
@@ -168,7 +168,7 @@ const Chat = ({ route, navigation }) => {
               setHighlightedMessages={setHighlightedMessages}
               />
             )}
-          </>
+          </View>
         )}
       </ScrollView>}
 
