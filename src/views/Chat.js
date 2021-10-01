@@ -155,7 +155,7 @@ const Chat = ({ route, navigation }) => {
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
         {messageDays.map((day,index) =>
           <View key={index}>
-            <Text style={styles.messageDay}>{day}</Text>
+            <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
             {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
               <ChatBubble
               text={message.text}
