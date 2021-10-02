@@ -39,17 +39,21 @@ const Chat = ({ route, navigation }) => {
   },[]);
 
   const loadMessages = async () => {
-    const contact = getContactById(route.params.contactID)
+    const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
-    const messages = await getMessagesWithContact(contact.key)
+    const messages = await getMessagesWithContact(contact.key);
+    setMessageDays(calculateMessageDays(messages));
+    setMessages(messages);
+  }
+
+  const calculateMessageDays = messages => {
     var dates = [];
     for(var message in messages) {
       let messageDate = moment(messages[message].timestamp).format("DD/MM");
       dates.indexOf(messageDate) === -1 &&
       dates.push(messageDate)
     }
-    setMessageDays(dates)
-    setMessages(messages)
+    return dates
   }
 
   const loadStyles = async () => {
@@ -96,7 +100,12 @@ const Chat = ({ route, navigation }) => {
     }
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
-    setMessages([...messages,{...plainText,_id : messageID}])
+    setMessages([...messages,{...plainText,_id : messageID}]);
+    const newDate = moment(metaData.timestamp).format("DD/MM");
+
+    messageDays.indexOf(newDate) === -1 &&
+    setMessageDays([...messageDays,newDate]);
+
     setChatInput("");
     setInputDisabled(false);
   }
@@ -114,9 +123,11 @@ const Chat = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             setInputDisabled(true);
-            deleteMessagesFromRealm(highlightedMessages)
+            deleteMessagesFromRealm(highlightedMessages);
             setHighlightedMessages([]);
-            setMessages(await getMessagesWithContact(contactInfo.key));
+            const messages = await getMessagesWithContact(contactInfo.key);
+            setMessageDays(calculateMessageDays(messages));
+            setMessages(messages);
             setInputDisabled(false);
           },
         },
