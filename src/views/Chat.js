@@ -41,7 +41,7 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async () => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
-    const messages = await getMessagesWithContact(contact.key);
+    const messages = await getMessagesWithContact(contact.key,-5);
     setMessageDays(calculateMessageDays(messages));
     setMessages(messages);
   }

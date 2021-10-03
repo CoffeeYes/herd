@@ -19,9 +19,9 @@ const messageSentRealm = new Realm({
   schema : [Schemas.MessageSchema]
 })
 
-const getMessagesWithContact = async key => {
-  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'");
-  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'");
+const getMessagesWithContact = async (key, startIndex, endIndex) => {
+  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
+  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'").slice(startIndex,endIndex);
 
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
