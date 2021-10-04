@@ -28,20 +28,22 @@ const Chat = ({ route, navigation }) => {
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [messageDays, setMessageDays] = useState([]);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [messageCount, setMessageCount] = useState(-5);
 
   useEffect(() => {
     (async () => {
       setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
-      await loadMessages();
+      await loadMessages(messageCount);
       await loadStyles();
       setLoading(false);
     })()
   },[]);
 
-  const loadMessages = async () => {
+  const loadMessages = async messageCount => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
-    const messages = await getMessagesWithContact(contact.key,-5);
+    const messages = await getMessagesWithContact(contact.key,messageCount);
     setMessageDays(calculateMessageDays(messages));
     setMessages(messages);
   }
@@ -135,6 +137,14 @@ const Chat = ({ route, navigation }) => {
     );
   }
 
+  const handleScroll = event => {
+    let pos = event.nativeEvent.contentOffset.y
+    if(pos === 0) {
+      loadMessages(messageCount - 5);
+      setMessageCount(messageCount - 5);
+    }
+  }
+
   const scrollRef = useRef();
 
   return (
@@ -162,6 +172,7 @@ const Chat = ({ route, navigation }) => {
       :
       <ScrollView
       contentContainerStyle={styles.messageContainer}
+      onScroll={handleScroll}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
         {messageDays.map((day,index) =>
