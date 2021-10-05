@@ -30,6 +30,7 @@ const Chat = ({ route, navigation }) => {
   const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageCount, setMessageCount] = useState(-5);
+  const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -137,11 +138,14 @@ const Chat = ({ route, navigation }) => {
     );
   }
 
-  const handleScroll = event => {
+  const handleScroll = async event => {
     let pos = event.nativeEvent.contentOffset.y
     if(pos === 0) {
-      loadMessages(messageCount - 5);
+      setLoadingMoreMessages(true)
+      await loadMessages(messageCount - 5);
       setMessageCount(messageCount - 5);
+      setLoadingMoreMessages(false);
+      scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
     }
   }
 
@@ -175,6 +179,10 @@ const Chat = ({ route, navigation }) => {
       onScroll={handleScroll}
       ref={scrollRef}
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
+
+        {loadingMoreMessages &&
+        <ActivityIndicator size="large" color="#e05e3f"/>}
+
         {messageDays.map((day,index) =>
           <View key={index}>
             <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
