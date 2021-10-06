@@ -29,24 +29,25 @@ const Chat = ({ route, navigation }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [messageCount, setMessageCount] = useState(-5);
+  const [messageStart, setMessageStart] = useState(-5);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
 
   useEffect(() => {
     (async () => {
       setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
-      await loadMessages(messageCount);
+      await loadMessages(-5);
       await loadStyles();
       setLoading(false);
     })()
   },[]);
 
-  const loadMessages = async messageCount => {
+  const loadMessages = async (messageStart, messageEnd) => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
-    const messages = await getMessagesWithContact(contact.key,messageCount);
-    setMessageDays(calculateMessageDays(messages));
-    setMessages(messages);
+    const newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
+    const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
+    setMessageDays(calculateMessageDays(allMessages));
+    setMessages(allMessages);
   }
 
   const calculateMessageDays = messages => {
@@ -142,8 +143,8 @@ const Chat = ({ route, navigation }) => {
     let pos = event.nativeEvent.contentOffset.y
     if(pos === 0) {
       setLoadingMoreMessages(true)
-      await loadMessages(messageCount - 5);
-      setMessageCount(messageCount - 5);
+      await loadMessages(messageStart - 5, messageStart);
+      setMessageStart(messageStart - 5);
       setLoadingMoreMessages(false);
       scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
     }
