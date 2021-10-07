@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -7,42 +8,28 @@ import Chats from './Chats';
 import Contacts from './Contacts';
 import Settings from './Settings';
 
+const Tab = createBottomTabNavigator();
+
 const Main = ({ navigation }) => {
-    const [activePage, setActivePage] = useState("contacts");
     return(
-      <>
-        <ScrollView>
-          {activePage === "contacts" &&
-            <Contacts navigation={navigation} route={{params : {type : "contacts"}}}/>
+      <Tab.Navigator screenOptions={({ route }) => ({
+        headerShown : false,
+        tabBarIcon : () => {
+          if(route.name === "chats") {
+            return <Icon name="chat" size={24}/>
           }
-          {activePage === "chats" &&
-            <Chats navigation={navigation}/>
+          else if (route.name === "contacts") {
+            return <Icon name="contacts" size={24}/>
           }
-          {activePage === "settings" &&
-            <Settings navigation={navigation}/>
+          else if (route.name === "settings") {
+            return <Icon name="settings" size={24}/>
           }
-        </ScrollView>
-
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-          style={activePage === "chats" ? styles.navItemActive : styles.navItem}
-          onPress={() => setActivePage("chats")}>
-            <Icon name="chat" size={24}/>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-          style={activePage === "contacts" ? styles.navItemActive : styles.navItem}
-          onPress={() => setActivePage("contacts")}>
-            <Icon name="contacts" size={24}/>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-          style={activePage === "settings" ? styles.navItemActive : styles.navItem}
-          onPress={() => setActivePage("settings")}>
-            <Icon name="settings" size={24}/>
-          </TouchableOpacity>
-        </View>
-      </>
+        }
+      })}>
+        <Tab.Screen name="chats" component={Chats} />
+        <Tab.Screen name="contacts" component={Contacts} initialParams={{disableAddNew : false}}/>
+        <Tab.Screen name="settings" component={Settings} />
+      </Tab.Navigator>
     )
 }
 
