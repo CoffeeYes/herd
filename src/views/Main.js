@@ -14,15 +14,18 @@ const Main = ({ navigation }) => {
     return(
       <Tab.Navigator screenOptions={({ route }) => ({
         headerShown : false,
-        tabBarIcon : () => {
+        tabBarShowLabel : false,
+        tabBarInactiveTintColor: 'black',
+        tabBarActiveTintColor: '#E86252',
+        tabBarIcon : ({ color, size }) => {
           if(route.name === "chats") {
-            return <Icon name="chat" size={24}/>
+            return <Icon name="chat" size={size} color={color}/>
           }
           else if (route.name === "contacts") {
-            return <Icon name="contacts" size={24}/>
+            return <Icon name="contacts" size={size} color={color}/>
           }
           else if (route.name === "settings") {
-            return <Icon name="settings" size={24}/>
+            return <Icon name="settings" size={size} color={color}/>
           }
         }
       })}>
