@@ -70,7 +70,7 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   messageSentRealm.write(() => {
     messageSentRealm.create("Message",{
       ...metaData,
-      _id : Realm.BSON.ObjectId(),
+      _id : messageID,
       text : encrypted,
     })
   });
@@ -122,10 +122,13 @@ const deleteAllChats = () => {
 }
 
 const deleteMessages = messages => {
-  var messagesToDelete = [];
-  messagesToDelete = messages.map(id => messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
+  const messageCopiesToDelete = messages.map(id => messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
   messageCopyRealm.write(() => {
-    messageCopyRealm.delete(messagesToDelete)
+    messageCopyRealm.delete(messageCopiesToDelete)
+  })
+  const messagesToDelete = messages.map(id => messageSentRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
+  messageSentRealm.write(() => {
+    messageSentRealm.delete(messagesToDelete)
   })
 }
 
