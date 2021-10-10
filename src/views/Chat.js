@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, ScrollView, TextInput, ActivityIndicator,
-         Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, TextInput, ActivityIndicator,
+         Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
 import Realm from 'realm';
+import {PanGestureHandler  } from 'react-native-gesture-handler'
 import {
   getMessagesWithContact,
   sendMessageToContact,
@@ -31,6 +32,7 @@ const Chat = ({ route, navigation }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-5);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+  const [enableGestureHandler, setEnableGestureHandler] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -142,12 +144,26 @@ const Chat = ({ route, navigation }) => {
   const handleScroll = async event => {
     let pos = event.nativeEvent.contentOffset.y
     if(pos === 0) {
-      setLoadingMoreMessages(true)
-      await loadMessages(messageStart - 5, messageStart);
-      setMessageStart(messageStart - 5);
-      setLoadingMoreMessages(false);
-      scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
+      loadMoreMessages();
     }
+  }
+
+  const loadMoreMessages = async() => {
+    setLoadingMoreMessages(true)
+    await loadMessages(messageStart - 5, messageStart);
+    setMessageStart(messageStart - 5);
+    setLoadingMoreMessages(false);
+    scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
+  }
+
+  const handleContentSizeChange = (contentWidth, contentHeight) => {
+    let windowHeight = Dimensions.get('window').height;
+    contentHeight < windowHeight * 0.8 ? setEnableGestureHandler(true) : setEnableGestureHandler(false)
+  }
+
+  const handleGesture = event => {
+    event.nativeEvent.translationY > 200 && enableGestureHandler &&
+    loadMoreMessages();
   }
 
   const scrollRef = useRef();
@@ -175,10 +191,15 @@ const Chat = ({ route, navigation }) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
+      <PanGestureHandler
+      enabled={enableGestureHandler}
+      onGestureEvent={handleGesture}>
       <ScrollView
       contentContainerStyle={styles.messageContainer}
       onScroll={handleScroll}
       ref={scrollRef}
+      onContentSizeChange={handleContentSizeChange}
+      endFillColor='red'
       onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
 
         {loadingMoreMessages &&
@@ -201,7 +222,8 @@ const Chat = ({ route, navigation }) => {
             )}
           </View>
         )}
-      </ScrollView>}
+      </ScrollView>
+      </PanGestureHandler>}
 
       <TextInput
       placeholder="Send a Message"
