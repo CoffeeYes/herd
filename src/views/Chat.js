@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, View, TextInput, ActivityIndicator,
+import { Text, View, TextInput, ActivityIndicator, StatusBar,
          Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
@@ -32,7 +32,9 @@ const Chat = ({ route, navigation }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-5);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
+  const [allowLoadingMoreMessages, setAllowLoadingMoreMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -47,6 +49,12 @@ const Chat = ({ route, navigation }) => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
     const newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
+    if(newMessages.length === 0) {
+      setAllowLoadingMoreMessages(false);
+      setShowPopup(true);
+      setTimeout(() => setShowPopup(false),500);
+      return;
+    }
     const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
     setMessageDays(calculateMessageDays(allMessages));
     setMessages(allMessages);
@@ -194,35 +202,39 @@ const Chat = ({ route, navigation }) => {
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
-      <ScrollView
-      contentContainerStyle={styles.messageContainer}
-      onScroll={handleScroll}
-      ref={scrollRef}
-      onContentSizeChange={handleContentSizeChange}
-      endFillColor='red'
-      onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
+        <ScrollView
+        contentContainerStyle={styles.messageContainer}
+        onScroll={handleScroll}
+        ref={scrollRef}
+        onContentSizeChange={handleContentSizeChange}
+        onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
 
-        {loadingMoreMessages &&
-        <ActivityIndicator size="large" color="#e05e3f"/>}
+          {loadingMoreMessages &&
+          <ActivityIndicator size="large" color="#e05e3f"/>}
 
-        {messageDays.map((day,index) =>
-          <View key={index}>
-            <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
-            {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
-              <ChatBubble
-              text={message.text}
-              timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
-              messageFrom={message.from === ownPublicKey}
-              key={parseRealmID(message)}
-              identifier={parseRealmID(message)}
-              customStyle={customStyle}
-              highlightedMessages={highlightedMessages}
-              setHighlightedMessages={setHighlightedMessages}
-              />
-            )}
-          </View>
-        )}
-      </ScrollView>
+          {showPopup &&
+          <View style={styles.popup}>
+            <Text>No More messages to load</Text>
+          </View>}
+
+          {messageDays.map((day,index) =>
+            <View key={index}>
+              <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
+              {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
+                <ChatBubble
+                text={message.text}
+                timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
+                messageFrom={message.from === ownPublicKey}
+                key={parseRealmID(message)}
+                identifier={parseRealmID(message)}
+                customStyle={customStyle}
+                highlightedMessages={highlightedMessages}
+                setHighlightedMessages={setHighlightedMessages}
+                />
+              )}
+            </View>
+          )}
+        </ScrollView>
       </PanGestureHandler>}
 
       <TextInput
@@ -269,6 +281,15 @@ const styles = {
   },
   messageDay : {
     alignSelf : "center"
+  },
+  popup : {
+    position : "absolute",
+    marginLeft : Dimensions.get("window").width * 0.3,
+    marginTop : Dimensions.get("window").height * 0.1,
+    zIndex : 999,
+    elevation : 999,
+    backgroundColor : "white",
+    padding : 20
   }
 }
 
