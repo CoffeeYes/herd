@@ -52,7 +52,7 @@ const Chat = ({ route, navigation }) => {
     if(newMessages.length === 0) {
       setAllowLoadingMoreMessages(false);
       setShowPopup(true);
-      setTimeout(() => setShowPopup(false),500);
+      setTimeout(() => setShowPopup(false),1000);
       return;
     }
     const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
@@ -156,7 +156,7 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const loadMoreMessages = async() => {
+  const loadMoreMessages = async () => {
     setLoadingMoreMessages(true)
     await loadMessages(messageStart - 5, messageStart);
     setMessageStart(messageStart - 5);
@@ -204,7 +204,7 @@ const Chat = ({ route, navigation }) => {
       onGestureEvent={handleGesture}>
         <ScrollView
         contentContainerStyle={styles.messageContainer}
-        onScroll={handleScroll}
+        onScroll={allowLoadingMoreMessages && handleScroll}
         ref={scrollRef}
         onContentSizeChange={handleContentSizeChange}
         onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
@@ -214,7 +214,7 @@ const Chat = ({ route, navigation }) => {
 
           {showPopup &&
           <View style={styles.popup}>
-            <Text>No More messages to load</Text>
+            <Text style={styles.popupText}>No More messages to load</Text>
           </View>}
 
           {messageDays.map((day,index) =>
@@ -284,12 +284,20 @@ const styles = {
   },
   popup : {
     position : "absolute",
-    marginLeft : Dimensions.get("window").width * 0.3,
+    marginLeft : Dimensions.get("window").width * 0.1,
     marginTop : Dimensions.get("window").height * 0.1,
+    width : Dimensions.get("window").width * 0.8,
     zIndex : 999,
     elevation : 999,
     backgroundColor : "white",
-    padding : 20
+    padding : 20,
+    alignItems : "center",
+    borderRadius : 5,
+    borderColor : "#E86252",
+    borderWidth : 2
+  },
+  popupText : {
+    fontWeight : "bold"
   }
 }
 
