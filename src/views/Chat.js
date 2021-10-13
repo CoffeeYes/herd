@@ -138,8 +138,8 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
+            const messages = await getMessagesWithContact(contactInfo.key,messageStart + highlightedMessages.length);
             setHighlightedMessages([]);
-            const messages = await getMessagesWithContact(contactInfo.key);
             setMessageDays(calculateMessageDays(messages));
             setMessages(messages);
             setInputDisabled(false);
@@ -294,7 +294,8 @@ const styles = {
     alignItems : "center",
     borderRadius : 5,
     borderColor : "#E86252",
-    borderWidth : 2
+    borderWidth : 2,
+    opacity : 0.8
   },
   popupText : {
     fontWeight : "bold"
