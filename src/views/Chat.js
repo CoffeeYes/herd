@@ -138,10 +138,10 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            const messages = await getMessagesWithContact(contactInfo.key,messageStart + highlightedMessages.length);
+            const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
+            setMessageDays(calculateMessageDays(updatedMessages));
+            setMessages(updatedMessages);
             setHighlightedMessages([]);
-            setMessageDays(calculateMessageDays(messages));
-            setMessages(messages);
             setInputDisabled(false);
           },
         },
