@@ -48,13 +48,14 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async (messageStart, messageEnd) => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
-    const newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
+    var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
     if(newMessages.length === 0) {
       setAllowLoadingMoreMessages(false);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false),1000);
       return;
     }
+    newMessages = newMessages.filter(newMessage => messages.find(message => parseRealmID(message) === parseRealmID(newMessage)) === undefined);
     const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
     setMessageDays(calculateMessageDays(allMessages));
     setMessages(allMessages);
@@ -86,7 +87,6 @@ const Chat = ({ route, navigation }) => {
       text : message,
       timestamp : Date.now(),
     }
-    scrollRef.current.scrollToEnd({animated : true})
 
     //encrypt the message to be sent using the other users public key
     const newMessageEncrypted = await Crypto.encryptStringWithKey(
@@ -122,6 +122,7 @@ const Chat = ({ route, navigation }) => {
 
     setChatInput("");
     setInputDisabled(false);
+    scrollRef.current.scrollToEnd({animated : true})
   }
 
   const deleteMessages = () => {
