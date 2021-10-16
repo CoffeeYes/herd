@@ -32,7 +32,7 @@ const Chat = ({ route, navigation }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-5);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
-  const [allowLoadingMoreMessages, setAllowLoadingMoreMessages] = useState(true);
+  const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
@@ -50,7 +50,7 @@ const Chat = ({ route, navigation }) => {
     setContactInfo(contact);
     var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
     if(newMessages.length === 0) {
-      setAllowLoadingMoreMessages(false);
+      setAllowScrollToLoadMessages(false);
       setShowPopup(true);
       setTimeout(() => setShowPopup(false),1000);
       return;
@@ -167,7 +167,14 @@ const Chat = ({ route, navigation }) => {
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
     let windowHeight = Dimensions.get('window').height;
-    contentHeight < windowHeight * 0.8 ? setEnableGestureHandler(true) : setEnableGestureHandler(false)
+    if(contentHeight < windowHeight * 0.8 ) {
+      setAllowScrollToLoadMessages(false)
+      setEnableGestureHandler(true)
+    }
+    else {
+      setAllowScrollToLoadMessages(true)
+      setEnableGestureHandler(false)
+    }
   }
 
   const handleGesture = event => {
@@ -205,7 +212,7 @@ const Chat = ({ route, navigation }) => {
       onGestureEvent={handleGesture}>
         <ScrollView
         contentContainerStyle={styles.messageContainer}
-        onScroll={allowLoadingMoreMessages && handleScroll}
+        onScroll={allowScrollToLoadMessages && handleScroll}
         ref={scrollRef}
         onContentSizeChange={handleContentSizeChange}
         onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
