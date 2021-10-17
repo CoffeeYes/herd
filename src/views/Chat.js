@@ -36,10 +36,12 @@ const Chat = ({ route, navigation }) => {
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
+  const messageLoadingSize = 5;
+
   useEffect(() => {
     (async () => {
       setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
-      await loadMessages(-5);
+      await loadMessages(-messageLoadingSize);
       await loadStyles();
       setLoading(false);
     })()
@@ -55,7 +57,6 @@ const Chat = ({ route, navigation }) => {
       setTimeout(() => setShowPopup(false),1000);
       return;
     }
-    newMessages = newMessages.filter(newMessage => messages.find(message => parseRealmID(message) === parseRealmID(newMessage)) === undefined);
     const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
     setMessageDays(calculateMessageDays(allMessages));
     setMessages(allMessages);
@@ -159,8 +160,10 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async () => {
     setLoadingMoreMessages(true)
-    await loadMessages(messageStart - 5, messageStart);
-    setMessageStart(messageStart - 5);
+    //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
+    await loadMessages(messageStart - (messageLoadingSize + 1), messageStart);
+    setMessageStart(messageStart - (messageLoadingSize + 1));
+
     setLoadingMoreMessages(false);
     scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
   }
