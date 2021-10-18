@@ -181,7 +181,9 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleGesture = event => {
-    event.nativeEvent.translationY > 200 && enableGestureHandler &&
+    event.nativeEvent.translationY > 200 &&
+    enableGestureHandler &&
+    messages.length > messageLoadingSize &&
     loadMoreMessages();
   }
 
