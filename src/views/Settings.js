@@ -139,7 +139,7 @@ const Settings = ({ navigation }) => {
         <TouchableOpacity
         style={styles.button}
         onPress={showQRCode}>
-          <Text style={styles.buttonText}> Show QR Code </Text>
+          <Text style={styles.buttonText}> Show My QR Code </Text>
         </TouchableOpacity>
 
         <TouchableOpacity

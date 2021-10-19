@@ -10,10 +10,12 @@ import Crypto from '../nativeWrapper/Crypto';
 const MessageQueue = ({}) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ownPublicKey, setOwnPublicKey] = useState("");
 
   useEffect(() => {
     loadMessages();
     setLoading(false);
+    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key));
   },[])
 
   const loadMessages = () => {
@@ -23,7 +25,7 @@ const MessageQueue = ({}) => {
     contactKeys = messageQueue.map(message => contactKeys.indexOf(message.to) === -1 && message.to);
     //find relevant contacts based on public keys
     const contacts = getContactsByKey(contactKeys);
-    //add contact names to messages using matching contact and message public key 
+    //add contact names to messages using matching contact and message public key
     messageQueue.map(message => message.toContactName = contacts.find(contact => message.to === contact.key)?.name)
     setMessages(messageQueue)
   }
@@ -39,8 +41,12 @@ const MessageQueue = ({}) => {
       :
       <ScrollView>
         {messages.map((message,index) =>
+
           <View style={styles.messageItem} key={index}>
+            {message.to === ownPublicKey || message.from === ownPublicKey ?
             <Text style={styles.messageTo}>To: {message.toContactName}</Text>
+            :
+            <Text>Encrypted Message for Other User</Text>}
           </View>
         )}
       </ScrollView>}
