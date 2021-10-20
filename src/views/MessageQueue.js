@@ -4,8 +4,11 @@ import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageQueue } from '../realm/chatRealm';
 import { getContactsByKey } from '../realm/contactRealm';
+import moment from 'moment';
 
 import Crypto from '../nativeWrapper/Crypto';
+
+import FoldableMessage from './FoldableMessage';
 
 const MessageQueue = ({}) => {
   const [messages, setMessages] = useState([]);
@@ -44,7 +47,10 @@ const MessageQueue = ({}) => {
 
           <View style={styles.messageItem} key={index}>
             {message.to === ownPublicKey || message.from === ownPublicKey ?
-            <Text style={styles.messageTo}>To: {message.toContactName}</Text>
+            <FoldableMessage
+            to={message.toContactName}
+            timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
+            text={message.text}/>
             :
             <Text>Encrypted Message for Other User</Text>}
           </View>
