@@ -1,19 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 
-const FoldableMessage = ({to, timestamp, text}) => {
+import Crypto from '../nativeWrapper/Crypto';
+
+const FoldableMessage = ({to, timestamp, text, style}) => {
   const [open, setOpen] = useState(false);
+  const [decryptedText, setDecryptedText] = useState("");
+
+  useEffect(() => {
+    Crypto.decryptString(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      text
+    ).then(result => setDecryptedText(result))
+  },[])
 
   return (
-    <TouchableOpacity style={styles.closed} onPress={() => setOpen(!open)}>
+    <TouchableOpacity style={style} onPress={() => setOpen(!open)}>
       {open ?
       <View style={styles.open}>
         <View style={styles.closed}>
           <Text>To: {to}</Text>
           <Text>{timestamp}</Text>
         </View>
-        <View>
-          <Text>{text}</Text>
+        <View style={styles.messageText}>
+          <Text>{decryptedText}</Text>
         </View>
       </View>
       :
@@ -30,7 +43,10 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%",
-  }
+  },
+  messageText : {
+    marginTop : 10,
+  },
 }
 
 export default FoldableMessage;

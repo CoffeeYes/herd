@@ -44,16 +44,15 @@ const MessageQueue = ({}) => {
       :
       <ScrollView>
         {messages.map((message,index) =>
-
-          <View style={styles.messageItem} key={index}>
-            {message.to === ownPublicKey || message.from === ownPublicKey ?
-            <FoldableMessage
-            to={message.toContactName}
-            timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-            text={message.text}/>
-            :
-            <Text>Encrypted Message for Other User</Text>}
-          </View>
+          message.to === ownPublicKey || message.from === ownPublicKey ?
+          <FoldableMessage
+          to={message.toContactName}
+          style={styles.messageItem}
+          key={index}
+          timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
+          text={message.text}/>
+          :
+          <Text key={index}>Encrypted Message for Other User</Text>
         )}
       </ScrollView>}
     </View>
