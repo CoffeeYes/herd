@@ -29,7 +29,10 @@ const MessageQueue = ({}) => {
     //find relevant contacts based on public keys
     const contacts = getContactsByKey(contactKeys);
     //add contact names to messages using matching contact and message public key
-    messageQueue.map(message => message.toContactName = contacts.find(contact => message.to === contact.key)?.name)
+    messageQueue.map(message => {
+      message.toContactName = contacts.find(contact => message.to === contact.key)?.name
+      message.fromContactName = contacts.find(contact => message.from === contact.key)?.name
+    })
     setMessages(messageQueue)
   }
 
@@ -47,6 +50,7 @@ const MessageQueue = ({}) => {
           message.to === ownPublicKey || message.from === ownPublicKey ?
           <FoldableMessage
           to={message.toContactName}
+          from={message.fromContactName}
           style={styles.messageItem}
           key={index}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}

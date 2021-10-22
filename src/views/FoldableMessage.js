@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-const FoldableMessage = ({to, timestamp, text, style}) => {
+const FoldableMessage = ({to, from, timestamp, text, style}) => {
   const [open, setOpen] = useState(false);
   const [decryptedText, setDecryptedText] = useState("");
 
@@ -23,6 +23,7 @@ const FoldableMessage = ({to, timestamp, text, style}) => {
       <View style={styles.open}>
         <View style={styles.closed}>
           <Text>To: {to}</Text>
+          <Text>From : {from}</Text>
           <Text>{timestamp}</Text>
         </View>
         <View style={styles.messageText}>
@@ -32,6 +33,7 @@ const FoldableMessage = ({to, timestamp, text, style}) => {
       :
       <View style={styles.closed}>
         <Text>To: {to}</Text>
+        <Text>From : {from}</Text>
         <Text>{timestamp}</Text>
       </View>}
     </TouchableOpacity>
@@ -47,6 +49,9 @@ const styles = {
   messageText : {
     marginTop : 10,
   },
+  open : {
+    width : "100%"
+  }
 }
 
 export default FoldableMessage;
