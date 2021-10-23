@@ -30,8 +30,15 @@ const MessageQueue = ({}) => {
     const contacts = getContactsByKey(contactKeys);
     //add contact names to messages using matching contact and message public key
     messageQueue.map(message => {
-      message.toContactName = contacts.find(contact => message.to === contact.key)?.name
-      message.fromContactName = contacts.find(contact => message.from === contact.key)?.name
+      message.toContactName = message.to === ownPublicKey ?
+        "You"
+        :
+        contacts.find(contact => message.to === contact.key)?.name
+
+      message.fromContactName = message.from === ownPublicKey ?
+        "You"
+        :
+        contacts.find(contact => message.from === contact.key)?.name
     })
     setMessages(messageQueue)
   }
