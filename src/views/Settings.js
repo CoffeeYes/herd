@@ -9,6 +9,7 @@ import ConfirmModal from './ConfirmModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
 
@@ -136,51 +137,41 @@ const Settings = ({ navigation }) => {
         onPress={copyKeyToClipboard}
         buttonStyle={styles.button}/>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={showQRCode}>
-          <Text style={styles.buttonText}> Show My QR Code </Text>
-        </TouchableOpacity>
+        <CustomButton
+        onPress={showQRCode}
+        text="Show My QR Code"/>
+        <CustomButton
+        onPress={() => navigation.navigate("customise")}
+        text="Customise"/>
+        <CustomButton
+        onPress={() => navigation.navigate("messageQueue")}
+        text="Message Queue"/>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("customise")}>
-          <Text style={styles.buttonText}> Customise </Text>
-        </TouchableOpacity>
+        <CustomButton
+        buttonStyle={{backgroundColor : "red"}}
+        onPress={deleteAllChats}
+        text="Delete All Chats"/>
+        <CustomButton
+        buttonStyle={{backgroundColor : "red"}}
+        onPress={deleteAllContacts}
+        text="Delete All Contacts"/>
 
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("messageQueue")}>
-          <Text style={styles.buttonText}> Message Queue </Text>
-        </TouchableOpacity>
+
+        {__DEV__ &&
+          <CustomButton
+          buttonStyle={{backgroundColor : "red"}}
+          onPress={() => {
+            closeChatRealm();
+            closeContactRealm();
+          }}
+          text="Close Realm"/>
+        }
 
         <QRCodeModal
         visible={QRCodeVisible}
         text={publicKey}
         title="My Key"
         setVisible={setQRCodeVisible}/>
-
-        <TouchableOpacity
-        style={{...styles.button,backgroundColor : "red"}}
-        onPress={deleteAllChats}>
-          <Text style={styles.buttonText}> Delete All Chats </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-        style={{...styles.button,backgroundColor : "red"}}
-        onPress={deleteAllContacts}>
-          <Text style={styles.buttonText}> Delete All Contacts </Text>
-        </TouchableOpacity>
-
-        {__DEV__ &&
-          <TouchableOpacity
-          style={{...styles.button,backgroundColor : "red"}}
-          onPress={() => {
-            closeChatRealm();
-            closeContactRealm();
-          }}>
-            <Text style={styles.buttonText}>Close Realm</Text>
-          </TouchableOpacity>
-        }
 
       </ScrollView>
     </View>

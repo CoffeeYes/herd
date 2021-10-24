@@ -10,7 +10,8 @@ import Realm from 'realm';
 import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
-import FlashTextButton from './FlashTextButton'
+import FlashTextButton from './FlashTextButton';
+import CustomButton from './CustomButton';
 import { getContactById } from '../realm/contactRealm';
 
 const Contact = ({route, navigation}) => {
@@ -96,17 +97,15 @@ const Contact = ({route, navigation}) => {
         onPress={copyKeyToClipboard}
         buttonStyle={styles.button}/>
 
-        <TouchableOpacity style={styles.button} onPress={shareContact}>
-          <Text style={styles.buttonText}>Share Contact</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("chat", {contactID : route.params.id})}>
-          <Text style={styles.buttonText}>Go To Chat</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => setShowQRCode(true)}>
-          <Text style={styles.buttonText}>Show Contact's QR Code</Text>
-        </TouchableOpacity>
+        <CustomButton
+        onPress={shareContact}
+        text="Share Contact"/>
+        <CustomButton
+        onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
+        text="Go To Chat"/>
+        <CustomButton
+        onPress={() => setShowQRCode(true)}
+        text="Show Contact's QR Code"/>
 
         <QRCodeModal
         visible={showQRCode}
