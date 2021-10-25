@@ -5,7 +5,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
 import Icon from 'react-native-vector-icons/MaterialIcons'
 import ContactImage from './ContactImage';
-import FlashTextButton from './FlashTextButton';
+import CustomButton from './CustomButton';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
@@ -163,12 +163,8 @@ const CreateContact = ({ navigation, route}) => {
         editable={!route?.params?.publicKey}
         value={publicKey}/>
 
-        <FlashTextButton
-        timeout={0}
-        flashText="Import"
-        normalText="Import"
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}
+        <CustomButton
+        text="Import"
         onPress={createNewContact}
         disabled={username.trim().length === 0 || publicKey.trim().length === 0}/>
 

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import CustomButton from './CustomButton';
 import Slider from '@react-native-community/slider'
 
 const Customise = ({ navigation }) => {
@@ -276,6 +277,17 @@ const Customise = ({ navigation }) => {
         }
         buttonStyle={{...styles.button,marginLeft : 10}}
         textStyle={styles.buttonText}/>
+
+        <CustomButton
+        text={"Restore Default"}
+        onPress={restoreDefault}
+        disabled={
+          sentBoxColor === "#c6c6c6" &&
+          sentTextColor === "#f5f5f5" &&
+          receivedBoxColor === "#E86252" &&
+          receivedTextColor === "#f5f5f5" &&
+          fontSize === 14
+        }/>
 
       </View>
 

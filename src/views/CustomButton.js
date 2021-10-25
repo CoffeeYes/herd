@@ -3,9 +3,12 @@ import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const CustomButton = ({ onPress, rightIcon, leftIcon, text, buttonStyle,
-                        textStyle}) => {
+                        textStyle, disabled}) => {
   return (
-    <TouchableOpacity onPress={onPress} style={{...styles.button,...buttonStyle}}>
+    <TouchableOpacity
+    onPress={onPress}
+    style={disabled ? {...styles.button,...buttonStyle, backgroundColor : "grey"} :{...styles.button,...buttonStyle}}
+    disabled={disabled}>
       {leftIcon &&
       <Icon name={leftIcon}/>}
 
