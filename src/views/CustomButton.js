@@ -24,10 +24,10 @@ const styles = {
   button : {
     backgroundColor : "#E86252",
     padding : 10,
-    marginTop : 10,
     borderRadius : 5,
     alignSelf : "center",
     alignItems : "center",
+    justifyContent : "center",
     width : Dimensions.get("window").width * 0.3
   },
   buttonText : {

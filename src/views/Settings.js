@@ -135,31 +135,34 @@ const Settings = ({ navigation }) => {
         flashText="Copied!"
         timeout={500}
         onPress={copyKeyToClipboard}
-        buttonStyle={styles.button}/>
+        buttonStyle={{width : Dimensions.get("window").width * 0.3}}/>
 
         <CustomButton
+        buttonStyle={styles.buttonMargin}
         onPress={showQRCode}
         text="Show My QR Code"/>
         <CustomButton
+        buttonStyle={styles.buttonMargin}
         onPress={() => navigation.navigate("customise")}
         text="Customise"/>
         <CustomButton
+        buttonStyle={styles.buttonMargin}
         onPress={() => navigation.navigate("messageQueue")}
         text="Message Queue"/>
 
         <CustomButton
-        buttonStyle={{backgroundColor : "red"}}
+        buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
         onPress={deleteAllChats}
         text="Delete All Chats"/>
         <CustomButton
-        buttonStyle={{backgroundColor : "red"}}
+        buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
         onPress={deleteAllContacts}
         text="Delete All Contacts"/>
 
 
         {__DEV__ &&
           <CustomButton
-          buttonStyle={{backgroundColor : "red"}}
+          buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
           onPress={() => {
             closeChatRealm();
             closeContactRealm();
@@ -179,24 +182,13 @@ const Settings = ({ navigation }) => {
   )
 }
 
-const styles ={
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5,
-    width : Dimensions.get("window").width * 0.3
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    textAlign : "center",
-    fontFamily : "Open-Sans"
-  },
+const styles = {
   warning : {
     color : "red",
     maxWidth : 300
+  },
+  buttonMargin : {
+    marginTop : 10
   }
 }
 

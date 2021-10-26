@@ -253,30 +253,14 @@ const Customise = ({ navigation }) => {
         flashText="Saved!"
         onPress={saveStyles}
         timeout={500}
+        buttonStyle={{...styles.buttonHeight,width : 100}}
         disabled={
           sentBoxColor === originalStyles.sentBoxColor &&
           sentTextColor === originalStyles.sentTextColor &&
           receivedBoxColor === originalStyles.receivedBoxColor &&
           receivedTextColor === originalStyles.receivedTextColor &&
           fontSize === originalStyles.fontSize
-        }
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}/>
-
-        <FlashTextButton
-        normalText="Restore Default"
-        flashText="Restore Default"
-        onPress={restoreDefault}
-        timeout={0}
-        disabled={
-          sentBoxColor === "#c6c6c6" &&
-          sentTextColor === "#f5f5f5" &&
-          receivedBoxColor === "#E86252" &&
-          receivedTextColor === "#f5f5f5" &&
-          fontSize === 14
-        }
-        buttonStyle={{...styles.button,marginLeft : 10}}
-        textStyle={styles.buttonText}/>
+        }/>
 
         <CustomButton
         text={"Restore Default"}
@@ -287,7 +271,8 @@ const Customise = ({ navigation }) => {
           receivedBoxColor === "#E86252" &&
           receivedTextColor === "#f5f5f5" &&
           fontSize === 14
-        }/>
+        }
+        buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
 
       </View>
 
@@ -319,17 +304,6 @@ const styles = {
   messagesContainer : {
     flex : 1
   },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    borderRadius : 5
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    textAlign : "center"
-  },
   colorChoiceContainer : {
     backgroundColor : "white",
     marginHorizontal : 10,
@@ -359,7 +333,13 @@ const styles = {
     flexDirection : "row",
     justifyContent : "center",
     alignItems : "center",
-    marginTop : 10
+    marginTop : 10,
+    borderWidth : 1,
+    borderColor : "red"
+  },
+  buttonHeight : {
+    height : Dimensions.get("window").height * 0.075,
+    justifyContent : "center"
   }
 }
 export default Customise;
