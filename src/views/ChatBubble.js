@@ -86,7 +86,7 @@ const styles = {
   },
   timestamp : {
     fontWeight : "bold",
-    marginTop : 10
+    alignSelf : "flex-end"
   },
   highlighted : {
     borderWidth : 2,

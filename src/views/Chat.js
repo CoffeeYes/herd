@@ -236,7 +236,7 @@ const Chat = ({ route, navigation }) => {
               {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
                 <ChatBubble
                 text={message.text}
-                timestamp={moment(message.timestamp).format("HH:mm - DD.MM")}
+                timestamp={moment(message.timestamp).format("HH:mm")}
                 messageFrom={message.from === ownPublicKey}
                 key={parseRealmID(message)}
                 identifier={parseRealmID(message)}

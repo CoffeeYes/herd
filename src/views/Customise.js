@@ -173,28 +173,46 @@ const Customise = ({ navigation }) => {
       <View style={styles.colorChoiceContainer}>
         <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
           <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentBox" ? "#EBB3A9" : "white"}}
+          style={{...styles.tabItem,width : tabWidth}}
           onPress={() => setActiveItem("sentBox")}>
-            <Text style={styles.tabText}>Sent Box</Text>
+            <Text style={{
+              ...styles.tabText,
+              color : activeItem === "sentBox" ? "#E86252" : "black"}}>
+                Sent Box
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "sentText" ? "#EBB3A9" : "white"}}
+          style={{...styles.tabItem,width : tabWidth}}
           onPress={() => setActiveItem("sentText")}>
-            <Text style={styles.tabText}>Sent Text</Text>
+            <Text style={{
+              ...styles.tabText,
+              color : activeItem === "sentText" ? "#E86252" : "black"}}>
+                Sent Text
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth,backgroundColor : activeItem === "receivedBox" ? "#EBB3A9" : "white"}}
+          style={{...styles.tabItem,width : tabWidth}}
           onPress={() => setActiveItem("receivedBox")}>
-            <Text style={styles.tabText}>Received Box</Text>
+            <Text style={{
+              ...styles.tabText,
+              color : activeItem === "receivedBox" ? "#E86252" : "black"}}>
+                Received Box
+            </Text>
           </TouchableOpacity>
+
           <TouchableOpacity
           style={{
             ...styles.tabItem,
             width : tabWidth,
-            borderRightWidth : 0,
-            backgroundColor : activeItem === "receivedText" ? "#EBB3A9" : "white"}}
+            borderRightWidth : 0}}
           onPress={() => setActiveItem("receivedText")}>
-            <Text style={styles.tabText}>Received Text</Text>
+            <Text style={{
+              ...styles.tabText,
+              color : activeItem === "receivedText" ? "#E86252" : "black"}}>
+                Received Text
+            </Text>
           </TouchableOpacity>
 
         </View>
@@ -284,12 +302,12 @@ const Customise = ({ navigation }) => {
 const styles = {
   messageFromOther : {
     backgroundColor : "#E86252",
-    marginLeft : 5
+    marginLeft : 10
   },
   messageFromYou : {
     backgroundColor : "#c6c6c6",
     alignSelf : "flex-end",
-    marginRight : 5
+    marginRight : 10
   },
   message : {
     padding : 20,
@@ -334,8 +352,6 @@ const styles = {
     justifyContent : "center",
     alignItems : "center",
     marginTop : 10,
-    borderWidth : 1,
-    borderColor : "red"
   },
   buttonHeight : {
     height : Dimensions.get("window").height * 0.075,
