@@ -6,7 +6,7 @@ import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
-import Slider from '@react-native-community/slider'
+import Slider from '@react-native-community/slider';
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -155,7 +155,7 @@ const Customise = ({ navigation }) => {
         style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
           <Text style={{...styles.messageText, color : sentTextColor || "black", fontSize : fontSize}}>Hello</Text>
           <Text style={{...styles.timestamp,color : sentTextColor || "black", fontSize : fontSize}}>
-          12:20 - 15.01
+          12:20
           </Text>
         </View>
 
@@ -163,12 +163,23 @@ const Customise = ({ navigation }) => {
         style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
           <Text style={{...styles.messageText,color : receivedTextColor || "black", fontSize : fontSize}}>Goodbye</Text>
           <Text style={{...styles.timestamp,color : receivedTextColor || "black", fontSize : fontSize}}>
-          12:21 - 15.01
+          12:21
           </Text>
         </View>
       </View>
 
-
+      <View style={styles.sliderContainer}>
+        <Slider
+        style={{flex : 1}}
+        onValueChange={val => setFontSize(Math.round(val))}
+        value={fontSize}
+        minimumValue={14}
+        maximumValue={24}/>
+        <View style={{alignItems : "center"}}>
+          <Text style={{fontWeight : "bold"}}> Font Size </Text>
+          <Text>{fontSize}</Text>
+        </View>
+      </View>
 
       <View style={styles.colorChoiceContainer}>
         <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
@@ -215,25 +226,6 @@ const Customise = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
 
-        </View>
-
-        <View style={{
-          alignItems : "center",
-          flexDirection : "row",
-          marginHorizontal : 10,
-          backgroundColor : "white",
-          marginVertical : 20
-        }}>
-          <Slider
-          style={{flex : 1}}
-          onValueChange={val => setFontSize(Math.round(val))}
-          value={fontSize}
-          minimumValue={14}
-          maximumValue={24}/>
-          <View style={{alignItems : "center"}}>
-            <Text style={{fontWeight : "bold"}}> Font Size </Text>
-            <Text>{fontSize}</Text>
-          </View>
         </View>
 
         {activeItem === "sentBox" &&
@@ -302,12 +294,10 @@ const Customise = ({ navigation }) => {
 const styles = {
   messageFromOther : {
     backgroundColor : "#E86252",
-    marginLeft : 10
   },
   messageFromYou : {
     backgroundColor : "#c6c6c6",
     alignSelf : "flex-end",
-    marginRight : 10
   },
   message : {
     padding : 20,
@@ -317,10 +307,11 @@ const styles = {
   },
   timestamp : {
     fontWeight : "bold",
-    marginTop : 10
+    alignSelf : "flex-end"
   },
   messagesContainer : {
-    flex : 1
+    flex : 1,
+    margin : 10,
   },
   colorChoiceContainer : {
     backgroundColor : "white",
@@ -356,6 +347,15 @@ const styles = {
   buttonHeight : {
     height : Dimensions.get("window").height * 0.075,
     justifyContent : "center"
-  }
+  },
+  sliderContainer : {
+    alignItems : "center",
+    flexDirection : "row",
+    marginHorizontal : 10,
+    backgroundColor : "white",
+    marginBottom : 10,
+    paddingVertical : 10,
+    borderRadius : 5,
+  },
 }
 export default Customise;
