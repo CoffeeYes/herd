@@ -94,17 +94,20 @@ const Contact = ({route, navigation}) => {
         normalText="Copy Key"
         flashText="Copied!"
         timeout={500}
-        onPress={copyKeyToClipboard}
-        buttonStyle={styles.button}/>
+        buttonStyle={styles.buttonMargin}
+        onPress={copyKeyToClipboard}/>
 
         <CustomButton
         onPress={shareContact}
+        buttonStyle={styles.buttonMargin}
         text="Share Contact"/>
         <CustomButton
         onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
+        buttonStyle={styles.buttonMargin}
         text="Go To Chat"/>
         <CustomButton
         onPress={() => setShowQRCode(true)}
+        buttonStyle={styles.buttonMargin}
         text="Show Contact's QR Code"/>
 
         <QRCodeModal
@@ -149,19 +152,8 @@ const styles = {
     paddingVertical : 10,
     backgroundColor : "#EBB3A9"
   },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    marginTop : 10,
-    borderRadius : 5,
-    alignSelf : "center",
-    alignItems : "center",
-    width : Dimensions.get("window").width * 0.3
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    fontFamily : "Open-Sans"
+  buttonMargin : {
+    marginTop : 10
   },
   imageContainer : {
     alignSelf : "center",

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {Text, TouchableOpacity } from 'react-native';
+import {Text, TouchableOpacity, Dimensions } from 'react-native';
 
 const FlashTextButton = ({ onPress, flashText, normalText,
                            timeout, buttonStyle, textStyle, disabled }) => {
@@ -29,7 +29,8 @@ const styles = {
     backgroundColor : "#E86252",
     padding : 10,
     alignSelf : "center",
-    borderRadius : 5
+    borderRadius : 5,
+    width : Dimensions.get("window").width * 0.3
   },
   buttonText : {
     color : "white",
