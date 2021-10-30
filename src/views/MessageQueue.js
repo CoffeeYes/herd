@@ -17,11 +17,12 @@ const MessageQueue = ({}) => {
 
   useEffect(() => {
     loadMessages();
-    setLoading(false);
-    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setOwnPublicKey(key));
   },[])
 
-  const loadMessages = () => {
+  const loadMessages = async () => {
+    setLoading(true);
+    const ownPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
+    setOwnPublicKey(ownPublicKey);
     const messageQueue = getMessageQueue();
     var contactKeys = [];
     //get unique public keys from messages
@@ -41,6 +42,7 @@ const MessageQueue = ({}) => {
         contacts.find(contact => message.from === contact.key)?.name
     })
     setMessages(messageQueue)
+    setLoading(false);
   }
 
   return (
