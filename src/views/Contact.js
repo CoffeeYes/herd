@@ -113,7 +113,7 @@ const Contact = ({route, navigation}) => {
         <QRCodeModal
         visible={showQRCode}
         setVisible={setShowQRCode}
-        text={contactKey}
+        value={{name : contactName, key : contactKey}}
         title={contactName}
         />
 

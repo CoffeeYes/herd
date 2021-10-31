@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
-const QRCodeModal = ({ visible, text, setVisible, title }) => {
+const QRCodeModal = ({ visible, value, setVisible, title }) => {
   return (
 
     <Modal
@@ -20,7 +20,7 @@ const QRCodeModal = ({ visible, text, setVisible, title }) => {
           </View>}
           <View style={styles.QRContainer}>
             <QRCode
-            value={text}
+            value={JSON.stringify(value)}
             size={300}/>
           </View>
         </View>

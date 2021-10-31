@@ -6,8 +6,9 @@ import CameraMarker from './CameraMarker';
 const QRScanner = ({ navigation }) => {
 
   const handleRead = scanResult => {
-    const publicKey = scanResult?.data
-    navigation.navigate("createcontact", { publicKey : publicKey})
+    const result = JSON.parse(scanResult?.data)
+    console.log(result);
+    navigation.navigate("createcontact", { publicKey : result.key, name : result.name})
   }
 
   return (

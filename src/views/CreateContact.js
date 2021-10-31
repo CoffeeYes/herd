@@ -37,10 +37,9 @@ const CreateContact = ({ navigation, route}) => {
   }
 
   useEffect(() => {
-    route?.params?.publicKey && setPublicKey(route.params.publicKey);
-    usernameRef.current = "";
-    publicKeyRef.current = "";
     imageRef.current = "";
+    route?.params?.publicKey ? setPublicKey(route.params.publicKey) : publicKeyRef.current = "";
+    route?.params?.name ? setUsername(route.params.name) : usernameRef.current = "";
   },[])
 
   const createNewContact = async () => {
@@ -153,7 +152,7 @@ const CreateContact = ({ navigation, route}) => {
         <TextInput
         placeholder="Name"
         onChangeText={name => setUsername(name)}
-        defaultValue={""}
+        value={username}
         style={styles.input}/>
 
         <TextInput
