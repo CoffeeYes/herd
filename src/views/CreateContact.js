@@ -146,7 +146,7 @@ const CreateContact = ({ navigation, route}) => {
             iconSize={64}
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
-            </View>
+          </View>
         </TouchableOpacity>
 
         <TextInput
