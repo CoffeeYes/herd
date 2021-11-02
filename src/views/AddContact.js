@@ -107,7 +107,7 @@ const AddContact = ({ navigation }) => {
         visible={showQRCode}
         setVisible={setShowQRCode}
         title="My Key"
-        value={publicKey}/>
+        value={{key : publicKey}}/>
     </>
   )
 }

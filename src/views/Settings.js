@@ -172,7 +172,7 @@ const Settings = ({ navigation }) => {
 
         <QRCodeModal
         visible={QRCodeVisible}
-        value={publicKey}
+        value={{key : publicKey}}
         title="My Key"
         setVisible={setQRCodeVisible}/>
 
