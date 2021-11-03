@@ -231,7 +231,7 @@ const Customise = ({ navigation }) => {
         {activeItem === "sentBox" &&
         <ColorChoice
           title={"Sent Box Color"}
-          defaultColor={toHsv(sentBoxColor)}
+          color={toHsv(sentBoxColor)}
           setColor={setSentBoxColor}
         />}
 

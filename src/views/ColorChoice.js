@@ -1,14 +1,16 @@
 import React from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Slider from '@react-native-community/slider';
 
-const ColorChoice = ({ title, style, setColor, defaultColor }) => {
+const ColorChoice = ({ title, style, setColor, color }) => {
 
   return (
     <View style={styles.colorPickerContainer}>
       <ColorPicker
-        defaultColor={defaultColor}
+        color={color}
+        slider={Slider}
         style={{...styles.colorPicker,...style}}
         onColorChange={color => setColor(fromHsv(color))}
       />
