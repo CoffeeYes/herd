@@ -149,143 +149,146 @@ const Customise = ({ navigation }) => {
     <Header title="Customise" allowGoBack/>
     <ScrollView contentContainerStyle={{paddingBottom : 10}}>
 
-      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
-      <View style={styles.messagesContainer}>
-        <View
-        style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
-          <Text style={{...styles.messageText, color : sentTextColor || "black", fontSize : fontSize}}>Hello</Text>
-          <Text style={{...styles.timestamp,color : sentTextColor || "black", fontSize : fontSize}}>
-          12:20
-          </Text>
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
+      <>
+        <View style={styles.messagesContainer}>
+          <View
+          style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
+            <Text style={{...styles.messageText, color : sentTextColor || "black", fontSize : fontSize}}>Hello</Text>
+            <Text style={{...styles.timestamp,color : sentTextColor || "black", fontSize : fontSize}}>
+            12:20
+            </Text>
+          </View>
+
+          <View
+          style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
+            <Text style={{...styles.messageText,color : receivedTextColor || "black", fontSize : fontSize}}>Goodbye</Text>
+            <Text style={{...styles.timestamp,color : receivedTextColor || "black", fontSize : fontSize}}>
+            12:21
+            </Text>
+          </View>
         </View>
 
-        <View
-        style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
-          <Text style={{...styles.messageText,color : receivedTextColor || "black", fontSize : fontSize}}>Goodbye</Text>
-          <Text style={{...styles.timestamp,color : receivedTextColor || "black", fontSize : fontSize}}>
-          12:21
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.sliderContainer}>
-        <Slider
-        style={{flex : 1}}
-        onValueChange={val => setFontSize(Math.round(val))}
-        value={fontSize}
-        minimumValue={14}
-        maximumValue={24}/>
-        <View style={{alignItems : "center"}}>
-          <Text style={{fontWeight : "bold"}}> Font Size </Text>
-          <Text>{fontSize}</Text>
-        </View>
-      </View>
-
-      <View style={styles.colorChoiceContainer}>
-        <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
-          <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth}}
-          onPress={() => setActiveItem("sentBox")}>
-            <Text style={{
-              ...styles.tabText,
-              color : activeItem === "sentBox" ? "#E86252" : "black"}}>
-                Sent Box
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth}}
-          onPress={() => setActiveItem("sentText")}>
-            <Text style={{
-              ...styles.tabText,
-              color : activeItem === "sentText" ? "#E86252" : "black"}}>
-                Sent Text
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-          style={{...styles.tabItem,width : tabWidth}}
-          onPress={() => setActiveItem("receivedBox")}>
-            <Text style={{
-              ...styles.tabText,
-              color : activeItem === "receivedBox" ? "#E86252" : "black"}}>
-                Received Box
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-          style={{
-            ...styles.tabItem,
-            width : tabWidth,
-            borderRightWidth : 0}}
-          onPress={() => setActiveItem("receivedText")}>
-            <Text style={{
-              ...styles.tabText,
-              color : activeItem === "receivedText" ? "#E86252" : "black"}}>
-                Received Text
-            </Text>
-          </TouchableOpacity>
-
+        <View style={styles.sliderContainer}>
+          <Slider
+          style={{flex : 1}}
+          onValueChange={val => setFontSize(Math.round(val))}
+          value={fontSize}
+          minimumValue={14}
+          maximumValue={24}/>
+          <View style={{alignItems : "center"}}>
+            <Text style={{fontWeight : "bold"}}> Font Size </Text>
+            <Text>{fontSize}</Text>
+          </View>
         </View>
 
-        {activeItem === "sentBox" &&
-        <ColorChoice
-          title={"Sent Box Color"}
-          color={toHsv(sentBoxColor)}
-          setColor={setSentBoxColor}
-        />}
+        <View style={styles.colorChoiceContainer}>
+          <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
+            <TouchableOpacity
+            style={{...styles.tabItem,width : tabWidth}}
+            onPress={() => setActiveItem("sentBox")}>
+              <Text style={{
+                ...styles.tabText,
+                color : activeItem === "sentBox" ? "#E86252" : "black"}}>
+                  Sent Box
+              </Text>
+            </TouchableOpacity>
 
-        {activeItem === "sentText" &&
-        <ColorChoice
-          title={"Sent Text Color"}
-          defaultColor={toHsv(sentTextColor)}
-          setColor={setSentTextColor}
-        />}
+            <TouchableOpacity
+            style={{...styles.tabItem,width : tabWidth}}
+            onPress={() => setActiveItem("sentText")}>
+              <Text style={{
+                ...styles.tabText,
+                color : activeItem === "sentText" ? "#E86252" : "black"}}>
+                  Sent Text
+              </Text>
+            </TouchableOpacity>
 
-        {activeItem === "receivedBox" &&
-        <ColorChoice
-          title={"Received Box Color"}
-          defaultColor={toHsv(receivedBoxColor)}
-          setColor={setReceivedBoxColor}
-        />}
+            <TouchableOpacity
+            style={{...styles.tabItem,width : tabWidth}}
+            onPress={() => setActiveItem("receivedBox")}>
+              <Text style={{
+                ...styles.tabText,
+                color : activeItem === "receivedBox" ? "#E86252" : "black"}}>
+                  Received Box
+              </Text>
+            </TouchableOpacity>
 
-        {activeItem === "receivedText" &&
-        <ColorChoice
-          title={"Received Text Color"}
-          defaultColor={toHsv(receivedTextColor)}
-          setColor={setReceivedTextColor}
-        />}
-      </View>
+            <TouchableOpacity
+            style={{
+              ...styles.tabItem,
+              width : tabWidth,
+              borderRightWidth : 0}}
+            onPress={() => setActiveItem("receivedText")}>
+              <Text style={{
+                ...styles.tabText,
+                color : activeItem === "receivedText" ? "#E86252" : "black"}}>
+                  Received Text
+              </Text>
+            </TouchableOpacity>
 
-      <View style={styles.buttonRow}>
-        <FlashTextButton
-        normalText="Save"
-        flashText="Saved!"
-        onPress={saveStyles}
-        timeout={500}
-        buttonStyle={{...styles.buttonHeight,width : 100}}
-        disabled={
-          sentBoxColor === originalStyles.sentBoxColor &&
-          sentTextColor === originalStyles.sentTextColor &&
-          receivedBoxColor === originalStyles.receivedBoxColor &&
-          receivedTextColor === originalStyles.receivedTextColor &&
-          fontSize === originalStyles.fontSize
-        }/>
+          </View>
 
-        <CustomButton
-        text={"Restore Default"}
-        onPress={restoreDefault}
-        disabled={
-          sentBoxColor === "#c6c6c6" &&
-          sentTextColor === "#f5f5f5" &&
-          receivedBoxColor === "#E86252" &&
-          receivedTextColor === "#f5f5f5" &&
-          fontSize === 14
-        }
-        buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
+          {activeItem === "sentBox" &&
+          <ColorChoice
+            title={"Sent Box Color"}
+            color={toHsv(sentBoxColor)}
+            setColor={setSentBoxColor}
+          />}
 
-      </View>
+          {activeItem === "sentText" &&
+          <ColorChoice
+            title={"Sent Text Color"}
+            color={toHsv(sentTextColor)}
+            setColor={setSentTextColor}
+          />}
 
+          {activeItem === "receivedBox" &&
+          <ColorChoice
+            title={"Received Box Color"}
+            color={toHsv(receivedBoxColor)}
+            setColor={setReceivedBoxColor}
+          />}
+
+          {activeItem === "receivedText" &&
+          <ColorChoice
+            title={"Received Text Color"}
+            color={toHsv(receivedTextColor)}
+            setColor={setReceivedTextColor}
+          />}
+        </View>
+
+        <View style={styles.buttonRow}>
+          <FlashTextButton
+          normalText="Save"
+          flashText="Saved!"
+          onPress={saveStyles}
+          timeout={500}
+          buttonStyle={{...styles.buttonHeight,width : 100}}
+          disabled={
+            sentBoxColor === originalStyles.sentBoxColor &&
+            sentTextColor === originalStyles.sentTextColor &&
+            receivedBoxColor === originalStyles.receivedBoxColor &&
+            receivedTextColor === originalStyles.receivedTextColor &&
+            fontSize === originalStyles.fontSize
+          }/>
+
+          <CustomButton
+          text={"Restore Default"}
+          onPress={restoreDefault}
+          disabled={
+            sentBoxColor === "#c6c6c6" &&
+            sentTextColor === "#f5f5f5" &&
+            receivedBoxColor === "#E86252" &&
+            receivedTextColor === "#f5f5f5" &&
+            fontSize === 14
+          }
+          buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
+
+        </View>
+      </>}
     </ScrollView>
     </>
   )
