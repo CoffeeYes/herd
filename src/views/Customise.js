@@ -236,6 +236,7 @@ const Customise = ({ navigation }) => {
             title={"Sent Box Color"}
             color={toHsv(sentBoxColor)}
             setColor={setSentBoxColor}
+            oldColor={originalStyles.sentBoxColor}
           />}
 
           {activeItem === "sentText" &&
@@ -243,6 +244,7 @@ const Customise = ({ navigation }) => {
             title={"Sent Text Color"}
             color={toHsv(sentTextColor)}
             setColor={setSentTextColor}
+            oldColor={originalStyles.sentTextColor}
           />}
 
           {activeItem === "receivedBox" &&
@@ -250,6 +252,7 @@ const Customise = ({ navigation }) => {
             title={"Received Box Color"}
             color={toHsv(receivedBoxColor)}
             setColor={setReceivedBoxColor}
+            oldColor={originalStyles.receivedBoxColor}
           />}
 
           {activeItem === "receivedText" &&
@@ -257,6 +260,7 @@ const Customise = ({ navigation }) => {
             title={"Received Text Color"}
             color={toHsv(receivedTextColor)}
             setColor={setReceivedTextColor}
+            oldColor={originalStyles.receivedTextColor}
           />}
         </View>
 

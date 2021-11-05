@@ -4,13 +4,14 @@ import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 
-const ColorChoice = ({ title, style, setColor, color }) => {
+const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
 
   return (
     <View style={styles.colorPickerContainer}>
       <ColorPicker
         color={color}
         slider={Slider}
+        oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
         onColorChange={color => setColor(fromHsv(color))}
       />
