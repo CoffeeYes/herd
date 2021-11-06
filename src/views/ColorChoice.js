@@ -10,7 +10,6 @@ const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
     <View style={styles.colorPickerContainer}>
       <ColorPicker
         color={color}
-        slider={Slider}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
         onColorChange={color => setColor(fromHsv(color))}

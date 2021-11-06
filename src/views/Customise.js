@@ -56,10 +56,10 @@ const Customise = ({ navigation }) => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
     if(styles) {
-      setSentBoxColor(styles.sentBoxColor);
-      setSentTextColor(styles.sentTextColor);
-      setReceivedBoxColor(styles.receivedBoxColor);
-      setReceivedTextColor(styles.receivedTextColor);
+      setSentBoxColor(toHsv(styles.sentBoxColor));
+      setSentTextColor(toHsv(styles.sentTextColor));
+      setReceivedBoxColor(toHsv(styles.receivedBoxColor));
+      setReceivedTextColor(toHsv(styles.receivedTextColor));
       setFontSize(styles.fontSize)
       setOriginalStyles(styles)
     }
@@ -67,10 +67,10 @@ const Customise = ({ navigation }) => {
 
   const saveStyles = async () => {
     const style = {
-      sentBoxColor : sentBoxColor,
-      sentTextColor : sentTextColor,
-      receivedBoxColor : receivedBoxColor,
-      receivedTextColor : receivedTextColor,
+      sentBoxColor : fromHsv(sentBoxColor),
+      sentTextColor : fromHsv(sentTextColor),
+      receivedBoxColor : fromHsv(receivedBoxColor),
+      receivedTextColor : fromHsv(receivedTextColor),
       fontSize : fontSize
     }
 
@@ -84,10 +84,10 @@ const Customise = ({ navigation }) => {
       const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
       const unsavedChanges = (
-        sentBoxColorRef.current != styles.sentBoxColor ||
-        sentTextColorRef.current != styles.sentTextColor ||
-        receivedBoxColorRef.current != styles.receivedBoxColor ||
-        receivedTextColorRef.current != styles.receivedTextColor ||
+        fromHsv(sentBoxColorRef.current) != styles.sentBoxColor ||
+        fromHsv(sentTextColorRef.current) != styles.sentTextColor ||
+        fromHsv(receivedBoxColorRef.current) != styles.receivedBoxColor ||
+        fromHsv(receivedTextColorRef.current) != styles.receivedTextColor ||
         fontSizeRef.current != styles.fontSize
       )
 
@@ -155,17 +155,17 @@ const Customise = ({ navigation }) => {
       <>
         <View style={styles.messagesContainer}>
           <View
-          style={{...styles.message,...styles.messageFromYou, backgroundColor : sentBoxColor}}>
-            <Text style={{...styles.messageText, color : sentTextColor || "black", fontSize : fontSize}}>Hello</Text>
-            <Text style={{...styles.timestamp,color : sentTextColor || "black", fontSize : fontSize}}>
+          style={{...styles.message,...styles.messageFromYou, backgroundColor : fromHsv(sentBoxColor)}}>
+            <Text style={{...styles.messageText, color : fromHsv(sentTextColor) || "black", fontSize : fontSize}}>Hello</Text>
+            <Text style={{...styles.timestamp,color : fromHsv(sentTextColor) || "black", fontSize : fontSize}}>
             12:20
             </Text>
           </View>
 
           <View
-          style={{...styles.message,...styles.messageFromOther, backgroundColor : receivedBoxColor}}>
-            <Text style={{...styles.messageText,color : receivedTextColor || "black", fontSize : fontSize}}>Goodbye</Text>
-            <Text style={{...styles.timestamp,color : receivedTextColor || "black", fontSize : fontSize}}>
+          style={{...styles.message,...styles.messageFromOther, backgroundColor : fromHsv(receivedBoxColor)}}>
+            <Text style={{...styles.messageText,color : fromHsv(receivedTextColor) || "black", fontSize : fontSize}}>Goodbye</Text>
+            <Text style={{...styles.timestamp,color : fromHsv(receivedTextColor) || "black", fontSize : fontSize}}>
             12:21
             </Text>
           </View>
@@ -175,7 +175,7 @@ const Customise = ({ navigation }) => {
           <Slider
           style={{flex : 1}}
           onValueChange={val => setFontSize(Math.round(val))}
-          value={fontSize}
+          value={originalStyles.fontSize}
           minimumValue={14}
           maximumValue={24}/>
           <View style={{alignItems : "center"}}>
@@ -272,10 +272,10 @@ const Customise = ({ navigation }) => {
           timeout={500}
           buttonStyle={{...styles.buttonHeight,width : 100}}
           disabled={
-            sentBoxColor === originalStyles.sentBoxColor &&
-            sentTextColor === originalStyles.sentTextColor &&
-            receivedBoxColor === originalStyles.receivedBoxColor &&
-            receivedTextColor === originalStyles.receivedTextColor &&
+            fromHsv(sentBoxColor) === originalStyles.sentBoxColor &&
+            fromHsv(sentTextColor) === originalStyles.sentTextColor &&
+            fromHsv(receivedBoxColor) === originalStyles.receivedBoxColor &&
+            fromHsv(receivedTextColor) === originalStyles.receivedTextColor &&
             fontSize === originalStyles.fontSize
           }/>
 
