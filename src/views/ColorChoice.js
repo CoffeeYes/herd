@@ -12,7 +12,7 @@ const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
         color={color}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
-        onColorChange={color => setColor(fromHsv(color))}
+        onColorChange={color => setColor(color)}
       />
     </View>
   )
