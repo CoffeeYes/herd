@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import CameraMarker from './CameraMarker';
+import CustomButton from './CustomButton';
 
 const QRScanner = ({ navigation }) => {
 
@@ -18,31 +19,15 @@ const QRScanner = ({ navigation }) => {
     <QRCodeScanner
     showMarker
     onRead={handleRead}
+    reactivate={true}
     customMarker={<CameraMarker borderWidth={5} borderColor="white"/>}
     bottomContent={
-      <TouchableOpacity
-      style={styles.button}
-      onPress={() => navigation.goBack()}>
-        <Text style={styles.buttonText}>Cancel</Text>
-      </TouchableOpacity>
+      <CustomButton
+      text="Cancel"
+      onPress={() => navigation.goBack()}
+      buttonStyle={{marginTop : 30}}/>
     }/>
   )
-}
-
-const styles = {
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
-  }
 }
 
 export default QRScanner;
