@@ -54,7 +54,7 @@ const EditContact = ({ route, navigation }) => {
 
   const save = () => {
     setError("");
-    const newInfo = {name : name, key : publicKey, image : contactImage};
+    const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     setOriginalContact(newInfo)
   }
@@ -83,8 +83,8 @@ const EditContact = ({ route, navigation }) => {
 
       if(contact) {
         const unsavedChanges = (
-          contact.name != nameRef.current ||
-          contact.key != keyRef.current ||
+          contact.name.trim() != nameRef.current.trim() ||
+          contact.key.trim() != keyRef.current.trim() ||
           contact.image != imageRef.current
         )
 
@@ -151,8 +151,8 @@ const EditContact = ({ route, navigation }) => {
         onPress={save}
         timeout={500}
         disabled={
-          name === originalContact.name &&
-          publicKey === originalContact.key &&
+          name.trim() === originalContact.name &&
+          publicKey.trim() === originalContact.key &&
           contactImage === originalContact.image
         }
         buttonStyle={styles.button}
