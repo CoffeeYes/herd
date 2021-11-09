@@ -120,7 +120,7 @@ const Customise = ({ navigation }) => {
     const style = {
       sentBoxColor : "#c6c6c6",
       sentTextColor : "#f5f5f5",
-      receivedBoxColor : "#E86252",
+      receivedBoxColor : "#e86252",
       receivedTextColor : "#f5f5f5",
       fontSize : 14
     }
@@ -285,7 +285,7 @@ const Customise = ({ navigation }) => {
           disabled={
             sentBoxColor === "#c6c6c6" &&
             sentTextColor === "#f5f5f5" &&
-            receivedBoxColor === "#E86252" &&
+            receivedBoxColor === "#e86252" &&
             receivedTextColor === "#f5f5f5" &&
             fontSize === 14
           }
@@ -300,7 +300,7 @@ const Customise = ({ navigation }) => {
 
 const styles = {
   messageFromOther : {
-    backgroundColor : "#E86252",
+    backgroundColor : "#e86252",
   },
   messageFromYou : {
     backgroundColor : "#c6c6c6",
