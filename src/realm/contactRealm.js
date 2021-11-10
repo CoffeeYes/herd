@@ -31,8 +31,13 @@ const getContactById = id => {
 }
 
 const getContactsByKey = keys => {
-  const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
-  return contactsRealm.objects('Contact').filtered(keyQuery);
+  if(keys.length > 0) {
+    const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
+    return contactsRealm.objects('Contact').filtered(keyQuery);
+  }
+  else {
+    return []
+  }
 }
 
 const editContact = (id, values) => {

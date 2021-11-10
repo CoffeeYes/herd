@@ -6,7 +6,7 @@ const QRCodeModal = ({ visible, value, setVisible, title }) => {
   return (
 
     <Modal
-    animationType="slide"
+    animationType="fade"
     transparent={true}
     onRequestClose={() => setVisible(false)}
     visible={visible}>
