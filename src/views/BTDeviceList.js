@@ -5,6 +5,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 
 import BTExchangeModal from './BTExchangeModal';
+import Header from './Header';
+import CustomButton from './CustomButton';
 
 const BTDeviceList = () => {
   const [deviceList, setDeviceList] = useState([]);
@@ -79,39 +81,44 @@ const BTDeviceList = () => {
   }
 
   return (
-    <View style={styles.mainContainer}>
-      {scanning &&
-      <View>
-        <Text>Scanning...</Text>
-        <ActivityIndicator size="large" color="#e05e3f"/>
+    <>
+      <Header
+      title="Bluetooth Scan"
+      allowGoBack/>
+
+      <View style={styles.mainContainer}>
+        {scanning &&
+        <View>
+          <Text>Scanning...</Text>
+          <ActivityIndicator size="large" color="#e05e3f"/>
+        </View>
+        }
+        {error.length > 0 &&
+        <Text style={styles.error}>{error}</Text>
+        }
+        <ScrollView contentContainerStyle={styles.BTList}>
+          {deviceList.map((device,index) =>
+            <TouchableOpacity
+            key={index}
+            style={styles.deviceContainer}
+            onPress={ () => handleDeviceClick(device)}>
+              <Text>{device.name || "Nameless Device"}</Text>
+              <Text>{device.macAddress}</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
+
+        <CustomButton
+        text="Re-Scan"
+        onPress={restartScan}
+        buttonStyle={{marginTop : 10}}/>
+
+        <BTExchangeModal
+        visible={showModal}
+        setVisible={setShowModal}/>
+
       </View>
-      }
-      {error.length > 0 &&
-      <Text style={styles.error}>{error}</Text>
-      }
-      <ScrollView contentContainerStyle={styles.BTList}>
-        {deviceList.map((device,index) =>
-          <TouchableOpacity
-          key={index}
-          style={styles.deviceContainer}
-          onPress={ () => handleDeviceClick(device)}>
-            <Text>{device.name || "Nameless Device"}</Text>
-            <Text>{device.macAddress}</Text>
-          </TouchableOpacity>
-        )}
-      </ScrollView>
-
-      <TouchableOpacity
-      style={styles.button}
-      onPress={restartScan}>
-        <Text style={styles.buttonText}>Re-scan</Text>
-      </TouchableOpacity>
-
-      <BTExchangeModal
-      visible={showModal}
-      setVisible={setShowModal}/>
-
-    </View>
+    </>
   )
 }
 
@@ -130,19 +137,6 @@ const styles = {
     backgroundColor : "white",
     marginTop : 2,
     borderBottomColor : "black"
-  },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    textAlign : "center",
-    fontFamily : "Open-Sans"
   },
   error : {
     color : "red",

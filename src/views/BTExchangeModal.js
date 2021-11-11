@@ -14,7 +14,7 @@ const BTExchangeModal = ({ visible, setVisible}) => {
 
   return (
     <Modal
-    animationType="slide"
+    animationType="fade"
     transparent={true}
     visible={visible}>
       <View style={styles.modalMainContainer}>
