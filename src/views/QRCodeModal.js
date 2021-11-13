@@ -1,32 +1,25 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import CustomModal from './CustomModal';
 
 const QRCodeModal = ({ visible, value, setVisible, title }) => {
   return (
-
-    <Modal
-    animationType="fade"
-    transparent={true}
-    onRequestClose={() => setVisible(false)}
-    visible={visible}>
-      <TouchableOpacity
-      style={styles.modalMainContainer}
-      onPress={() => setVisible(false)}>
-        <View style={styles.modalContentContainer}>
-          {title &&
-          <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-          </View>}
-          <View style={styles.QRContainer}>
-            <QRCode
-            value={JSON.stringify(value)}
-            size={300}/>
-          </View>
+    <CustomModal
+    visible={visible}
+    setVisible={setVisible}>
+      <View style={styles.modalContentContainer}>
+        {title &&
+        <View style={styles.header}>
+          <Text style={styles.title}>{title}</Text>
+        </View>}
+        <View style={styles.QRContainer}>
+          <QRCode
+          value={JSON.stringify(value)}
+          size={300}/>
         </View>
-      </TouchableOpacity>
-    </Modal>
-
+      </View>
+    </CustomModal>
   )
 }
 

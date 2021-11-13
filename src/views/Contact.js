@@ -12,6 +12,7 @@ import Schemas from '../Schemas';
 import QRCodeModal from './QRCodeModal';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
+import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 
 const Contact = ({route, navigation}) => {
@@ -117,19 +118,12 @@ const Contact = ({route, navigation}) => {
         title={contactName}
         />
 
-        <Modal
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowLargeImage(false)}
-        visible={showLargeImage}>
-          <TouchableOpacity style={styles.modalMainContainer} onPress={() => setShowLargeImage(false)}>
-            <View style={styles.modalContentContainer}>
+        <CustomModal visible={showLargeImage} setVisible={setShowLargeImage}>
             <Image
             source={{uri : contactImage}}
-            style={{width : Dimensions.get("window").width * 0.8, height : Dimensions.get("window").height * 0.8}}/>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+            style={styles.largeImage}/>
+        </CustomModal>
+
       </ScrollView>}
     </>
   )
@@ -179,6 +173,10 @@ const styles = {
     alignItems : "center",
     maxWidth : Dimensions.get('window').width * 0.8,
     maxHeight : Dimensions.get('window').height * 0.8
+  },
+  largeImage : {
+    width : Dimensions.get("window").width * 0.8,
+    height : Dimensions.get("window").height * 0.8
   }
 }
 
