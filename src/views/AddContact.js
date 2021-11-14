@@ -3,7 +3,8 @@ import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
-import Header from './Header'
+import Header from './Header';
+import Card from './Card'
 
 import QRCodeModal from './QRCodeModal'
 
@@ -66,74 +67,60 @@ const AddContact = ({ navigation }) => {
       <View style={styles.mainContainer}>
         <View style={styles.row}>
 
-          <TouchableOpacity
+          <Card
           onPress={requestBTPermissions}
-          style={!!BTError ? {...styles.card,...styles.cardDisabled }: {...styles.card,...styles.leftCard}}
-          disabled={!!BTError}>
-            {!!BTError && <Text style={styles.error}>{BTError}</Text>}
-            <Icon name="bluetooth-searching" size={120}/>
-            <Text style={styles.cardText}>Start Bluetooth Scan </Text>
-          </TouchableOpacity>
+          disabled={!!BTError}
+          cardStyle={!!BTError ?
+            styles.cardDisabled
+            :
+            styles.leftCard
+          }
+          errorText={BTError}
+          icon="bluetooth-searching"
+          iconSize={120}
+          text="Start Bluetooth Scan"/>
 
-          <TouchableOpacity
-          style={{...styles.card,...styles.rightCard}}
-          onPress={() => navigation.navigate("createcontact")}>
-            <Icon name="import-export" size={120}/>
-            <Text style={styles.cardText}>Import Key </Text>
-          </TouchableOpacity>
+          <Card
+          onPress={() => navigation.navigate("createcontact")}
+          cardStyle={styles.rightCard}
+          icon="import-export"
+          iconSize={120}
+          text="Import Key"/>
 
         </View>
 
         <View style={styles.row}>
 
-          <TouchableOpacity
+          <Card
           onPress={() => setShowQRCode(true)}
-          style={{...styles.card,...styles.leftCard}}>
-            <Icon name="qr-code-2" size={120}/>
-            <Text style={styles.cardText}>Show My QR Code</Text>
-          </TouchableOpacity>
+          cardStyle={styles.leftCard}
+          icon="qr-code-2"
+          iconSize={120}
+          text="Show My QR Code"/>
 
-          <TouchableOpacity
+          <Card
           onPress={() => navigation.navigate("QRScanner")}
-          style={{...styles.card,...styles.rightCard}}>
-            <Icon name="qr-code-scanner" size={120}/>
-            <Text style={styles.cardText}>Scan QR Code</Text>
-          </TouchableOpacity>
+          cardStyle={styles.rightCard}
+          icon="qr-code-scanner"
+          iconSize={120}
+          text="Scan QR Code"/>
 
         </View>
 
       </View>
-        <QRCodeModal
-        visible={showQRCode}
-        setVisible={setShowQRCode}
-        title="My Key"
-        value={{key : publicKey}}/>
+      <QRCodeModal
+      visible={showQRCode}
+      setVisible={setShowQRCode}
+      title="My Key"
+      value={{key : publicKey}}/>
     </>
   )
 }
 
 const styles = {
-  header : {
-    backgroundColor : "#E86252",
-    padding : 15
-  },
   mainContainer : {
     padding : 20,
     flex : 1
-  },
-  error : {
-    color : "red",
-    fontWeight : "bold",
-    textAlign : "center",
-    fontSize : 18
-  },
-  card : {
-    padding : 20,
-    flex : 1,
-    backgroundColor : "white",
-    borderRadius : 5,
-    alignItems : "center",
-    justifyContent : "center"
   },
   cardDisabled : {
     backgroundColor : "grey"
@@ -143,10 +130,6 @@ const styles = {
   },
   rightCard : {
     marginLeft : 5
-  },
-  cardText : {
-    color : "black",
-    marginTop : 10
   },
   row : {
     flexDirection : "row",
