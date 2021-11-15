@@ -7,6 +7,7 @@ import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import Slider from '@react-native-community/slider';
+import TabItem from './TabItem';
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -186,49 +187,29 @@ const Customise = ({ navigation }) => {
 
         <View style={styles.colorChoiceContainer}>
           <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
-            <TouchableOpacity
-            style={{...styles.tabItem,width : tabWidth}}
-            onPress={() => setActiveItem("sentBox")}>
-              <Text style={{
-                ...styles.tabText,
-                color : activeItem === "sentBox" ? "#E86252" : "black"}}>
-                  Sent Box
-              </Text>
-            </TouchableOpacity>
+            <TabItem
+            text="Sent Box"
+            containerStyle={{width : tabWidth}}
+            active={activeItem === "sentBox"}
+            onPress={() => setActiveItem("sentBox")}/>
 
-            <TouchableOpacity
-            style={{...styles.tabItem,width : tabWidth}}
-            onPress={() => setActiveItem("sentText")}>
-              <Text style={{
-                ...styles.tabText,
-                color : activeItem === "sentText" ? "#E86252" : "black"}}>
-                  Sent Text
-              </Text>
-            </TouchableOpacity>
+            <TabItem
+            text="Sent Text"
+            containerStyle={{width : tabWidth}}
+            active={activeItem === "sentText"}
+            onPress={() => setActiveItem("sentText")}/>
 
-            <TouchableOpacity
-            style={{...styles.tabItem,width : tabWidth}}
-            onPress={() => setActiveItem("receivedBox")}>
-              <Text style={{
-                ...styles.tabText,
-                color : activeItem === "receivedBox" ? "#E86252" : "black"}}>
-                  Received Box
-              </Text>
-            </TouchableOpacity>
+            <TabItem
+            text="Received Box"
+            containerStyle={{width : tabWidth}}
+            active={activeItem === "receivedBox"}
+            onPress={() => setActiveItem("receivedBox")}/>
 
-            <TouchableOpacity
-            style={{
-              ...styles.tabItem,
-              width : tabWidth,
-              borderRightWidth : 0}}
-            onPress={() => setActiveItem("receivedText")}>
-              <Text style={{
-                ...styles.tabText,
-                color : activeItem === "receivedText" ? "#E86252" : "black"}}>
-                  Received Text
-              </Text>
-            </TouchableOpacity>
-
+            <TabItem
+            text="Received Text"
+            containerStyle={{width : tabWidth}}
+            active={activeItem === "receivedText"}
+            onPress={() => setActiveItem("receivedText")}/>
           </View>
 
           {activeItem === "sentBox" &&
