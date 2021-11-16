@@ -8,6 +8,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import Slider from '@react-native-community/slider';
 import TabItem from './TabItem';
+import ChatBubble from './ChatBubble';
 
 const Customise = ({ navigation }) => {
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -155,21 +156,30 @@ const Customise = ({ navigation }) => {
       :
       <>
         <View style={styles.messagesContainer}>
-          <View
-          style={{...styles.message,...styles.messageFromYou, backgroundColor : fromHsv(sentBoxColor)}}>
-            <Text style={{...styles.messageText, color : fromHsv(sentTextColor) || "black", fontSize : fontSize}}>Hello</Text>
-            <Text style={{...styles.timestamp,color : fromHsv(sentTextColor) || "black", fontSize : fontSize}}>
-            12:20
-            </Text>
-          </View>
+          <ChatBubble
+          text="This is a sample sent message"
+          timestamp="12 : 20"
+          customStyle={{
+            sentBoxColor : fromHsv(sentBoxColor),
+            receivedBoxColor : fromHsv(receivedBoxColor),
+            sentTextColor : fromHsv(sentTextColor),
+            receivedTextColor : fromHsv(receivedTextColor),
+            fontSize : fontSize}
+          }
+          messageFrom={true}/>
 
-          <View
-          style={{...styles.message,...styles.messageFromOther, backgroundColor : fromHsv(receivedBoxColor)}}>
-            <Text style={{...styles.messageText,color : fromHsv(receivedTextColor) || "black", fontSize : fontSize}}>Goodbye</Text>
-            <Text style={{...styles.timestamp,color : fromHsv(receivedTextColor) || "black", fontSize : fontSize}}>
-            12:21
-            </Text>
-          </View>
+          <ChatBubble
+          text="This is a sample response message"
+          timestamp="12 : 21"
+          customStyle={{
+            sentBoxColor : fromHsv(sentBoxColor),
+            receivedBoxColor : fromHsv(receivedBoxColor),
+            sentTextColor : fromHsv(sentTextColor),
+            receivedTextColor : fromHsv(receivedTextColor),
+            fontSize : fontSize}
+          }
+          messageFrom={false}/>
+
         </View>
 
         <View style={styles.sliderContainer}>
