@@ -66,7 +66,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
 const styles = {
   messageFromOther : {
     backgroundColor : "#E86252",
-    maxWidth: "85%",
+    maxWidth: "90%",
     alignSelf : "flex-start",
     marginLeft : 5,
   },

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
+import CustomModal from './CustomModal';
+import CustomButton from './CustomButton';
 
 const BTExchangeModal = ({ visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
@@ -13,45 +15,22 @@ const BTExchangeModal = ({ visible, setVisible}) => {
   }
 
   return (
-    <Modal
-    animationType="fade"
-    transparent={true}
-    visible={visible}>
-      <View style={styles.modalMainContainer}>
+    <CustomModal
+    visible={visible}
+    setVisible={setVisible}>
         <View style={styles.modalContentContainer}>
           {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
           <Text>{activityText}</Text>
-          <TouchableOpacity
-          style={styles.button}
-          onPress={cancel}>
-          <Text style={styles.buttonText}>Cancel</Text>
-          </TouchableOpacity>
+          <CustomButton
+          onPress={cancel}
+          buttonStyle={{marginTop : 10}}
+          text="Cancel"/>
         </View>
-      </View>
-    </Modal>
+    </CustomModal>
   )
 }
 
 const styles = {
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    textAlign : "center",
-    fontFamily : "Open-Sans"
-  },
-  modalMainContainer : {
-    alignItems : "center",
-    justifyContent : "center",
-    flex : 1,
-    backgroundColor : "rgba(0,0,0,0.4)"
-  },
   modalContentContainer : {
     backgroundColor : "white",
     borderRadius : 5,
