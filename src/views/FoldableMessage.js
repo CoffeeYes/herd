@@ -18,7 +18,7 @@ const FoldableMessage = ({to, from, timestamp, text, style}) => {
   },[])
 
   return (
-    <TouchableOpacity style={style} onPress={() => setOpen(!open)}>
+    <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={() => setOpen(!open)}>
       {open ?
       <View style={styles.open}>
         <View style={styles.closed}>
@@ -45,13 +45,27 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%",
+    paddingHorizontal : 20
   },
   messageText : {
     marginTop : 10,
+    width : "100%",
+    backgroundColor : "#e0e0e0",
+    padding : 20,
+    borderBottomWidth : 1,
+    borderBottomColor : "black"
   },
   open : {
     width : "100%"
-  }
+  },
+  container : {
+    flexDirection : "row",
+    backgroundColor : "white",
+    borderBottomWidth : 1,
+    borderBottomColor : "black",
+    paddingVertical : 20,
+    backgroundColor : "white",
+  },
 }
 
 export default FoldableMessage;

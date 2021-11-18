@@ -60,7 +60,6 @@ const MessageQueue = ({}) => {
           <FoldableMessage
           to={message.toContactName}
           from={message.fromContactName}
-          style={styles.messageItem}
           key={index}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text={message.text}/>
@@ -72,14 +71,6 @@ const MessageQueue = ({}) => {
   )
 }
 const styles = {
-  messageItem : {
-    flexDirection : "row",
-    backgroudnColor : "white",
-    borderBottomWidth : 1,
-    borderBottomColor : "black",
-    padding : 20,
-    backgroundColor : "white",
-  },
   messageTo : {
     fontWeight : "bold",
     marginRight : 10
