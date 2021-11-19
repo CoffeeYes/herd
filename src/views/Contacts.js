@@ -53,7 +53,7 @@ const Contacts = ({ route, navigation }) => {
   return (
     <>
       <Header
-      title="Contacts"
+      title={route.params.type === "newChat" ? "Start a new Chat" : "Contacts"}
       {...(!route.params.disableAddNew && {rightButtonIcon : "add"})}
       rightButtonOnClick={() => navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>

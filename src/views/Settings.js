@@ -112,19 +112,29 @@ const Settings = ({ navigation }) => {
     <Header title="Settings"/>
     <View>
 
-      <View style={{alignSelf : "center",alignItems : "center"}}>
+      <View style={{
+        alignSelf : "center",
+        alignItems : "center",
+        backgroundColor : "white",
+        borderRadius : 5,
+        padding : 20,
+        marginVertical : 10,
+        width : Dimensions.get('window').width * 0.9}}>
         {!backgroundTransfer &&
         <Text style={styles.warning}>
         WARNING : if you disable background transfers your messages
         will not be transmitted
         </Text>}
-        <Text>Background Transfers</Text>
-        <Switch
-        onValueChange={toggleBackgroundTransfer}
-        value={backgroundTransfer}
-        trackColor={{ false: "#767577", true: "#E86252" }}
-        thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
-        ios_backgroundColor="#E86252"/>
+        <View style={{flexDirection : "row", marginVertical: 10}}>
+          <Text>Background Transfers</Text>
+          <Switch
+          style={{marginLeft : 10}}
+          onValueChange={toggleBackgroundTransfer}
+          value={backgroundTransfer}
+          trackColor={{ false: "#767577", true: "#E86252" }}
+          thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
+          ios_backgroundColor="#E86252"/>
+        </View>
       </View>
 
       <ScrollView>
