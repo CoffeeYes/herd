@@ -11,6 +11,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
+import CardButton from './CardButton';
 
 import { deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
@@ -109,65 +110,71 @@ const Settings = ({ navigation }) => {
 
   return (
     <>
-    <Header title="Settings"/>
-    <View>
+      <Header title="Settings"/>
 
-      <View style={{
-        alignSelf : "center",
-        alignItems : "center",
-        backgroundColor : "white",
-        borderRadius : 5,
-        padding : 20,
-        marginVertical : 10,
-        width : Dimensions.get('window').width * 0.9}}>
-        {!backgroundTransfer &&
-        <Text style={styles.warning}>
-        WARNING : if you disable background transfers your messages
-        will not be transmitted
-        </Text>}
-        <View style={{flexDirection : "row", marginVertical: 10}}>
-          <Text>Background Transfers</Text>
-          <Switch
-          style={{marginLeft : 10}}
-          onValueChange={toggleBackgroundTransfer}
-          value={backgroundTransfer}
-          trackColor={{ false: "#767577", true: "#E86252" }}
-          thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
-          ios_backgroundColor="#E86252"/>
+      <ScrollView contentContainerStyle={{alignItems : "center"}}>
+
+        <View style={{
+          alignSelf : "center",
+          alignItems : "center",
+          backgroundColor : "white",
+          elevation : 2,
+          borderRadius : 10,
+          padding : 20,
+          marginVertical : 10,
+          width : Dimensions.get('window').width * 0.9}}>
+          {!backgroundTransfer &&
+          <Text style={styles.warning}>
+          WARNING : if you disable background transfers your messages
+          will not be transmitted
+          </Text>}
+          <View style={{flexDirection : "row", marginVertical: 10}}>
+            <Text>Background Transfers</Text>
+            <Switch
+            style={{marginLeft : 10}}
+            onValueChange={toggleBackgroundTransfer}
+            value={backgroundTransfer}
+            trackColor={{ false: "#767577", true: "#E86252" }}
+            thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
+            ios_backgroundColor="#E86252"/>
+          </View>
         </View>
-      </View>
 
-      <ScrollView>
-
-        <FlashTextButton
-        normalText="Copy Your Key"
+        <CardButton
+        text="Copy Your Key"
         flashText="Copied!"
         timeout={500}
-        onPress={copyKeyToClipboard}
-        buttonStyle={{width : Dimensions.get("window").width * 0.3}}/>
+        rightIcon="content-copy"
+        onPress={copyKeyToClipboard}/>
 
-        <CustomButton
-        buttonStyle={styles.buttonMargin}
-        onPress={showQRCode}
-        text="Show My QR Code"/>
-        <CustomButton
-        buttonStyle={styles.buttonMargin}
-        onPress={() => navigation.navigate("customise")}
-        text="Customise"/>
-        <CustomButton
-        buttonStyle={styles.buttonMargin}
-        onPress={() => navigation.navigate("messageQueue")}
-        text="Message Queue"/>
+        <CardButton
+        text="Show My QR Code"
+        rightIcon="qr-code-2"
+        onPress={showQRCode}/>
 
-        <CustomButton
-        buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
-        onPress={deleteAllChats}
-        text="Delete All Chats"/>
-        <CustomButton
-        buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
-        onPress={deleteAllContacts}
-        text="Delete All Contacts"/>
+        <CardButton
+        text="Customise"
+        rightIcon="edit"
+        onPress={() => navigation.navigate("customise")}/>
 
+        <CardButton
+        text="Message Queue"
+        rightIcon="message"
+        onPress={() => navigation.navigate("messageQueue")}/>
+
+        <CardButton
+        text="Delete All Chats"
+        textStyle={{color : "red"}}
+        iconStyle={{color : "red"}}
+        rightIcon="delete-forever"
+        onPress={deleteAllChats}/>
+
+        <CardButton
+        text="Delete All Contacts"
+        textStyle={{color : "red"}}
+        iconStyle={{color : "red"}}
+        rightIcon="delete-sweep"
+        onPress={deleteAllContacts}/>
 
         {__DEV__ &&
           <CustomButton
@@ -186,7 +193,6 @@ const Settings = ({ navigation }) => {
         setVisible={setQRCodeVisible}/>
 
       </ScrollView>
-    </View>
     </>
   )
 }
