@@ -321,16 +321,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       @Volatile var shouldLoop = true
       public override fun run() {
+        Log.d(TAG, "Bluetooth Server Thread Was Started")
         val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
         while (shouldLoop) {
             connectionSocket = try {
                 serverSocket?.accept()
             } catch (e: Exception) {
+                Log.d(TAG, "Accepting Bluetooth Socket Failed")
                 shouldLoop = false
                 throw(e);
             }
             connectionSocket?.also {
                 /* manageBTServerConnection(it) */
+                Log.d(TAG, "SERVER SOCKET WAS CONNECTED")
                 connectionThread = BTConnectionThread(it, messageHandler)
                 connectionThread?.start();
                 serverSocket?.close()
@@ -353,17 +356,28 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val device = adapter?.getRemoteDevice(deviceAddress);
 
       public override fun run() {
+        Log.d(TAG, "Bluetooth Client Thread was started")
         // Cancel discovery because it otherwise slows down the connection.
         adapter.cancelDiscovery()
-        clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
+        try {
+          clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
+        }
+        catch(e : Exception) {
+          Log.e(TAG, "Error creating client socket in BT Client Thread", e);
+        }
 
         clientSocket?.use { socket ->
-          socket.connect();
-
-          //TODO do work with connected socket in seperate thread
-          /* manageBTClientConnection(socket); */
-          connectionThread = BTConnectionThread(socket, messageHandler);
-          connectionThread?.start();
+          try {
+            socket.connect();
+            Log.d(TAG, "Bluetooth client socket connected")
+            //TODO do work with connected socket in seperate thread
+            /* manageBTClientConnection(socket); */
+            connectionThread = BTConnectionThread(socket, messageHandler);
+            connectionThread?.start();
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "Error Connecting Bluetooth Client socket", e);
+          }
         }
       }
 
@@ -480,6 +494,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun connectAsClient(device : String, promise : Promise) {
       try {
         BTClientThread = createBTClientThread(device);
+        BTClientThread?.start();
         promise.resolve(true);
       }
       catch(e : Exception) {
