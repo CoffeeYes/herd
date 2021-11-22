@@ -391,11 +391,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(1024);
 
+      @Volatile var shouldLoop = true
       override fun run() {
+          Log.d(TAG, "Bluetooth Connection Thread Started")
           var numBytes: Int;
-
           // Keep listening to the InputStream until an exception occurs.
-          while (true) {
+          while (shouldLoop) {
               // Read from the InputStream.
               numBytes = try {
                   inputStream.read(buffer)
@@ -421,7 +422,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       fun cancel() {
         try {
-          socket.close()
+          socket.close();
+          shouldLoop = false;
         }
         catch(e : Exception) {
           Log.e(TAG, "Could not close BT connection socket",e)
@@ -438,6 +440,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       catch(e : Exception) {
         promise.reject("Error writing to connection",e)
+      }
+    }
+
+    @ReactMethod
+    fun cancelBTConnectionThread() {
+      try {
+        connectionThread.cancel();
+      }
+      catch(e : Exception) {
+        Log.e(TAG, "Error cancelling bluetooth connection thread", e)
       }
     }
 
