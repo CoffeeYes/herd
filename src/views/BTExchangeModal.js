@@ -11,6 +11,7 @@ const BTExchangeModal = ({ visible, setVisible}) => {
   const cancel = async () => {
     await Bluetooth.cancelListenAsServer();
     await Bluetooth.cancelConnectAsClient();
+    await Bluetooth.cancelBTConnectionThread();
     setVisible(false);
   }
 

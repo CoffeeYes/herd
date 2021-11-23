@@ -352,21 +352,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private inner class createBTClientThread(deviceAddress : String) : Thread() {
       val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
-      var clientSocket : BluetoothSocket? = null;
       val device = adapter?.getRemoteDevice(deviceAddress);
+      
+      private val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
+        device?.createRfcommSocketToServiceRecord(btUUID)
+      }
 
       public override fun run() {
         Log.d(TAG, "Bluetooth Client Thread was started")
         // Cancel discovery because it otherwise slows down the connection.
         adapter.cancelDiscovery()
-        try {
-          clientSocket = device?.createRfcommSocketToServiceRecord(btUUID);
-        }
-        catch(e : Exception) {
-          Log.e(TAG, "Error creating client socket in BT Client Thread", e);
-        }
 
-        clientSocket?.use { socket ->
+        clientSocket?.let { socket ->
           try {
             socket.connect();
             Log.d(TAG, "Bluetooth client socket connected")
@@ -391,12 +388,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(1024);
 
-      @Volatile var shouldLoop = true
       override fun run() {
           Log.d(TAG, "Bluetooth Connection Thread Started")
           var numBytes: Int;
           // Keep listening to the InputStream until an exception occurs.
-          while (shouldLoop) {
+          while (true) {
               // Read from the InputStream.
               numBytes = try {
                   inputStream.read(buffer)
@@ -423,7 +419,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       fun cancel() {
         try {
           socket.close();
-          shouldLoop = false;
         }
         catch(e : Exception) {
           Log.e(TAG, "Could not close BT connection socket",e)
@@ -446,7 +441,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun cancelBTConnectionThread() {
       try {
-        connectionThread.cancel();
+        connectionThread?.cancel();
       }
       catch(e : Exception) {
         Log.e(TAG, "Error cancelling bluetooth connection thread", e)
