@@ -1,24 +1,26 @@
 import React, { useState } from 'react';
 import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
 import ContactImage from './ContactImage';
-import Icon from 'react-native-vector-icons/MaterialIcons'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { imageValues } from '../assets/palette';
 
-const ListItem = ({ name, image, deleteItem, onPress }) => {
+const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
+                    imageContainerStyle, imageSize }) => {
   const [showDelete, setShowDelete ] = useState(false);
 
   return (
     <TouchableOpacity
-    style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10}}
+    style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10,...containerStyle}}
     onPress={onPress}
     onLongPress={() => setShowDelete(!showDelete)}>
-      <View style={styles.imageContainer}>
+      <View style={{...styles.imageContainer,...imageContainerStyle}}>
         <ContactImage
         imageURI={image}
         iconSize={24}
-        imageWidth={Dimensions.get("window").width * 0.1}
-        imageHeight={Dimensions.get("window").height * 0.1}/>
+        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
+        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
-      <Text style={styles.chatText}>{name}</Text>
+      <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
 
       {showDelete &&
       <TouchableOpacity
@@ -40,8 +42,7 @@ const styles = {
     backgroundColor : "white",
     alignItems : "center",
     justifyContent : "flex-start",
-    borderBottomWidth : 0.2,
-    borderBottomColor : "#e05e3f"
+    paddingVertical : 20
   },
   deleteButton : {
     backgroundColor : "#e05e3f",
@@ -52,15 +53,18 @@ const styles = {
   imageContainer : {
     borderWidth : 1,
     borderColor : "grey",
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
+    width : Dimensions.get("window").width * imageValues.smallFactor,
+    height : Dimensions.get("window").width * imageValues.smallFactor,
     marginRight : 10,
-    borderRadius : Dimensions.get("window").width * 0.05,
+    borderRadius : Dimensions.get("window").width * (imageValues.smallFactor/2),
     overflow : "hidden",
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center"
-  }
+  },
+  chatText : {
+    fontSize : 16
+  },
 }
 
 export default ListItem;

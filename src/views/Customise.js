@@ -217,7 +217,7 @@ const Customise = ({ navigation }) => {
 
             <TabItem
             text="Received Text"
-            containerStyle={{width : tabWidth}}
+            containerStyle={{width : tabWidth, borderRightWidth : 0}}
             active={activeItem === "receivedText"}
             onPress={() => setActiveItem("receivedText")}/>
           </View>

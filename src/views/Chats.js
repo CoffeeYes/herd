@@ -74,27 +74,4 @@ const Chats = ({ navigation }) => {
   )
 }
 
-const styles = {
-  chat : {
-    flexDirection : "row",
-    flex : 1,
-    backgroundColor : "white",
-    alignItems : "center",
-    justifyContent : "flex-start",
-    borderBottomWidth : 0.2,
-    borderBottomColor : "#e05e3f"
-  },
-  header : {
-    flexDirection : "row",
-    justifyContent : "space-between",
-    alignItems : "center",
-    backgroundColor : "#e05e3f",
-    paddingLeft : 20,
-  },
-  headerText : {
-    fontSize : 18,
-    color : "white"
-  }
-}
-
 export default Chats;

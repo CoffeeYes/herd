@@ -12,6 +12,7 @@ import {
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
+import { imageValues } from '../assets/palette';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -278,10 +279,10 @@ const styles = {
   imageContainer : {
     borderWidth : 1,
     borderColor : "grey",
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
+    width : Dimensions.get("window").width * imageValues.smallFactor,
+    height : Dimensions.get("window").width * imageValues.smallFactor,
     marginLeft : 10,
-    borderRadius : Dimensions.get("window").width * 0.05,
+    borderRadius : Dimensions.get("window").width * (imageValues.smallFactor/2),
     overflow : "hidden",
     alignSelf : "center",
     alignItems : "center",
@@ -289,8 +290,8 @@ const styles = {
     marginRight : 20
   },
   image : {
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
+    width : Dimensions.get("window").width * imageValues.smallFactor,
+    height : Dimensions.get("window").width * imageValues.smallFactor,
   },
   messageDay : {
     alignSelf : "center"
