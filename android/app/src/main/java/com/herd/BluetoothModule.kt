@@ -353,7 +353,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
       val device = adapter?.getRemoteDevice(deviceAddress);
-      
+
       private val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
         device?.createRfcommSocketToServiceRecord(btUUID)
       }
@@ -395,11 +395,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           while (true) {
               // Read from the InputStream.
               numBytes = try {
-                  inputStream.read(buffer)
+                  inputStream.read(buffer);
               } catch (e: Exception) {
                   Log.d(TAG, "Input stream was disconnected", e)
                   break
               }
+
+              //get string from byte array
+              val receivedString : String = String(buffer.copyOfRange(0,numBytes));
+              Log.d(TAG, "Received message over BT Connection : " + receivedString);
+
+              //emit string upwards to javscript event listener
+              context.getJSModule(RCTDeviceEventEmitter::class.java)
+              .emit("newBTMessageReceived",receivedString);
 
               val readMsg = handler.obtainMessage(
                         MESSAGE_READ, numBytes, -1,
