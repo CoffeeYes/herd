@@ -10,6 +10,7 @@ import Realm from 'realm';
 import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
+import CardButton from './CardButton';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import CustomModal from './CustomModal';
@@ -91,25 +92,30 @@ const Contact = ({route, navigation}) => {
           imageHeight={Dimensions.get("window").height * 0.4}/>}
         </View>
 
-        <FlashTextButton
-        normalText="Copy Key"
-        flashText="Copied!"
-        timeout={500}
-        buttonStyle={styles.buttonMargin}
-        onPress={copyKeyToClipboard}/>
+        <View style={{alignItems : "center"}}>
+          <CardButton
+          text="Copy Key"
+          flashText="Copied!"
+          timeout={500}
+          rightIcon="content-copy"
+          onPress={copyKeyToClipboard}/>
 
-        <CustomButton
-        onPress={shareContact}
-        buttonStyle={styles.buttonMargin}
-        text="Share Contact"/>
-        <CustomButton
-        onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
-        buttonStyle={styles.buttonMargin}
-        text="Go To Chat"/>
-        <CustomButton
-        onPress={() => setShowQRCode(true)}
-        buttonStyle={styles.buttonMargin}
-        text="Show Contact's QR Code"/>
+          <CardButton
+          onPress={shareContact}
+          rightIcon="share"
+          text="Share Contact"/>
+
+          <CardButton
+          onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
+          rightIcon="chat"
+          text="Go To Chat"/>
+
+          <CardButton
+          onPress={() => setShowQRCode(true)}
+          rightIcon="qr-code"
+          text="Show Contact's QR Code"/>
+
+        </View>
 
         <QRCodeModal
         visible={showQRCode}
