@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -52,8 +52,6 @@ const styles = {
     width : "100%",
     backgroundColor : "#e0e0e0",
     padding : 20,
-    borderBottomWidth : 1,
-    borderBottomColor : "black"
   },
   open : {
     width : "100%"
@@ -61,10 +59,12 @@ const styles = {
   container : {
     flexDirection : "row",
     backgroundColor : "white",
-    borderBottomWidth : 1,
-    borderBottomColor : "black",
     paddingVertical : 20,
     backgroundColor : "white",
+    width : Dimensions.get('window').width * 0.8,
+    marginVertical : 5,
+    borderRadius : 10,
+    elevation : 2
   },
 }
 

@@ -54,7 +54,7 @@ const MessageQueue = ({}) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
-      <ScrollView>
+      <ScrollView contentContainerStyle={{alignItems : "center"}}>
         {messages.map((message,index) =>
           message.to === ownPublicKey || message.from === ownPublicKey ?
           <FoldableMessage
