@@ -18,9 +18,11 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
     <TouchableOpacity
     style={{...styles.container,...containerStyle}}
     onPress={(flashText && timeout) ? flash : onPress}>
-      <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
+      <View style={styles.textContainer}>
+        <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
+      </View>
       <Icon
-      style={{...iconStyle, marginLeft : "auto"}}
+      style={{...styles.icon, ...iconStyle}}
       name={rightIcon}
       size={iconSize || 32}/>
     </TouchableOpacity>
@@ -40,10 +42,18 @@ const styles = {
     marginVertical : 5
   },
   text : {
-    marginLeft : "auto",
-    marginRight : "auto",
     fontWeight : "bold",
     fontSize : 16
+  },
+  textContainer : {
+    marginLeft : "auto",
+    marginRight : "auto",
+    flexDirection : "row",
+    justifyContent : "flex-start",
+    width : Dimensions.get('window').width * 0.4,
+  },
+  icon : {
+    alignSelf : "flex-end"
   }
 }
 
