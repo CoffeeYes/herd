@@ -86,7 +86,23 @@ const getContactsWithChats = () => {
   sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
   if(keys.length > 0) {
-    return getContactsByKey(keys);
+    var timestamps = [];
+    var promises = [];
+    for(var key in keys) {
+      const currentKey = keys[key];
+      promises.push(getMessagesWithContact(currentKey,-1).then(messages => {
+        if(messages[0]) {
+          timestamps.push({key : [currentKey], timestamp : messages[0].timestamp});
+        }
+      }));
+    }
+    var contacts = getContactsByKey(keys);
+    Promise.all(promises).then(() => {
+      contacts.map(contact => {
+        contact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp
+      })
+    })
+    return contacts;
   }
   else {
     return []
