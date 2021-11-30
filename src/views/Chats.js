@@ -4,7 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
 import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
-import { parseRealmID } from '../realm/helper'
+import { parseRealmID } from '../realm/helper';
+import moment from 'moment'
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
@@ -67,6 +68,7 @@ const Chats = ({ navigation }) => {
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
         }
         deleteItem={() => deleteChat(chat.key)}
+        rightText={moment(chat.timestamp).format("DD/MM")}
         />
       )}
       </ScrollView>
