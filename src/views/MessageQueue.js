@@ -46,7 +46,7 @@ const MessageQueue = ({}) => {
   }
 
   return (
-    <View>
+    <View style={{flex : 1}}>
       <Header
       allowGoBack
       title="Message Queue"/>
@@ -54,7 +54,7 @@ const MessageQueue = ({}) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
-      <ScrollView contentContainerStyle={{alignItems : "center"}}>
+      <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {messages.map((message,index) =>
           message.to === ownPublicKey || message.from === ownPublicKey ?
           <FoldableMessage

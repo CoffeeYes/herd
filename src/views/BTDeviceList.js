@@ -125,7 +125,8 @@ const BTDeviceList = () => {
 const styles = {
   mainContainer : {
     alignItems : "center",
-    padding : 20
+    padding : 20,
+    flex : 1
   },
   BTList : {
     backgroundColor : "#D8D8D8",
