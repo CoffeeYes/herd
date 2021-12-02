@@ -23,9 +23,14 @@ const Chats = ({ navigation }) => {
     return focusListener;
   },[navigation])
 
-  const loadContactsWithChats = () => {
+  const loadContactsWithChats = async () => {
     setLoading(true);
-    setChats(getContactsWithChats());
+    //create array copy using slice, then sort by timestamp
+    var contactsWithChats = getContactsWithChats();
+    contactsWithChats = contactsWithChats
+    .slice()
+    .sort( (a,b) => a.timestamp > b.timestamp);
+    setChats(contactsWithChats);
     setLoading(false);
   }
 
