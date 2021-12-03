@@ -78,7 +78,7 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   return messageID;
 }
 
-const getContactsWithChats = () => {
+const getContactsWithChats = async () => {
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
   var keys = [];
@@ -90,17 +90,15 @@ const getContactsWithChats = () => {
     var promises = [];
     for(var key in keys) {
       const currentKey = keys[key];
-      promises.push(getMessagesWithContact(currentKey,-1).then(messages => {
+      await getMessagesWithContact(currentKey,-1).then(messages => {
         if(messages[0]) {
           timestamps.push({key : [currentKey], timestamp : messages[0].timestamp});
         }
-      }));
+      });
     }
     var contacts = getContactsByKey(keys);
-    Promise.all(promises).then(() => {
-      contacts.map(contact => {
-        contact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp
-      })
+    contacts.map(contact => {
+      contact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp
     })
     return contacts;
   }

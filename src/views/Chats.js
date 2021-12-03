@@ -19,17 +19,16 @@ const Chats = ({ navigation }) => {
     const focusListener = navigation.addListener('focus', () => {
       loadContactsWithChats();
     });
-
     return focusListener;
   },[navigation])
 
   const loadContactsWithChats = async () => {
     setLoading(true);
     //create array copy using slice, then sort by timestamp
-    var contactsWithChats = getContactsWithChats();
-    contactsWithChats = contactsWithChats
-    .slice()
+    var contactsWithChats = await getContactsWithChats();
+    contactsWithChats = contactsWithChats.slice()
     .sort( (a,b) => a.timestamp > b.timestamp);
+
     setChats(contactsWithChats);
     setLoading(false);
   }
@@ -76,8 +75,7 @@ const Chats = ({ navigation }) => {
         rightText={moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
           "Today"
           :
-          moment(chat.timestamp).format("DD/MM")
-        }
+          moment(chat.timestamp).format("DD/MM")}
         />
       )}
       </ScrollView>
