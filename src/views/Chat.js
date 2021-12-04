@@ -36,6 +36,7 @@ const Chat = ({ route, navigation }) => {
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+  const [showedPopup, setShowedPopup] = useState(false);
 
   const messageLoadingSize = 5;
 
@@ -54,8 +55,7 @@ const Chat = ({ route, navigation }) => {
     var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
     if(newMessages.length === 0) {
       setAllowScrollToLoadMessages(false);
-      setShowPopup(true);
-      setTimeout(() => setShowPopup(false),1000);
+      showNoMoreMessagePopup();
       return;
     }
     const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
@@ -182,10 +182,23 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleGesture = event => {
-    event.nativeEvent.translationY > 200 &&
-    enableGestureHandler &&
-    messages.length >= messageLoadingSize &&
-    loadMoreMessages();
+    const allow = event.nativeEvent.translationY > 200 && enableGestureHandler;
+    if(allow) {
+      if(messages.length >= messageLoadingSize) {
+        loadMoreMessages();
+      }
+      else if (!showedPopup) {
+        showNoMoreMessagePopup();
+      }
+    }
+  }
+
+  const showNoMoreMessagePopup = () => {
+    setShowPopup(true)
+    setTimeout(() => {
+      setShowPopup(false);
+    },1000)
+    setShowedPopup(true);
   }
 
   const scrollRef = useRef();
@@ -210,6 +223,11 @@ const Chat = ({ route, navigation }) => {
     }/>
     <View style={{flex : 1}}>
 
+      {showPopup &&
+      <View style={styles.popup}>
+        <Text style={styles.popupText}>No More messages to load</Text>
+      </View>}
+
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
@@ -225,11 +243,6 @@ const Chat = ({ route, navigation }) => {
 
           {loadingMoreMessages &&
           <ActivityIndicator size="large" color="#e05e3f"/>}
-
-          {showPopup &&
-          <View style={styles.popup}>
-            <Text style={styles.popupText}>No More messages to load</Text>
-          </View>}
 
           {messageDays.map((day,index) =>
             <View key={index}>
