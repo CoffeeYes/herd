@@ -87,14 +87,11 @@ const getContactsWithChats = async () => {
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
   if(keys.length > 0) {
     var timestamps = [];
-    var promises = [];
     for(var key in keys) {
       const currentKey = keys[key];
-      await getMessagesWithContact(currentKey,-1).then(messages => {
-        if(messages[0]) {
-          timestamps.push({key : [currentKey], timestamp : messages[0].timestamp});
-        }
-      });
+      const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
+      currentLastMessage &&
+      timestamps.push({key : [currentKey], timestamp : currentLastMessage.timestamp});
     }
     var contacts = getContactsByKey(keys);
     contacts.map(contact => {

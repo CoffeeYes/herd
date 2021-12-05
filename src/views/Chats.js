@@ -72,11 +72,14 @@ const Chats = ({ navigation }) => {
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
         }
         deleteItem={() => deleteChat(chat.key)}
-        rightText={moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
-          "Today"
+        rightText={chat.timestamp ?
+          moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
+            "Today"
+            :
+            moment(chat.timestamp).format("DD/MM")
           :
-          moment(chat.timestamp).format("DD/MM")}
-        />
+          ""
+        }/>
       )}
       </ScrollView>
     </>
