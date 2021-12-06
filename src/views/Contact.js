@@ -16,6 +16,8 @@ import CustomButton from './CustomButton';
 import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 
+import { largeImageContainerStyle } from '../assets/styles';
+
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showQRCode, setShowQRCode] = useState(false);
@@ -75,9 +77,10 @@ const Contact = ({route, navigation}) => {
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
-        <View style={styles.imageContainer}>
+        <View style={largeImageContainerStyle}>
           {contactImage !== "" ?
-          <TouchableOpacity onPress={() => contactImage != "" && setShowLargeImage(true)}>
+          <TouchableOpacity
+          onPress={() => contactImage != "" && setShowLargeImage(true)}>
             <ContactImage
             imageURI={contactImage}
             iconSize={64}
@@ -136,50 +139,6 @@ const Contact = ({route, navigation}) => {
 }
 
 const styles = {
-  header : {
-    flexDirection : "row",
-    justifyContent : "space-between",
-    alignItems : "center",
-    backgroundColor : "#e05e3f",
-    paddingLeft : 20
-  },
-  headerText : {
-    fontSize : 18,
-    color : "white"
-  },
-  editButton : {
-    paddingHorizontal : 15,
-    paddingVertical : 10,
-    backgroundColor : "#EBB3A9"
-  },
-  buttonMargin : {
-    marginTop : 10
-  },
-  imageContainer : {
-    alignSelf : "center",
-    width : Dimensions.get("window").width * 0.4,
-    height : Dimensions.get("window").width * 0.4,
-    borderRadius : Dimensions.get("window").width * 0.2,
-    borderWidth : 1,
-    borderColor : "grey",
-    alignItems : "center",
-    justifyContent : "center",
-    overflow : "hidden",
-    backgroundColor : "white"
-  },
-  modalMainContainer : {
-    alignItems : "center",
-    justifyContent : "center",
-    flex : 1,
-    backgroundColor : "rgba(0,0,0,0.4)"
-  },
-  modalContentContainer : {
-    backgroundColor : "white",
-    borderRadius : 5,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
-  },
   largeImage : {
     width : Dimensions.get("window").width * 0.8,
     height : Dimensions.get("window").height * 0.8

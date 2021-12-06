@@ -6,9 +6,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
-import FlashTextButton from './FlashTextButton'
+import FlashTextButton from './FlashTextButton';
 
-import { getContactById, editContact } from '../realm/contactRealm'
+import { getContactById, editContact } from '../realm/contactRealm';
+import { largeImageContainerStyle } from '../assets/styles';
 
 
 const EditContact = ({ route, navigation }) => {
@@ -123,7 +124,7 @@ const EditContact = ({ route, navigation }) => {
         <Text>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
-          <View style={styles.imageContainer}>
+          <View style={largeImageContainerStyle}>
             <ContactImage
             imageURI={contactImage}
             iconSize={64}
@@ -193,18 +194,6 @@ const styles = {
   inputTitle : {
     fontWeight : "bold",
     marginBottom : 5
-  },
-  imageContainer : {
-    alignSelf : "center",
-    width : Dimensions.get("window").width * 0.4,
-    height : Dimensions.get("window").width * 0.4,
-    borderRadius : Dimensions.get("window").width * 0.2,
-    borderWidth : 1,
-    borderColor : "grey",
-    alignItems : "center",
-    justifyContent : "center",
-    overflow : "hidden",
-    backgroundColor : "white"
   },
 }
 

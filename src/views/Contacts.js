@@ -82,49 +82,7 @@ const Contacts = ({ route, navigation }) => {
 }
 
 const styles = {
-  header : {
-    flexDirection : "row",
-    justifyContent : "space-between",
-    alignItems : "center",
-    backgroundColor : "#e05e3f",
-    paddingLeft : 20,
-  },
-  headerText : {
-    fontSize : 18,
-    color : "white"
-  },
-  contact : {
-    backgroundColor : "white",
-    flexDirection : "row",
-    borderBottomColor : "#e05e3f",
-    borderBottomWidth : 0.2
-  },
-  contactText : {
-    padding : 20,
-    paddingLeft : 10
-  },
-  image : {
-    borderRadius : 50,
-    overflow : "hidden",
-    alignSelf : "center"
-  },
-  imageContainer : {
-    borderWidth : 1,
-    borderColor : "grey",
-    width : Dimensions.get("window").width * 0.1,
-    height : Dimensions.get("window").width * 0.1,
-    marginLeft : 10,
-    borderRadius : Dimensions.get("window").width * 0.05,
-    overflow : "hidden",
-    alignSelf : "center",
-    alignItems : "center",
-    justifyContent : "center"
-  },
-  deleteButton : {
-    backgroundColor : "#e05e3f",
-    marginLeft : "auto",
-    padding : 13
-  }
+
 }
 
 export default Contacts;
