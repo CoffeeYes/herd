@@ -26,6 +26,7 @@ const Chats = ({ navigation }) => {
     setLoading(true);
     //create array copy using slice, then sort by timestamp
     var contactsWithChats = await getContactsWithChats();
+    console.log(contactsWithChats)
     contactsWithChats = contactsWithChats.slice()
     .sort( (a,b) => a.timestamp > b.timestamp);
 
@@ -72,13 +73,11 @@ const Chats = ({ navigation }) => {
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
         }
         deleteItem={() => deleteChat(chat.key)}
-        rightText={chat.timestamp ?
-          moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
+        rightText={chat.timestamp &&
+          (moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
             "Today"
             :
-            moment(chat.timestamp).format("DD/MM")
-          :
-          ""
+            moment(chat.timestamp).format("DD/MM"))
         }/>
       )}
       </ScrollView>

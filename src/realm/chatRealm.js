@@ -79,25 +79,32 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 }
 
 const getContactsWithChats = async () => {
+  //get all messages sent and received
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
   var keys = [];
 
+  //get unique keys in all messages
   sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
   if(keys.length > 0) {
+    //get timestamp of last message for each key
     var timestamps = [];
     for(var key in keys) {
       const currentKey = keys[key];
       const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
       currentLastMessage &&
-      timestamps.push({key : [currentKey], timestamp : currentLastMessage.timestamp});
+      timestamps.push({key : currentKey, timestamp : currentLastMessage.timestamp});
     }
+    //create new contacts array with timestamps because realm doesnt allow mutation in place
     var contacts = getContactsByKey(keys);
+    var contactsWithTimestamps = [];
     contacts.map(contact => {
-      contact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp
+      let currentContact = JSON.parse(JSON.stringify(contact));
+      currentContact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp;
+      contactsWithTimestamps.push(currentContact);
     })
-    return contacts;
+    return contactsWithTimestamps;
   }
   else {
     return []
