@@ -290,23 +290,6 @@ const Customise = ({ navigation }) => {
 }
 
 const styles = {
-  messageFromOther : {
-    backgroundColor : "#e86252",
-  },
-  messageFromYou : {
-    backgroundColor : "#c6c6c6",
-    alignSelf : "flex-end",
-  },
-  message : {
-    padding : 20,
-    width : "50%",
-    marginVertical : 5,
-    borderRadius : 10,
-  },
-  timestamp : {
-    fontWeight : "bold",
-    alignSelf : "flex-end"
-  },
   messagesContainer : {
     flex : 1,
     margin : 10,
@@ -321,20 +304,6 @@ const styles = {
     justifyContent : "space-around",
     borderBottomWidth : 1,
     borderBottomColor : "grey"
-  },
-  tabItem : {
-    borderRightWidth : 1,
-    borderRightColor : "grey",
-    padding : 10,
-    alignItems : "center",
-    justifyContent : "center"
-  },
-  activeTabItem : {
-    backgroundColor : "grey"
-  },
-  tabText : {
-    color : "black",
-    fontWeight : "bold"
   },
   buttonRow : {
     flexDirection : "row",
