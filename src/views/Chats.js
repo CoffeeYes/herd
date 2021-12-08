@@ -26,7 +26,6 @@ const Chats = ({ navigation }) => {
     setLoading(true);
     //create array copy using slice, then sort by timestamp
     var contactsWithChats = await getContactsWithChats();
-    console.log(contactsWithChats)
     contactsWithChats = contactsWithChats.slice()
     .sort( (a,b) => a.timestamp > b.timestamp);
 

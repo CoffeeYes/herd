@@ -27,7 +27,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
 
       {showDelete &&
       <TouchableOpacity
-      style={styles.deleteButton}
+      style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto"}}
       onPress={() => {
         setShowDelete(false);
         deleteItem(name);
