@@ -23,8 +23,6 @@ const Chats = ({ navigation }) => {
   },[navigation])
 
   const loadContactsWithChats = async () => {
-    //prevent "flicker" of loading indicator for small updates of state
-    chats.length === 0 &&
     setLoading(true);
     //create array copy using slice, then sort by timestamp
     var contactsWithChats = await getContactsWithChats();
@@ -32,8 +30,7 @@ const Chats = ({ navigation }) => {
     .sort( (a,b) => a.timestamp > b.timestamp);
 
     setChats(contactsWithChats);
-
-    loading &&
+    
     setLoading(false);
   }
 

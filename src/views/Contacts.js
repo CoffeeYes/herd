@@ -6,7 +6,9 @@ import ListItem from './ListItem';
 import Realm from 'realm';
 import Schemas from '../Schemas';
 import { getAllContacts, deleteContact } from '../realm/contactRealm';
-import { parseRealmID } from '../realm/helper'
+import { parseRealmID } from '../realm/helper';
+import { CommonActions } from '@react-navigation/native';
+
 
 const Contacts = ({ route, navigation }) => {
   const [contacts, setContacts] = useState([]);
@@ -50,6 +52,18 @@ const Contacts = ({ route, navigation }) => {
     );
   }
 
+  const navigateToNewChat = id => {
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [
+          { name: 'chats' },
+          { name: 'chat', params: { contactID: id },}
+        ],
+      })
+    );
+  }
+
   return (
     <>
       <Header
@@ -69,7 +83,7 @@ const Contacts = ({ route, navigation }) => {
           navigation={navigation}
           image={contact.image}
           onPress={() => route.params.type === "newChat" ?
-            navigation.navigate("chat", {contactID : parseRealmID(contact)})
+            navigateToNewChat(parseRealmID(contact))
             :
             navigation.navigate("contact", {id : parseRealmID(contact)})
           }
