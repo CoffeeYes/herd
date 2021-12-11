@@ -89,19 +89,23 @@ const getContactsWithChats = async () => {
   receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
-    var timestamps = [];
+    var lastMessages = [];
     for(var key in keys) {
       const currentKey = keys[key];
       const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
+      console.log(currentLastMessage)
       currentLastMessage &&
-      timestamps.push({key : currentKey, timestamp : currentLastMessage.timestamp});
+      lastMessages.push({key : currentKey, message : currentLastMessage});
     }
-    //create new contacts array with timestamps because realm doesnt allow mutation in place
+    //create new contacts array with last message text and timestamp
+    // because realm doesnt allow mutation in place
     var contacts = getContactsByKey(keys);
     var contactsWithTimestamps = [];
     contacts.map(contact => {
       let currentContact = JSON.parse(JSON.stringify(contact));
-      currentContact.timestamp = timestamps.find(timestamp => timestamp.key == contact.key)?.timestamp;
+      const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
+      currentContact.timestamp = matchingMessage?.timestamp;
+      currentContact.lastText = matchingMessage?.text;
       contactsWithTimestamps.push(currentContact);
     })
     return contactsWithTimestamps;
