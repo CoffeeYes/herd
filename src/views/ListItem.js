@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
-                    imageContainerStyle, imageSize, rightText }) => {
+                    imageContainerStyle, imageSize, rightText, subText, subTextStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
 
   return (
@@ -20,7 +20,16 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
         imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
         imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
-      <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
+      <View style={{flex : 1}}>
+        <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
+
+        {subText &&
+        <View style={styles.subTextContainer}>
+          <Text
+          numberOfLines={1}
+          style={{...styles.subText,...subTextStyle}}>{subText}</Text>
+        </View>}
+      </View>
 
       {rightText &&
       <Text style={{marginLeft : "auto", marginRight : 10}}>{rightText}</Text>}
@@ -65,8 +74,14 @@ const styles = {
     justifyContent : "center"
   },
   chatText : {
-    fontSize : 16
+    fontSize : 16,
   },
+  subTextContainer : {
+    paddingRight : 10,
+  },
+  subText : {
+    color : "grey"
+  }
 }
 
 export default ListItem;

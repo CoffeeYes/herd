@@ -30,7 +30,7 @@ const Chats = ({ navigation }) => {
     .sort( (a,b) => a.timestamp > b.timestamp);
 
     setChats(contactsWithChats);
-    
+
     setLoading(false);
   }
 
@@ -70,6 +70,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
+        textStyle={{fontWeight : "bold"}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
         }
         deleteItem={() => deleteChat(chat.key)}
@@ -78,7 +79,8 @@ const Chats = ({ navigation }) => {
             "Today"
             :
             moment(chat.timestamp).format("DD/MM"))
-        }/>
+        }
+        subText={chat.lastText}/>
       )}
       </ScrollView>
     </>
