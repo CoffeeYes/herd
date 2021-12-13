@@ -57,7 +57,7 @@ const Contacts = ({ route, navigation }) => {
       CommonActions.reset({
         index: 1,
         routes: [
-          { name: 'chats' },
+          { name: 'main' },
           { name: 'chat', params: { contactID: id },}
         ],
       })
