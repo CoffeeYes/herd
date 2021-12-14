@@ -152,9 +152,9 @@ const EditContact = ({ route, navigation }) => {
         onPress={save}
         timeout={500}
         disabled={
-          (name.trim() === originalContact.name || name === originalContact.name) &&
-          (publicKey.trim() === originalContact.key || publicKey === originalContact.key) &&
-          contactImage === originalContact.image
+          (name.trim() === originalContact.name.trim() || name === originalContact.name) &&
+          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key)
+          // contactImage === originalContact.image
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
