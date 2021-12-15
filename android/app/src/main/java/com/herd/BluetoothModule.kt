@@ -386,7 +386,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private inner class BTConnectionThread(private val socket : BluetoothSocket, private val handler : Handler) : Thread() {
       private val inputStream : InputStream = socket.inputStream;
       private val outputStream : OutputStream = socket.outputStream;
-      private val buffer : ByteArray = ByteArray(1024);
+      private val buffer : ByteArray = ByteArray(8192);
 
       override fun run() {
           Log.d(TAG, "Bluetooth Connection Thread Started")

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
@@ -9,19 +9,63 @@ import navigationRef from '../NavigationRef';
 const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device");
+  const [otherKey, _setOtherKey] = useState("");
+  const [keyReceived, _setKeyReceived] = useState(false);
+  const [keySent, _setKeySent] = useState(false);
+
+  const otherKeyRef = useRef();
+  const keyReceivedRef = useRef();
+  const keySentRef = useRef();
+
+  const setOtherKey = data => {
+    otherKeyRef.current = data;
+    _setOtherKey(data);
+  }
+  const setKeyReceived = data => {
+    keyReceivedRef.current = data;
+    _setKeyReceived(data);
+  }
+  const setKeySent = data => {
+    keySentRef.current = data;
+    _setKeySent(data);
+  }
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
     var messageListener;
     if(visible) {
       messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
-        console.log(msg)
+        try {
+          const message = JSON.parse(msg);
+          console.log(message);
+          if(message?.key) {
+            setOtherKey(message.key);
+            setKeyReceived(true);
+            Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
+          }
+          if(message?.haveReceivedKey) {
+            setKeySent(true);
+          }
+        }
+        catch(e) {
+          console.log("Error parsing JSON : ",e);
+        }
       });
     }
     else {
       messageListener?.remove();
+      setKeySent(false);
+      setKeyReceived(false);
+      setOtherKey("");
     }
   },[visible])
+
+  useEffect(() => {
+    if(keySentRef.current && keyReceivedRef.current) {
+      navigationRef.current.navigate("createcontact",{publicKey : otherKeyRef.current});
+      setVisible(false);
+    }
+  },[keySentRef.current,keyReceivedRef.current])
 
   const cancel = async () => {
     await Bluetooth.cancelListenAsServer();
@@ -32,7 +76,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
   const test = async () => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-    await Bluetooth.writeToBTConnection(key);
+    await Bluetooth.writeToBTConnection(JSON.stringify({key : key}));
   }
 
   return (
