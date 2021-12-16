@@ -390,6 +390,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       override fun run() {
           Log.d(TAG, "Bluetooth Connection Thread Started")
+
+          context.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTConnectionStateChange","Connected")
+
           var numBytes: Int;
           // Keep listening to the InputStream until an exception occurs.
           while (true) {

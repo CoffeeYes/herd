@@ -33,11 +33,21 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
     var messageListener;
+    var stateChangeListener;
+
     if(visible) {
+      //listen for connected state to begin key exchange
+      stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
+        if(state === "Connected") {
+          setActivityText("Connected, Waiting for Data");
+          const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+          await Bluetooth.writeToBTConnection(JSON.stringify({key : key}));
+        }
+      })
+      //listen for messages to receive keys and ACKS
       messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
         try {
           const message = JSON.parse(msg);
-          console.log(message);
           if(message?.key) {
             setOtherKey(message.key);
             setKeyReceived(true);
@@ -52,14 +62,18 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
         }
       });
     }
+    //remove all listeners and cancel threads, reset variables
     else {
       messageListener?.remove();
+      stateChangeListener?.remove();
+      Bluetooth.cancelBTConnectionThread();
       setKeySent(false);
       setKeyReceived(false);
       setOtherKey("");
     }
   },[visible])
 
+  //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
       navigationRef.current.navigate("createcontact",{publicKey : otherKeyRef.current});
@@ -74,11 +88,6 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     setVisible(false);
   }
 
-  const test = async () => {
-    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-    await Bluetooth.writeToBTConnection(JSON.stringify({key : key}));
-  }
-
   return (
     <CustomModal
     visible={visible}
@@ -91,7 +100,6 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
           buttonStyle={{marginTop : 10}}
           text="Cancel"/>
           <CustomButton
-          onPress={test}
           buttonStyle={{marginTop : 10}}
           text="test"/>
         </View>
