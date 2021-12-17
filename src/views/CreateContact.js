@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
@@ -133,10 +133,10 @@ const CreateContact = ({ navigation, route}) => {
   },[navigation])
 
   return (
-    <View>
+    <>
       <Header title="Create Contact" allowGoBack/>
 
-      <View style={{padding : 20}}>
+      <ScrollView contentContainerStyle={{padding : 20}}>
         <Text style={styles.error}>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
@@ -167,8 +167,8 @@ const CreateContact = ({ navigation, route}) => {
         onPress={createNewContact}
         disabled={username.trim().length === 0 || publicKey.trim().length === 0}/>
 
-      </View>
-  </View>
+      </ScrollView>
+  </>
   )
 }
 
