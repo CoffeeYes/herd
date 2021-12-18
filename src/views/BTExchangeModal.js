@@ -66,6 +66,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     else {
       messageListener?.remove();
       stateChangeListener?.remove();
+      Bluetooth.cancelListenAsServer();
+      Bluetooth.cancelConnectAsClient();
       Bluetooth.cancelBTConnectionThread();
       setKeySent(false);
       setKeyReceived(false);

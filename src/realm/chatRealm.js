@@ -93,7 +93,6 @@ const getContactsWithChats = async () => {
     for(var key in keys) {
       const currentKey = keys[key];
       const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
-      console.log(currentLastMessage)
       currentLastMessage &&
       lastMessages.push({key : currentKey, message : currentLastMessage});
     }
