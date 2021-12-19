@@ -93,7 +93,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   return (
     <CustomModal
     visible={visible}
-    setVisible={setVisible}>
+    setVisible={setVisible}
+    disableHideOnPress>
         <View style={styles.modalContentContainer}>
           {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
           <Text>{activityText}</Text>
@@ -101,9 +102,6 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
           onPress={cancel}
           buttonStyle={{marginTop : 10}}
           text="Cancel"/>
-          <CustomButton
-          buttonStyle={{marginTop : 10}}
-          text="test"/>
         </View>
     </CustomModal>
   )

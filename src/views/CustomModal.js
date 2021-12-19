@@ -1,18 +1,23 @@
 import React from 'react';
-import { Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { Modal, TouchableOpacity, Dimensions, View } from 'react-native';
 
-const CustomModal = ({ children, visible, setVisible }) => {
+const CustomModal = ({ children, visible, setVisible, disableHideOnPress }) => {
   return (
     <Modal
     animationType="fade"
     transparent={true}
     onRequestClose={() => setVisible(false)}
     visible={visible}>
+      {disableHideOnPress ?
+      <View style={styles.modalMainContainer}>
+        {children}
+      </View>
+      :
       <TouchableOpacity
       style={styles.modalMainContainer}
       onPress={() => setVisible(false)}>
-        {children} 
-      </TouchableOpacity>
+        {children}
+      </TouchableOpacity>}
     </Modal>
   )
 }
