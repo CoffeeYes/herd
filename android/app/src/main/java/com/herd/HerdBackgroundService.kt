@@ -7,6 +7,11 @@ import android.util.Log
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.BluetoothLeScanner
+import android.bluetooth.le.BluetoothLeAdvertiser
+import android.bluetooth.le.AdvertiseData
+import android.bluetooth.le.AdvertisingSetParameters
+import android.bluetooth.le.AdvertisingSetCallback
+import android.bluetooth.le.AdvertisingSet
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanFilter
@@ -26,6 +31,7 @@ class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
   private var bluetoothAdapter : BluetoothAdapter? = null;
   private var BLEScanner : BluetoothLeScanner? = null;
+  private var BLEAdvertiser : BluetoothLeAdvertiser? = null;
   private final val serviceUUID = ParcelUuid(UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa"));
 
   companion object {
@@ -126,9 +132,54 @@ class HerdBackgroundService : Service() {
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
   }
 
+  private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
+    override fun onAdvertisingSetStarted(advertisingSet : AdvertisingSet?, txPower : Int, status : Int) {
+      Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: "
+      + status);
+      /* currentAdvertisingSet = advertisingSet; */
+    }
+
+    override fun onAdvertisingDataSet(advertisingSet : AdvertisingSet?, status : Int) {
+      Log.i(TAG, "onAdvertisingDataSet() :status:" + status);
+    }
+
+    override fun onScanResponseDataSet(advertisingSet : AdvertisingSet?,status : Int) {
+      Log.i(TAG, "onScanResponseDataSet(): status:" + status);
+    }
+
+    override fun onAdvertisingSetStopped(advertisingSet : AdvertisingSet?) {
+      Log.i(TAG, "onAdvertisingSetStopped():");
+    }
+  };
+
+  fun advertiseLE() {
+    BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+    if(BLEAdvertiser != null) {
+      Log.i(TAG,"Bluetooth LE Advertiser Found");
+
+      if(bluetoothAdapter?.isLe2MPhySupported() as Boolean) {
+        val advertisingParameters = AdvertisingSetParameters.Builder()
+        .setLegacyMode(false) // True by default, but set here as a reminder.
+        /* .setConnectable(true) */ // cant be both connectable and scannable
+        .setScannable(true)
+        .setInterval(AdvertisingSetParameters.INTERVAL_MEDIUM)
+        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
+        .build();
+
+        val advertisingData = AdvertiseData.Builder()
+        .addServiceUuid(serviceUUID)
+        .setIncludeDeviceName(true)
+        .build()
+
+        BLEAdvertiser?.startAdvertisingSet(advertisingParameters,advertisingData,null,null,null,advertisingCallback)
+      }
+    }
+  }
+
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
         scanLeDevice();
+        advertiseLE();
         running = true;
         return Service.START_STICKY
     }
@@ -141,6 +192,7 @@ class HerdBackgroundService : Service() {
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
       BLEScanner?.stopScan(leScanCallback)
+      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
       running = false;
   }
 }
