@@ -153,26 +153,48 @@ class HerdBackgroundService : Service() {
   };
 
   fun advertiseLE() {
+    //https://source.android.com/devices/bluetooth/ble_advertising
     BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
       Log.i(TAG,"Bluetooth LE Advertiser Found");
+      // Check if all features are supported
+      if (!(bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
+          Log.e(TAG, "2M PHY not supported!");
+          return;
+      }
+      if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
+          Log.e(TAG, "LE Extended Advertising not supported!");
+          return;
+      }
+
+      var advertisingParameters : AdvertisingSetParameters.Builder? = null;
+
+      val advertisingData = AdvertiseData.Builder()
+      .addServiceUuid(serviceUUID)
+      .setIncludeDeviceName(true)
+      .build()
 
       if(bluetoothAdapter?.isLe2MPhySupported() as Boolean) {
-        val advertisingParameters = AdvertisingSetParameters.Builder()
+        val maxDataLength : Int? = bluetoothAdapter?.getLeMaximumAdvertisingDataLength();
+
+        advertisingParameters = AdvertisingSetParameters.Builder()
+        .setLegacyMode(false)
+        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
+        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_MEDIUM)
+        .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+        .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
+
+      }
+      else {
+        advertisingParameters = AdvertisingSetParameters.Builder()
         .setLegacyMode(false) // True by default, but set here as a reminder.
         /* .setConnectable(true) */ // cant be both connectable and scannable
         .setScannable(true)
         .setInterval(AdvertisingSetParameters.INTERVAL_MEDIUM)
-        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
-        .build();
+        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW);
 
-        val advertisingData = AdvertiseData.Builder()
-        .addServiceUuid(serviceUUID)
-        .setIncludeDeviceName(true)
-        .build()
-
-        BLEAdvertiser?.startAdvertisingSet(advertisingParameters,advertisingData,null,null,null,advertisingCallback)
       }
+      BLEAdvertiser?.startAdvertisingSet(advertisingParameters?.build(),advertisingData,null,null,null,advertisingCallback)
     }
   }
 
