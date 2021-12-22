@@ -160,21 +160,19 @@ class HerdBackgroundService : Service() {
       // Check if all features are supported
       if (!(bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
           Log.e(TAG, "2M PHY not supported!");
-          return;
+          /* return; */
       }
       if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
           Log.e(TAG, "LE Extended Advertising not supported!");
-          return;
+          /* return; */
       }
 
       var advertisingParameters : AdvertisingSetParameters.Builder? = null;
 
-      val advertisingData = AdvertiseData.Builder()
+      var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(serviceUUID)
-      .setIncludeDeviceName(true)
-      .build()
 
-      if(bluetoothAdapter?.isLe2MPhySupported() as Boolean) {
+      if((bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
         val maxDataLength : Int? = bluetoothAdapter?.getLeMaximumAdvertisingDataLength();
 
         advertisingParameters = AdvertisingSetParameters.Builder()
@@ -184,17 +182,33 @@ class HerdBackgroundService : Service() {
         .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
 
+        //include device name when extended advertising is supported
+        if((bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
+          advertisingData.setIncludeDeviceName(true);
+        }
+        else {
+          advertisingData.setIncludeDeviceName(false);
+        }
+
       }
       else {
+        Log.i(TAG,"Using Legacy BLE advertising")
         advertisingParameters = AdvertisingSetParameters.Builder()
-        .setLegacyMode(false) // True by default, but set here as a reminder.
+        .setLegacyMode(true) // True by default, but set here as a reminder.
         /* .setConnectable(true) */ // cant be both connectable and scannable
         .setScannable(true)
         .setInterval(AdvertisingSetParameters.INTERVAL_MEDIUM)
         .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW);
 
+        //dont include device name in legacy mode as advertisingData size is limited
+        advertisingData.setIncludeDeviceName(false);
       }
-      BLEAdvertiser?.startAdvertisingSet(advertisingParameters?.build(),advertisingData,null,null,null,advertisingCallback)
+      BLEAdvertiser?.startAdvertisingSet(
+        advertisingParameters?.build(),
+        advertisingData?.build(),
+        null,null,null,
+        advertisingCallback
+      )
     }
   }
 
