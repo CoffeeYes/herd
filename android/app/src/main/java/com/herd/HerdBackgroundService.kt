@@ -2,6 +2,7 @@ package com.herd
 
 import android.app.Service
 import android.content.Intent
+import android.content.Context
 import android.os.IBinder
 import android.util.Log
 
@@ -16,7 +17,15 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
+
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
+
 import android.os.Handler
 import android.os.ParcelUuid
 import java.util.UUID
@@ -32,7 +41,9 @@ class HerdBackgroundService : Service() {
   private var bluetoothAdapter : BluetoothAdapter? = null;
   private var BLEScanner : BluetoothLeScanner? = null;
   private var BLEAdvertiser : BluetoothLeAdvertiser? = null;
-  private final val serviceUUID = ParcelUuid(UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa"));
+  private val serviceUUID = UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa");
+  private final val parcelServiceUUID = ParcelUuid(serviceUUID);
+  private val bluetoothManager : BluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
   companion object {
     var running : Boolean = false;
@@ -122,7 +133,7 @@ class HerdBackgroundService : Service() {
           }
       } */
       val filter = ScanFilter.Builder()
-      .setServiceUuid(serviceUUID)
+      .setServiceUuid(parcelServiceUUID)
       .build()
 
       val settings = ScanSettings.Builder()
@@ -170,7 +181,7 @@ class HerdBackgroundService : Service() {
       var advertisingParameters : AdvertisingSetParameters.Builder? = null;
 
       var advertisingData = AdvertiseData.Builder()
-      .addServiceUuid(serviceUUID)
+      .addServiceUuid(parcelServiceUUID)
 
       if((bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
         val maxDataLength : Int? = bluetoothAdapter?.getLeMaximumAdvertisingDataLength();
@@ -210,6 +221,47 @@ class HerdBackgroundService : Service() {
         advertisingCallback
       )
     }
+  }
+
+  private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
+    override fun onConnectionStateChange(device : BluetoothDevice, stats : Int, newState : Int) {
+
+    }
+
+    override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
+       offset : Int, characteristic : BluetoothGattCharacteristic) {
+
+    }
+
+    override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
+       characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
+       responseNeeded : Boolean, offset : Int, value : ByteArray) {
+
+    }
+
+    override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, descriptor : BluetoothGattDescriptor) {
+
+    }
+
+    override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
+      descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
+      responseNeeded : Boolean, offset : Int, value : ByteArray) {
+
+    }
+  }
+
+  fun startGATTService() {
+    val server : BluetoothGattServer = bluetoothManager.openGattServer(this, bluetoothGattServerCallback);
+    val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
+    val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(UUID.fromString("11112902-1111-1111-8111-00805f9b34fb"),
+                    BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE or
+                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                    BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE);
+    characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE));
+    service.addCharacteristic(characteristic);
+
+    server.addService(service);
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
