@@ -43,7 +43,8 @@ class HerdBackgroundService : Service() {
   private var BLEAdvertiser : BluetoothLeAdvertiser? = null;
   private val serviceUUID = UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa");
   private final val parcelServiceUUID = ParcelUuid(serviceUUID);
-  private val bluetoothManager : BluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+  private var bluetoothManager : BluetoothManager? = null;
+  private var gattServer : BluetoothGattServer? = null;
 
   companion object {
     var running : Boolean = false;
@@ -251,21 +252,26 @@ class HerdBackgroundService : Service() {
     }
   }
 
+
   fun startGATTService() {
-    val server : BluetoothGattServer = bluetoothManager.openGattServer(this, bluetoothGattServerCallback);
+
+    val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329")
+
     val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
-    val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(UUID.fromString("11112902-1111-1111-8111-00805f9b34fb"),
+    val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
                     BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE or
                     BluetoothGattCharacteristic.PROPERTY_NOTIFY,
                     BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE);
-    characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE));
+    /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
     service.addCharacteristic(characteristic);
 
-    server.addService(service);
+    gattServer?.addService(service);
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
+        bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
         scanLeDevice();
         advertiseLE();
         running = true;
@@ -281,6 +287,7 @@ class HerdBackgroundService : Service() {
       Log.i(TAG, "Service onDestroy")
       BLEScanner?.stopScan(leScanCallback)
       BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
+      gattServer?.close();
       running = false;
   }
 }
