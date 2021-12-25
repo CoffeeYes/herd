@@ -133,8 +133,9 @@ class HerdBackgroundService : Service() {
               scanner.stopScan(leScanCallback)
           }
       } */
+      val bitmask = ParcelUuid(UUID.fromString("ffffffff-ffff-ffff-ffff-ffffffffffff"));
       val filter = ScanFilter.Builder()
-      .setServiceUuid(parcelServiceUUID)
+      .setServiceUuid(parcelServiceUUID,bitmask)
       .build()
 
       val settings = ScanSettings.Builder()
@@ -142,6 +143,7 @@ class HerdBackgroundService : Service() {
       .build()
 
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
+      /* BLEScanner?.startScan(leScanCallback); */
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -179,7 +181,9 @@ class HerdBackgroundService : Service() {
           /* return; */
       }
 
-      var advertisingParameters : AdvertisingSetParameters.Builder? = null;
+      var advertisingParameters = AdvertisingSetParameters.Builder()
+      .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
+      .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
 
       var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(parcelServiceUUID)
@@ -187,10 +191,8 @@ class HerdBackgroundService : Service() {
       if((bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
         val maxDataLength : Int? = bluetoothAdapter?.getLeMaximumAdvertisingDataLength();
 
-        advertisingParameters = AdvertisingSetParameters.Builder()
+        advertisingParameters
         .setLegacyMode(false)
-        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
-        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_MEDIUM)
         .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
 
@@ -205,18 +207,19 @@ class HerdBackgroundService : Service() {
       }
       else {
         Log.i(TAG,"Using Legacy BLE advertising")
-        advertisingParameters = AdvertisingSetParameters.Builder()
+
+        advertisingParameters
         .setLegacyMode(true) // True by default, but set here as a reminder.
-        /* .setConnectable(true) */ // cant be both connectable and scannable
-        .setScannable(true)
-        .setInterval(AdvertisingSetParameters.INTERVAL_MEDIUM)
+        .setConnectable(true)
+        /* .setScannable(true) */
+        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
         .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW);
 
         //dont include device name in legacy mode as advertisingData size is limited
         advertisingData.setIncludeDeviceName(false);
       }
       BLEAdvertiser?.startAdvertisingSet(
-        advertisingParameters?.build(),
+        advertisingParameters.build(),
         advertisingData?.build(),
         null,null,null,
         advertisingCallback
@@ -266,12 +269,13 @@ class HerdBackgroundService : Service() {
     service.addCharacteristic(characteristic);
 
     gattServer?.addService(service);
+    gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
         bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
+        startGATTService();
         scanLeDevice();
         advertiseLE();
         running = true;
