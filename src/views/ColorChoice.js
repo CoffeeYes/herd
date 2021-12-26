@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ useEffect } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -12,7 +12,7 @@ const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
         color={color}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
-        onColorChange={color => setColor(color)}
+        onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
       />
     </View>
   )
@@ -42,5 +42,10 @@ const styles = {
   },
   icon : {
     marginRight : 10
+  },
+  error : {
+    fontWeight : "bold",
+    color : "red",
+    marginTop : 10
   }
 }
