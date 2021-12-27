@@ -184,6 +184,7 @@ class HerdBackgroundService : Service() {
       var advertisingParameters = AdvertisingSetParameters.Builder()
       .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
       .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
+      .setConnectable(true)
 
       var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(parcelServiceUUID)
@@ -210,8 +211,7 @@ class HerdBackgroundService : Service() {
 
         advertisingParameters
         .setLegacyMode(true) // True by default, but set here as a reminder.
-        .setConnectable(true)
-        /* .setScannable(true) */
+        .setScannable(true)
         .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
         .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW);
 
@@ -257,19 +257,23 @@ class HerdBackgroundService : Service() {
 
 
   fun startGATTService() {
+    try {
+      val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329")
 
-    val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329")
+      val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
+      val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
+        BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE or
+        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+        BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE);
+        /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
+        service.addCharacteristic(characteristic);
 
-    val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
-    val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
-                    BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE or
-                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                    BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE);
-    /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
-    service.addCharacteristic(characteristic);
-
-    gattServer?.addService(service);
-    gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
+        gattServer?.addService(service);
+        gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
+    }
+    catch(e : Exception) {
+      Log.d(TAG,"Error creating bluetooth GATT Server : " + e as String);
+    }
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
