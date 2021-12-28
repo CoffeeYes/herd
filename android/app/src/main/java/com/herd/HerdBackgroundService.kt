@@ -144,6 +144,7 @@ class HerdBackgroundService : Service() {
 
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
       /* BLEScanner?.startScan(leScanCallback); */
+      Log.i(TAG,"BLE Scanning started");
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -170,15 +171,12 @@ class HerdBackgroundService : Service() {
     //https://source.android.com/devices/bluetooth/ble_advertising
     BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
+      var useLegacyMode : Boolean = false;
       Log.i(TAG,"Bluetooth LE Advertiser Found");
       // Check if all features are supported
       if (!(bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
           Log.e(TAG, "2M PHY not supported!");
-          /* return; */
-      }
-      if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
-          Log.e(TAG, "LE Extended Advertising not supported!");
-          /* return; */
+          useLegacyMode = true;
       }
 
       var advertisingParameters = AdvertisingSetParameters.Builder()
@@ -188,35 +186,29 @@ class HerdBackgroundService : Service() {
 
       var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(parcelServiceUUID)
+      .setIncludeDeviceName(true);
 
-      if((bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
-        val maxDataLength : Int? = bluetoothAdapter?.getLeMaximumAdvertisingDataLength();
+      if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
+        Log.e(TAG, "LE Extended Advertising not supported!");
+        //dont include device name when extended advertising is not supported as only 31 bytes are available
+        advertisingData.setIncludeDeviceName(false);
+        useLegacyMode = true;
+      }
+
+      if(!useLegacyMode) {
+        Log.i(TAG,"Using BLE 5 2MPHY with extended advertising")
 
         advertisingParameters
         .setLegacyMode(false)
         .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
-
-        //include device name when extended advertising is supported
-        if((bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
-          advertisingData.setIncludeDeviceName(true);
-        }
-        else {
-          advertisingData.setIncludeDeviceName(false);
-        }
-
       }
       else {
         Log.i(TAG,"Using Legacy BLE advertising")
 
         advertisingParameters
-        .setLegacyMode(true) // True by default, but set here as a reminder.
-        .setScannable(true)
-        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
-        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW);
-
-        //dont include device name in legacy mode as advertisingData size is limited
-        advertisingData.setIncludeDeviceName(false);
+        .setLegacyMode(true)
+        .setScannable(true);
       }
       BLEAdvertiser?.startAdvertisingSet(
         advertisingParameters.build(),
@@ -270,6 +262,7 @@ class HerdBackgroundService : Service() {
 
         gattServer?.addService(service);
         gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
+        Log.i(TAG,"BLE Gatt Server Started");
     }
     catch(e : Exception) {
       Log.d(TAG,"Error creating bluetooth GATT Server : " + e as String);
