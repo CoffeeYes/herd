@@ -102,11 +102,16 @@ class HerdBackgroundService : Service() {
   }
 
   val leScanCallback: ScanCallback = object : ScanCallback() {
+      val deviceList = mutableSetOf<BluetoothDevice>();
       override fun onScanResult(callbackType: Int, result: ScanResult) {
           super.onScanResult(callbackType, result);
           Log.i(TAG, "BLE Scan Result Callback Invoked")
           //perform actions related to finding a device
           val device : BluetoothDevice = result.getDevice();
+          if(!(deviceList.contains(device))) {
+            deviceList.add(device);
+            Log.i(TAG,"Device List Length : " + deviceList.size);
+          }
           val name = device.getName();
           val address = device.getAddress();
           Log.i(TAG, "device name : " + name);
@@ -265,7 +270,7 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"BLE Gatt Server Started");
     }
     catch(e : Exception) {
-      Log.d(TAG,"Error creating bluetooth GATT Server : " + e as String);
+      Log.d(TAG,"Error creating bluetooth GATT Server : " + e);
     }
   }
 
