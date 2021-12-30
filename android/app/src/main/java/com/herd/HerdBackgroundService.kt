@@ -108,14 +108,22 @@ class HerdBackgroundService : Service() {
           Log.i(TAG, "BLE Scan Result Callback Invoked")
           //perform actions related to finding a device
           val device : BluetoothDevice = result.getDevice();
-          if(!(deviceList.contains(device))) {
-            deviceList.add(device);
-            Log.i(TAG,"Device List Length : " + deviceList.size);
+          if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
+            if(deviceList.contains(device)) {
+              deviceList.remove(device);
+              Log.i(TAG,"Device removed from device list")
+            }
+          }
+          else {
+            if(!(deviceList.contains(device))) {
+              deviceList.add(device);
+            }
           }
           val name = device.getName();
           val address = device.getAddress();
           Log.i(TAG, "device name : " + name);
           Log.i(TAG, "device Address : " + address);
+          Log.i(TAG,"Device List Length : " + deviceList.size);
       }
   }
 
@@ -145,6 +153,10 @@ class HerdBackgroundService : Service() {
 
       val settings = ScanSettings.Builder()
       .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+      /* .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES) */
+      .setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH or ScanSettings.CALLBACK_TYPE_MATCH_LOST)
+      .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
+      .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
