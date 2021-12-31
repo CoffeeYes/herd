@@ -7,6 +7,7 @@ import android.os.IBinder
 import android.util.Log
 
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.bluetooth.le.AdvertiseData
@@ -20,9 +21,11 @@ import android.bluetooth.le.ScanSettings
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothGattServer
 import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 
@@ -45,6 +48,7 @@ class HerdBackgroundService : Service() {
   private final val parcelServiceUUID = ParcelUuid(serviceUUID);
   private var bluetoothManager : BluetoothManager? = null;
   private var gattServer : BluetoothGattServer? = null;
+  private val context : Context = this;
 
   companion object {
     var running : Boolean = false;
@@ -101,6 +105,34 @@ class HerdBackgroundService : Service() {
       }
   }
 
+  private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
+    override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+      Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+          else -> "UNKNOWN STATE"
+      });
+    }
+
+    override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead");
+    }
+
+    override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
+         Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicWrite");
+    }
+
+    override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorRead");
+    }
+
+    override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+        Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorWrite");
+    }
+  }
+
   val leScanCallback: ScanCallback = object : ScanCallback() {
       val deviceList = mutableSetOf<BluetoothDevice>();
       override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -108,6 +140,9 @@ class HerdBackgroundService : Service() {
           Log.i(TAG, "BLE Scan Result Callback Invoked")
           //perform actions related to finding a device
           val device : BluetoothDevice = result.getDevice();
+          val name = device.getName();
+          val address = device.getAddress();
+
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
             if(deviceList.contains(device)) {
               deviceList.remove(device);
@@ -117,10 +152,12 @@ class HerdBackgroundService : Service() {
           else {
             if(!(deviceList.contains(device))) {
               deviceList.add(device);
+              if(address != null) {
+                val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
+                remoteDeviceInstance?.connectGatt(context,true,bluetoothGattClientCallback);
+              }
             }
           }
-          val name = device.getName();
-          val address = device.getAddress();
           Log.i(TAG, "device name : " + name);
           Log.i(TAG, "device Address : " + address);
           Log.i(TAG,"Device List Length : " + deviceList.size);
@@ -238,29 +275,29 @@ class HerdBackgroundService : Service() {
 
   private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
     override fun onConnectionStateChange(device : BluetoothDevice, stats : Int, newState : Int) {
-
+      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange");
     }
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
-       offset : Int, characteristic : BluetoothGattCharacteristic) {
-
+      offset : Int, characteristic : BluetoothGattCharacteristic) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest");
     }
 
     override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
        characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
        responseNeeded : Boolean, offset : Int, value : ByteArray) {
-
+         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
     }
 
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
-
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
     }
 
     override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
       descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
       responseNeeded : Boolean, offset : Int, value : ByteArray) {
-
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
     }
   }
 
