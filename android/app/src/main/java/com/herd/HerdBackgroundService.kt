@@ -142,11 +142,15 @@ class HerdBackgroundService : Service() {
           val device : BluetoothDevice = result.getDevice();
           val name = device.getName();
           val address = device.getAddress();
+          var gattInstance : BluetoothGatt? = null;
 
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
             if(deviceList.contains(device)) {
               deviceList.remove(device);
-              Log.i(TAG,"Device removed from device list")
+              Log.i(TAG,"Device removed from device list");
+              if(gattInstance != null) {
+                gattInstance.close();
+              }
             }
           }
           else {
@@ -154,7 +158,12 @@ class HerdBackgroundService : Service() {
               deviceList.add(device);
               if(address != null) {
                 val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
-                remoteDeviceInstance?.connectGatt(context,true,bluetoothGattClientCallback);
+                gattInstance = remoteDeviceInstance?.connectGatt(
+                  context,
+                  true,
+                  bluetoothGattClientCallback,
+                  BluetoothDevice.TRANSPORT_LE
+                );
               }
             }
           }
