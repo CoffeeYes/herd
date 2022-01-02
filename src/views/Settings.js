@@ -129,7 +129,7 @@ const Settings = ({ navigation }) => {
           will not be transmitted
           </Text>}
           <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text>Background Transfers</Text>
+            <Text style={{fontWeight : "bold"}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}
@@ -200,7 +200,8 @@ const Settings = ({ navigation }) => {
 const styles = {
   warning : {
     color : "red",
-    maxWidth : 300
+    maxWidth : 300,
+    fontWeight : "bold"
   },
   buttonMargin : {
     marginTop : 10
