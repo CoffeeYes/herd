@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Button, Platform, Dimensions } from 'react-native';
-import palette from '../assets/palette.js';
 import Crypto from '../nativeWrapper/Crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomButton from './CustomButton';
 
 const Splash = ({ navigation }) => {
   const [textWidth, setTextWidth] = useState(100);
@@ -36,12 +36,13 @@ const Splash = ({ navigation }) => {
       <Text style={{color : "white",marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
         Welcome to Herd, the peer-to-peer messaging app!
       </Text>
-      <Button
-      title="Get Started"
-      color={palette.secondary}
+
+      <CustomButton
+      text="Get Started"
       onPress={setup}
-      disabled={Platform.OS === "android" && Platform.Version < 23}
-      />
+      buttonStyle={{borderWidth : 1,borderColor : "white"}}
+      disabled={Platform.OS === "android" && Platform.Version < 23}/>
+
       {Platform.OS === "android" && Platform.Version < 23 &&
         <Text style={{color : "white", marginTop : 20, fontWeight : "bold", width : textWidth}}>
           Unfortunately, your device's software is too old to utilise the security features herd requires to run.
