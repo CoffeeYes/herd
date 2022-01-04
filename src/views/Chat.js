@@ -53,7 +53,7 @@ const Chat = ({ route, navigation }) => {
     const contact = getContactById(route.params.contactID);
     setContactInfo(contact);
     var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
-    if(newMessages.length === 0) {
+    if(newMessages.length === 0 && !route?.params?.newChat) {
       setAllowScrollToLoadMessages(false);
       showNoMoreMessagePopup();
       return;
