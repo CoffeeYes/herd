@@ -58,7 +58,7 @@ const Contacts = ({ route, navigation }) => {
         index: 1,
         routes: [
           { name: 'main' },
-          { name: 'chat', params: { contactID: id, newChat : true }}
+          { name: 'chat', params: { contactID: id }}
         ],
       })
     );
