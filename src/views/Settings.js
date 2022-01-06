@@ -13,7 +13,7 @@ import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
 import CardButton from './CardButton';
 
-import { deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
+import { getMessageQueue, deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
 const Settings = ({ navigation }) => {
@@ -95,7 +95,8 @@ const Settings = ({ navigation }) => {
 
       if(btEnabled && locationEnabled) {
         setBackgroundTransfer(true);
-        ServiceInterface.enableService();
+        const messageQueue = getMessageQueue();
+        ServiceInterface.enableService(messageQueue);
       }
     }
     else {
