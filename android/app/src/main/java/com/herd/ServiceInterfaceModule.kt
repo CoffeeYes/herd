@@ -15,9 +15,10 @@ import android.content.Context
 import android.app.Activity
 import android.app.ActivityManager
 import android.os.Bundle
-import android.os.Parcelable 
+import android.os.Parcelable
 import android.util.Log
 import kotlinx.parcelize.Parcelize
+import java.util.ArrayList
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext
@@ -32,13 +33,25 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val to : String,
     val from : String,
     val text : String,
-    val timestamp : Long
+    val timestamp : Int
   ) : Parcelable
 
   @ReactMethod
   fun enableService(messageQueue : ReadableArray) {
+    val msgQ : ArrayList<HerdMessage> = ArrayList();
+    for(i in 0 until messageQueue.size()) {
+      val currentMsg : HerdMessage = HerdMessage(
+        messageQueue.getMap(i).getString("to") as String,
+        messageQueue.getMap(i).getString("from") as String,
+        messageQueue.getMap(i).getString("text") as String,
+        messageQueue.getMap(i).getInt("timestamp")
+      )
+      msgQ.add(currentMsg);
+    }
+    /* Log.i(TAG,"TEST : " + messageQueue.getMap(0).getString("to")); */
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    serviceIntent.putExtra("messageQueue",msgQ);
     context.startService(serviceIntent);
   }
 
