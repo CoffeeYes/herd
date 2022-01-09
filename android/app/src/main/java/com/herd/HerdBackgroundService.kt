@@ -32,12 +32,24 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.os.Handler
 import android.os.ParcelUuid
 import java.util.UUID
+import java.util.ArrayList
+import android.os.Bundle
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.R.drawable
+
+@Parcelize
+class HerdMessage(
+  val to : String,
+  val from : String,
+  val text : String,
+  val timestamp : Int
+) : Parcelable
 
 class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
@@ -49,6 +61,7 @@ class HerdBackgroundService : Service() {
   private var bluetoothManager : BluetoothManager? = null;
   private var gattServer : BluetoothGattServer? = null;
   private val context : Context = this;
+  private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
 
   companion object {
     var running : Boolean = false;
@@ -334,6 +347,8 @@ class HerdBackgroundService : Service() {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
+        val bundle : Bundle? = intent?.getExtras();
+        messageQueue = bundle?.getParcelableArrayList("messageQueue");
         bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         startGATTService();
         scanLeDevice();
