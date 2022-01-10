@@ -20,6 +20,14 @@ import android.util.Log
 import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 
+@Parcelize
+data class HerdMessage(
+  val to : String,
+  val from : String,
+  val text : String,
+  val timestamp : Int
+) : Parcelable
+
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext
   private final val TAG = "ServiceInterfaceModule"
@@ -27,14 +35,6 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   override fun getName(): String {
       return "ServiceInterfaceModule"
   }
-
-  @Parcelize
-  class HerdMessage(
-    val to : String,
-    val from : String,
-    val text : String,
-    val timestamp : Int
-  ) : Parcelable
 
   @ReactMethod
   fun enableService(messageQueue : ReadableArray) {

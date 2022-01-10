@@ -43,13 +43,7 @@ import android.app.NotificationChannel
 import android.app.PendingIntent
 import android.R.drawable
 
-@Parcelize
-class HerdMessage(
-  val to : String,
-  val from : String,
-  val text : String,
-  val timestamp : Int
-) : Parcelable
+import com.herd.HerdMessage
 
 class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
