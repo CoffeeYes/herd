@@ -10,15 +10,18 @@ import com.facebook.react.bridge.ReadableMap;
 import com.herd.HerdBackgroundService
 
 import android.app.Service
+import android.content.ServiceConnection
 import android.content.Intent
 import android.content.Context
 import android.app.Activity
 import android.app.ActivityManager
 import android.os.Bundle
 import android.os.Parcelable
+import android.os.IBinder
 import android.util.Log
 import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
+import android.content.ComponentName
 
 @Parcelize
 data class HerdMessage(
@@ -29,8 +32,21 @@ data class HerdMessage(
 ) : Parcelable
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-  val context = reactContext
-  private final val TAG = "ServiceInterfaceModule"
+  val context = reactContext;
+  private final val TAG = "ServiceInterfaceModule";
+  private var iBinder: IBinder? = null;
+
+  var serviceConnection = object : ServiceConnection {
+    override fun onServiceConnected(name : ComponentName, binder : IBinder) {
+      Log.i(TAG,"Service Connected");
+      iBinder = binder;
+    }
+
+    override fun onServiceDisconnected(name : ComponentName) {
+      Log.i(TAG,"Service disconnected");
+      iBinder = null;
+    }
+  }
 
   override fun getName(): String {
       return "ServiceInterfaceModule"
@@ -53,6 +69,17 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     serviceIntent.putExtra("messageQueue",msgQ);
     context.startService(serviceIntent);
+    context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
+  }
+
+  @ReactMethod
+  fun addMessageToService(message : ReadableMap) {
+
+  }
+
+  @ReactMethod
+  fun removeMessageFromService(index : Int) {
+
   }
 
   @ReactMethod

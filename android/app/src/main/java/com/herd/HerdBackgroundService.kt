@@ -339,6 +339,19 @@ class HerdBackgroundService : Service() {
     }
   }
 
+  fun addMessage(message : HerdMessage) {
+
+  }
+
+  fun removeMessage(index : Int) {
+    try {
+      messageQueue?.removeAt(index);
+    }
+    catch(e : Exception) {
+      Log.d(TAG,"Error removing message from message queue",e);
+    }
+  }
+
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
         val bundle : Bundle? = intent?.getExtras();
