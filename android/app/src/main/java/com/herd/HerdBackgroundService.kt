@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.Context
 import android.os.IBinder
+import android.os.Binder
 import android.util.Log
 
 import android.bluetooth.BluetoothAdapter
@@ -60,6 +61,11 @@ class HerdBackgroundService : Service() {
   companion object {
     var running : Boolean = false;
   }
+
+  inner class LocalBinder : Binder() {
+    fun getService() : HerdBackgroundService = this@HerdBackgroundService
+  }
+  private val binder = LocalBinder();
 
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
@@ -366,7 +372,7 @@ class HerdBackgroundService : Service() {
 
   override fun onBind(intent : Intent) : IBinder? {
     Log.i(TAG, "Service onBind")
-    return null;
+    return binder;
   }
 
   override fun onDestroy() {

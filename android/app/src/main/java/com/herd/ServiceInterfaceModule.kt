@@ -34,17 +34,20 @@ data class HerdMessage(
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext;
   private final val TAG = "ServiceInterfaceModule";
-  private var iBinder: IBinder? = null;
+  private lateinit var service : HerdBackgroundService;
+  private var bound : Boolean = false;
 
   var serviceConnection = object : ServiceConnection {
     override fun onServiceConnected(name : ComponentName, binder : IBinder) {
       Log.i(TAG,"Service Connected");
-      iBinder = binder;
+      val tempBinder = binder as HerdBackgroundService.LocalBinder;
+      service = tempBinder.getService();
+      bound = true;
     }
 
     override fun onServiceDisconnected(name : ComponentName) {
       Log.i(TAG,"Service disconnected");
-      iBinder = null;
+      bound = false;
     }
   }
 
@@ -86,7 +89,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun disableService() {
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    context.unbindService(serviceConnection);
     context.stopService(serviceIntent);
+    bound = false;
   }
 
   @ReactMethod
