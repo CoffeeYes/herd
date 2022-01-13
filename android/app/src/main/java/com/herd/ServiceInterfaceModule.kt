@@ -77,12 +77,23 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   @ReactMethod
   fun addMessageToService(message : ReadableMap) {
+    if(bound) {
+      val msgParcel : HerdMessage = HerdMessage(
+        message.getString("to") as String,
+        message.getString("from") as String,
+        message.getString("text") as String,
+        message.getInt("timestamp")
+      )
 
+      service.addMessage(msgParcel)
+    }
   }
 
   @ReactMethod
   fun removeMessageFromService(index : Int) {
-
+    if(bound) {
+      service.removeMessage(index);
+    }
   }
 
   @ReactMethod
