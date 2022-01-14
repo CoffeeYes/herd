@@ -13,6 +13,7 @@ import {
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -124,7 +125,9 @@ const Chat = ({ route, navigation }) => {
 
     setChatInput("");
     setInputDisabled(false);
-    scrollRef.current.scrollToEnd({animated : true})
+    scrollRef.current.scrollToEnd({animated : true});
+
+    ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted});
   }
 
   const deleteMessages = () => {

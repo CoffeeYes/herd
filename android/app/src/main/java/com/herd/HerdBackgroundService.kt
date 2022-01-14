@@ -346,7 +346,7 @@ class HerdBackgroundService : Service() {
   }
 
   fun addMessage(message : HerdMessage) {
-
+    messageQueue?.add(message);
   }
 
   fun removeMessage(index : Int) {
