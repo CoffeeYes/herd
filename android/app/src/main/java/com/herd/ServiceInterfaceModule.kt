@@ -85,16 +85,30 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         message.getInt("timestamp")
       )
 
-      service.addMessage(msgParcel)
-      promise.resolve(true);
+      if(service.addMessage(msgParcel)) {
+        promise.resolve(true);
+      } else {
+        promise.resolve(false);
+      }
     }
   }
 
   @ReactMethod
-  fun removeMessageFromService(index : Int, promise : Promise) {
+  fun removeMessageFromService(message : ReadableMap, promise : Promise) {
     if(bound) {
-      service.removeMessage(index);
-      promise.resolve(true);
+      val msgParcel : HerdMessage = HerdMessage(
+        message.getString("to") as String,
+        message.getString("from") as String,
+        message.getString("text") as String,
+        message.getInt("timestamp")
+      )
+
+      if(service.removeMessage(msgParcel)) {
+        promise.resolve(true);
+      }
+      else {
+        promise.resolve(false);
+      }
     }
   }
 

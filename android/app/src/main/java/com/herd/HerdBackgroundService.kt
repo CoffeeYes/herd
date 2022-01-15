@@ -345,17 +345,12 @@ class HerdBackgroundService : Service() {
     }
   }
 
-  fun addMessage(message : HerdMessage) {
-    messageQueue?.add(message);
+  fun addMessage(message : HerdMessage) : Boolean {
+    return messageQueue?.add(message) as Boolean;
   }
 
-  fun removeMessage(index : Int) {
-    try {
-      messageQueue?.removeAt(index);
-    }
-    catch(e : Exception) {
-      Log.d(TAG,"Error removing message from message queue",e);
-    }
+  fun removeMessage(message : HerdMessage) : Boolean {
+    return messageQueue?.remove(message)  as Boolean;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
