@@ -145,6 +145,7 @@ const Chat = ({ route, navigation }) => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
+            highlightedMessages.map(message => ServiceInterface.deleteMessageFromService(message));
             setMessageDays(calculateMessageDays(updatedMessages));
             setMessages(updatedMessages);
             setHighlightedMessages([]);
