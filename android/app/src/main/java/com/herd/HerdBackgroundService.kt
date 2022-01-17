@@ -349,8 +349,15 @@ class HerdBackgroundService : Service() {
     return messageQueue?.add(message) as Boolean;
   }
 
-  fun removeMessage(message : HerdMessage) : Boolean {
-    return messageQueue?.remove(message)  as Boolean;
+  fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
+    /* return messageQueue?.remove(message)  as Boolean; */
+    var removedAll : Boolean = true;
+    for(message in messages) {
+      if(messageQueue?.remove(message) != true) {
+        removedAll = false;
+      }
+    }
+    return removedAll;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -94,16 +94,19 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun removeMessageFromService(message : ReadableMap, promise : Promise) {
+  fun removeMessageFromService(messages : ReadableArray, promise : Promise) {
     if(bound) {
-      val msgParcel : HerdMessage = HerdMessage(
-        message.getString("to") as String,
-        message.getString("from") as String,
-        message.getString("text") as String,
-        message.getInt("timestamp")
-      )
-
-      if(service.removeMessage(msgParcel)) {
+      val messagesToDelete : ArrayList<HerdMessage> = ArrayList();
+      for(i in 0 until messages.size()) {
+        val currentMsg : HerdMessage = HerdMessage(
+          messages.getMap(i).getString("to") as String,
+          messages.getMap(i).getString("from") as String,
+          messages.getMap(i).getString("text") as String,
+          messages.getMap(i).getInt("timestamp")
+        )
+        messagesToDelete.add(currentMsg);
+      }
+      if(service.removeMessage(messagesToDelete)) {
         promise.resolve(true);
       }
       else {
