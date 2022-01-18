@@ -85,16 +85,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         message.getInt("timestamp")
       )
 
-      if(service.addMessage(msgParcel)) {
-        promise.resolve(true);
-      } else {
-        promise.resolve(false);
-      }
+      promise.resolve(service.addMessage(msgParcel))
     }
   }
 
   @ReactMethod
-  fun removeMessageFromService(messages : ReadableArray, promise : Promise) {
+  fun removeMessagesFromService(messages : ReadableArray, promise : Promise) {
     if(bound) {
       val messagesToDelete : ArrayList<HerdMessage> = ArrayList();
       for(i in 0 until messages.size()) {
@@ -106,12 +102,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         )
         messagesToDelete.add(currentMsg);
       }
-      if(service.removeMessage(messagesToDelete)) {
-        promise.resolve(true);
-      }
-      else {
-        promise.resolve(false);
-      }
+      promise.resolve(service.removeMessage(messagesToDelete))
     }
   }
 

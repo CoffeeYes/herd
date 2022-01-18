@@ -353,7 +353,7 @@ class HerdBackgroundService : Service() {
     /* return messageQueue?.remove(message)  as Boolean; */
     var removedAll : Boolean = true;
     for(message in messages) {
-      if(messageQueue?.remove(message) != true) {
+      if(!(messageQueue?.remove(message) as Boolean)) {
         removedAll = false;
       }
     }
