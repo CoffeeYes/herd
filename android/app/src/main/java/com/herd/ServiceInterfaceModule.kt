@@ -84,8 +84,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         message.getString("text") as String,
         message.getInt("timestamp")
       )
-
       promise.resolve(service.addMessage(msgParcel))
+    }
+    else {
+      promise.resolve(false);
     }
   }
 
@@ -103,6 +105,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         messagesToDelete.add(currentMsg);
       }
       promise.resolve(service.removeMessage(messagesToDelete))
+    }
+    else {
+      promise.resolve(false);
     }
   }
 
