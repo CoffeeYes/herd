@@ -127,6 +127,7 @@ const Chat = ({ route, navigation }) => {
     setInputDisabled(false);
     scrollRef.current.scrollToEnd({animated : true});
 
+    await ServiceInterface.isRunning() &&
     ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted});
   }
 
@@ -145,7 +146,10 @@ const Chat = ({ route, navigation }) => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
+
+            await ServiceInterface.isRunning() &&
             await ServiceInterface.removeMessagesFromService(highlightedMessages);
+
             setMessageDays(calculateMessageDays(updatedMessages));
             setMessages(updatedMessages);
             setHighlightedMessages([]);
