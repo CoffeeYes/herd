@@ -25,6 +25,7 @@ import android.content.ComponentName
 
 @Parcelize
 data class HerdMessage(
+  val _id : String,
   val to : String,
   val from : String,
   val text : String,
@@ -60,6 +61,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val msgQ : ArrayList<HerdMessage> = ArrayList();
     for(i in 0 until messageQueue.size()) {
       val currentMsg : HerdMessage = HerdMessage(
+        messageQueue.getMap(i).getString("_id") as String,
         messageQueue.getMap(i).getString("to") as String,
         messageQueue.getMap(i).getString("from") as String,
         messageQueue.getMap(i).getString("text") as String,
@@ -79,6 +81,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun addMessageToService(message : ReadableMap,promise : Promise) {
     if(bound) {
       val msgParcel : HerdMessage = HerdMessage(
+        message.getString("_id") as String,
         message.getString("to") as String,
         message.getString("from") as String,
         message.getString("text") as String,
@@ -97,6 +100,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       val messagesToDelete : ArrayList<HerdMessage> = ArrayList();
       for(i in 0 until messages.size()) {
         val currentMsg : HerdMessage = HerdMessage(
+          messages.getMap(i).getString("_id") as String,
           messages.getMap(i).getString("to") as String,
           messages.getMap(i).getString("from") as String,
           messages.getMap(i).getString("text") as String,

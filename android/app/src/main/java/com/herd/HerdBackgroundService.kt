@@ -350,14 +350,15 @@ class HerdBackgroundService : Service() {
   }
 
   fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
-    /* return messageQueue?.remove(message)  as Boolean; */
-    var removedAll : Boolean = true;
-    for(message in messages) {
-      if(!(messageQueue?.remove(message) as Boolean)) {
-        removedAll = false;
-      }
+    val lengthBefore : Int? = messageQueue?.size;
+    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
+    val lengthAfter : Int? = messageQueue?.size;
+    var deleted : Boolean = false;
+    if(lengthBefore != null && lengthAfter != null) {
+      deleted = (lengthBefore - lengthAfter) == messages.size
     }
-    return removedAll;
+    Log.i(TAG,"All messages Deleted : " + deleted);
+    return deleted;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

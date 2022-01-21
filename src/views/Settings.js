@@ -11,6 +11,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
+import { parseRealmID } from '../realm/helper';
 import CardButton from './CardButton';
 
 import { getMessageQueue, deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
@@ -95,7 +96,7 @@ const Settings = ({ navigation }) => {
 
       if(btEnabled && locationEnabled) {
         setBackgroundTransfer(true);
-        const messageQueue = getMessageQueue();
+        const messageQueue = getMessageQueue().map(msg => ({...msg,_id : parseRealmID(msg)}));
         ServiceInterface.enableService(messageQueue);
       }
     }

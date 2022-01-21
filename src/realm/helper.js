@@ -1,13 +1,12 @@
 const parseRealmID = object => {
   try {
-    if(object._id.length === 2) {
+    if(object._id[0].length > 1) {
       return object._id[1];
     }
-    else if (object._id) {
+    else if (object._id[0].length === 1) {
       return JSON.parse(JSON.stringify(object))._id;
     }
     else {
-      console.log(object._id.length)
       throw "Error Parsing Realm Object : Object did not Conform to exptected Object Structure"
     }
   }

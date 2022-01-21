@@ -128,7 +128,7 @@ const Chat = ({ route, navigation }) => {
     scrollRef.current.scrollToEnd({animated : true});
 
     await ServiceInterface.isRunning() &&
-    ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted});
+    ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted,_id : messageID});
   }
 
   const deleteMessages = () => {
@@ -146,7 +146,8 @@ const Chat = ({ route, navigation }) => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
-            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1);
+            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
+            .map(message => ({...message,_id : parseRealmID(message)}))
 
             await ServiceInterface.isRunning() &&
             await ServiceInterface.removeMessagesFromService(messagesToDelete);
