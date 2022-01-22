@@ -75,7 +75,7 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
     })
   });
 
-  return messageID;
+  return messageID.toString();
 }
 
 const getContactsWithChats = async () => {

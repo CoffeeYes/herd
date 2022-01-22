@@ -353,11 +353,11 @@ class HerdBackgroundService : Service() {
     val lengthBefore : Int? = messageQueue?.size;
     messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
     val lengthAfter : Int? = messageQueue?.size;
+
     var deleted : Boolean = false;
     if(lengthBefore != null && lengthAfter != null) {
       deleted = (lengthBefore - lengthAfter) == messages.size
     }
-    Log.i(TAG,"All messages Deleted : " + deleted);
     return deleted;
   }
 
