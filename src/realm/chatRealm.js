@@ -153,12 +153,22 @@ const deleteMessages = messages => {
   })
 }
 
-const getMessageQueue = () => {
-  const sentMessages = messageCopyRealm.objects('Message')
-  const receivedMessages= messageReceivedRealm.objects('Message');
+//useMessageCopies determines wether to include self-encrypted copies of sent messages
+//for the purpose of displaying them to the user
+//when passing messageQueue to the background service these messages are not desired
+const getMessageQueue = async useMessageCopies => {
+  let sentMessages;
+  let key = await Crypto.loadKeyFromKeystore("herdPersonal")
+  if(useMessageCopies) {
+    sentMessages = messageCopyRealm.objects('Message')
+  }
+  else {
+    sentMessages = messageSentRealm.objects('Message').filtered("to != " + "'" + key + "'")
+  }
+  const receivedMessages= messageReceivedRealm.objects('Message').filtered("to != " + "'" + key + "'")
 
-  var sentMessagesCopy = [];
-  var receivedMessagesCopy = [];
+  let sentMessagesCopy = [];
+  let receivedMessagesCopy = [];
 
   sentMessages.map(message => sentMessagesCopy.push({...JSON.parse(JSON.stringify(message))}));
   receivedMessages.map(message => receivedMessageCopy.push({...JSON.parse(JSON.stringify(message))}));

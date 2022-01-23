@@ -23,7 +23,7 @@ const MessageQueue = ({}) => {
     setLoading(true);
     const ownPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
     setOwnPublicKey(ownPublicKey);
-    const messageQueue = getMessageQueue();
+    const messageQueue = await getMessageQueue(true);
     var contactKeys = [];
     //get unique public keys from messages
     contactKeys = messageQueue.map(message => contactKeys.indexOf(message.to) === -1 && message.to);
