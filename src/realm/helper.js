@@ -1,9 +1,9 @@
 const parseRealmID = object => {
   try {
-    if(object._id[0].length > 1) {
+    if(object._id.toString()[0].length > 1) {
       return object._id[1];
     }
-    else if (object._id[0].length === 1) {
+    else if (object._id.toString()[0].length === 1) {
       return JSON.parse(JSON.stringify(object))._id;
     }
     else {
