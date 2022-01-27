@@ -157,6 +157,7 @@ const Customise = ({ navigation }) => {
       <>
         <View style={styles.messagesContainer}>
           <ChatBubble
+          notTouchable={true}
           text="This is a sample sent message"
           timestamp="12 : 20"
           customStyle={{
@@ -169,6 +170,7 @@ const Customise = ({ navigation }) => {
           messageFrom={true}/>
 
           <ChatBubble
+          notTouchable={true}
           text="This is a sample response message"
           timestamp="12 : 21"
           customStyle={{

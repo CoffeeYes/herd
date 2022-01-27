@@ -3,7 +3,7 @@ import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 
 const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
-                      highlightedMessages, setHighlightedMessages }) => {
+                      highlightedMessages, setHighlightedMessages, notTouchable }) => {
   const [highlighted, setHighlighted] = useState(false);
 
   const invertColor = color => {
@@ -31,6 +31,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
 
   return (
     <TouchableOpacity
+    disabled={notTouchable}
     onLongPress={highlight}
     onPress={() => highlighted ? unhighlight() : highlightedMessages.length > 0 && highlight()}
     style={messageFrom ?
