@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import navigationRef from './src/NavigationRef.js'
 import Crypto from './src/nativeWrapper/Crypto.js';
+import ServiceInterface from './src/nativeWrapper/ServiceInterface.js'
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -41,7 +42,14 @@ const Stack = createStackNavigator()
 const App = ({ }) => {
 
   useEffect(() => {
-    loadOwnKey()
+    // console.log("APP MOUNT")
+    loadOwnKey();
+    // (async () => {
+    //   if(ServiceInterface.isRunning()) {
+    //     const newMessages = await ServiceInterface.getReceivedMessages();
+    //     console.log(newMessages)
+    //   }
+    // })()
   },[])
 
   const loadOwnKey = async () => {

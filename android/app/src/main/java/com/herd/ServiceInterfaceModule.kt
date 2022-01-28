@@ -116,6 +116,25 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun getReceivedMessages(promise : Promise) {
+    var messages : ArrayList<Map<String,Any>> = ArrayList();
+    if(bound) {
+      val herdMessages = service.getReceivedMessages();
+      for(message in herdMessages) {
+        val newMessage : Map<String,Any> = mapOf(
+          "_id" to message._id,
+          "to" to message.to,
+          "from" to message.from,
+          "text" to message.text,
+          "timestamp" to message.timestamp
+        )
+        messages.add(newMessage)
+      }
+    }
+    promise.resolve(messages);
+  }
+
+  @ReactMethod
   fun disableService() {
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);

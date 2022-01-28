@@ -57,6 +57,8 @@ class HerdBackgroundService : Service() {
   private var gattServer : BluetoothGattServer? = null;
   private val context : Context = this;
   private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
+  private var messagePointer : Int = 0;
+  private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
 
   companion object {
     var running : Boolean = false;
@@ -359,6 +361,10 @@ class HerdBackgroundService : Service() {
       deleted = (lengthBefore - lengthAfter) == messages.size
     }
     return deleted;
+  }
+
+  fun getReceivedMessages() : ArrayList<HerdMessage> {
+    return receivedMessages;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
