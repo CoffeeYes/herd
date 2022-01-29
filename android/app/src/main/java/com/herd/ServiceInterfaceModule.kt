@@ -5,7 +5,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.Arguments
 
 import com.herd.HerdBackgroundService
 
@@ -117,18 +119,18 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   @ReactMethod
   fun getReceivedMessages(promise : Promise) {
-    var messages : ArrayList<Map<String,Any>> = ArrayList();
+    var messages : WritableArray = Arguments.createArray();
     if(bound) {
-      val herdMessages = service.getReceivedMessages();
+      val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
       for(message in herdMessages) {
-        val newMessage : Map<String,Any> = mapOf(
+        val newMessage = mapOf(
           "_id" to message._id,
           "to" to message.to,
           "from" to message.from,
           "text" to message.text,
           "timestamp" to message.timestamp
-        )
-        messages.add(newMessage)
+        ) as ReadableMap
+        messages.pushMap(newMessage)
       }
     }
     promise.resolve(messages);

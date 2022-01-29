@@ -42,14 +42,13 @@ const Stack = createStackNavigator()
 const App = ({ }) => {
 
   useEffect(() => {
-    // console.log("APP MOUNT")
     loadOwnKey();
-    // (async () => {
-    //   if(ServiceInterface.isRunning()) {
-    //     const newMessages = await ServiceInterface.getReceivedMessages();
-    //     console.log(newMessages)
-    //   }
-    // })()
+    (async () => {
+      if(ServiceInterface.isRunning()) {
+        const newMessages = await ServiceInterface.getReceivedMessages();
+        console.log(newMessages)
+      }
+    })()
   },[])
 
   const loadOwnKey = async () => {
