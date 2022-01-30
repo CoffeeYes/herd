@@ -37,6 +37,8 @@ import EditContact from './src/views/EditContact';
 import Customise from './src/views/Customise';
 import MessageQueue from './src/views/MessageQueue';
 
+import { addNewReceivedMessages as addNewReceivedMessagesToRealm} from './src/realm/chatRealm'
+
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
@@ -46,7 +48,7 @@ const App = ({ }) => {
     (async () => {
       if(ServiceInterface.isRunning()) {
         const newMessages = await ServiceInterface.getReceivedMessages();
-        console.log(newMessages)
+        addNewReceivedMessagesToRealm(newMessages)
       }
     })()
   },[])

@@ -20,8 +20,10 @@ const messageSentRealm = new Realm({
 })
 
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
-  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
-  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered("from = " + "'" + key + "'").slice(startIndex,endIndex);
+  const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
+  // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
+  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
+  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key}' AND to = '${ownKey}'`).slice(startIndex,endIndex);
 
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
@@ -76,6 +78,12 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   });
 
   return messageID.toString();
+}
+
+const addNewReceivedMessages = messages => {
+  messageReceivedRealm.write(() => {
+    messages.map(message => messageReceivedRealm.write("Message",message))
+  })
 }
 
 const getContactsWithChats = async () => {
@@ -185,6 +193,7 @@ const closeChatRealm = () => {
 export {
   getMessagesWithContact,
   sendMessageToContact,
+  addNewReceivedMessages,
   getContactsWithChats,
   deleteChat,
   deleteAllChats,
