@@ -6,6 +6,7 @@ import ListItem from './ListItem';
 import Realm from 'realm';
 import Schemas from '../Schemas';
 import { getAllContacts, deleteContact } from '../realm/contactRealm';
+import { getContactsWithChats } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
@@ -28,7 +29,14 @@ const Contacts = ({ route, navigation }) => {
 
   const loadContacts = async () => {
     setLoading(true);
-    setContacts(getAllContacts());
+    if(route.params.type === "newChat") {
+      const allContacts = await getAllContacts();
+      const contactsWithChats = await getContactsWithChats();
+      setContacts(allContacts.filter(contact => contactsWithChats.indexOf(contact) !== -1))
+    }
+    else {
+      setContacts(getAllContacts());
+    }
     setLoading(false);
   }
 
