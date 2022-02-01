@@ -129,6 +129,10 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
       });
+      if(newState === BluetoothProfile.STATE_CONNECTED) {
+        Log.i(TAG,"Discovering GATT Services");
+        gatt.discoverServices();
+      }
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
@@ -145,6 +149,11 @@ class HerdBackgroundService : Service() {
 
     override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
         Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorWrite");
+    }
+
+    override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
+      Log.i(TAG, "onServicesDiscovered fires, status : $status");
+      val services = gatt.getServices();
     }
   }
 
