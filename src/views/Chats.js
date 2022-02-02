@@ -71,8 +71,7 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
-        onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})
-        }
+        onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
         deleteItem={() => deleteChat(chat.key)}
         rightText={chat.timestamp &&
           (moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?

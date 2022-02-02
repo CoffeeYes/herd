@@ -1,19 +1,11 @@
 const parseRealmID = object => {
-  try {
-    if(object._id.toString()[0].length > 1) {
+    //determine whether id is in array form or string form and return appropriate value
+    if(object._id[0] === "$oid") {
       return object._id[1];
     }
-    else if (object._id.toString()[0].length === 1) {
-      return JSON.parse(JSON.stringify(object))._id;
-    }
     else {
-      throw "Error Parsing Realm Object : Object did not Conform to exptected Object Structure"
+      return object._id.toString();
     }
-  }
-  catch(e) {
-    console.log("Error parsing realm ID : " + e)
-    console.log(object)
-  }
 }
 
 export {
