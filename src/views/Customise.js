@@ -265,10 +265,10 @@ const Customise = ({ navigation }) => {
           timeout={500}
           buttonStyle={{...styles.buttonHeight,width : 100}}
           disabled={
-            fromHsv(sentBoxColor) === originalStyles.sentBoxColor &&
-            fromHsv(sentTextColor) === originalStyles.sentTextColor &&
-            fromHsv(receivedBoxColor) === originalStyles.receivedBoxColor &&
-            fromHsv(receivedTextColor) === originalStyles.receivedTextColor &&
+            fromHsv(sentBoxColor) == originalStyles.sentBoxColor &&
+            fromHsv(sentTextColor) == originalStyles.sentTextColor &&
+            fromHsv(receivedBoxColor) == originalStyles.receivedBoxColor &&
+            fromHsv(receivedTextColor) == originalStyles.receivedTextColor &&
             fontSize === originalStyles.fontSize
           }/>
 
@@ -276,10 +276,10 @@ const Customise = ({ navigation }) => {
           text={"Restore Default"}
           onPress={restoreDefault}
           disabled={
-            fromHsv(sentBoxColor) === "#c6c6c6" &&
-            fromHsv(sentTextColor) === "#f5f5f5" &&
-            fromHsv(receivedBoxColor) === "#e86252" &&
-            fromHsv(receivedTextColor) === "#f5f5f5" &&
+            fromHsv(sentBoxColor) == "#c6c6c6" &&
+            fromHsv(sentTextColor) == "#f5f5f5" &&
+            fromHsv(receivedBoxColor) == "#e86252" &&
+            fromHsv(receivedTextColor) == "#f5f5f5" &&
             fontSize === 14
           }
           buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
