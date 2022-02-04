@@ -32,7 +32,11 @@ const Contacts = ({ route, navigation }) => {
     if(route.params.type === "newChat") {
       const allContacts = await getAllContacts();
       const contactsWithChats = await getContactsWithChats();
+
+      contactsWithChats.length > 0 ?
       setContacts(allContacts.filter(contact => contactsWithChats.indexOf(contact) !== -1))
+      :
+      setContacts(allContacts)
     }
     else {
       setContacts(getAllContacts());
