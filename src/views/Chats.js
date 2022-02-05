@@ -12,7 +12,9 @@ const Chats = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     loadContactsWithChats();
+    setLoading(false);
   },[])
 
   useEffect(() => {
@@ -23,15 +25,12 @@ const Chats = ({ navigation }) => {
   },[navigation])
 
   const loadContactsWithChats = async () => {
-    setLoading(true);
     //create array copy using slice, then sort by timestamp
     var contactsWithChats = await getContactsWithChats();
     contactsWithChats = contactsWithChats.slice()
     .sort( (a,b) => a.timestamp > b.timestamp);
-
+    
     setChats(contactsWithChats);
-
-    setLoading(false);
   }
 
   const deleteChat = async key => {
