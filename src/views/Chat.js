@@ -164,7 +164,7 @@ const Chat = ({ route, navigation }) => {
 
   const handleScroll = async event => {
     let pos = event.nativeEvent.contentOffset.y
-    if(pos === 0) {
+    if(pos === 0 && !showedPopup) {
       loadMoreMessages();
     }
   }
@@ -195,6 +195,7 @@ const Chat = ({ route, navigation }) => {
     const allow = event.nativeEvent.translationY > 200 && enableGestureHandler;
     if(allow) {
       if(messages.length >= messageLoadingSize) {
+        setEnableGestureHandler(false);
         loadMoreMessages();
       }
       else if (!showedPopup) {
@@ -204,6 +205,9 @@ const Chat = ({ route, navigation }) => {
   }
 
   const showNoMoreMessagePopup = () => {
+    if(!showedPopup) {
+
+    }
     setShowPopup(true)
     setTimeout(() => {
       setShowPopup(false);
