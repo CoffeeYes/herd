@@ -154,6 +154,10 @@ class HerdBackgroundService : Service() {
     override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
       Log.i(TAG, "onServicesDiscovered fires, status : $status");
       val services = gatt.getServices();
+      val characteristics = services[0].characteristics;
+      if(characteristics[0].uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
+        gatt.readCharacteristic(characteristics[0])
+      }
     }
   }
 
@@ -341,9 +345,9 @@ class HerdBackgroundService : Service() {
 
       val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
       val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
-        BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_WRITE or
+        BluetoothGattCharacteristic.PROPERTY_READ or
         BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-        BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE);
+        BluetoothGattCharacteristic.PERMISSION_READ);
         /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
         service.addCharacteristic(characteristic);
 
