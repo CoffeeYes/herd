@@ -19,7 +19,8 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 
 import Crypto from '../nativeWrapper/Crypto';
-import Schemas from '../Schemas'
+import Schemas from '../Schemas';
+const swipeSize = Dimensions.get('window').height * 0.25;
 
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([]);
@@ -192,7 +193,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleGesture = event => {
-    const allow = event.nativeEvent.translationY > 200 && enableGestureHandler;
+    const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
     if(allow) {
       if(messages.length >= messageLoadingSize) {
         setEnableGestureHandler(false);
