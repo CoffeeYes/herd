@@ -341,13 +341,20 @@ class HerdBackgroundService : Service() {
 
   fun startGATTService() {
     try {
-      val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329")
+      val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329");
+      val gattDescriptorUUID : UUID = UUID.fromString("bb301a02-c16e-4c5c-8778-0eb692b132a7");
 
       val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
       val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
         BluetoothGattCharacteristic.PROPERTY_READ or
         BluetoothGattCharacteristic.PROPERTY_NOTIFY,
         BluetoothGattCharacteristic.PERMISSION_READ);
+
+        val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ);
+        descriptor.setValue(messageQueue?.get(0) as ByteArray);
+        characteristic.addDescriptor(descriptor);
+        //change to mitm protected read once working
+        /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
         /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
         service.addCharacteristic(characteristic);
 
