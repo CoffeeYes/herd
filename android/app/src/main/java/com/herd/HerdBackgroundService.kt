@@ -318,6 +318,7 @@ class HerdBackgroundService : Service() {
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, characteristic : BluetoothGattCharacteristic) {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest");
+        gattServer?.sendResponse(device,requestId,0,0,messageQueue?.get(messagePointer) as ByteArray);
     }
 
     override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
