@@ -153,16 +153,27 @@ class HerdBackgroundService : Service() {
 
     override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
       Log.i(TAG, "onServicesDiscovered fires, status : $status");
-      val services = gatt.getServices();
-      val characteristics = services[0].characteristics;
-      if(characteristics[0].uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
-        gatt.readCharacteristic(characteristics[0])
+      if(status == BluetoothGatt.GATT_SUCCESS) {
+        val services = gatt.getServices();
+
+        for(service in services) {
+          Log.i(TAG,"Service UUID : " + service.uuid.toString() )
+          val characteristics = service.characteristics;
+          for(characteristic in characteristics) {
+            Log.i(TAG,"Characteristic UUID : " + characteristic.uuid.toString() )
+            if(characteristic.uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
+              Log.i(TAG,"Found characteristic with matching uuid");
+              gatt.readCharacteristic(characteristics[0])
+            }
+          }
+        }
       }
     }
   }
 
   val leScanCallback: ScanCallback = object : ScanCallback() {
       val deviceList = mutableSetOf<BluetoothDevice>();
+      var gattInstance : BluetoothGatt? = null;
       override fun onScanResult(callbackType: Int, result: ScanResult) {
           super.onScanResult(callbackType, result);
           Log.i(TAG, "BLE Scan Result Callback Invoked")
@@ -170,14 +181,13 @@ class HerdBackgroundService : Service() {
           val device : BluetoothDevice = result.getDevice();
           val name = device.getName();
           val address = device.getAddress();
-          var gattInstance : BluetoothGatt? = null;
 
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
             if(deviceList.contains(device)) {
               deviceList.remove(device);
               Log.i(TAG,"Device removed from device list");
               if(gattInstance != null) {
-                gattInstance.close();
+                gattInstance?.close();
               }
             }
           }
@@ -186,6 +196,9 @@ class HerdBackgroundService : Service() {
               deviceList.add(device);
               if(address != null) {
                 val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
+                if(gattInstance != null) {
+                  gattInstance?.close();
+                }
                 gattInstance = remoteDeviceInstance?.connectGatt(
                   context,
                   true,
@@ -352,7 +365,6 @@ class HerdBackgroundService : Service() {
         BluetoothGattCharacteristic.PERMISSION_READ);
 
         val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ);
-        descriptor.setValue(messageQueue?.get(0) as ByteArray);
         characteristic.addDescriptor(descriptor);
         //change to mitm protected read once working
         /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
