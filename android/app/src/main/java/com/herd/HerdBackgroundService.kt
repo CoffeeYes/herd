@@ -350,6 +350,10 @@ class HerdBackgroundService : Service() {
       responseNeeded : Boolean, offset : Int, value : ByteArray) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
     }
+
+    override fun onServiceAdded(status : Int, service : BluetoothGattService) {
+      Log.i(TAG,"GATT Server onServiceAdded, status : $status");
+    }
   }
 
 
@@ -357,23 +361,26 @@ class HerdBackgroundService : Service() {
     try {
       val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329");
       val gattDescriptorUUID : UUID = UUID.fromString("bb301a02-c16e-4c5c-8778-0eb692b132a7");
+      val gattServiceUUID : UUID = UUID.fromString("663bb186-30a5-4e78-8d42-e8f1a57c5f0a");
 
-      val service : BluetoothGattService = BluetoothGattService(serviceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
+      val service : BluetoothGattService = BluetoothGattService(gattServiceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
+
       val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
-        BluetoothGattCharacteristic.PROPERTY_READ or
-        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-        BluetoothGattCharacteristic.PERMISSION_READ);
+      BluetoothGattCharacteristic.PROPERTY_READ or
+      BluetoothGattCharacteristic.PROPERTY_NOTIFY or
+      BluetoothGattCharacteristic.PROPERTY_BROADCAST ,
+      BluetoothGattCharacteristic.PERMISSION_READ);
 
-        val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ);
-        characteristic.addDescriptor(descriptor);
-        //change to mitm protected read once working
-        /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
-        /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
-        service.addCharacteristic(characteristic);
+      val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ);
+      characteristic.addDescriptor(descriptor);
+      //change to mitm protected read once working
+      /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
+      /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
+      service.addCharacteristic(characteristic);
 
-        gattServer?.addService(service);
-        gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
-        Log.i(TAG,"BLE Gatt Server Started");
+      gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
+      gattServer?.addService(service);
+      Log.i(TAG,"BLE Gatt Server Started");
     }
     catch(e : Exception) {
       Log.d(TAG,"Error creating bluetooth GATT Server : " + e);
