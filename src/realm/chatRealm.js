@@ -81,8 +81,10 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 }
 
 const addNewReceivedMessages = messages => {
+  const receivedMessages = messageReceivedRealm.objects("Message");
+  const newMessages = messages.filter(nMessage => receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined)
   messageReceivedRealm.write(() => {
-    messages.map(message => messageReceivedRealm.write("Message",message))
+    newMessages.map(message => messageReceivedRealm.write("Message",message))
   })
 }
 
