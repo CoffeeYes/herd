@@ -131,7 +131,11 @@ class HerdBackgroundService : Service() {
       });
       if(newState === BluetoothProfile.STATE_CONNECTED) {
         Log.i(TAG,"Discovering GATT Services");
+        BLEScanner?.stopScan(leScanCallback);
         gatt.discoverServices();
+      }
+      else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
+        scanLeDevice();
       }
     }
 
@@ -163,7 +167,7 @@ class HerdBackgroundService : Service() {
             Log.i(TAG,"Characteristic UUID : " + characteristic.uuid.toString() )
             if(characteristic.uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
               Log.i(TAG,"Found characteristic with matching uuid");
-              gatt.readCharacteristic(characteristics[0])
+              gatt.readCharacteristic(characteristic);
             }
           }
         }
@@ -199,9 +203,9 @@ class HerdBackgroundService : Service() {
                 if(gattInstance != null) {
                   gattInstance?.close();
                 }
-                gattInstance = remoteDeviceInstance?.connectGatt(
+                remoteDeviceInstance?.connectGatt(
                   context,
-                  true,
+                  false,
                   bluetoothGattClientCallback,
                   BluetoothDevice.TRANSPORT_LE
                 );
@@ -331,7 +335,14 @@ class HerdBackgroundService : Service() {
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, characteristic : BluetoothGattCharacteristic) {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest");
-        gattServer?.sendResponse(device,requestId,0,0,messageQueue?.get(messagePointer) as ByteArray);
+        try {
+          if((messageQueue?.size as Int) > messagePointer){
+            gattServer?.sendResponse(device,requestId,0,0,messageQueue?.get(messagePointer) as ByteArray);
+          }
+        }
+        catch(e : Exception) {
+          Log.d(TAG,"Error sending onCharacteristicReadRequest response : ",e);
+        }
     }
 
     override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
