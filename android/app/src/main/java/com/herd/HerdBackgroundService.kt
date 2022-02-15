@@ -36,6 +36,7 @@ import java.util.UUID
 import java.util.ArrayList
 import android.os.Bundle
 import android.os.Parcelable
+import android.os.Parcel
 import kotlinx.parcelize.Parcelize
 
 import android.app.Notification
@@ -140,7 +141,13 @@ class HerdBackgroundService : Service() {
     }
 
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
-       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead");
+       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
+       val messageBytes : ByteArray = characteristic.getValue();
+       val parcelMessage : Parcel = Parcel.obtain();
+       parcelMessage.unmarshall(messageBytes,0,messageBytes.size);
+       parcelMessage.setDataPosition(0);
+       /* val Message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage); */
+       Log.i(TAG,"Characteristic : " + messageBytes);
     }
 
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
@@ -337,7 +344,11 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest");
         try {
           if((messageQueue?.size as Int) > messagePointer){
-            gattServer?.sendResponse(device,requestId,0,0,messageQueue?.get(messagePointer) as ByteArray);
+            //convert parcelable HerdMessage to byteArray and send as response value to read req.
+            val currentMessage : HerdMessage? = messageQueue?.get(messagePointer)
+            val currentMessageParcel : Parcel = Parcel.obtain();
+            currentMessage?.writeToParcel(currentMessageParcel,0);
+            gattServer?.sendResponse(device,requestId,0,0,currentMessageParcel.marshall());
           }
         }
         catch(e : Exception) {
