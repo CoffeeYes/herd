@@ -19,6 +19,7 @@ import android.app.Activity
 import android.app.ActivityManager
 import android.os.Bundle
 import android.os.Parcelable
+import android.os.Parcel
 import android.os.IBinder
 import android.util.Log
 import kotlinx.parcelize.Parcelize
@@ -32,7 +33,26 @@ data class HerdMessage(
   val from : String,
   val text : String,
   val timestamp : Int
-) : Parcelable
+) : Parcelable {
+  companion object {
+    val CREATOR = object : Parcelable.Creator<HerdMessage> {
+      override fun createFromParcel(parcel : Parcel) : HerdMessage {
+        return HerdMessage(
+            parcel.readString() as String,
+            parcel.readString() as String,
+            parcel.readString() as String,
+            parcel.readString() as String,
+            parcel.readInt() as Int,
+        )
+      }
+
+      override fun newArray(size : Int) : Array<HerdMessage?> {
+        val array : Array<HerdMessage?> = arrayOf<HerdMessage?>();
+        return array;
+      }
+    }
+  }
+}
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext;
