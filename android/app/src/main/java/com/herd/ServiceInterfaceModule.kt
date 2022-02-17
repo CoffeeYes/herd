@@ -26,8 +26,8 @@ import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 import android.content.ComponentName
 
-@Parcelize
-data class HerdMessage(
+/* @Parcelize */
+class HerdMessage(
   val _id : String,
   val to : String,
   val from : String,
@@ -35,23 +35,32 @@ data class HerdMessage(
   val timestamp : Int
 ) : Parcelable {
   companion object {
+    @JvmField
     val CREATOR = object : Parcelable.Creator<HerdMessage> {
       override fun createFromParcel(parcel : Parcel) : HerdMessage {
-        return HerdMessage(
-            parcel.readString() as String,
-            parcel.readString() as String,
-            parcel.readString() as String,
-            parcel.readString() as String,
-            parcel.readInt() as Int,
-        )
+        return HerdMessage(parcel);
       }
 
-      override fun newArray(size : Int) : Array<HerdMessage?> {
-        val array : Array<HerdMessage?> = arrayOf<HerdMessage?>();
-        return array;
-      }
+      override fun newArray(size: Int) = arrayOfNulls<HerdMessage>(size)
     }
   }
+
+  private constructor(parcel: Parcel) : this(
+        _id = parcel.readString() as String,
+        to = parcel.readString() as String,
+        from = parcel.readString() as String,
+        text = parcel.readString() as String,
+        timestamp = parcel.readInt()
+  )
+  override fun writeToParcel(parcel: Parcel, flags: Int) {
+      parcel.writeString(_id)
+      parcel.writeString(to)
+      parcel.writeString(from)
+      parcel.writeString(text)
+      parcel.writeInt(timestamp)
+  }
+
+  override fun describeContents() = 0
 }
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {

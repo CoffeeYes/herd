@@ -148,6 +148,7 @@ class HerdBackgroundService : Service() {
        parcelMessage.setDataPosition(0);
        /* val Message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage); */
        Log.i(TAG,"Characteristic : " + messageBytes);
+       Log.i(TAG,"Message : " + Message.text)
     }
 
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
