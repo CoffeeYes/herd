@@ -84,7 +84,7 @@ const addNewReceivedMessages = messages => {
   const receivedMessages = messageReceivedRealm.objects("Message");
   const newMessages = messages.filter(nMessage => receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined)
   messageReceivedRealm.write(() => {
-    newMessages.map(message => messageReceivedRealm.write("Message",message))
+    newMessages.map(message => messageReceivedRealm.create("Message",{...message,_id : Realm.BSON.ObjectId(message._id)},true))
   })
 }
 

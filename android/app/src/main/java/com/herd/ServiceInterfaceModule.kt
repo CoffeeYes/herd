@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Arguments
 
@@ -152,13 +153,19 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     if(bound) {
       val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
       for(message in herdMessages) {
-        val newMessage = mapOf(
+        /* val newMessage = mapOf(
           "_id" to message._id,
           "to" to message.to,
           "from" to message.from,
           "text" to message.text,
           "timestamp" to message.timestamp
-        ) as ReadableMap
+        ) as ReadableMap */
+        val newMessage : WritableMap = Arguments.createMap();
+        newMessage.putString("_id",message._id);
+        newMessage.putString("to",message.to);
+        newMessage.putString("from",message.from);
+        newMessage.putString("text",message.text);
+        newMessage.putInt("timestamp",message.timestamp);
         messages.pushMap(newMessage)
       }
     }

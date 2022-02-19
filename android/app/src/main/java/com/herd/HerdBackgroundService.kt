@@ -166,11 +166,14 @@ class HerdBackgroundService : Service() {
        else {
          Log.i(TAG,"Done reading Characteristic, total size : ${totalBytes.size}");
          try {
+           //create parcel and custom parcelable from received bytes
            val parcelMessage : Parcel = Parcel.obtain();
            parcelMessage.unmarshall(totalBytes,0,totalBytes.size);
            parcelMessage.setDataPosition(0);
-           val Message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-           Log.i(TAG,"Message : " + Message.text)
+           val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
+           //add custom parcelable to received array
+           receivedMessages.add(message)
+           Log.i(TAG,"Message : " + message.text)
          }
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e)
@@ -406,7 +409,10 @@ class HerdBackgroundService : Service() {
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
             }
             else {
-              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf())
+              //send empty array to indicate that transfer is done to client
+              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
+              //update message pointer to point to next message with boundary check
+              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
             }
           }
         }

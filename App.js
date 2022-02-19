@@ -48,6 +48,7 @@ const App = ({ }) => {
     (async () => {
       if(ServiceInterface.isRunning()) {
         const newMessages = await ServiceInterface.getReceivedMessages();
+        newMessages.length > 0 &&
         addNewReceivedMessagesToRealm(newMessages)
       }
     })()
