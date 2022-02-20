@@ -60,6 +60,7 @@ class HerdBackgroundService : Service() {
   private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
   private var messagePointer : Int = 0;
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
+  private var currentMessageBytes : ByteArray = byteArrayOf();
 
   companion object {
     var running : Boolean = false;
@@ -398,19 +399,12 @@ class HerdBackgroundService : Service() {
             if(requestId == 2) {
               offsetSize = offset;
             }
-            //convert parcelable HerdMessage to byteArray and send as response value to read req.
-            val currentMessage : HerdMessage? = messageQueue?.get(messagePointer)
-            val currentMessageParcel : Parcel = Parcel.obtain();
-            currentMessage?.writeToParcel(currentMessageParcel,0);
-            val parcelBytes = currentMessageParcel.marshall();
-            Log.i(TAG,"Char Read Req Total Parcel Size : ${parcelBytes.size}")
-            /* Log.i(TAG,"CurrentCopy Size : ${currentCopy.size}") */
-            /* Log.i(TAG,"$parcelBytes"); */
+            Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
             //calculate current offset in total array for sending current chunk
             val currentOffset : Int = offsetSize * (requestId - 1);
-            if(currentOffset < parcelBytes.size) {
+            if(currentOffset < currentMessageBytes.size) {
               //create current subArray starting from offset
-              val currentCopy = parcelBytes.copyOfRange(currentOffset,parcelBytes.lastIndex);
+              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex);
               /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
             }
@@ -419,6 +413,8 @@ class HerdBackgroundService : Service() {
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
               //update message pointer to point to next message with boundary check
               messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              //create new byteArray for next message to be sent
+              createCurrentMessageBytes(messageQueue?.get(messagePointer));
               Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
             }
           }
@@ -493,6 +489,10 @@ class HerdBackgroundService : Service() {
     val added : Boolean = messageQueue?.add(message) as Boolean;
     if(added) {
       Log.i(TAG,"Added message to Queue, new length : ${messageQueue?.size}");
+      //if Queue was empty initialise bytes to be sent
+      if((messageQueue?.size as Int) == 1) {
+        createCurrentMessageBytes(messageQueue?.get(0));
+      }
     } else {
       Log.i(TAG,"Failed to add message to Queue");
     }
@@ -511,6 +511,13 @@ class HerdBackgroundService : Service() {
     return deleted;
   }
 
+  fun createCurrentMessageBytes(message : HerdMessage?) {
+    val messageParcel : Parcel = Parcel.obtain();
+    message?.writeToParcel(messageParcel,0);
+    val parcelBytes = messageParcel.marshall();
+    currentMessageBytes = parcelBytes;
+  }
+
   fun getReceivedMessages() : ArrayList<HerdMessage> {
     return receivedMessages;
   }
@@ -519,6 +526,10 @@ class HerdBackgroundService : Service() {
         Log.i(TAG, "Service onStartCommand " + startId)
         val bundle : Bundle? = intent?.getExtras();
         messageQueue = bundle?.getParcelableArrayList("messageQueue");
+        //initialise byte array for sending message
+        if((messageQueue?.size as Int) > 0) {
+          createCurrentMessageBytes(messageQueue?.get(0))
+        }
         bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         startGATTService();
         scanLeDevice();
