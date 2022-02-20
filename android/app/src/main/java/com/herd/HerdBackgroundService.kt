@@ -174,6 +174,12 @@ class HerdBackgroundService : Service() {
            //add custom parcelable to received array
            receivedMessages.add(message)
            Log.i(TAG,"Message : " + message.text)
+           //reset array for total bytes
+           totalBytes = byteArrayOf();
+           //end connection with this device
+           gatt.close();
+           //start scanning for new devices
+           scanLeDevice();
          }
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e)
@@ -413,6 +419,7 @@ class HerdBackgroundService : Service() {
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
               //update message pointer to point to next message with boundary check
               messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
             }
           }
         }
@@ -483,7 +490,13 @@ class HerdBackgroundService : Service() {
   }
 
   fun addMessage(message : HerdMessage) : Boolean {
-    return messageQueue?.add(message) as Boolean;
+    val added : Boolean = messageQueue?.add(message) as Boolean;
+    if(added) {
+      Log.i(TAG,"Added message to Queue, new length : ${messageQueue?.size}");
+    } else {
+      Log.i(TAG,"Failed to add message to Queue");
+    }
+    return added;
   }
 
   fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
