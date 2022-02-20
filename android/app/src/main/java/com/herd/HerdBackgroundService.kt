@@ -61,6 +61,7 @@ class HerdBackgroundService : Service() {
   private var messagePointer : Int = 0;
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
+  val bleDeviceList = mutableSetOf<BluetoothDevice>();
 
   companion object {
     var running : Boolean = false;
@@ -178,6 +179,7 @@ class HerdBackgroundService : Service() {
            //reset array for total bytes
            totalBytes = byteArrayOf();
            //end connection with this device
+           bleDeviceList.remove(gatt.getDevice())
            gatt.close();
            //start scanning for new devices
            scanLeDevice();
@@ -233,7 +235,7 @@ class HerdBackgroundService : Service() {
   }
 
   val leScanCallback: ScanCallback = object : ScanCallback() {
-      val deviceList = mutableSetOf<BluetoothDevice>();
+
       var gattInstance : BluetoothGatt? = null;
       override fun onScanResult(callbackType: Int, result: ScanResult) {
           super.onScanResult(callbackType, result);
@@ -244,8 +246,8 @@ class HerdBackgroundService : Service() {
           val address = device.getAddress();
 
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
-            if(deviceList.contains(device)) {
-              deviceList.remove(device);
+            if(bleDeviceList.contains(device)) {
+              bleDeviceList.remove(device);
               Log.i(TAG,"Device removed from device list");
               if(gattInstance != null) {
                 gattInstance?.close();
@@ -253,8 +255,8 @@ class HerdBackgroundService : Service() {
             }
           }
           else {
-            if(!(deviceList.contains(device))) {
-              deviceList.add(device);
+            if(!(bleDeviceList.contains(device))) {
+              bleDeviceList.add(device);
               if(address != null) {
                 val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
                 if(gattInstance != null) {
@@ -271,7 +273,7 @@ class HerdBackgroundService : Service() {
           }
           Log.i(TAG, "device name : " + name);
           Log.i(TAG, "device Address : " + address);
-          Log.i(TAG,"Device List Length : " + deviceList.size);
+          Log.i(TAG,"Device List Length : " + bleDeviceList.size);
       }
   }
 
