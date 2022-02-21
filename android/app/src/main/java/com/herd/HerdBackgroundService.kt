@@ -38,6 +38,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.os.Parcel
 import kotlinx.parcelize.Parcelize
+import android.os.Looper
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -62,6 +63,7 @@ class HerdBackgroundService : Service() {
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   val bleDeviceList = mutableSetOf<BluetoothDevice>();
+  private var allowBleScan : Boolean = true;
 
   companion object {
     var running : Boolean = false;
@@ -152,6 +154,12 @@ class HerdBackgroundService : Service() {
       }
       Log.i(TAG,"Discovering GATT Services");
       BLEScanner?.stopScan(leScanCallback);
+      allowBleScan = false;
+      Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
+      Handler(Looper.getMainLooper()).postDelayed({
+          Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
+          allowBleScan = true;
+      },30000)
       gatt.discoverServices();
     }
 
@@ -309,6 +317,8 @@ class HerdBackgroundService : Service() {
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
+      //wait 30 seconds before starting scan again after stopping
+      while(!allowBleScan){};
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
       /* BLEScanner?.startScan(leScanCallback); */
       Log.i(TAG,"BLE Scanning started");
@@ -388,8 +398,14 @@ class HerdBackgroundService : Service() {
 
   var offsetSize : Int = 0;
   private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
-    override fun onConnectionStateChange(device : BluetoothDevice, stats : Int, newState : Int) {
-      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange");
+    override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
+      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+          else -> "UNKNOWN STATE"
+      });
     }
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
