@@ -63,6 +63,9 @@ class HerdBackgroundService : Service() {
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   val bleDeviceList = mutableSetOf<BluetoothDevice>();
+  private var remoteMessageQueueSize : Int = 0;
+
+  @Volatile
   private var allowBleScan : Boolean = true;
 
   companion object {
@@ -164,6 +167,7 @@ class HerdBackgroundService : Service() {
     }
 
     var totalBytes : ByteArray = byteArrayOf();
+    var totalMessagesRead : Int = 0;
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
@@ -174,7 +178,8 @@ class HerdBackgroundService : Service() {
          gatt?.readCharacteristic(characteristic)
        }
        else {
-         Log.i(TAG,"Done reading Characteristic, total size : ${totalBytes.size}");
+         Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
+         totalMessagesRead += 1;
          try {
            //create parcel and custom parcelable from received bytes
            val parcelMessage : Parcel = Parcel.obtain();
@@ -186,11 +191,24 @@ class HerdBackgroundService : Service() {
            Log.i(TAG,"Message : " + message.text)
            //reset array for total bytes
            totalBytes = byteArrayOf();
-           //end connection with this device
-           bleDeviceList.remove(gatt.getDevice())
-           gatt.close();
-           //start scanning for new devices
-           scanLeDevice();
+           //check if there are more messages to read
+           if(totalMessagesRead < remoteMessageQueueSize) {
+             Log.i(TAG,"Messages Read : $totalMessagesRead/$remoteMessageQueueSize");
+             Log.i(TAG,"Waiting 10 Seconds before reading next message");
+
+             Handler(Looper.getMainLooper()).postDelayed({
+                 Log.i(TAG,"Starting to read next Message");
+                 gatt?.readCharacteristic(characteristic);
+             },10000)
+           }
+           else {
+             //end connection with this device
+             bleDeviceList.remove(gatt.getDevice())
+             gatt.close();
+             totalMessagesRead = 0;
+             //start scanning for new devices
+             scanLeDevice();
+           }
          }
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e)
@@ -215,7 +233,18 @@ class HerdBackgroundService : Service() {
     }
 
     override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-        Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorRead");
+        Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorRead, status : $status");
+        if(descriptor.getUuid().toString() == "bb301a02-c16e-4c5c-8778-0eb692b132a7") {
+          try {
+            //receive remote messageQueue size and start reading messages
+            remoteMessageQueueSize = descriptor.getValue().get(0).toInt();
+            Log.i(TAG,"Remote Message Queue Size : $remoteMessageQueueSize");
+            gatt.readCharacteristic(descriptor.getCharacteristic());
+          }
+          catch(e : Exception) {
+            Log.i(TAG,"Error getting remote message queue size.",e);
+          }
+        }
     }
 
     override fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
@@ -234,7 +263,9 @@ class HerdBackgroundService : Service() {
             Log.i(TAG,"Characteristic UUID : " + characteristic.uuid.toString() )
             if(characteristic.uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
               Log.i(TAG,"Found characteristic with matching uuid");
-              gatt.readCharacteristic(characteristic);
+              //read descriptor to get remote MessageQueue Size
+              gatt.readDescriptor(characteristic.getDescriptor(UUID.fromString("bb301a02-c16e-4c5c-8778-0eb692b132a7")));
+              /* gatt.readCharacteristic(characteristic); */
             }
           }
         }
@@ -319,8 +350,9 @@ class HerdBackgroundService : Service() {
 
       //wait 30 seconds before starting scan again after stopping
       while(!allowBleScan){};
+      //double check service is still running before starting scan
+      //as blocking call above prevents this section from being notified
       BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
-      /* BLEScanner?.startScan(leScanCallback); */
       Log.i(TAG,"BLE Scanning started");
   }
 
@@ -397,6 +429,7 @@ class HerdBackgroundService : Service() {
   }
 
   var offsetSize : Int = 0;
+  var currentPacket : Int = 0;
   private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
     override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
       Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -410,16 +443,21 @@ class HerdBackgroundService : Service() {
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, characteristic : BluetoothGattCharacteristic) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offest : $offset");
+        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
         try {
           if((messageQueue?.size as Int) > messagePointer){
-            //get MTU rate by looking at initial offset sent with second request
-            if(requestId == 2) {
+            //increment packet for offset calculation
+            currentPacket += 1;
+            //get MTU rate by looking at initial offset sent with third request
+            //first request is descriptor read, second request has offset 0
+            //third request has first actuall MTU value
+            if(requestId == 3) {
               offsetSize = offset;
             }
             Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
             //calculate current offset in total array for sending current chunk
-            val currentOffset : Int = offsetSize * (requestId - 1);
+            val currentOffset : Int = offsetSize * (currentPacket - 1);
+            Log.i(TAG,"Current Message Offset : $currentOffset");
             if(currentOffset < currentMessageBytes.size) {
               //create current subArray starting from offset
               val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex);
@@ -429,6 +467,8 @@ class HerdBackgroundService : Service() {
             else {
               //send empty array to indicate that transfer is done to client
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
+              //reset currentPacket counter for next message
+              currentPacket = 0;
               //update message pointer to point to next message with boundary check
               messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
               //create new byteArray for next message to be sent
@@ -451,6 +491,9 @@ class HerdBackgroundService : Service() {
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
+        if(descriptor.getUuid().toString() == "bb301a02-c16e-4c5c-8778-0eb692b132a7") {
+          gattServer?.sendResponse(device,requestId,0,0,byteArrayOf((messageQueue?.size as Int).toByte()))
+        }
     }
 
     override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
@@ -482,16 +525,15 @@ class HerdBackgroundService : Service() {
       BluetoothGattCharacteristic.PROPERTY_READ,
       BluetoothGattCharacteristic.PERMISSION_READ);
 
-      val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ);
+      val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(
+      gattDescriptorUUID,
+      BluetoothGattDescriptor.PERMISSION_READ);
+
       characteristic.addDescriptor(descriptor);
-      /* val currentMessage : HerdMessage? = messageQueue?.get(messagePointer)
-      val currentMessageParcel : Parcel = Parcel.obtain();
-      currentMessage?.writeToParcel(currentMessageParcel,0);
-      characteristic.setValue(currentMessageParcel.marshall());
-      Log.i(TAG, "Size of message added to characteristic : ${currentMessageParcel.marshall().size}") */
       //change to mitm protected read once working
       /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
       /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
+
       service.addCharacteristic(characteristic);
 
       gattServer = bluetoothManager?.openGattServer(this, bluetoothGattServerCallback);
