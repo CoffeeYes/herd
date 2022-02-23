@@ -3,4 +3,14 @@
     <string name="background_service_description">
       Service for passing Herd messages in the background
     </string>
+
+    <string name="messageQueueServiceUUID">
+      7a38fab9-c286-402d-ac6d-6b79c1cbf329
+    </string>
+    <string name="messageQueueCharacteristicUUID">
+      bb301a02-c16e-4c5c-8778-0eb692b132a7
+    </string>
+    <string name="messageQueueDescriptorUUID">
+      663bb186-30a5-4e78-8d42-e8f1a57c5f0a
+    </string>
 </resources>

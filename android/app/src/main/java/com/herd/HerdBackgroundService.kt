@@ -65,6 +65,10 @@ class HerdBackgroundService : Service() {
   val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
 
+  private lateinit var messageQueueServiceUUID : UUID;
+  private lateinit var messageQueueCharacteristicUUID : UUID;
+  private lateinit var messageQueueDescriptorUUID : UUID;
+
   @Volatile
   private var allowBleScan : Boolean = true;
 
@@ -79,6 +83,9 @@ class HerdBackgroundService : Service() {
 
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
+      messageQueueServiceUUID = UUID.fromString(getString(R.string.messageQueueServiceUUID))
+      messageQueueCharacteristicUUID = UUID.fromString(getString(R.string.messageQueueCharacteristicUUID))
+      messageQueueDescriptorUUID = UUID.fromString(getString(R.string.messageQueueDescriptorUUID))
       try {
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if(bluetoothAdapter === null) {
@@ -234,7 +241,7 @@ class HerdBackgroundService : Service() {
 
     override fun onDescriptorRead(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
         Log.i(TAG,"Bluetooth GATT Client Callback onDescriptorRead, status : $status");
-        if(descriptor.getUuid().toString() == "bb301a02-c16e-4c5c-8778-0eb692b132a7") {
+        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
           try {
             //receive remote messageQueue size and start reading messages
             remoteMessageQueueSize = descriptor.getValue().get(0).toInt();
@@ -261,10 +268,10 @@ class HerdBackgroundService : Service() {
           val characteristics = service.characteristics;
           for(characteristic in characteristics) {
             Log.i(TAG,"Characteristic UUID : " + characteristic.uuid.toString() )
-            if(characteristic.uuid.toString() == "7a38fab9-c286-402d-ac6d-6b79c1cbf329") {
+            if(characteristic.uuid.equals(messageQueueCharacteristicUUID)) {
               Log.i(TAG,"Found characteristic with matching uuid");
               //read descriptor to get remote MessageQueue Size
-              gatt.readDescriptor(characteristic.getDescriptor(UUID.fromString("bb301a02-c16e-4c5c-8778-0eb692b132a7")));
+              gatt.readDescriptor(characteristic.getDescriptor(messageQueueDescriptorUUID));
               /* gatt.readCharacteristic(characteristic); */
             }
           }
@@ -273,7 +280,7 @@ class HerdBackgroundService : Service() {
     }
   }
 
-  val leScanCallback: ScanCallback = object : ScanCallback() {
+  private val leScanCallback: ScanCallback = object : ScanCallback() {
 
       var gattInstance : BluetoothGatt? = null;
       override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -316,7 +323,7 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  fun scanLeDevice() {
+  private fun scanLeDevice() {
       /* var scanning = false;
       val handler = Handler();
 
@@ -376,7 +383,7 @@ class HerdBackgroundService : Service() {
     }
   };
 
-  fun advertiseLE() {
+  private fun advertiseLE() {
     //https://source.android.com/devices/bluetooth/ble_advertising
     BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
@@ -491,7 +498,7 @@ class HerdBackgroundService : Service() {
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
-        if(descriptor.getUuid().toString() == "bb301a02-c16e-4c5c-8778-0eb692b132a7") {
+        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf((messageQueue?.size as Int).toByte()))
         }
     }
@@ -508,30 +515,26 @@ class HerdBackgroundService : Service() {
   }
 
 
-  fun startGATTService() {
+  private fun startGATTService() {
     try {
-      val gattCharacteristicUUID : UUID = UUID.fromString("7a38fab9-c286-402d-ac6d-6b79c1cbf329");
-      val gattDescriptorUUID : UUID = UUID.fromString("bb301a02-c16e-4c5c-8778-0eb692b132a7");
-      val gattServiceUUID : UUID = UUID.fromString("663bb186-30a5-4e78-8d42-e8f1a57c5f0a");
+      val service : BluetoothGattService = BluetoothGattService(messageQueueServiceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
 
-      val service : BluetoothGattService = BluetoothGattService(gattServiceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
-
-      /* val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
+      /* val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(messageQueueCharacteristicUUID,
       BluetoothGattCharacteristic.PROPERTY_READ or
       BluetoothGattCharacteristic.PROPERTY_NOTIFY or
       BluetoothGattCharacteristic.PROPERTY_BROADCAST,
       BluetoothGattCharacteristic.PERMISSION_READ); */
-      val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(gattCharacteristicUUID,
+      val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(messageQueueCharacteristicUUID,
       BluetoothGattCharacteristic.PROPERTY_READ,
       BluetoothGattCharacteristic.PERMISSION_READ);
 
       val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(
-      gattDescriptorUUID,
+      messageQueueDescriptorUUID,
       BluetoothGattDescriptor.PERMISSION_READ);
 
       characteristic.addDescriptor(descriptor);
       //change to mitm protected read once working
-      /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(gattDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
+      /* val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(messageQueueDescriptorUUID,BluetoothGattDescriptor.PERMISSION_READ_ENCRYPTED_MITM); */
       /* characteristic.addDescriptor(BluetoothGattDescriptor(UUID.fromString("00002902-0000-1000-8000-00805f9b34fb"), BluetoothGattCharacteristic.PERMISSION_WRITE)); */
 
       service.addCharacteristic(characteristic);
@@ -571,7 +574,7 @@ class HerdBackgroundService : Service() {
     return deleted;
   }
 
-  fun createCurrentMessageBytes(message : HerdMessage?) {
+  private fun createCurrentMessageBytes(message : HerdMessage?) {
     val messageParcel : Parcel = Parcel.obtain();
     message?.writeToParcel(messageParcel,0);
     val parcelBytes = messageParcel.marshall();
