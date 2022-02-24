@@ -467,7 +467,7 @@ class HerdBackgroundService : Service() {
             Log.i(TAG,"Current Message Offset : $currentOffset");
             if(currentOffset < currentMessageBytes.size) {
               //create current subArray starting from offset
-              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex);
+              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex + 1);
               /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
             }
@@ -499,7 +499,7 @@ class HerdBackgroundService : Service() {
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
         if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
-          gattServer?.sendResponse(device,requestId,0,0,byteArrayOf((messageQueue?.size as Int).toByte()))
+          gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf((messageQueue?.size as Int).toByte()))
         }
     }
 
