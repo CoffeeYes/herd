@@ -201,12 +201,14 @@ class HerdBackgroundService : Service() {
            //check if there are more messages to read
            if(totalMessagesRead < remoteMessageQueueSize) {
              Log.i(TAG,"Messages Read : $totalMessagesRead/$remoteMessageQueueSize");
-             Log.i(TAG,"Waiting 10 Seconds before reading next message");
+             /* Log.i(TAG,"Waiting 10 Seconds before reading next message");
 
              Handler(Looper.getMainLooper()).postDelayed({
                  Log.i(TAG,"Starting to read next Message");
                  gatt?.readCharacteristic(characteristic);
-             },10000)
+             },10000) */
+             Log.i(TAG,"Starting to read next Message");
+             gatt?.readCharacteristic(characteristic);
            }
            else {
              //end connection with this device
@@ -263,18 +265,24 @@ class HerdBackgroundService : Service() {
       if(status == BluetoothGatt.GATT_SUCCESS) {
         val services = gatt.getServices();
 
-        for(service in services) {
-          Log.i(TAG,"Service UUID : " + service.uuid.toString() )
-          val characteristics = service.characteristics;
-          for(characteristic in characteristics) {
-            Log.i(TAG,"Characteristic UUID : " + characteristic.uuid.toString() )
-            if(characteristic.uuid.equals(messageQueueCharacteristicUUID)) {
-              Log.i(TAG,"Found characteristic with matching uuid");
-              //read descriptor to get remote MessageQueue Size
-              gatt.readDescriptor(characteristic.getDescriptor(messageQueueDescriptorUUID));
-              /* gatt.readCharacteristic(characteristic); */
-            }
-          }
+        val messageService : BluetoothGattService? = services.find {
+          service -> service.uuid.equals(messageQueueServiceUUID)
+        };
+
+        val messageCharacteristic : BluetoothGattCharacteristic? =
+        messageService?.characteristics?.find { characteristic ->
+          characteristic.uuid.equals(messageQueueCharacteristicUUID)
+        };
+
+        if(messageCharacteristic != null) {
+          Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
+          gatt.readDescriptor(messageCharacteristic.getDescriptor(messageQueueDescriptorUUID));
+        }
+        else {
+          Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
+          bleDeviceList.remove(gatt.getDevice());
+          gatt.close();
+          scanLeDevice();
         }
       }
     }
