@@ -101,20 +101,30 @@ class HerdBackgroundService : Service() {
             PendingIntent.getActivity(this, 0, notificationIntent, 0)
         }
 
-        //create notification channel
-        val CHANNEL_ID = "HerdServiceChannel"
-        val name = "Herd Service Channel"
-        val descriptionText = "Herd Background Service"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(CHANNEL_ID, name, importance)
-        mChannel.description = descriptionText
+        //create service notification channel
+        val SERVICE_CHANNEL_ID = "HerdServiceChannel"
+        val serviceChannelName = "Herd Service Channel"
+        val serviceChannelDescriptionText = "Herd Background Service"
+        val serviceChannlImportance = NotificationManager.IMPORTANCE_DEFAULT
+        val serviceChannel = NotificationChannel(SERVICE_CHANNEL_ID, serviceChannelName, serviceChannlImportance)
+        serviceChannel.description = serviceChannelDescriptionText
+
+        //create message notification channel
+        val MESSAGE_CHANNEL_ID = "HerdMessageChannel"
+        val msgChannelName = "Herd Message Channel"
+        val msgChannelDescriptionText = "Herd Messages"
+        val msgChannelImportance = NotificationManager.IMPORTANCE_DEFAULT
+        val msgChannel = NotificationChannel(MESSAGE_CHANNEL_ID, msgChannelName, msgChannelImportance)
+        msgChannel.description = msgChannelDescriptionText
+
+
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(mChannel)
+        notificationManager.createNotificationChannels(mutableListOf(serviceChannel,msgChannel))
 
         //create notification
-        val notification : Notification = Notification.Builder(this,CHANNEL_ID)
+        val notification : Notification = Notification.Builder(this,SERVICE_CHANNEL_ID)
         .setOngoing(true)
         .setContentTitle("Herd Background Service")
         .setContentText("Herd is Running in the background in order to transfer messages")
@@ -133,6 +143,27 @@ class HerdBackgroundService : Service() {
       catch(e : Exception) {
         Log.e(TAG, "Error creating background service",e)
       }
+  }
+
+  private fun sendMessageNotification() {
+    val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
+        PendingIntent.getActivity(this, 0, notificationIntent, 0)
+    }
+
+    //create notification
+    val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
+    .setOngoing(true)
+    .setContentTitle("You have messages waiting for you")
+    .setContentText("You have received new messages")
+    .setContentIntent(pendingIntent)
+    .setSmallIcon(R.mipmap.ic_launcher)
+    .setCategory(Notification.CATEGORY_MESSAGE)
+    .setAutoCancel(true)
+    .build()
+
+    Log.i(TAG,"Sending Notification for new messages");
+    val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.notify(1738,notification);
   }
 
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
@@ -175,6 +206,7 @@ class HerdBackgroundService : Service() {
 
     var totalBytes : ByteArray = byteArrayOf();
     var totalMessagesRead : Int = 0;
+    var receivedMessagesForUser : Boolean = false;
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
@@ -211,6 +243,12 @@ class HerdBackgroundService : Service() {
              gatt?.readCharacteristic(characteristic);
            }
            else {
+             //send a notificaiton if messages destined for this user were received
+             if(receivedMessagesForUser) {
+               sendMessageNotification()
+             }
+             //reset flag
+             receivedMessagesForUser = false;
              //end connection with this device
              bleDeviceList.remove(gatt.getDevice())
              gatt.close();
