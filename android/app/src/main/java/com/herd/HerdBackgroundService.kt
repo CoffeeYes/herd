@@ -64,6 +64,7 @@ class HerdBackgroundService : Service() {
   private var currentMessageBytes : ByteArray = byteArrayOf();
   val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
+  private var publicKey : String? = null;
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -225,6 +226,10 @@ class HerdBackgroundService : Service() {
            parcelMessage.unmarshall(totalBytes,0,totalBytes.size);
            parcelMessage.setDataPosition(0);
            val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
+           //check if message is destined for this user, set notification flag
+           if(message.to == publicKey) {
+             receivedMessagesForUser = true;
+           }
            //add custom parcelable to received array
            receivedMessages.add(message)
            Log.i(TAG,"Message : " + message.text)
@@ -635,6 +640,7 @@ class HerdBackgroundService : Service() {
         Log.i(TAG, "Service onStartCommand " + startId)
         val bundle : Bundle? = intent?.getExtras();
         messageQueue = bundle?.getParcelableArrayList("messageQueue");
+        publicKey = bundle?.getString("publicKey");
         //initialise byte array for sending message
         if((messageQueue?.size as Int) > 0) {
           createCurrentMessageBytes(messageQueue?.get(0))

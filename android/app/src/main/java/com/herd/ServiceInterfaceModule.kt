@@ -89,7 +89,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun enableService(messageQueue : ReadableArray) {
+  fun enableService(messageQueue : ReadableArray, publicKey : String) {
     val msgQ : ArrayList<HerdMessage> = ArrayList();
     for(i in 0 until messageQueue.size()) {
       val currentMsg : HerdMessage = HerdMessage(
@@ -105,6 +105,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     serviceIntent.putExtra("messageQueue",msgQ);
+    serviceIntent.putExtra("publicKey",publicKey);
     context.startService(serviceIntent);
     context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }

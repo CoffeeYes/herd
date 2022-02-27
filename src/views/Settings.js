@@ -97,7 +97,8 @@ const Settings = ({ navigation }) => {
       if(btEnabled && locationEnabled) {
         setBackgroundTransfer(true);
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
-        ServiceInterface.enableService(messageQueue);
+        const publicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
+        ServiceInterface.enableService(messageQueue,publicKey);
       }
     }
     else {
