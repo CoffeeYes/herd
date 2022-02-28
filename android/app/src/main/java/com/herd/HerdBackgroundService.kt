@@ -211,12 +211,16 @@ class HerdBackgroundService : Service() {
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
+       //get bytes for this read instance and add to overall bytes
        val messageBytes : ByteArray = characteristic.getValue();
        totalBytes += messageBytes
        Log.i(TAG,"Received ${messageBytes.size} Bytes");
+       //check if message transfer is over, signified by 0 size array being received
        if(messageBytes.size != 0) {
+         //continue reading until 0 size array is received
          gatt?.readCharacteristic(characteristic)
        }
+       //transfer is done, assemble message and save to array
        else {
          Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
          totalMessagesRead += 1;
@@ -226,12 +230,16 @@ class HerdBackgroundService : Service() {
            parcelMessage.unmarshall(totalBytes,0,totalBytes.size);
            parcelMessage.setDataPosition(0);
            val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
+           //check if message has been received before
+           val messageAlreadyExists : Boolean = receivedMessages.contains(message);
            //check if message is destined for this user, set notification flag
-           if(message.to == publicKey) {
+           if(message.to == publicKey && !messageAlreadyExists) {
              receivedMessagesForUser = true;
            }
            //add custom parcelable to received array
-           receivedMessages.add(message)
+           if(!messageAlreadyExists) {
+             receivedMessages.add(message)
+           }
            Log.i(TAG,"Message : " + message.text)
            //reset array for total bytes
            totalBytes = byteArrayOf();
