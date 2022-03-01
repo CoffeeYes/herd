@@ -62,7 +62,7 @@ class HerdBackgroundService : Service() {
   private var messagePointer : Int = 0;
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
-  val bleDeviceList = mutableSetOf<BluetoothDevice>();
+  private val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
 
@@ -74,6 +74,7 @@ class HerdBackgroundService : Service() {
   private var allowBleScan : Boolean = true;
 
   companion object {
+    @Volatile
     var running : Boolean = false;
   }
 
@@ -417,9 +418,16 @@ class HerdBackgroundService : Service() {
       //wait 30 seconds before starting scan again after stopping
       while(!allowBleScan){};
       //double check service is still running before starting scan
-      //as blocking call above prevents this section from being notified
-      BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
-      Log.i(TAG,"BLE Scanning started");
+      //as blocking call above could prevent this section from being notified
+      if(running) {
+        try {
+          BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
+          Log.i(TAG,"BLE Scanning started");
+        }
+        catch(e : Exception) {
+          Log.e(TAG,"Error starting BLE scan",e);
+        }
+      }
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -646,6 +654,7 @@ class HerdBackgroundService : Service() {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i(TAG, "Service onStartCommand " + startId)
+        running = true;
         val bundle : Bundle? = intent?.getExtras();
         messageQueue = bundle?.getParcelableArrayList("messageQueue");
         publicKey = bundle?.getString("publicKey");
@@ -657,7 +666,6 @@ class HerdBackgroundService : Service() {
         startGATTService();
         scanLeDevice();
         advertiseLE();
-        running = true;
         return Service.START_STICKY
     }
 
