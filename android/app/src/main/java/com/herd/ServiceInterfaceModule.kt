@@ -33,7 +33,7 @@ class HerdMessage(
   val to : String,
   val from : String,
   val text : String,
-  val timestamp : Int
+  val timestamp : Long
 ) : Parcelable {
   companion object {
     @JvmField
@@ -51,14 +51,14 @@ class HerdMessage(
         to = parcel.readString() as String,
         from = parcel.readString() as String,
         text = parcel.readString() as String,
-        timestamp = parcel.readInt()
+        timestamp = parcel.readLong()
   )
   override fun writeToParcel(parcel: Parcel, flags: Int) {
       parcel.writeString(_id)
       parcel.writeString(to)
       parcel.writeString(from)
       parcel.writeString(text)
-      parcel.writeInt(timestamp)
+      parcel.writeLong(timestamp)
   }
 
   override fun describeContents() = 0
@@ -97,7 +97,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         messageQueue.getMap(i).getString("to") as String,
         messageQueue.getMap(i).getString("from") as String,
         messageQueue.getMap(i).getString("text") as String,
-        messageQueue.getMap(i).getInt("timestamp")
+        //getDouble is the only way to get a long from JS as it is not natively supported in JS
+        messageQueue.getMap(i).getDouble("timestamp").toLong()
       )
       msgQ.add(currentMsg);
     }
@@ -118,7 +119,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         message.getString("to") as String,
         message.getString("from") as String,
         message.getString("text") as String,
-        message.getInt("timestamp")
+        //getDouble is the only way to get a long from JS as it is not natively supported in JS
+        message.getDouble("timestamp").toLong()
       )
       promise.resolve(service.addMessage(msgParcel))
     }
@@ -137,7 +139,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           messages.getMap(i).getString("to") as String,
           messages.getMap(i).getString("from") as String,
           messages.getMap(i).getString("text") as String,
-          messages.getMap(i).getInt("timestamp")
+          //getDouble is the only way to get a long from JS as it is not natively supported in JS
+          messages.getMap(i).getDouble("timestamp").toLong()
         )
         messagesToDelete.add(currentMsg);
       }
@@ -166,7 +169,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         newMessage.putString("to",message.to);
         newMessage.putString("from",message.from);
         newMessage.putString("text",message.text);
-        newMessage.putInt("timestamp",message.timestamp);
+        //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
+        newMessage.putDouble("timestamp",message.timestamp.toDouble());
         messages.pushMap(newMessage)
       }
     }

@@ -241,7 +241,6 @@ class HerdBackgroundService : Service() {
            if(!messageAlreadyExists) {
              receivedMessages.add(message)
            }
-           Log.i(TAG,"Message : " + message.text)
            //reset array for total bytes
            totalBytes = byteArrayOf();
            //check if there are more messages to read
