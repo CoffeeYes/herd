@@ -34,6 +34,9 @@ import android.os.Handler
 import android.os.ParcelUuid
 import java.util.UUID
 import java.util.ArrayList
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import android.os.Bundle
 import android.os.Parcelable
 import android.os.Parcel
@@ -649,6 +652,69 @@ class HerdBackgroundService : Service() {
 
   fun getReceivedMessages() : ArrayList<HerdMessage> {
     return receivedMessages;
+  }
+
+  fun writeToCache(filename : String, value : ByteArray) {
+    var tempFile : File = File(context.cacheDir,filename);
+    if(!tempFile.exists()) {
+      tempFile = File.createTempFile(filename,null,context.cacheDir);
+    }
+    val outputStream : FileOutputStream = FileOutputStream(tempFile);
+    outputStream.write(value);
+    outputStream.close();
+  }
+
+  fun readFromCache(filename : String) : ByteArray {
+    var buffer : ByteArray = byteArrayOf();
+    val tempFile = File(context.cacheDir,filename);
+    if(tempFile.exists()) {
+      val inputStream = FileInputStream(tempFile);
+      var finishedReading : Boolean = false;
+      //read until EOF is reached
+      while(!finishedReading) {
+        val currentByte : Int = inputStream.read();
+        if(currentByte == -1) {
+          finishedReading = true;
+          break;
+        }
+        else {
+          buffer += currentByte as Byte;
+        }
+      }
+      inputStream.close();
+    }
+    return buffer;
+  }
+
+  fun writeMessageQueueToCache(queue : ArrayList<HerdMessage>) {
+    var buffer : ByteArray = byteArrayOf();
+    val messageSizes : ArrayList<Int> = arrayListOf();
+    for(message in queue) {
+      val messageParcel : Parcel = Parcel.obtain();
+      message.writeToParcel(messageParcel,0);
+      val parcelBytes = messageParcel.marshall();
+      messageSizes.add(parcelBytes.size)
+      buffer += parcelBytes;
+    }
+    writeToCache("savedMessageQueueSizes",messageSizes as ByteArray);
+    writeToCache("savedMessageQueue",buffer);
+  }
+
+  fun readMessageQueueFromCache() : ArrayList<HerdMessage> {
+    var queue : ArrayList<HerdMessage> = arrayListOf();
+    var buffer : ByteArray = readFromCache("savedMessageQueue");
+    val messageSizes : ArrayList<Int> = readFromCache("savedMessageQueueSizes") as ArrayList<Int>;
+    for(size in messageSizes) {
+      //create Message from bytes and add to array
+      val parcelMessage : Parcel = Parcel.obtain();
+      parcelMessage.unmarshall(buffer,0,size);
+      parcelMessage.setDataPosition(0);
+      val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
+      queue.add(message);
+      //remove messageBytes from front of buffer
+      buffer = buffer.copyOfRange(size,buffer.lastIndex + 1);
+    }
+    return queue;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
