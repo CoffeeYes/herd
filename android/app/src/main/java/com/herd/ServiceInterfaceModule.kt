@@ -151,28 +151,39 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     }
   }
 
+  fun parseMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
+    var messages : WritableArray = Arguments.createArray();
+    val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
+
+    for(message in herdMessages) {
+      val newMessage : WritableMap = Arguments.createMap();
+      newMessage.putString("_id",message._id);
+      newMessage.putString("to",message.to);
+      newMessage.putString("from",message.from);
+      newMessage.putString("text",message.text);
+      //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
+      newMessage.putDouble("timestamp",message.timestamp.toDouble());
+      messages.pushMap(newMessage)
+    }
+    return messages;
+  }
+
   @ReactMethod
   fun getReceivedMessages(promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
       val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
-      for(message in herdMessages) {
-        /* val newMessage = mapOf(
-          "_id" to message._id,
-          "to" to message.to,
-          "from" to message.from,
-          "text" to message.text,
-          "timestamp" to message.timestamp
-        ) as ReadableMap */
-        val newMessage : WritableMap = Arguments.createMap();
-        newMessage.putString("_id",message._id);
-        newMessage.putString("to",message.to);
-        newMessage.putString("from",message.from);
-        newMessage.putString("text",message.text);
-        //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
-        newMessage.putDouble("timestamp",message.timestamp.toDouble());
-        messages.pushMap(newMessage)
-      }
+      messages = parseMessages(herdMessages);
+    }
+    promise.resolve(messages);
+  }
+
+  @ReactMethod
+  fun getCachedMessages(promise : Promise) {
+    var messages : WritableArray = Arguments.createArray();
+    if(bound) {
+      val cachedMessages : ArrayList<HerdMessage> = service.readMessageQueueFromCache();
+      messages = parseMessages(cachedMessages);
     }
     promise.resolve(messages);
   }
