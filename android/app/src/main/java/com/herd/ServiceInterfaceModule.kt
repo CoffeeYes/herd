@@ -11,6 +11,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.Arguments
 
 import com.herd.HerdBackgroundService
+import com.herd.StorageInterface
 
 import android.app.Service
 import android.content.ServiceConnection
@@ -182,7 +183,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun getCachedMessages(promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
-      val cachedMessages : ArrayList<HerdMessage> = service.readMessageQueueFromCache();
+      val cachedMessages : ArrayList<HerdMessage> = StorageInterface(context.getApplicationContext()).readMessageQueueFromCache();
       messages = parseMessages(cachedMessages);
     }
     promise.resolve(messages);
