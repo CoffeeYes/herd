@@ -154,17 +154,20 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   fun parseMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
     var messages : WritableArray = Arguments.createArray();
-    val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
-
-    for(message in herdMessages) {
-      val newMessage : WritableMap = Arguments.createMap();
-      newMessage.putString("_id",message._id);
-      newMessage.putString("to",message.to);
-      newMessage.putString("from",message.from);
-      newMessage.putString("text",message.text);
-      //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
-      newMessage.putDouble("timestamp",message.timestamp.toDouble());
-      messages.pushMap(newMessage)
+    try {
+      for(message in herdMessages) {
+        val newMessage : WritableMap = Arguments.createMap();
+        newMessage.putString("_id",message._id);
+        newMessage.putString("to",message.to);
+        newMessage.putString("from",message.from);
+        newMessage.putString("text",message.text);
+        //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
+        newMessage.putDouble("timestamp",message.timestamp.toDouble());
+        messages.pushMap(newMessage)
+      }
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error parsing herd messages",e);
     }
     return messages;
   }
@@ -180,12 +183,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun getCachedMessages(promise : Promise) {
+  fun getStoredMessages(promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
-    if(bound) {
-      val cachedMessages : ArrayList<HerdMessage> = StorageInterface(context.getApplicationContext()).readMessageQueueFromCache();
-      messages = parseMessages(cachedMessages);
-    }
+    val cachedMessages : ArrayList<HerdMessage> = StorageInterface(context.getApplicationContext())
+    .readMessageQueueFromStorage();
+    messages = parseMessages(cachedMessages);
     promise.resolve(messages);
   }
 

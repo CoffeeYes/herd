@@ -51,6 +51,8 @@ const App = ({ }) => {
         newMessages.length > 0 &&
         addNewReceivedMessagesToRealm(newMessages)
       }
+      const cachedMessages = await ServiceInterface.getStoredMessages();
+      console.log(cachedMessages)
     })()
   },[])
 

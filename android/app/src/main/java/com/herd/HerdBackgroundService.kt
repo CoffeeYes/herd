@@ -270,7 +270,7 @@ class HerdBackgroundService : Service() {
              bleDeviceList.remove(gatt.getDevice())
              gatt.close();
              totalMessagesRead = 0;
-             StorageInterface(context).writeMessageQueueToCache(receivedMessages);
+             StorageInterface(context).writeMessageQueueToStorage(receivedMessages);
              //start scanning for new devices
              scanLeDevice();
            }

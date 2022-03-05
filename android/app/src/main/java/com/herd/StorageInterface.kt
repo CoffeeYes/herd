@@ -12,14 +12,30 @@ import android.content.Context
 class StorageInterface(val context : Context) {
   private final val TAG = "StorageInterface";
 
-  fun writeToCache(filename : String, value : ByteArray) {
-    var tempFile : File = File(context.getCacheDir(),filename);
+  fun convertIntToBytes(int : Int) : ByteArray {
+    return byteArrayOf(
+      int.toByte(),
+      int.shr(8).toByte(),
+      int.shr(16).toByte(),
+      int.shr(24).toByte(),
+    )
+  }
+
+  fun convertBytesToInt(bytes : ByteArray) : Int {
+    return ((bytes[3].toInt() shl 24) or
+    (bytes[2].toInt() and 0xff shl 16) or
+    (bytes[1].toInt() and 0xff shl 8) or
+    (bytes[0].toInt() and 0xff));
+  }
+
+  fun writeToStorage(filename : String, value : ByteArray) {
+    var tempFile : File = File(context.getFilesDir(),filename);
     if(!tempFile.exists()) {
-      Log.i(TAG,"Requested cache file $filename did not exist, creating it.")
-      tempFile = File.createTempFile(filename,null,context.getCacheDir());
+      Log.i(TAG,"Requested storage file $filename did not exist, creating it.")
+      tempFile = File.createTempFile(filename,null,context.getFilesDir());
     }
     if(!tempFile.exists()) {
-      Log.i(TAG,"Error creating temporary cache file $filename");
+      Log.i(TAG,"Error creating temporary storage file $filename");
     }
     try {
       val outputStream : FileOutputStream = FileOutputStream(tempFile);
@@ -31,11 +47,11 @@ class StorageInterface(val context : Context) {
     }
   }
 
-  fun readFromCache(filename : String) : ByteArray {
+  fun readFromStorage(filename : String) : ByteArray {
     var buffer : ByteArray = byteArrayOf();
-    val tempFile = File(context.getCacheDir(),filename);
+    val tempFile = File(context.getFilesDir(),filename);
     if(tempFile.exists()) {
-      Log.i(TAG,"Found Cache File $filename");
+      Log.i(TAG,"Found Storage File $filename");
       val inputStream = FileInputStream(tempFile);
       var finishedReading : Boolean = false;
       //read until EOF is reached
@@ -52,13 +68,13 @@ class StorageInterface(val context : Context) {
       inputStream.close();
     }
     else {
-      Log.i(TAG,"Temporary Cache file $filename does not exist, cannot read from it");
+      Log.i(TAG,"Temporary Storage file $filename does not exist, cannot read from it");
     }
-    Log.i(TAG,"Read ${buffer.size} bytes from cache file $filename");
+    Log.i(TAG,"Read ${buffer.size} bytes from storage file $filename");
     return buffer;
   }
 
-  fun writeMessageQueueToCache(queue : ArrayList<HerdMessage>) {
+  fun writeMessageQueueToStorage(queue : ArrayList<HerdMessage>) {
     var buffer : ByteArray = byteArrayOf();
     val messageSizes : ArrayList<Int> = arrayListOf();
     var messageSizesBytes : ByteArray = byteArrayOf();
@@ -70,22 +86,30 @@ class StorageInterface(val context : Context) {
       buffer += parcelBytes;
     }
     for(item in messageSizes) {
-      messageSizesBytes += item.toByte();
+      messageSizesBytes += convertIntToBytes(item)
     }
-    writeToCache("savedMessageQueueSizes",messageSizesBytes);
-    writeToCache("savedMessageQueue",buffer);
+    Log.i(TAG,"Message Sizes being written : ${messageSizesBytes.size}, $messageSizesBytes")
+    writeToStorage("savedMessageQueueSizes",messageSizesBytes);
+    writeToStorage("savedMessageQueue",buffer);
   }
 
-  fun readMessageQueueFromCache() : ArrayList<HerdMessage> {
+  fun readMessageQueueFromStorage() : ArrayList<HerdMessage> {
     var queue : ArrayList<HerdMessage> = arrayListOf();
-    var buffer : ByteArray = readFromCache("savedMessageQueue");
-    val messageSizesBytes : ByteArray = readFromCache("savedMessageQueueSizes");
+    var buffer : ByteArray = readFromStorage("savedMessageQueue");
+    val messageSizesBytes : ByteArray = readFromStorage("savedMessageQueueSizes");
     var messageSizes : ArrayList<Int> = arrayListOf();
+    var tempArray : ByteArray = byteArrayOf();
     for(item in messageSizesBytes) {
-      messageSizes.add(item.toInt());
+      tempArray += item;
+      if(tempArray.size == 4) {
+        val currentInt : Int = convertBytesToInt(tempArray);
+        messageSizes.add(currentInt);
+        tempArray = byteArrayOf();
+      }
     }
-    Log.i(TAG,"Cache Message Bytes : ${messageSizesBytes.size}");
-    Log.i(TAG,"Cache Message Sizes : $messageSizes");
+    Log.i(TAG,"Int Size kotlin : ${Int.SIZE_BITS}")
+    Log.i(TAG,"Storage Message Bytes : ${messageSizesBytes.size}");
+    Log.i(TAG,"Storage Message Sizes : $messageSizes");
     for(size in messageSizes) {
       //create Message from bytes and add to array
       val parcelMessage : Parcel = Parcel.obtain();
