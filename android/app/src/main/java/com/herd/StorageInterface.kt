@@ -107,9 +107,7 @@ class StorageInterface(val context : Context) {
         tempArray = byteArrayOf();
       }
     }
-    Log.i(TAG,"Int Size kotlin : ${Int.SIZE_BITS}")
-    Log.i(TAG,"Storage Message Bytes : ${messageSizesBytes.size}");
-    Log.i(TAG,"Storage Message Sizes : $messageSizes");
+    Log.i(TAG,"Storage Message Bytes : ${messageSizesBytes.size}, Sizes : $messageSizes");
     for(size in messageSizes) {
       //create Message from bytes and add to array
       val parcelMessage : Parcel = Parcel.obtain();

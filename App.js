@@ -46,13 +46,15 @@ const App = ({ }) => {
   useEffect(() => {
     loadOwnKey();
     (async () => {
-      if(ServiceInterface.isRunning()) {
-        const newMessages = await ServiceInterface.getReceivedMessages();
-        newMessages.length > 0 &&
-        addNewReceivedMessagesToRealm(newMessages)
+      let newMessages = []
+      if(await ServiceInterface.isRunning()) {
+        newMessages = await ServiceInterface.getReceivedMessages();
       }
-      const cachedMessages = await ServiceInterface.getStoredMessages();
-      console.log(cachedMessages)
+      else {
+        newMessages = await ServiceInterface.getStoredMessages();
+      }
+      newMessages.length > 0 &&
+      addNewReceivedMessagesToRealm(newMessages)
     })()
   },[])
 
