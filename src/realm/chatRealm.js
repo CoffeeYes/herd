@@ -153,13 +153,28 @@ const deleteAllChats = () => {
 }
 
 const deleteMessages = messages => {
-  const messageCopiesToDelete = messages.map(id => messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
+  const sentMessageCopiesToDelete = messages.map(id =>
+    messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
+  ).filter(message => message !== undefined);
+  sentMessageCopiesToDelete.length > 0 &&
   messageCopyRealm.write(() => {
-    messageCopyRealm.delete(messageCopiesToDelete)
+    messageCopyRealm.delete(sentMessageCopiesToDelete)
   })
-  const messagesToDelete = messages.map(id => messageSentRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id)));
+
+  const sentMessagesToDelete = messages.map(id =>
+    messageSentRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
+  ).filter(message => message !== undefined);
+  sentMessagesToDelete.length > 0 &&
   messageSentRealm.write(() => {
-    messageSentRealm.delete(messagesToDelete)
+    messageSentRealm.delete(sentMessagesToDelete)
+  })
+
+  const receivedMessagesToDelete = messages.map(id =>
+    messageReceivedRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
+  ).filter(message => message !== undefined);
+  receivedMessagesToDelete.length > 0 &&
+  messageReceivedRealm.write(() => {
+    messageReceivedRealm.delete(receivedMessagesToDelete);
   })
 }
 
