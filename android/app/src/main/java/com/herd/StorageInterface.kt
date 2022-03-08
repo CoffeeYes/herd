@@ -120,4 +120,28 @@ class StorageInterface(val context : Context) {
     }
     return queue;
   }
+
+  fun deleteFile(filename : String) : Boolean {
+    var success : Boolean = false;
+    try {
+      val file = File(context.getFilesDir(),filename);
+      if(file.exists()) {
+        success =  file.delete();
+      }
+      else {
+        success = true;
+      }
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error deleting file $filename",e);
+      success = false;
+    }
+    return success;
+  }
+
+  fun deleteStoredMessages() : Boolean {
+    val deletedSizes = deleteFile("savedMessageQueueSizes");
+    val deletedMessages = deleteFile("savedMessageQueue");
+    return deletedSizes && deletedMessages;
+  }
 }
