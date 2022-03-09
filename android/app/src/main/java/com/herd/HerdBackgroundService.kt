@@ -182,7 +182,9 @@ class HerdBackgroundService : Service() {
           else -> "UNKNOWN STATE"
       });
       if(newState === BluetoothProfile.STATE_CONNECTED) {
-        gatt.requestMtu(151);
+        //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
+        //that fits in MTU
+        gatt.requestMtu(301);
         /* Log.i(TAG,"Discovering GATT Services");
         BLEScanner?.stopScan(leScanCallback);
         gatt.discoverServices(); */
@@ -236,13 +238,24 @@ class HerdBackgroundService : Service() {
            parcelMessage.setDataPosition(0);
            val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
            //check if message has been received before
-           val messageAlreadyExists : Boolean = receivedMessages.contains(message);
+           val messageAlreadyReceived : Boolean = receivedMessages.find{it -> it._id == message._id}  != null;
+
            //check if message is destined for this user, set notification flag
-           if(message.to == publicKey && !messageAlreadyExists) {
-             receivedMessagesForUser = true;
+           if(message.to == publicKey) {
+             if (!messageAlreadyReceived) {receivedMessagesForUser = true;}
+           }
+           //if message is destined for other user add it directly to messageQueue
+           else {
+             Log.i(TAG,"Received Message is for another user, adding it to Queue");
+             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id == message._id} != null;
+             Log.i(TAG,"message : " + message._id);
+             Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
+             if(!messageAlreadyInQueue) {
+               addMessage(message);
+             }
            }
            //add custom parcelable to received array
-           if(!messageAlreadyExists) {
+           if(!messageAlreadyReceived) {
              receivedMessages.add(message)
            }
            //reset array for total bytes

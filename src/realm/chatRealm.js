@@ -196,7 +196,7 @@ const getMessageQueue = async useMessageCopies => {
   let receivedMessagesCopy = [];
 
   sentMessages.map(message => sentMessagesCopy.push({...JSON.parse(JSON.stringify(message))}));
-  receivedMessages.map(message => receivedMessageCopy.push({...JSON.parse(JSON.stringify(message))}));
+  receivedMessages.map(message => receivedMessagesCopy.push({...JSON.parse(JSON.stringify(message))}));
 
   return [...sentMessagesCopy,...receivedMessagesCopy]
 }
