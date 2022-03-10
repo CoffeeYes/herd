@@ -19,6 +19,11 @@ const messageSentRealm = new Realm({
   schema : [Schemas.MessageSchema]
 })
 
+const deletedReceivedRealm = new Realm({
+  path : "MessagesReceivedAndDeleted",
+  schema : [Schemas.MessageSchema]
+})
+
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
   // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
@@ -82,7 +87,11 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 
 const addNewReceivedMessages = messages => {
   const receivedMessages = messageReceivedRealm.objects("Message");
-  const newMessages = messages.filter(nMessage => receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined)
+  const deletedReceivedMessage = deletedReceivedRealm.objects("Message");
+  const newMessages = messages.filter(nMessage =>
+    receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined &&
+    deletedReceivedMessage.find(dMessage => dMessage._id === nMessage.id) === undefined
+  );
   messageReceivedRealm.write(() => {
     newMessages.map(message => messageReceivedRealm.create("Message",{...message,_id : Realm.BSON.ObjectId(message._id)},true))
   })
@@ -172,6 +181,13 @@ const deleteMessages = messages => {
   const receivedMessagesToDelete = messages.map(id =>
     messageReceivedRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
   ).filter(message => message !== undefined);
+
+  //add deleted received messages to seperate realm to prevent them from being
+  //re-added in the future
+  receivedDeletedRealm.write(() => {
+    receivedMessagesToDelete.map(message => receivedMessagesToDelete.create('Message',message,true))
+  })
+  //remove deleted messages from received realm
   receivedMessagesToDelete.length > 0 &&
   messageReceivedRealm.write(() => {
     messageReceivedRealm.delete(receivedMessagesToDelete);
