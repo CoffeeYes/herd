@@ -184,8 +184,8 @@ const deleteMessages = messages => {
 
   //add deleted received messages to seperate realm to prevent them from being
   //re-added in the future
-  receivedDeletedRealm.write(() => {
-    receivedMessagesToDelete.map(message => receivedMessagesToDelete.create('Message',message,true))
+  deletedReceivedRealm.write(() => {
+    receivedMessagesToDelete.map(message => deletedReceivedRealm.create('Message',message,true))
   })
   //remove deleted messages from received realm
   receivedMessagesToDelete.length > 0 &&
