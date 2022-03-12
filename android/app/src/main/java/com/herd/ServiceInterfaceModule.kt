@@ -89,21 +89,55 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       return "ServiceInterfaceModule"
   }
 
+  fun createMessageFromObject(messageObject : ReadableMap) : HerdMessage {
+    val message : HerdMessage = HerdMessage(
+      messageObject.getString("_id") as String,
+      messageObject.getString("to") as String,
+      messageObject.getString("from") as String,
+      messageObject.getString("text") as String,
+      //getDouble is the only way to get a long from JS as it is not natively supported in JS
+      messageObject.getDouble("timestamp").toLong()
+    )
+    return message;
+  }
+
+  fun createObjectFromMessage(message : HerdMessage) : WritableMap {
+    val messageObject : WritableMap = Arguments.createMap();
+    messageObject.putString("_id",message._id);
+    messageObject.putString("to",message.to);
+    messageObject.putString("from",message.from);
+    messageObject.putString("text",message.text);
+    //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
+    messageObject.putDouble("timestamp",message.timestamp.toDouble());
+    return messageObject;
+  }
+
+  fun createMessagesFromArray(messageArray : ReadableArray) : ArrayList<HerdMessage> {
+    val messages : ArrayList<HerdMessage> = ArrayList();
+    for(i in 0 until messageArray.size()) {
+      val currentMessageObject : HerdMessage = createMessageFromObject(messageArray.getMap(i));
+      messages.add(currentMessageObject);
+    }
+    return messages;
+  }
+
+  fun createArrayFromMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
+    var messages : WritableArray = Arguments.createArray();
+    try {
+      for(message in herdMessages) {
+        val newMessage : WritableMap = createObjectFromMessage(message);
+        messages.pushMap(newMessage)
+      }
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error parsing herd messages",e);
+    }
+    return messages;
+  }
+
   @ReactMethod
   fun enableService(messageQueue : ReadableArray, publicKey : String) {
-    val msgQ : ArrayList<HerdMessage> = ArrayList();
-    for(i in 0 until messageQueue.size()) {
-      val currentMsg : HerdMessage = HerdMessage(
-        messageQueue.getMap(i).getString("_id") as String,
-        messageQueue.getMap(i).getString("to") as String,
-        messageQueue.getMap(i).getString("from") as String,
-        messageQueue.getMap(i).getString("text") as String,
-        //getDouble is the only way to get a long from JS as it is not natively supported in JS
-        messageQueue.getMap(i).getDouble("timestamp").toLong()
-      )
-      msgQ.add(currentMsg);
-    }
-    /* Log.i(TAG,"TEST : " + messageQueue.getMap(0).getString("to")); */
+    val msgQ : ArrayList<HerdMessage> = createMessagesFromArray(messageQueue);
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     serviceIntent.putExtra("messageQueue",msgQ);
@@ -115,14 +149,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun addMessageToService(message : ReadableMap,promise : Promise) {
     if(bound) {
-      val msgParcel : HerdMessage = HerdMessage(
-        message.getString("_id") as String,
-        message.getString("to") as String,
-        message.getString("from") as String,
-        message.getString("text") as String,
-        //getDouble is the only way to get a long from JS as it is not natively supported in JS
-        message.getDouble("timestamp").toLong()
-      )
+      val msgParcel : HerdMessage = createMessageFromObject(message);
       promise.resolve(service.addMessage(msgParcel))
     }
     else {
@@ -133,43 +160,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun removeMessagesFromService(messages : ReadableArray, promise : Promise) {
     if(bound) {
-      val messagesToDelete : ArrayList<HerdMessage> = ArrayList();
-      for(i in 0 until messages.size()) {
-        val currentMsg : HerdMessage = HerdMessage(
-          messages.getMap(i).getString("_id") as String,
-          messages.getMap(i).getString("to") as String,
-          messages.getMap(i).getString("from") as String,
-          messages.getMap(i).getString("text") as String,
-          //getDouble is the only way to get a long from JS as it is not natively supported in JS
-          messages.getMap(i).getDouble("timestamp").toLong()
-        )
-        messagesToDelete.add(currentMsg);
-      }
-      promise.resolve(service.removeMessage(messagesToDelete))
+      val messagesToDelete : ArrayList<HerdMessage> = createMessagesFromArray(messages);
+      promise.resolve(service.removeMessage(messagesToDelete));
     }
     else {
       promise.resolve(false);
     }
-  }
-
-  fun parseMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
-    var messages : WritableArray = Arguments.createArray();
-    try {
-      for(message in herdMessages) {
-        val newMessage : WritableMap = Arguments.createMap();
-        newMessage.putString("_id",message._id);
-        newMessage.putString("to",message.to);
-        newMessage.putString("from",message.from);
-        newMessage.putString("text",message.text);
-        //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
-        newMessage.putDouble("timestamp",message.timestamp.toDouble());
-        messages.pushMap(newMessage)
-      }
-    }
-    catch(e : Exception) {
-      Log.e(TAG,"Error parsing herd messages",e);
-    }
-    return messages;
   }
 
   @ReactMethod
@@ -177,17 +173,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
       val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
-      messages = parseMessages(herdMessages);
+      messages = createArrayFromMessages(herdMessages);
     }
     promise.resolve(messages);
   }
 
   @ReactMethod
   fun getStoredMessages(promise : Promise) {
-    var messages : WritableArray = Arguments.createArray();
     val storageInterface = StorageInterface(context.getApplicationContext());
     val cachedMessages : ArrayList<HerdMessage> = storageInterface.readMessageQueueFromStorage();
-    messages = parseMessages(cachedMessages);
+    val messages : WritableArray = createArrayFromMessages(cachedMessages);
     promise.resolve(messages);
     storageInterface.deleteStoredMessages();
   }
