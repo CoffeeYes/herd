@@ -64,6 +64,7 @@ class HerdBackgroundService : Service() {
   private val context : Context = this;
   private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
   private var messagePointer : Int = 0;
+  private var deletedMessages : ArrayList<HerdMessage>? = ArrayList();
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
@@ -239,10 +240,11 @@ class HerdBackgroundService : Service() {
            val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
            //check if message has been received before
            val messageAlreadyReceived : Boolean = receivedMessages.find{it -> it._id == message._id}  != null;
-
-           //check if message is destined for this user, set notification flag
+           //check if message has been previously deleted by user
+           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
+           //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to == publicKey) {
-             if (!messageAlreadyReceived) {receivedMessagesForUser = true;}
+             if (!messageAlreadyReceived && !messagePreviouslyDeleted) {receivedMessagesForUser = true;}
            }
            //if message is destined for other user add it directly to messageQueue
            else {
@@ -255,7 +257,7 @@ class HerdBackgroundService : Service() {
              }
            }
            //add custom parcelable to received array
-           if(!messageAlreadyReceived) {
+           if(!messageAlreadyReceived && !messagePreviouslyDeleted) {
              receivedMessages.add(message)
            }
            //reset array for total bytes
@@ -674,6 +676,7 @@ class HerdBackgroundService : Service() {
       running = true;
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
+      deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
       publicKey = bundle?.getString("publicKey");
       //initialise byte array for sending message
       if((messageQueue?.size as Int) > 0) {

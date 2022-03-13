@@ -14,7 +14,10 @@ import { closeContactRealm } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import CardButton from './CardButton';
 
-import { getMessageQueue, deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
+import {
+  getMessageQueue,
+  getDeletedReceivedMessages,
+  deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
 const Settings = ({ navigation }) => {
@@ -97,8 +100,9 @@ const Settings = ({ navigation }) => {
       if(btEnabled && locationEnabled) {
         setBackgroundTransfer(true);
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
+        const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
         const publicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-        ServiceInterface.enableService(messageQueue,publicKey);
+        ServiceInterface.enableService(messageQueue,deletedReceivedMessages,publicKey);
       }
     }
     else {

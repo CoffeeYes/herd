@@ -136,12 +136,14 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun enableService(messageQueue : ReadableArray, publicKey : String) {
+  fun enableService(messageQueue : ReadableArray, deletedReceivedMessages : ReadableArray, publicKey : String) {
     val msgQ : ArrayList<HerdMessage> = createMessagesFromArray(messageQueue);
+    val deletedMessages = createMessagesFromArray(deletedReceivedMessages);
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     serviceIntent.putExtra("messageQueue",msgQ);
     serviceIntent.putExtra("publicKey",publicKey);
+    serviceIntent.putExtra("deletedMessages",deletedMessages);
     context.startService(serviceIntent);
     context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }

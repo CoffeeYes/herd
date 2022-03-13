@@ -217,6 +217,10 @@ const getMessageQueue = async useMessageCopies => {
   return [...sentMessagesCopy,...receivedMessagesCopy]
 }
 
+const getDeletedReceivedMessages = () => {
+  return deletedReceivedRealm.objects('Message').map(message => JSON.parse(JSON.stringify(message)));
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -232,5 +236,6 @@ export {
   deleteAllChats,
   deleteMessages,
   getMessageQueue,
+  getDeletedReceivedMessages,
   closeChatRealm,
 }
