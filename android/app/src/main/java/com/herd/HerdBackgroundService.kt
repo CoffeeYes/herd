@@ -43,6 +43,9 @@ import android.os.Parcel
 import kotlinx.parcelize.Parcelize
 import android.os.Looper
 
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
+
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.NotificationChannel
@@ -87,6 +90,20 @@ class HerdBackgroundService : Service() {
     fun getService() : HerdBackgroundService = this@HerdBackgroundService
   }
   private val binder = LocalBinder();
+
+  private final val bluetoothStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val action : String? = intent.action
+      if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+        if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+          Log.i(TAG,"Bluetooth Turned off, stopping service");
+          //stop this service and remove notification
+          stopForeground(true);
+          running = false;
+        }
+      }
+    }
+  }
 
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
@@ -686,6 +703,7 @@ class HerdBackgroundService : Service() {
       startGATTService();
       scanLeDevice();
       advertiseLE();
+      this.registerReceiver(bluetoothStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
       return Service.START_STICKY
     }
 
@@ -696,9 +714,12 @@ class HerdBackgroundService : Service() {
 
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
-      BLEScanner?.stopScan(leScanCallback)
-      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
-      gattServer?.close();
+      if(BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+        BLEScanner?.stopScan(leScanCallback)
+        BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
+        gattServer?.close();
+      }
+      this.unregisterReceiver(bluetoothStateReceiver);
       running = false;
   }
 }
