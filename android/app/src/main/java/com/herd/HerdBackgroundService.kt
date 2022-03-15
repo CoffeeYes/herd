@@ -674,6 +674,11 @@ class HerdBackgroundService : Service() {
     if(lengthBefore != null && lengthAfter != null) {
       deleted = (lengthBefore - lengthAfter) == messages.size
     }
+    //if deleted message was last message update it to prevent OOB error.
+    val messageQueueSize : Int = messageQueue?.size as Int
+    if(messagePointer >= messageQueueSize) {
+      messagePointer = messageQueueSize - 1;
+    }
     return deleted;
   }
 
