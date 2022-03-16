@@ -97,7 +97,12 @@ class HerdBackgroundService : Service() {
       if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
         if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
           Log.i(TAG,"Bluetooth Turned off, stopping service");
-          //stop this service and remove notification
+          //let the user know the service is stopping
+          sendNotification(
+            "Herd has stopped sending messages in the background",
+            "because bluetooth was turned off"
+          )
+          //stop this service and remove constant notification
           stopForeground(true);
           running = false;
         }
@@ -169,7 +174,7 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  private fun sendMessageNotification() {
+  private fun sendNotification(title : String, text : String) {
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
         PendingIntent.getActivity(this, 0, notificationIntent, 0)
     }
@@ -177,8 +182,8 @@ class HerdBackgroundService : Service() {
     //create notification
     val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
     .setOngoing(true)
-    .setContentTitle("You have messages waiting for you")
-    .setContentText("You have received new messages")
+    .setContentTitle(title)
+    .setContentText(text)
     .setContentIntent(pendingIntent)
     .setSmallIcon(R.mipmap.ic_launcher)
     .setCategory(Notification.CATEGORY_MESSAGE)
@@ -294,7 +299,7 @@ class HerdBackgroundService : Service() {
            else {
              //send a notificaiton if messages destined for this user were received
              if(receivedMessagesForUser) {
-               sendMessageNotification()
+               sendNotification("You have messages waiting for you","You have received new messages");
              }
              //reset flag
              receivedMessagesForUser = false;
@@ -674,7 +679,7 @@ class HerdBackgroundService : Service() {
     if(lengthBefore != null && lengthAfter != null) {
       deleted = (lengthBefore - lengthAfter) == messages.size
     }
-    //if deleted message was last message update it to prevent OOB error.
+    //if deleted message was last message update pointer to prevent OOB error.
     val messageQueueSize : Int = messageQueue?.size as Int
     if(messagePointer >= messageQueueSize) {
       messagePointer = messageQueueSize - 1;
