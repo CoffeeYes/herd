@@ -42,6 +42,7 @@ import android.os.Parcelable
 import android.os.Parcel
 import kotlinx.parcelize.Parcelize
 import android.os.Looper
+import android.location.LocationManager
 
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
@@ -101,6 +102,26 @@ class HerdBackgroundService : Service() {
           sendNotification(
             "Herd has stopped sending messages in the background",
             "because bluetooth was turned off"
+          )
+          //stop this service and remove constant notification
+          stopForeground(true);
+          running = false;
+        }
+      }
+    }
+  }
+
+  private final val locationStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val action : String? = intent.action
+      if(action === "android.location.PROVIDERS_CHANGED") {
+        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+        if(!locationManager.isLocationEnabled()) {
+          Log.i(TAG,"Location has been turned off, stopping service");
+          //let the user know the service is stopping
+          sendNotification(
+            "Herd has stopped sending messages in the background",
+            "because location was turned off"
           )
           //stop this service and remove constant notification
           stopForeground(true);
@@ -714,6 +735,7 @@ class HerdBackgroundService : Service() {
       scanLeDevice();
       advertiseLE();
       this.registerReceiver(bluetoothStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+      this.registerReceiver(locationStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
       return Service.START_STICKY
     }
 
