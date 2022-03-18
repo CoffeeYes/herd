@@ -70,6 +70,7 @@ class HerdBackgroundService : Service() {
   private var messagePointer : Int = 0;
   private var deletedMessages : ArrayList<HerdMessage>? = ArrayList();
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
+  private var receivedMessagesForSelf : ArrayList<HerdMessage>? = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
@@ -281,8 +282,10 @@ class HerdBackgroundService : Service() {
            parcelMessage.unmarshall(totalBytes,0,totalBytes.size);
            parcelMessage.setDataPosition(0);
            val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-           //check if message has been received before
-           val messageAlreadyReceived : Boolean = receivedMessages.find{it -> it._id == message._id}  != null;
+           //check if message has been received before, either in this instance of the background service
+           //or another instance where it has already been passed up to JS side
+           val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id == message._id}  != null) ||
+           (receivedMessagesForSelf?.find{it -> it._id == message._id} != null)
            //check if message has been previously deleted by user
            val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
@@ -725,6 +728,7 @@ class HerdBackgroundService : Service() {
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
       deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
+      receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
       publicKey = bundle?.getString("publicKey");
       //initialise byte array for sending message
       if((messageQueue?.size as Int) > 0) {
@@ -752,6 +756,7 @@ class HerdBackgroundService : Service() {
         gattServer?.close();
       }
       this.unregisterReceiver(bluetoothStateReceiver);
+      this.unregisterReceiver(locationStateReceiver);
       running = false;
   }
 }

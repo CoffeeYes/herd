@@ -17,6 +17,7 @@ import CardButton from './CardButton';
 import {
   getMessageQueue,
   getDeletedReceivedMessages,
+  getReceivedMessagesForSelf,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
@@ -102,7 +103,13 @@ const Settings = ({ navigation }) => {
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
         const publicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-        ServiceInterface.enableService(messageQueue,deletedReceivedMessages,publicKey);
+        const receivedMessagesForSelf = getReceivedMessagesForSelf(publicKey);
+        ServiceInterface.enableService(
+          messageQueue,
+          receivedMessagesForSelf,
+          deletedReceivedMessages,
+          publicKey
+        );
       }
     }
     else {

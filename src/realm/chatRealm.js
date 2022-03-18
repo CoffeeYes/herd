@@ -221,6 +221,11 @@ const getDeletedReceivedMessages = () => {
   return deletedReceivedRealm.objects('Message').map(message => JSON.parse(JSON.stringify(message)));
 }
 
+const getReceivedMessagesForSelf = key => {
+  return messageReceivedRealm.objects('Message').filtered(`to == '${key}'`)
+  .map(message => JSON.parse(JSON.stringify(message)))
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -237,5 +242,6 @@ export {
   deleteMessages,
   getMessageQueue,
   getDeletedReceivedMessages,
+  getReceivedMessagesForSelf,
   closeChatRealm,
 }
