@@ -8,7 +8,8 @@ import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 import com.herd.HerdBackgroundService
 import com.herd.StorageInterface
@@ -27,6 +28,8 @@ import android.util.Log
 import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 import android.content.ComponentName
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
 
 /* @Parcelize */
 class HerdMessage(
@@ -82,6 +85,23 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     override fun onServiceDisconnected(name : ComponentName) {
       Log.i(TAG,"Service disconnected");
       bound = false;
+    }
+  }
+
+  private final val messageReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val action : String? = intent.action;
+      if(action == "com.herd.NEW_HERD_MESSAGE_RECEIVED") {
+        val bundle : Bundle? = intent.getExtras();
+        val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
+        Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
+        if(messages != null && (messages?.size as Int) > 0) {
+          val messageArray = createArrayFromMessages(messages as ArrayList<HerdMessage>);
+          //pass object to JS through event emitter
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("newHerdMessagesReceived",messageArray);
+        }
+      }
     }
   }
 
@@ -150,6 +170,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("publicKey",publicKey);
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
+      context.registerReceiver(messageReceiver,IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED"));
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }
@@ -201,6 +222,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     context.unbindService(serviceConnection);
     context.stopService(serviceIntent);
+    context.unregisterReceiver(messageReceiver);
     bound = false;
   }
 

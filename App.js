@@ -6,7 +6,8 @@ import {
   View,
   Text,
   StatusBar,
-  Button
+  Button,
+  NativeEventEmitter
 } from 'react-native';
 
 import {
@@ -56,6 +57,14 @@ const App = ({ }) => {
       newMessages.length > 0 &&
       addNewReceivedMessagesToRealm(newMessages)
     })()
+
+    const eventEmitter = new NativeEventEmitter(ServiceInterface);
+    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
+      console.log("event emitter for messages")
+      console.log(messages);
+    })
+
+    return messagesListener.remove();
   },[])
 
   const loadOwnKey = async () => {

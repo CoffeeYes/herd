@@ -217,6 +217,12 @@ class HerdBackgroundService : Service() {
     notificationManager.notify(1738,notification);
   }
 
+  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?) {
+    val intent : Intent = Intent("com.herd.NEW_HERD_MESSAGE_RECEIVED");
+    intent.putParcelableArrayListExtra("messages",messages);
+    sendBroadcast(intent);
+  }
+
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -321,6 +327,7 @@ class HerdBackgroundService : Service() {
              gatt?.readCharacteristic(characteristic);
            }
            else {
+             sendMessagesToReceiver(receivedMessages);
              //send a notificaiton if messages destined for this user were received
              if(receivedMessagesForUser) {
                sendNotification("You have messages waiting for you","You have received new messages");
