@@ -327,10 +327,11 @@ class HerdBackgroundService : Service() {
              gatt?.readCharacteristic(characteristic);
            }
            else {
-             sendMessagesToReceiver(receivedMessages);
              //send a notificaiton if messages destined for this user were received
+             //also emit messages to receiver in case they are already in the app
              if(receivedMessagesForUser) {
                sendNotification("You have messages waiting for you","You have received new messages");
+               sendMessagesToReceiver(receivedMessages);
              }
              //reset flag
              receivedMessagesForUser = false;

@@ -60,11 +60,12 @@ const App = ({ }) => {
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
-      console.log("event emitter for messages")
-      console.log(messages);
+      addNewReceivedMessagesToRealm(messages);
     })
 
-    return messagesListener.remove();
+    return () => {
+      messagesListener.remove();
+    }
   },[])
 
   const loadOwnKey = async () => {

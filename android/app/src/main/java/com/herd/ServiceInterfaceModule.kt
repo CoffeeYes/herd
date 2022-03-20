@@ -70,7 +70,7 @@ class HerdMessage(
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext;
-  private final val TAG = "ServiceInterfaceModule";
+  private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
   private var bound : Boolean = false;
 

@@ -10,7 +10,7 @@ import android.os.Parcel;
 import android.content.Context
 
 class StorageInterface(val context : Context) {
-  private final val TAG = "StorageInterface";
+  private final val TAG = "HerdStorageInterface";
 
   fun convertIntToBytes(int : Int) : ByteArray {
     return byteArrayOf(
