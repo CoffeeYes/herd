@@ -198,6 +198,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun addDeletedMessagesToService(messages : ReadableArray, promise : Promise) {
+    var success : Boolean = false;
+    if(bound) {
+      val msgArray : ArrayList<HerdMessage> = createMessagesFromArray(messages);
+      success = service.addMessagesToDeletedList(msgArray);
+    }
+    promise.resolve(success);
+  }
+
+  @ReactMethod
   fun getReceivedMessages(promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
     if(bound) {

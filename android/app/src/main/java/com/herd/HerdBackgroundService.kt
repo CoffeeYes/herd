@@ -702,6 +702,17 @@ class HerdBackgroundService : Service() {
     return added;
   }
 
+  fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
+    val added : Boolean = deletedMessages?.addAll(messages) as Boolean;
+    if(added) {
+      Log.i(TAG,"Successfully added messages to deleted list");
+    }
+    else {
+      Log.i(TAG,"Failed to add messages to deleted list")
+    }
+    return added;
+  }
+
   fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
     val lengthBefore : Int? = messageQueue?.size;
     messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
