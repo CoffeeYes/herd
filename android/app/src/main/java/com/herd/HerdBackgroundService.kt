@@ -266,6 +266,9 @@ class HerdBackgroundService : Service() {
     var totalBytes : ByteArray = byteArrayOf();
     var totalMessagesRead : Int = 0;
     var receivedMessagesForUser : Boolean = false;
+    var messageReadTimeout : Boolean = false;
+    var messageTimeoutRegistered : Boolean = false;
+    val handler : Handler = Handler();
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
@@ -273,16 +276,29 @@ class HerdBackgroundService : Service() {
        val messageBytes : ByteArray = characteristic.getValue();
        totalBytes += messageBytes
        Log.i(TAG,"Received ${messageBytes.size} Bytes");
+       //register timeout per message to prevent infinite loop on error
+       val timeoutRunnable = object : Runnable {
+         override fun run() {
+           Log.d(TAG,"Message read timed out");
+           messageReadTimeout = true;
+         }
+       }
+       if(!messageTimeoutRegistered) {
+         messageTimeoutRegistered = handler.postDelayed(timeoutRunnable,10000);
+       }
        //check if message transfer is over, signified by 0 size array being received
-       if(messageBytes.size != 0) {
+       if(messageBytes.size != 0 && !messageReadTimeout) {
          //continue reading until 0 size array is received
          gatt?.readCharacteristic(characteristic)
        }
        //transfer is done, assemble message and save to array
        else {
-         Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
-         totalMessagesRead += 1;
+         //reset message timeout
+         handler.removeCallbacksAndMessages(null);
+         messageTimeoutRegistered = false;
          try {
+           Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
+           totalMessagesRead += 1;
            //create parcel and custom parcelable from received bytes
            val parcelMessage : Parcel = Parcel.obtain();
            parcelMessage.unmarshall(totalBytes,0,totalBytes.size);
@@ -345,7 +361,15 @@ class HerdBackgroundService : Service() {
            }
          }
          catch(e : Exception) {
-           Log.d(TAG,"Error creating message from parcel : ",e)
+           Log.d(TAG,"Error creating message from parcel : ",e);
+           //reset connection variables for next connection
+           bleDeviceList.remove(gatt.getDevice())
+           gatt.close();
+           totalMessagesRead = 0;
+           totalBytes = byteArrayOf();
+           messageReadTimeout = false;
+           messageTimeoutRegistered = false;
+           scanLeDevice();
          }
        }
        /* val parcelMessage : Parcel = Parcel.obtain();
@@ -586,6 +610,12 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
       });
+      //reset values on disconnect to ensure values are not carried forward
+      //when unexpected disconnect occurs.
+      if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+        currentPacket = 0;
+        offsetSize = 0;
+      }
     }
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
