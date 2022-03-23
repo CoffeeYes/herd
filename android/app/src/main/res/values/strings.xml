@@ -13,4 +13,11 @@
     <string name="messageQueueDescriptorUUID">
       663bb186-30a5-4e78-8d42-e8f1a57c5f0a
     </string>
+    <string name="transferCompleteCharacteristicUUID">
+      547d9721-b143-4113-910b-d0608a3c4fda
+    </string>
+    <string name="MTUCharacteristicUUID">
+      7f9f74f7-2d7d-4f6a-b5c9-81983202ef1f
+    </string>
+
 </resources>
