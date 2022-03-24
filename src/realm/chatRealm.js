@@ -226,6 +226,24 @@ const getReceivedMessagesForSelf = key => {
   .map(message => JSON.parse(JSON.stringify(message)))
 }
 
+const removeCompletedMessagesFromRealm = messages => {
+  //get messages sent from this device which have reached their final destination
+  const sentMessagesToRemove = messageSentRealm.objects('Message')
+  .filter(sentMessage => messages.find(message => message._id == sentMessage._id) != undefined)
+
+  messageSentRealm.write(() => {
+    messageSentRealm.delete(sentMessagesToRemove);
+  })
+
+  //get messages sent from this device which have reached their final destination
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message')
+  .filter(receivedMessage => messages.find(message => message._id == receivedMessage._id) != undefined)
+
+  messageReceivedRealm.write(() => {
+    messageReceivedRealm.delete(receivedMessagesToDelete);
+  })
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -243,5 +261,6 @@ export {
   getMessageQueue,
   getDeletedReceivedMessages,
   getReceivedMessagesForSelf,
+  removeCompletedMessagesFromRealm,
   closeChatRealm,
 }

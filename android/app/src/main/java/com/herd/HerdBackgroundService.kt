@@ -707,6 +707,7 @@ class HerdBackgroundService : Service() {
          if(message != null) {
            val removed = messageQueue?.remove(message)
            Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
+           messagesToRemoveFromQueue.add(message);
          }
          gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
     }
@@ -788,7 +789,7 @@ class HerdBackgroundService : Service() {
     return added;
   }
 
-  fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
+  public fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
     val added : Boolean = deletedMessages?.addAll(messages) as Boolean;
     if(added) {
       Log.i(TAG,"Successfully added messages to deleted list");
@@ -799,7 +800,7 @@ class HerdBackgroundService : Service() {
     return added;
   }
 
-  fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
+  public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
     val lengthBefore : Int? = messageQueue?.size;
     messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
     val lengthAfter : Int? = messageQueue?.size;
@@ -839,8 +840,12 @@ class HerdBackgroundService : Service() {
     return message;
   }
 
-  fun getReceivedMessages() : ArrayList<HerdMessage> {
+  public fun getReceivedMessages() : ArrayList<HerdMessage> {
     return receivedMessages;
+  }
+
+  public fun getCompletedMessages() : ArrayList<HerdMessage> {
+    return messagesToRemoveFromQueue;
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

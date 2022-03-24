@@ -218,6 +218,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun getCompletedMessages(promise : Promise) {
+    var messages : WritableArray = Arguments.createArray();
+    if(bound) {
+      val herdMessages : ArrayList<HerdMessage> = service.getCompletedMessages();
+      messages = createArrayFromMessages(herdMessages);
+    }
+    promise.resolve(messages);
+  }
+
+  @ReactMethod
   fun getStoredMessages(promise : Promise) {
     val storageInterface = StorageInterface(context.getApplicationContext());
     val cachedMessages : ArrayList<HerdMessage> = storageInterface.readMessageQueueFromStorage();

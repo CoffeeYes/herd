@@ -38,7 +38,10 @@ import EditContact from './src/views/EditContact';
 import Customise from './src/views/Customise';
 import MessageQueue from './src/views/MessageQueue';
 
-import { addNewReceivedMessages as addNewReceivedMessagesToRealm} from './src/realm/chatRealm'
+import {
+  addNewReceivedMessages as addNewReceivedMessagesToRealm,
+  removeCompletedMessagesFromRealm
+} from './src/realm/chatRealm'
 
 const Stack = createStackNavigator()
 
@@ -55,7 +58,13 @@ const App = ({ }) => {
         newMessages = await ServiceInterface.getStoredMessages();
       }
       newMessages.length > 0 &&
-      addNewReceivedMessagesToRealm(newMessages)
+      addNewReceivedMessagesToRealm(newMessages);
+
+      //remove messages which have reached their final destination
+      const completedMessages = await ServiceInterface.getCompletedMessages();
+      
+      completedMessages.length > 0 &&
+      removeCompletedMessagesFromRealm(completedMessages);
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
