@@ -312,7 +312,10 @@ class HerdBackgroundService : Service() {
            val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to == publicKey) {
-             if (!messageAlreadyReceived && !messagePreviouslyDeleted) {receivedMessagesForUser = true;}
+             if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
+               receivedMessagesForUser = true;
+               receivedMessagesForSelf?.add(message);
+             }
            }
            //if message is destined for other user add it directly to messageQueue
            else {
@@ -353,11 +356,35 @@ class HerdBackgroundService : Service() {
              receivedMessagesForUser = false;
              //end connection with this device
              bleDeviceList.remove(gatt.getDevice())
-             gatt.close();
+             /* gatt.close(); */
              totalMessagesRead = 0;
              StorageInterface(context).writeMessageQueueToStorage(receivedMessages);
              //start scanning for new devices
-             scanLeDevice();
+             /* scanLeDevice(); */
+
+             //start write-back phase to let server know which messages have
+             //reached their final destination and can be removed from message queue
+             val services = gatt.getServices();
+
+             val messageService : BluetoothGattService? = services.find {
+               service -> service.uuid.equals(messageQueueServiceUUID)
+             };
+
+             val transferCompleteCharacteristic = messageService?.characteristics?.find {
+               characteristic -> characteristic.uuid.equals(transferCompleteCharacteristicUUID)
+             };
+
+             if(transferCompleteCharacteristic != null) {
+               Log.i(TAG,"Transfer complete characteristic found");
+               transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
+               gatt.writeCharacteristic(transferCompleteCharacteristic);
+             }
+             else {
+               Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
+               bleDeviceList.remove(gatt.getDevice());
+               gatt.close();
+               scanLeDevice();
+             }
            }
          }
          catch(e : Exception) {
@@ -397,28 +424,11 @@ class HerdBackgroundService : Service() {
            gatt.writeCharacteristic(characteristic);
          }
          else {
-           //initiate reading messages once unwanted ones have been removed on server side
-           val services = gatt.getServices();
-
-           val messageService : BluetoothGattService? = services.find {
-             service -> service.uuid.equals(messageQueueServiceUUID)
-           };
-
-           val messageCharacteristic : BluetoothGattCharacteristic? =
-           messageService?.characteristics?.find { characteristic ->
-             characteristic.uuid.equals(messageQueueCharacteristicUUID)
-           };
-
-           if(messageCharacteristic != null) {
-             Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
-             gatt.readDescriptor(messageCharacteristic.getDescriptor(messageQueueDescriptorUUID));
-           }
-           else {
-             Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
-             bleDeviceList.remove(gatt.getDevice());
-             gatt.close();
-             scanLeDevice();
-           }
+           Log.i(TAG,"Write-back phase complete");
+           writeMessageIndex = 0;
+           bleDeviceList.remove(gatt.getDevice());
+           gatt.close();
+           scanLeDevice();
          }
        }
     }
@@ -451,7 +461,23 @@ class HerdBackgroundService : Service() {
           service -> service.uuid.equals(messageQueueServiceUUID)
         };
 
-        val transferCompleteCharacteristic = messageService?.characteristics?.find {
+        val messageCharacteristic : BluetoothGattCharacteristic? =
+        messageService?.characteristics?.find { characteristic ->
+          characteristic.uuid.equals(messageQueueCharacteristicUUID)
+        };
+
+        if(messageCharacteristic != null) {
+          Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
+          gatt.readDescriptor(messageCharacteristic.getDescriptor(messageQueueDescriptorUUID));
+        }
+        else {
+          Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
+          bleDeviceList.remove(gatt.getDevice());
+          gatt.close();
+          scanLeDevice();
+        }
+
+        /* val transferCompleteCharacteristic = messageService?.characteristics?.find {
           characteristic -> characteristic.uuid.equals(transferCompleteCharacteristicUUID)
         };
 
@@ -465,7 +491,7 @@ class HerdBackgroundService : Service() {
           bleDeviceList.remove(gatt.getDevice());
           gatt.close();
           scanLeDevice();
-        }
+        } */
       }
     }
   }
@@ -663,12 +689,6 @@ class HerdBackgroundService : Service() {
           if((messageQueue?.size as Int) > messagePointer){
             //increment packet for offset calculation
             currentPacket += 1;
-            //get MTU rate by looking at initial offset sent with third request
-            //first request is descriptor read, second request has offset 0
-            //third request has first actuall MTU value
-            /* if(requestId == 3) {
-              offsetSize = offset;
-            } */
             Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
             //calculate current offset in total array for sending current chunk
             val currentOffset : Int = offsetSize * (currentPacket - 1);
@@ -736,17 +756,13 @@ class HerdBackgroundService : Service() {
     try {
       val service : BluetoothGattService = BluetoothGattService(messageQueueServiceUUID,BluetoothGattService.SERVICE_TYPE_PRIMARY);
 
-      /* val characteristic : BluetoothGattCharacteristic = BluetoothGattCharacteristic(messageQueueCharacteristicUUID,
-      BluetoothGattCharacteristic.PROPERTY_READ or
-      BluetoothGattCharacteristic.PROPERTY_NOTIFY or
-      BluetoothGattCharacteristic.PROPERTY_BROADCAST,
-      BluetoothGattCharacteristic.PERMISSION_READ); */
       //characteristic through which the message queue will be read
       val messageQueueCharacteristic = BluetoothGattCharacteristic(
         messageQueueCharacteristicUUID,
         BluetoothGattCharacteristic.PROPERTY_READ,
         BluetoothGattCharacteristic.PERMISSION_READ
       );
+
       //descriptor to show client how many messages are available to be read
       val descriptor : BluetoothGattDescriptor = BluetoothGattDescriptor(
         messageQueueDescriptorUUID,
@@ -756,7 +772,6 @@ class HerdBackgroundService : Service() {
 
       //back-channel to allow client to inform server of messages which have
       //arrived at their final destination.
-
       val transferCompleteCharacteristic = BluetoothGattCharacteristic(
         transferCompleteCharacteristicUUID,
         BluetoothGattCharacteristic.PROPERTY_WRITE,
