@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import CameraMarker from './CameraMarker';
 import CustomButton from './CustomButton';
+import Orientation from "react-native-orientation-locker";
 
 const QRScanner = ({ navigation }) => {
 
@@ -14,6 +15,13 @@ const QRScanner = ({ navigation }) => {
       }
     )
   }
+
+  useEffect(() => {
+    Orientation.lockToPortrait();
+    return () => {
+      Orientation.unlockAllOrientations();
+    }
+  },[])
 
   return (
     <QRCodeScanner
