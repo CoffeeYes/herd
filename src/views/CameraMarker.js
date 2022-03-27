@@ -17,8 +17,8 @@ const CameraMarker = ({ borderWidth, borderColor }) => {
           borderLeftWidth : borderWidth,
           borderTopColor : borderColor,
           borderLeftColor : borderColor,
-          width : Dimensions.get("window").width * 0.3,
-          height : Dimensions.get("window").width * 0.3}}
+          width : Dimensions.get("window").width * 0.2,
+          height : Dimensions.get("window").width * 0.2}}
         />
 
         <View style={{
@@ -27,8 +27,8 @@ const CameraMarker = ({ borderWidth, borderColor }) => {
           borderTopColor : borderColor,
           borderRightColor : borderColor,
           alignSelf : "flex-end",
-          width : Dimensions.get("window").width * 0.3,
-          height : Dimensions.get("window").width * 0.3}}
+          width : Dimensions.get("window").width * 0.2,
+          height : Dimensions.get("window").width * 0.2}}
         />
       </View>
 
@@ -41,8 +41,8 @@ const CameraMarker = ({ borderWidth, borderColor }) => {
           borderLeftWidth : borderWidth,
           borderBottomColor : borderColor,
           borderLeftColor : borderColor,
-          width : Dimensions.get("window").width * 0.3,
-          height : Dimensions.get("window").width * 0.3}}
+          width : Dimensions.get("window").width * 0.2,
+          height : Dimensions.get("window").width * 0.2}}
         />
 
         <View style={{
@@ -51,8 +51,8 @@ const CameraMarker = ({ borderWidth, borderColor }) => {
           borderBottomColor : borderColor,
           borderRightColor : borderColor,
           alignSelf : "flex-end",
-          width : Dimensions.get("window").width * 0.3,
-          height : Dimensions.get("window").width * 0.3}}
+          width : Dimensions.get("window").width * 0.2,
+          height : Dimensions.get("window").width * 0.2}}
         />
       </View>
     </View>

@@ -18,9 +18,7 @@ const QRScanner = ({ navigation }) => {
 
   useEffect(() => {
     Orientation.lockToPortrait();
-    return () => {
-      Orientation.unlockAllOrientations();
-    }
+    return Orientation.unlockAllOrientations;
   },[])
 
   return (
@@ -29,6 +27,8 @@ const QRScanner = ({ navigation }) => {
     onRead={handleRead}
     reactivate={true}
     customMarker={<CameraMarker borderWidth={5} borderColor="white"/>}
+    cameraStyle={styles.camera}
+    containerStyle={styles.container}
     bottomContent={
       <CustomButton
       text="Cancel"
@@ -36,6 +36,17 @@ const QRScanner = ({ navigation }) => {
       buttonStyle={{marginTop : 30}}/>
     }/>
   )
+}
+
+const styles = {
+  container : {
+    alignItems : "center",
+    justifyContent : "center"
+  },
+  camera : {
+    maxHeight : Dimensions.get('window').height * 0.8,
+    maxWidth : Dimensions.get('window').width
+  },
 }
 
 export default QRScanner;
