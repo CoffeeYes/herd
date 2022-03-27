@@ -7,6 +7,7 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "rebuild": "cd android && gradlew clean && cd .. && react-native run-android",
+    "docs": "jsdoc -c jsdoc.conf.json",
     "test": "jest",
     "lint": "eslint .",
     "run-relase": "react-native run-android --variant=release"
@@ -19,8 +20,10 @@
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/native": "^5.9.8",
     "@react-navigation/stack": "^5.14.9",
+    "better-docs": "^2.7.2",
     "buffer": "^6.0.3",
     "fbjs": "^3.0.0",
+    "jsdoc": "^3.6.10",
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "react": "16.13.1",
@@ -37,7 +40,7 @@
     "react-native-reanimated": "^1.13.3",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^2.18.1",
-    "react-native-svg": "^12.1.1",
+    "react-native-svg": "^12.3.0",
     "react-native-vector-icons": "^7.1.0",
     "realm": "^10.12.0",
     "uuid": "^8.3.2"

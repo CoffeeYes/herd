@@ -60,3 +60,6 @@ buck-out/
 
 #android signing config file
 keystore.properties
+
+#ignore folder with generated docs
+docs/
