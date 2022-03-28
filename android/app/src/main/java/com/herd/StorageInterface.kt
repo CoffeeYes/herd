@@ -41,6 +41,7 @@ class StorageInterface(val context : Context) {
       val outputStream : FileOutputStream = FileOutputStream(tempFile);
       outputStream.write(value);
       outputStream.close();
+      Log.i(TAG,"$filename File Length : ${tempFile.length()}");
     }
     catch(e : Exception) {
       Log.e(TAG,"Error opening fileoutputstream for $filename",e);
@@ -74,7 +75,7 @@ class StorageInterface(val context : Context) {
     return buffer;
   }
 
-  fun writeMessageQueueToStorage(queue : ArrayList<HerdMessage>) {
+  fun writeMessagesToStorage(queue : ArrayList<HerdMessage>,messagesFilename : String, sizesFilename : String) {
     var buffer : ByteArray = byteArrayOf();
     val messageSizes : ArrayList<Int> = arrayListOf();
     var messageSizesBytes : ByteArray = byteArrayOf();
@@ -89,14 +90,14 @@ class StorageInterface(val context : Context) {
       messageSizesBytes += convertIntToBytes(item)
     }
     Log.i(TAG,"Message Sizes being written : ${messageSizesBytes.size}, $messageSizesBytes")
-    writeToStorage("savedMessageQueueSizes",messageSizesBytes);
-    writeToStorage("savedMessageQueue",buffer);
+    writeToStorage(sizesFilename,messageSizesBytes);
+    writeToStorage(messagesFilename,buffer);
   }
 
-  fun readMessageQueueFromStorage() : ArrayList<HerdMessage> {
+  fun readMessagesFromStorage(messagesFilename : String, sizesFilename : String) : ArrayList<HerdMessage> {
     var queue : ArrayList<HerdMessage> = arrayListOf();
-    var buffer : ByteArray = readFromStorage("savedMessageQueue");
-    val messageSizesBytes : ByteArray = readFromStorage("savedMessageQueueSizes");
+    var buffer : ByteArray = readFromStorage(messagesFilename);
+    val messageSizesBytes : ByteArray = readFromStorage(sizesFilename);
     var messageSizes : ArrayList<Int> = arrayListOf();
     var tempArray : ByteArray = byteArrayOf();
     for(item in messageSizesBytes) {
@@ -139,9 +140,9 @@ class StorageInterface(val context : Context) {
     return success;
   }
 
-  fun deleteStoredMessages() : Boolean {
-    val deletedSizes = deleteFile("savedMessageQueueSizes");
-    val deletedMessages = deleteFile("savedMessageQueue");
+  fun deleteStoredMessages(messagesFilename : String, sizesFilename : String) : Boolean {
+    val deletedSizes = deleteFile(sizesFilename);
+    val deletedMessages = deleteFile(messagesFilename);
     return deletedSizes && deletedMessages;
   }
 }

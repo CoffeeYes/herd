@@ -239,9 +239,6 @@ class HerdBackgroundService : Service() {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
         gatt.requestMtu(301);
-        /* Log.i(TAG,"Discovering GATT Services");
-        BLEScanner?.stopScan(leScanCallback);
-        gatt.discoverServices(); */
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
         scanLeDevice();
@@ -336,12 +333,6 @@ class HerdBackgroundService : Service() {
            //check if there are more messages to read
            if(totalMessagesRead < remoteMessageQueueSize) {
              Log.i(TAG,"Messages Read : $totalMessagesRead/$remoteMessageQueueSize");
-             /* Log.i(TAG,"Waiting 10 Seconds before reading next message");
-
-             Handler(Looper.getMainLooper()).postDelayed({
-                 Log.i(TAG,"Starting to read next Message");
-                 gatt?.readCharacteristic(characteristic);
-             },10000) */
              Log.i(TAG,"Starting to read next Message");
              gatt?.readCharacteristic(characteristic);
            }
@@ -358,7 +349,11 @@ class HerdBackgroundService : Service() {
              bleDeviceList.remove(gatt.getDevice())
              /* gatt.close(); */
              totalMessagesRead = 0;
-             StorageInterface(context).writeMessageQueueToStorage(receivedMessages);
+             StorageInterface(context).writeMessagesToStorage(
+               receivedMessages,
+               "savedMessageQueue",
+               "savedMessageQueueSizes"
+             );
              //start scanning for new devices
              /* scanLeDevice(); */
 
@@ -399,19 +394,8 @@ class HerdBackgroundService : Service() {
            scanLeDevice();
          }
        }
-       /* val parcelMessage : Parcel = Parcel.obtain();
-       parcelMessage.unmarshall(messageBytes,0,messageBytes.size);
-       parcelMessage.setDataPosition(0); */
-       /* Log.i(TAG,"Characteristic : " + messageBytes); */
-
-       /* try {
-         val Message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-         Log.i(TAG,"Message : " + Message.text)
-       }
-       catch(e : Exception) {
-         Log.d(TAG,"Error creating message from parcel : ",e)
-       } */
     }
+
     var writeMessageIndex : Int = 0;
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicWrite");
@@ -476,22 +460,6 @@ class HerdBackgroundService : Service() {
           gatt.close();
           scanLeDevice();
         }
-
-        /* val transferCompleteCharacteristic = messageService?.characteristics?.find {
-          characteristic -> characteristic.uuid.equals(transferCompleteCharacteristicUUID)
-        };
-
-        if(transferCompleteCharacteristic != null) {
-          Log.i(TAG,"Transfer complete characteristic found");
-          transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
-          gatt.writeCharacteristic(transferCompleteCharacteristic);
-        }
-        else {
-          Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
-          bleDeviceList.remove(gatt.getDevice());
-          gatt.close();
-          scanLeDevice();
-        } */
       }
     }
   }

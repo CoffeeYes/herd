@@ -230,10 +230,13 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun getStoredMessages(promise : Promise) {
     val storageInterface = StorageInterface(context.getApplicationContext());
-    val cachedMessages : ArrayList<HerdMessage> = storageInterface.readMessageQueueFromStorage();
+    val cachedMessages : ArrayList<HerdMessage> = storageInterface.readMessagesFromStorage(
+      "savedMessageQueue",
+      "savedMessageQueueSizes"
+    );
     val messages : WritableArray = createArrayFromMessages(cachedMessages);
     promise.resolve(messages);
-    storageInterface.deleteStoredMessages();
+    storageInterface.deleteStoredMessages("savedMessageQueue","savedMessageQueueSizes");
   }
 
   @ReactMethod
