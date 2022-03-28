@@ -29,19 +29,11 @@ class StorageInterface(val context : Context) {
   }
 
   fun writeToStorage(filename : String, value : ByteArray) {
-    var tempFile : File = File(context.getFilesDir(),filename);
-    if(!tempFile.exists()) {
-      Log.i(TAG,"Requested storage file $filename did not exist, creating it.")
-      tempFile = File.createTempFile(filename,null,context.getFilesDir());
-    }
-    if(!tempFile.exists()) {
-      Log.i(TAG,"Error creating temporary storage file $filename");
-    }
     try {
-      val outputStream : FileOutputStream = FileOutputStream(tempFile);
+      val outputStream : FileOutputStream = context.openFileOutput(filename,Context.MODE_PRIVATE);
       outputStream.write(value);
       outputStream.close();
-      Log.i(TAG,"$filename File Length : ${tempFile.length()}");
+      Log.i(TAG,"Wrote ${value.size} bytes to file $filename");
     }
     catch(e : Exception) {
       Log.e(TAG,"Error opening fileoutputstream for $filename",e);
