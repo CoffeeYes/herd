@@ -407,6 +407,8 @@ class HerdBackgroundService : Service() {
          }
          else {
            Log.i(TAG,"Write-back phase complete");
+           characteristic.setValue("COMPLETE".toByteArray());
+           gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
            bleDeviceList.remove(gatt.getDevice());
            gatt.close();
@@ -689,13 +691,24 @@ class HerdBackgroundService : Service() {
          Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
          Log.i(TAG,"characteristic value size : ${value.size}");
          val messageID : String = String(value);
-         val message = messageQueue?.find {it -> it._id == messageID};
-         if(message != null) {
-           val removed = messageQueue?.remove(message)
-           Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
-           messagesToRemoveFromQueue.add(message);
+         if(messageID != "COMPLETE") {
+           val message = messageQueue?.find {it -> it._id == messageID};
+           if(message != null) {
+             val removed = messageQueue?.remove(message)
+             Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
+             messagesToRemoveFromQueue.add(message);
+           }
+           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
          }
-         gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
+         else {
+           Log.i(TAG,"Server message writeback complete");
+           //store deleted messages in case service is cancelled before app is opened
+           StorageInterface(context).writeMessagesToStorage(
+             messagesToRemoveFromQueue,
+             "messagesToRemove",
+             "messagesToRemoveSizes"
+           );
+         }
     }
 
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
