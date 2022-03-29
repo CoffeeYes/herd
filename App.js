@@ -55,16 +55,8 @@ const App = ({ }) => {
         newMessages = await ServiceInterface.getReceivedMessages();
       }
       else {
-        newMessages = await ServiceInterface.getStoredMessages();
+        loadStoredMessages();
       }
-      newMessages.length > 0 &&
-      addNewReceivedMessagesToRealm(newMessages);
-
-      //remove messages which have reached their final destination
-      const completedMessages = await ServiceInterface.getCompletedMessages();
-      
-      completedMessages.length > 0 &&
-      removeCompletedMessagesFromRealm(completedMessages);
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
@@ -72,9 +64,7 @@ const App = ({ }) => {
       addNewReceivedMessagesToRealm(messages);
     })
 
-    return () => {
-      messagesListener.remove();
-    }
+    return messagesListener.remove;
   },[])
 
   const loadOwnKey = async () => {
@@ -82,6 +72,24 @@ const App = ({ }) => {
     if(!key) {
       navigationRef.current.navigate("splash")
     }
+  }
+
+  const loadStoredMessages = async () => {
+    const newMessages = await ServiceInterface.getStoredMessages(
+      "savedMessageQueue",
+      "savedMessageQueueSizes"
+    )
+
+    newMessages.length > 0 &&
+    addNewReceivedMessagesToRealm(newMessages);
+
+    const messagesToRemove = await ServiceInterface.getStoredMessages(
+      "messagesToRemove",
+      "messagesToRemoveSizes"
+    )
+
+    messagesToRemove.length > 0 &&
+    removeCompletedMessagesFromRealm(messagesToRemove);
   }
 
   return (
