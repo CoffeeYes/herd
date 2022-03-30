@@ -235,7 +235,7 @@ const removeCompletedMessagesFromRealm = messages => {
     messageSentRealm.delete(sentMessagesToRemove);
   })
 
-  //get messages sent from this device which have reached their final destination
+  //get messages received, potentially for other users, which have reached their final destination
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message')
   .filter(receivedMessage => messages.find(message => message._id == receivedMessage._id) != undefined)
 

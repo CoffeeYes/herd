@@ -369,7 +369,12 @@ class HerdBackgroundService : Service() {
 
              if(transferCompleteCharacteristic != null) {
                Log.i(TAG,"Transfer complete characteristic found");
-               transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
+               if((deletedMessages?.size as Int) > 0) {
+                 transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
+               }
+               else {
+                 transferCompleteCharacteristic.setValue("COMPLETE".toByteArray());
+               }
                gatt.writeCharacteristic(transferCompleteCharacteristic);
              }
              else {
@@ -400,7 +405,7 @@ class HerdBackgroundService : Service() {
        if(characteristic.uuid.toString().equals(getString(R.string.transferCompleteCharacteristicUUID))) {
          val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) + (receivedMessagesForSelf as ArrayList<HerdMessage>);
          writeMessageIndex += 1;
-         if(writeMessageIndex < (messagesToAvoid.size - 1)) {
+         if(writeMessageIndex < messagesToAvoid.size) {
            Log.i(TAG,"Writing message id $writeMessageIndex/${(messagesToAvoid.size - 1)}")
            characteristic.setValue(messagesToAvoid.get(writeMessageIndex)._id.toByteArray());
            gatt.writeCharacteristic(characteristic);
