@@ -31,6 +31,12 @@ target 'herd' do
   #post_install do |installer|
   #  flipper_post_install(installer)
   #end
+
+  #permissions setup
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
 end
 
 target 'herd-tvOS' do

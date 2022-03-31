@@ -59,12 +59,12 @@ const App = ({ }) => {
       }
     })()
 
-    const eventEmitter = new NativeEventEmitter(ServiceInterface);
-    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
-      addNewReceivedMessagesToRealm(messages);
-    })
-
-    return messagesListener.remove;
+    // const eventEmitter = new NativeEventEmitter(ServiceInterface);
+    // const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
+    //   addNewReceivedMessagesToRealm(messages);
+    // })
+    //
+    // return messagesListener.remove;
   },[])
 
   const loadOwnKey = async () => {
