@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* herdTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* herdTests.m */; };
 		134091E927F632BF00C69C5B /* HerdCryptoModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 134091E827F632BF00C69C5B /* HerdCryptoModule.m */; };
+		134091EE27F6374100C69C5B /* HerdBluetoothModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 134091EA27F6374100C69C5B /* HerdBluetoothModule.m */; };
+		134091EF27F6374100C69C5B /* HerdServiceInterfaceModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 134091ED27F6374100C69C5B /* HerdServiceInterfaceModule.m */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -49,6 +51,10 @@
 		0FBB8BA8D44607B7BF8512EE /* libPods-herd.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-herd.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		134091E727F6325700C69C5B /* HerdCryptoModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HerdCryptoModule.h; sourceTree = "<group>"; };
 		134091E827F632BF00C69C5B /* HerdCryptoModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HerdCryptoModule.m; sourceTree = "<group>"; };
+		134091EA27F6374100C69C5B /* HerdBluetoothModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HerdBluetoothModule.m; sourceTree = "<group>"; };
+		134091EB27F6374100C69C5B /* HerdBluetoothModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HerdBluetoothModule.h; sourceTree = "<group>"; };
+		134091EC27F6374100C69C5B /* HerdServiceInterfaceModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HerdServiceInterfaceModule.h; sourceTree = "<group>"; };
+		134091ED27F6374100C69C5B /* HerdServiceInterfaceModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HerdServiceInterfaceModule.m; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* herd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = herd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = herd/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = herd/AppDelegate.m; sourceTree = "<group>"; };
@@ -195,6 +201,10 @@
 			children = (
 				134091E727F6325700C69C5B /* HerdCryptoModule.h */,
 				134091E827F632BF00C69C5B /* HerdCryptoModule.m */,
+				134091EB27F6374100C69C5B /* HerdBluetoothModule.h */,
+				134091EA27F6374100C69C5B /* HerdBluetoothModule.m */,
+				134091EC27F6374100C69C5B /* HerdServiceInterfaceModule.h */,
+				134091ED27F6374100C69C5B /* HerdServiceInterfaceModule.m */,
 				13B07FAE1A68108700A75B9A /* herd */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* herdTests */,
@@ -678,7 +688,9 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				134091EF27F6374100C69C5B /* HerdServiceInterfaceModule.m in Sources */,
 				134091E927F632BF00C69C5B /* HerdCryptoModule.m in Sources */,
+				134091EE27F6374100C69C5B /* HerdBluetoothModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
