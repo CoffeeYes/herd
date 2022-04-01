@@ -406,7 +406,7 @@ class HerdBackgroundService : Service() {
          val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) + (receivedMessagesForSelf as ArrayList<HerdMessage>);
          writeMessageIndex += 1;
          if(writeMessageIndex < messagesToAvoid.size) {
-           Log.i(TAG,"Writing message id $writeMessageIndex/${(messagesToAvoid.size - 1)}")
+           Log.i(TAG,"Writing message id ${writeMessageIndex + 1}/${messagesToAvoid.size}")
            characteristic.setValue(messagesToAvoid.get(writeMessageIndex)._id.toByteArray());
            gatt.writeCharacteristic(characteristic);
          }
@@ -429,7 +429,14 @@ class HerdBackgroundService : Service() {
             //receive remote messageQueue size and start reading messages
             remoteMessageQueueSize = descriptor.getValue().get(0).toInt();
             Log.i(TAG,"Remote Message Queue Size : $remoteMessageQueueSize");
-            gatt.readCharacteristic(descriptor.getCharacteristic());
+            if(remoteMessageQueueSize > 0) {
+              gatt.readCharacteristic(descriptor.getCharacteristic());
+            }
+            else {
+              bleDeviceList.remove(gatt.getDevice());
+              gatt.close();
+              scanLeDevice();
+            }
           }
           catch(e : Exception) {
             Log.i(TAG,"Error getting remote message queue size.",e);
@@ -647,6 +654,7 @@ class HerdBackgroundService : Service() {
       if(newState == BluetoothProfile.STATE_DISCONNECTED) {
         currentPacket = 0;
         offsetSize = 0;
+        scanLeDevice();
       }
     }
 
