@@ -415,9 +415,9 @@ class HerdBackgroundService : Service() {
            characteristic.setValue("COMPLETE".toByteArray());
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
-           bleDeviceList.remove(gatt.getDevice());
-           gatt.close();
-           scanLeDevice();
+           /* bleDeviceList.remove(gatt.getDevice()); */
+           /* gatt.close(); */
+           /* scanLeDevice(); */
          }
        }
     }
@@ -468,11 +468,127 @@ class HerdBackgroundService : Service() {
         }
         else {
           Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
-          bleDeviceList.remove(gatt.getDevice());
+          /* bleDeviceList.remove(gatt.getDevice()); */
           gatt.close();
           scanLeDevice();
         }
       }
+    }
+  }
+
+  var offsetSize : Int = 0;
+  var currentPacket : Int = 0;
+  private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
+    override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
+      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+          else -> "UNKNOWN STATE"
+      });
+      //reset values on disconnect to ensure values are not carried forward
+      //when unexpected disconnect occurs.
+      if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+        currentPacket = 0;
+        offsetSize = 0;
+        scanLeDevice();
+      }
+    }
+
+    override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
+      Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
+      offsetSize = mtu - 1;
+    }
+
+    override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, characteristic : BluetoothGattCharacteristic) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
+        try {
+          if((messageQueue?.size as Int) > messagePointer){
+            //increment packet for offset calculation
+            currentPacket += 1;
+            Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
+            //calculate current offset in total array for sending current chunk
+            val currentOffset : Int = offsetSize * (currentPacket - 1);
+            Log.i(TAG,"Current Message Offset : $currentOffset");
+            if(currentOffset < currentMessageBytes.size) {
+              //create current subArray starting from offset
+              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex + 1);
+              /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
+              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
+            }
+            else {
+              //send empty array to indicate that transfer is done to client
+              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
+              //reset currentPacket counter for next message
+              currentPacket = 0;
+              //update message pointer to point to next message with boundary check
+              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              //create new byteArray for next message to be sent
+              createCurrentMessageBytes(messageQueue?.get(messagePointer));
+              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
+            }
+          }
+        }
+        catch(e : Exception) {
+          Log.d(TAG,"Error sending onCharacteristicReadRequest response : ",e);
+        }
+    }
+
+    override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
+       characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
+       responseNeeded : Boolean, offset : Int, value : ByteArray) {
+         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
+         Log.i(TAG,"characteristic value size : ${value.size}");
+         val messageID : String = String(value);
+         if(messageID != "COMPLETE") {
+           val message = messageQueue?.find {it -> it._id == messageID};
+           if(message != null) {
+             val removed = messageQueue?.remove(message)
+             Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
+             messagesToRemoveFromQueue.add(message);
+           }
+           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
+         }
+         else {
+           Log.i(TAG,"Server message writeback complete");
+           //store deleted messages in case service is cancelled before app is opened
+           StorageInterface(context).writeMessagesToStorage(
+             messagesToRemoveFromQueue,
+             "messagesToRemove",
+             "messagesToRemoveSizes"
+           );
+           if(!bleDeviceList.contains(device)) {
+             device.connectGatt(
+               context,
+               false,
+               bluetoothGattClientCallback,
+               BluetoothDevice.TRANSPORT_LE
+             );
+           }
+           else {
+             bleDeviceList.remove(device);
+           }
+         }
+    }
+
+    override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, descriptor : BluetoothGattDescriptor) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
+        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
+          gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf((messageQueue?.size as Int).toByte()))
+        }
+    }
+
+    override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
+      descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
+      responseNeeded : Boolean, offset : Int, value : ByteArray) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
+    }
+
+    override fun onServiceAdded(status : Int, service : BluetoothGattService) {
+      Log.i(TAG,"GATT Server onServiceAdded, status : $status");
     }
   }
 
@@ -637,112 +753,6 @@ class HerdBackgroundService : Service() {
       )
     }
   }
-
-  var offsetSize : Int = 0;
-  var currentPacket : Int = 0;
-  private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
-    override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
-      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-          else -> "UNKNOWN STATE"
-      });
-      //reset values on disconnect to ensure values are not carried forward
-      //when unexpected disconnect occurs.
-      if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        currentPacket = 0;
-        offsetSize = 0;
-        scanLeDevice();
-      }
-    }
-
-    override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
-      Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
-      offsetSize = mtu - 1;
-    }
-
-    override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
-      offset : Int, characteristic : BluetoothGattCharacteristic) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
-        try {
-          if((messageQueue?.size as Int) > messagePointer){
-            //increment packet for offset calculation
-            currentPacket += 1;
-            Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
-            //calculate current offset in total array for sending current chunk
-            val currentOffset : Int = offsetSize * (currentPacket - 1);
-            Log.i(TAG,"Current Message Offset : $currentOffset");
-            if(currentOffset < currentMessageBytes.size) {
-              //create current subArray starting from offset
-              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex + 1);
-              /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
-              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
-            }
-            else {
-              //send empty array to indicate that transfer is done to client
-              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
-              //reset currentPacket counter for next message
-              currentPacket = 0;
-              //update message pointer to point to next message with boundary check
-              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
-              //create new byteArray for next message to be sent
-              createCurrentMessageBytes(messageQueue?.get(messagePointer));
-              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
-            }
-          }
-        }
-        catch(e : Exception) {
-          Log.d(TAG,"Error sending onCharacteristicReadRequest response : ",e);
-        }
-    }
-
-    override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
-       characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
-       responseNeeded : Boolean, offset : Int, value : ByteArray) {
-         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
-         Log.i(TAG,"characteristic value size : ${value.size}");
-         val messageID : String = String(value);
-         if(messageID != "COMPLETE") {
-           val message = messageQueue?.find {it -> it._id == messageID};
-           if(message != null) {
-             val removed = messageQueue?.remove(message)
-             Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
-             messagesToRemoveFromQueue.add(message);
-           }
-           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
-         }
-         else {
-           Log.i(TAG,"Server message writeback complete");
-           //store deleted messages in case service is cancelled before app is opened
-           StorageInterface(context).writeMessagesToStorage(
-             messagesToRemoveFromQueue,
-             "messagesToRemove",
-             "messagesToRemoveSizes"
-           );
-         }
-    }
-
-    override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
-      offset : Int, descriptor : BluetoothGattDescriptor) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
-        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
-          gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf((messageQueue?.size as Int).toByte()))
-        }
-    }
-
-    override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
-      descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
-      responseNeeded : Boolean, offset : Int, value : ByteArray) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
-    }
-
-    override fun onServiceAdded(status : Int, service : BluetoothGattService) {
-      Log.i(TAG,"GATT Server onServiceAdded, status : $status");
-    }
-  }
-
 
   private fun startGATTService() {
     try {
