@@ -668,18 +668,20 @@ class HerdBackgroundService : Service() {
       .build()
 
       //wait 30 seconds before starting scan again after stopping
-      while(!allowBleScan){};
-      //double check service is still running before starting scan
-      //as blocking call above could prevent this section from being notified
-      if(running) {
-        try {
-          BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
-          Log.i(TAG,"BLE Scanning started");
-        }
-        catch(e : Exception) {
-          Log.e(TAG,"Error starting BLE scan",e);
-        }
-      }
+      Thread({
+        while(!allowBleScan){};
+          //double check service is still running before starting scan
+          //as blocking call above could prevent this section from being notified
+          if(running) {
+            try {
+              BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
+              Log.i(TAG,"BLE Scanning started");
+            }
+            catch(e : Exception) {
+              Log.e(TAG,"Error starting BLE scan",e);
+            }
+          }
+      }).start()
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
