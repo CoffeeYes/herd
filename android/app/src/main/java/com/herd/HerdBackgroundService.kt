@@ -34,6 +34,7 @@ import android.os.Handler
 import android.os.ParcelUuid
 import java.util.UUID
 import java.util.ArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -76,6 +77,7 @@ class HerdBackgroundService : Service() {
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
+  private val bleScanningThreadActive = AtomicBoolean(false);
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -253,7 +255,7 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"MTU Request failed, MTU changed to $mtu");
       }
       Log.i(TAG,"Discovering GATT Services");
-      BLEScanner?.stopScan(leScanCallback);
+      stopLeScan();
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
       Handler(Looper.getMainLooper()).postDelayed({
@@ -667,12 +669,14 @@ class HerdBackgroundService : Service() {
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
-      //wait 30 seconds before starting scan again after stopping
-      Thread({
-        while(!allowBleScan){};
+      if(!bleScanningThreadActive.get()) {
+        Thread({
+          bleScanningThreadActive.set(true);
+          //wait 30 seconds before starting scan again after stopping
+          while(!allowBleScan && bleScanningThreadActive.get()){};
           //double check service is still running before starting scan
           //as blocking call above could prevent this section from being notified
-          if(running) {
+          if(running && bleScanningThreadActive.get()) {
             try {
               BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
               Log.i(TAG,"BLE Scanning started");
@@ -681,7 +685,13 @@ class HerdBackgroundService : Service() {
               Log.e(TAG,"Error starting BLE scan",e);
             }
           }
-      }).start()
+        }).start()
+      }
+  }
+
+  private fun stopLeScan() {
+    BLEScanner?.stopScan(leScanCallback);
+    bleScanningThreadActive.set(false);
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -896,7 +906,7 @@ class HerdBackgroundService : Service() {
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
       if(BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-        BLEScanner?.stopScan(leScanCallback)
+        stopLeScan()
         BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
         gattServer?.close();
       }
