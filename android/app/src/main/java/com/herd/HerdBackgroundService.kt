@@ -208,7 +208,7 @@ class HerdBackgroundService : Service() {
 
     //create notification
     val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
-    .setOngoing(true)
+    .setOngoing(false)
     .setContentTitle(title)
     .setContentText(text)
     .setContentIntent(pendingIntent)
