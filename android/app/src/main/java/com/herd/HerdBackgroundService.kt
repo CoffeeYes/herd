@@ -383,7 +383,6 @@ class HerdBackgroundService : Service() {
                Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
                bleDeviceList.remove(gatt.getDevice());
                gatt.close();
-               scanLeDevice();
              }
            }
          }
@@ -396,7 +395,6 @@ class HerdBackgroundService : Service() {
            totalBytes = byteArrayOf();
            messageReadTimeout = false;
            messageTimeoutRegistered = false;
-           scanLeDevice();
          }
        }
     }
@@ -419,7 +417,6 @@ class HerdBackgroundService : Service() {
            writeMessageIndex = 0;
            /* bleDeviceList.remove(gatt.getDevice()); */
            /* gatt.close(); */
-           /* scanLeDevice(); */
          }
        }
     }
@@ -437,7 +434,6 @@ class HerdBackgroundService : Service() {
             else {
               bleDeviceList.remove(gatt.getDevice());
               gatt.close();
-              scanLeDevice();
             }
           }
           catch(e : Exception) {
@@ -472,7 +468,6 @@ class HerdBackgroundService : Service() {
           Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
           /* bleDeviceList.remove(gatt.getDevice()); */
           gatt.close();
-          scanLeDevice();
         }
       }
     }
