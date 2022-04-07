@@ -243,6 +243,7 @@ class HerdBackgroundService : Service() {
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
+        bleDeviceList.remove(gatt.getDevice());
         scanLeDevice();
       }
     }
@@ -347,9 +348,7 @@ class HerdBackgroundService : Service() {
              }
              //reset flag
              receivedMessagesForUser = false;
-             //end connection with this device
-             bleDeviceList.remove(gatt.getDevice())
-             /* gatt.close(); */
+
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
                receivedMessages,
@@ -381,7 +380,6 @@ class HerdBackgroundService : Service() {
              }
              else {
                Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
-               bleDeviceList.remove(gatt.getDevice());
                gatt.close();
              }
            }
@@ -389,7 +387,6 @@ class HerdBackgroundService : Service() {
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e);
            //reset connection variables for next connection
-           bleDeviceList.remove(gatt.getDevice())
            gatt.close();
            totalMessagesRead = 0;
            totalBytes = byteArrayOf();
@@ -415,8 +412,7 @@ class HerdBackgroundService : Service() {
            characteristic.setValue("COMPLETE".toByteArray());
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
-           /* bleDeviceList.remove(gatt.getDevice()); */
-           /* gatt.close(); */
+           gatt.close()
          }
        }
     }
@@ -432,7 +428,6 @@ class HerdBackgroundService : Service() {
               gatt.readCharacteristic(descriptor.getCharacteristic());
             }
             else {
-              bleDeviceList.remove(gatt.getDevice());
               gatt.close();
             }
           }
@@ -466,7 +461,6 @@ class HerdBackgroundService : Service() {
         }
         else {
           Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
-          /* bleDeviceList.remove(gatt.getDevice()); */
           gatt.close();
         }
       }
@@ -556,17 +550,6 @@ class HerdBackgroundService : Service() {
              "messagesToRemove",
              "messagesToRemoveSizes"
            );
-           if(!bleDeviceList.contains(device)) {
-             device.connectGatt(
-               context,
-               false,
-               bluetoothGattClientCallback,
-               BluetoothDevice.TRANSPORT_LE
-             );
-           }
-           else {
-             bleDeviceList.remove(device);
-           }
          }
     }
 
