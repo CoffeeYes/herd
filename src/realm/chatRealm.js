@@ -29,7 +29,7 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
   const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
   const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key}' AND to = '${ownKey}'`).slice(startIndex,endIndex);
-
+  console.log(receivedMessages)
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
@@ -109,11 +109,11 @@ const getContactsWithChats = async () => {
   if(keys.length > 0) {
     //get timestamp of last message for each key
     var lastMessages = [];
-    for(var key in keys) {
-      const currentKey = keys[key];
-      const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
+    for(const key of keys) {
+      const messages = (await getMessagesWithContact(key,-1));
+      const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
       currentLastMessage &&
-      lastMessages.push({key : currentKey, message : currentLastMessage});
+      lastMessages.push({key : key, message : currentLastMessage});
     }
     //create new contacts array with last message text and timestamp
     // because realm doesnt allow mutation in place
