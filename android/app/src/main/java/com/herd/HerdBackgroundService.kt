@@ -228,6 +228,8 @@ class HerdBackgroundService : Service() {
     sendBroadcast(intent);
   }
 
+  private var writebackComplete = false;
+  private var remoteHasReadMessages = false;
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -243,8 +245,12 @@ class HerdBackgroundService : Service() {
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
-        bleDeviceList.remove(gatt.getDevice());
-        scanLeDevice();
+        if(writebackComplete && remoteHasReadMessages) {
+          writebackComplete = false;
+          remoteHasReadMessages = false;
+          bleDeviceList.remove(gatt.getDevice());
+          scanLeDevice();
+        }
       }
     }
 
@@ -370,11 +376,15 @@ class HerdBackgroundService : Service() {
 
              if(transferCompleteCharacteristic != null) {
                Log.i(TAG,"Transfer complete characteristic found");
-               if((deletedMessages?.size as Int) > 0) {
-                 transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
+               val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) +
+               (receivedMessagesForSelf as ArrayList<HerdMessage>);
+
+               if((messagesToAvoid.size as Int) > 0) {
+                 transferCompleteCharacteristic.setValue(messagesToAvoid.get(0)._id.toByteArray());
                }
                else {
                  transferCompleteCharacteristic.setValue("COMPLETE".toByteArray());
+                 writebackComplete = true;
                }
                gatt.writeCharacteristic(transferCompleteCharacteristic);
              }
@@ -410,6 +420,7 @@ class HerdBackgroundService : Service() {
          else {
            Log.i(TAG,"Write-back phase complete");
            characteristic.setValue("COMPLETE".toByteArray());
+           writebackComplete = true;
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
            gatt.close()
@@ -428,6 +439,7 @@ class HerdBackgroundService : Service() {
               gatt.readCharacteristic(descriptor.getCharacteristic());
             }
             else {
+              writebackComplete = true;
               gatt.close();
             }
           }
@@ -481,9 +493,21 @@ class HerdBackgroundService : Service() {
       //reset values on disconnect to ensure values are not carried forward
       //when unexpected disconnect occurs.
       if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        currentPacket = 0;
-        offsetSize = 0;
-        scanLeDevice();
+        if(!(writebackComplete && remoteHasReadMessages)) {
+          device.connectGatt(
+            context,
+            false,
+            bluetoothGattClientCallback,
+            BluetoothDevice.TRANSPORT_LE
+          );
+        }
+        else {
+          currentPacket = 0;
+          offsetSize = 0;
+          writebackComplete = false;
+          remoteHasReadMessages = false;
+          scanLeDevice();
+        }
       }
     }
 
@@ -510,6 +534,7 @@ class HerdBackgroundService : Service() {
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
             }
             else {
+              remoteHasReadMessages = true;
               //send empty array to indicate that transfer is done to client
               gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
               //reset currentPacket counter for next message
@@ -533,6 +558,7 @@ class HerdBackgroundService : Service() {
          Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
          Log.i(TAG,"characteristic value size : ${value.size}");
          val messageID : String = String(value);
+         Log.i(TAG,"Message ID Received : $messageID")
          if(messageID != "COMPLETE") {
            val message = messageQueue?.find {it -> it._id == messageID};
            if(message != null) {
@@ -557,7 +583,15 @@ class HerdBackgroundService : Service() {
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
         if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
-          gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf((messageQueue?.size as Int).toByte()))
+          gattServer?.sendResponse(
+            device,
+            requestId,BluetoothGatt.GATT_SUCCESS,
+            0,
+            byteArrayOf((messageQueue?.size as Int).toByte())
+          );
+          if((messageQueue?.size as Int) == 0) {
+            remoteHasReadMessages = true;
+          }
         }
     }
 

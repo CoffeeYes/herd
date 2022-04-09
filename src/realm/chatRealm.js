@@ -29,7 +29,7 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
   const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
   const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key}' AND to = '${ownKey}'`).slice(startIndex,endIndex);
-  console.log(receivedMessages)
+
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
