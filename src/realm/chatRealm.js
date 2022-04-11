@@ -152,7 +152,7 @@ const deleteChat = key => {
 const deleteAllChats = async () => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal')
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered(`to = '${ownKey}'`);
-  
+
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
   })
@@ -247,6 +247,21 @@ const removeCompletedMessagesFromRealm = messages => {
   })
 }
 
+const deleteAllMessages = () => {
+  messageSentRealm.write(() => {
+    messageSentRealm.deleteAll();
+  })
+  messageCopyRealm.write(() => {
+    messageCopyRealm.deleteAll();
+  })
+  messageReceivedRealm.write(() => {
+    messageReceivedRealm.deleteAll();
+  })
+  deletedReceivedRealm.write(() => {
+    deletedReceivedRealm.deleteAll();
+  })
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -261,6 +276,7 @@ export {
   getContactsWithChats,
   deleteChat,
   deleteAllChats,
+  deleteAllMessages,
   deleteMessages,
   getMessageQueue,
   getDeletedReceivedMessages,

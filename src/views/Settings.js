@@ -18,6 +18,7 @@ import {
   getMessageQueue,
   getDeletedReceivedMessages,
   getReceivedMessagesForSelf,
+  deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
@@ -72,6 +73,25 @@ const Settings = ({ navigation }) => {
           onPress: async () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
+          },
+        },
+      ]
+    );
+  }
+
+  const deleteAllMessages = async () => {
+    Alert.alert(
+      'Discard you sure you want to delete all Messages?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            deleteAllMessagesFromRealm();
           },
         },
       ]
@@ -189,6 +209,13 @@ const Settings = ({ navigation }) => {
         iconStyle={{color : "red"}}
         rightIcon="delete-sweep"
         onPress={deleteAllContacts}/>
+
+        <CardButton
+        text="Delete All Messages"
+        textStyle={{color : "red"}}
+        iconStyle={{color : "red"}}
+        rightIcon="delete-sweep"
+        onPress={deleteAllMessages}/>
 
         {__DEV__ &&
           <CustomButton
