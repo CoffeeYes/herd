@@ -254,6 +254,7 @@ class HerdBackgroundService : Service() {
       }
     }
 
+    private val bleScanTimeoutHandler = Handler();
     override fun onMtuChanged(gatt : BluetoothGatt, mtu : Int, status : Int) {
       if(status == BluetoothGatt.GATT_SUCCESS) {
         Log.i(TAG,"MTU Succesfully changed to : $mtu");
@@ -265,7 +266,8 @@ class HerdBackgroundService : Service() {
       stopLeScan();
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
-      Handler(Looper.getMainLooper()).postDelayed({
+      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+      bleScanTimeoutHandler.postDelayed({
           Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
           allowBleScan = true;
       },30000)
