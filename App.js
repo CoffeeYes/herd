@@ -53,6 +53,9 @@ const App = ({ }) => {
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
         newMessages = await ServiceInterface.getReceivedMessages();
+
+        newMessages.length > 0 && 
+        addNewReceivedMessagesToRealm(newMessages);
       }
       else {
         loadStoredMessages();
