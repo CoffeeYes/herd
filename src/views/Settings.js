@@ -197,10 +197,15 @@ const Settings = ({ navigation }) => {
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
+        text="Password Protection"
+        rightIcon="lock"
+        onPress={() => navigation.navigate("passwordSettings")}/>
+
+        <CardButton
         text="Delete All Chats"
         textStyle={{color : "red"}}
         iconStyle={{color : "red"}}
-        rightIcon="delete-forever"
+        rightIcon="delete"
         onPress={deleteAllChats}/>
 
         <CardButton
@@ -214,7 +219,7 @@ const Settings = ({ navigation }) => {
         text="Delete All Messages"
         textStyle={{color : "red"}}
         iconStyle={{color : "red"}}
-        rightIcon="delete-sweep"
+        rightIcon="delete-forever"
         onPress={deleteAllMessages}/>
 
         {__DEV__ &&
