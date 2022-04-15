@@ -1,5 +1,5 @@
 import React from 'react'
-import { TouchableOpacity, Text, Dimensions } from 'react-native';
+import { TouchableOpacity, Text, Dimensions, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const CustomButton = ({ onPress, rightIcon, leftIcon, text, buttonStyle,
@@ -33,8 +33,8 @@ const styles = {
   buttonText : {
     color : "white",
     fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
+    textAlign : "center",
+    ...(Platform.OS === 'android' && {fontFamily : "Open-Sans"})
   },
 }
 
