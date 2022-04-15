@@ -38,6 +38,7 @@ import EditContact from './src/views/EditContact';
 import Customise from './src/views/Customise';
 import MessageQueue from './src/views/MessageQueue';
 import PasswordSettings from './src/views/PasswordSettings';
+import PasswordLockScreen from './src/views/PasswordLockScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
@@ -116,6 +117,7 @@ const App = ({ }) => {
             <Stack.Screen name="customise" component={Customise}/>
             <Stack.Screen name="messageQueue" component={MessageQueue}/>
             <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
+            <Stack.Screen name="passwordLockScreen" component={PasswordLockScreen}/>
           </Stack.Navigator>
     </>
   );

@@ -2,20 +2,20 @@ import React from 'react'
 import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const CustomButton = ({ onPress, rightIcon, leftIcon, text, buttonStyle,
-                        textStyle, disabled}) => {
+const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
+                        text, buttonStyle, textStyle, disabled}) => {
   return (
     <TouchableOpacity
     onPress={onPress}
     style={disabled ? {...styles.button,...buttonStyle, backgroundColor : "grey"} :{...styles.button,...buttonStyle}}
     disabled={disabled}>
       {leftIcon &&
-      <Icon name={leftIcon}/>}
+      <Icon name={leftIcon} size={leftIconSize}/>}
 
       <Text style={{...styles.buttonText, ...textStyle}}>{text}</Text>
 
       {rightIcon &&
-      <Icon name={rightIcon}/>}
+      <Icon name={rightIcon} size={rightIconSize}/>}
     </TouchableOpacity>
   )
 }
@@ -28,13 +28,16 @@ const styles = {
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center",
+    flexDirection : "row",
     width : Dimensions.get("window").width * 0.3
   },
   buttonText : {
     color : "white",
     fontWeight : "bold",
     fontFamily : "Open-Sans",
-    textAlign : "center"
+    textAlign : "center",
+    marginLeft : "auto",
+    marginRight : "auto"
   },
 }
 

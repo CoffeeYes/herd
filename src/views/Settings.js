@@ -28,6 +28,7 @@ const Settings = ({ navigation }) => {
   const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
+  const [userHasPassword, setUserHasPassword] = useState(false);
 
   const copyKeyToClipboard = async () => {
     setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
@@ -199,7 +200,11 @@ const Settings = ({ navigation }) => {
         <CardButton
         text="Password Protection"
         rightIcon="lock"
-        onPress={() => navigation.navigate("passwordSettings")}/>
+        onPress={() => userHasPassword ?
+          navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
+          :
+          navigation.navigate("passwordSettings")}
+        />
 
         <CardButton
         text="Delete All Chats"
