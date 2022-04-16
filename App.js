@@ -39,6 +39,7 @@ import Customise from './src/views/Customise';
 import MessageQueue from './src/views/MessageQueue';
 import PasswordSettings from './src/views/PasswordSettings';
 import PasswordLockScreen from './src/views/PasswordLockScreen';
+import LoadingScreen from './src/views/LoadingScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
@@ -48,10 +49,12 @@ import {
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
+  const [initialRoute, setInitialRoute] = useState("main");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadOwnKey();
     (async () => {
+      await determineEntryScreen();
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
         newMessages = await ServiceInterface.getReceivedMessages();
@@ -62,6 +65,7 @@ const App = ({ }) => {
       else {
         loadStoredMessages();
       }
+      setLoading(false);
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
@@ -71,13 +75,6 @@ const App = ({ }) => {
 
     return messagesListener.remove;
   },[])
-
-  const loadOwnKey = async () => {
-    const key = await Crypto.loadKeyFromKeystore("herdPersonal")
-    if(!key) {
-      navigationRef.current.navigate("splash")
-    }
-  }
 
   const loadStoredMessages = async () => {
     const newMessages = await ServiceInterface.getStoredMessages(
@@ -97,28 +94,42 @@ const App = ({ }) => {
     removeCompletedMessagesFromRealm(messagesToRemove);
   }
 
+  const determineEntryScreen = async () => {
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    const userHasPassword = false;
+    if(!key) {
+      setInitialRoute("splash")
+    }
+    else if(userHasPassword) {
+      setInitialRoute("passwordLockScreen")
+    }
+  }
+
   return (
     <>
-          <Stack.Navigator
-          initialRouteName="main"
-          screenOptions={{headerShown : false}}>
-            <Stack.Screen name="contacts" component={Contacts}/>
-            <Stack.Screen name="addContact" component={AddContact}/>
-            <Stack.Screen name="chats" component={Chats}/>
-            <Stack.Screen name="splash" component={Splash}/>
-            <Stack.Screen name="main" component={Main}/>
-            <Stack.Screen name="chat" component={Chat}/>
-            <Stack.Screen name="contact" component={Contact}/>
-            <Stack.Screen name="createcontact" component={CreateContact}/>
-            <Stack.Screen name="newChat" component={Contacts}/>
-            <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
-            <Stack.Screen name="QRScanner" component={QRScanner}/>
-            <Stack.Screen name="editContact" component={EditContact}/>
-            <Stack.Screen name="customise" component={Customise}/>
-            <Stack.Screen name="messageQueue" component={MessageQueue}/>
-            <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
-            <Stack.Screen name="passwordLockScreen" component={PasswordLockScreen}/>
-          </Stack.Navigator>
+      {loading ?
+      <LoadingScreen/>
+      :
+      <Stack.Navigator
+      initialRouteName={initialRoute}
+      screenOptions={{headerShown : false}}>
+        <Stack.Screen name="contacts" component={Contacts}/>
+        <Stack.Screen name="addContact" component={AddContact}/>
+        <Stack.Screen name="chats" component={Chats}/>
+        <Stack.Screen name="splash" component={Splash}/>
+        <Stack.Screen name="main" component={Main}/>
+        <Stack.Screen name="chat" component={Chat}/>
+        <Stack.Screen name="contact" component={Contact}/>
+        <Stack.Screen name="createcontact" component={CreateContact}/>
+        <Stack.Screen name="newChat" component={Contacts}/>
+        <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
+        <Stack.Screen name="QRScanner" component={QRScanner}/>
+        <Stack.Screen name="editContact" component={EditContact}/>
+        <Stack.Screen name="customise" component={Customise}/>
+        <Stack.Screen name="messageQueue" component={MessageQueue}/>
+        <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
+        <Stack.Screen name="passwordLockScreen" component={PasswordLockScreen}/>
+      </Stack.Navigator>}
     </>
   );
 };
