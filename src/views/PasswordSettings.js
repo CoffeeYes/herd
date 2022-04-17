@@ -1,44 +1,80 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Dimensions } from 'react-native';
+import { View, ScrollView, Text, TextInput, Dimensions } from 'react-native';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton'
 
 const PasswordSettings = () => {
   const [loginPassword, setLoginPassword] = useState("");
+  const [confirmLoginPassword, setConfirmLoginPassword] = useState("");
   const [erasurePassword, setErasurePassword] = useState("");
+  const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
 
-  const save = () => {
-    
+  const saveMainPassword = () => {
+
+  }
+  const saveErasurePassword = () => {
+
   }
 
   return (
     <>
       <Header title="Password Settings" allowGoBack/>
 
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
 
-        <Text style={styles.inputTitle}>Main Password</Text>
-        <TextInput
-        style={styles.input}
-        onChangeText={setLoginPassword}
-        value={loginPassword}/>
+        <View style={styles.card}>
+          <Text multiline>
+            You will be asked to enter this password when opening the app
+            and accessing security-critical pages such as this one.
+          </Text>
+          <Text style={styles.inputTitle}>Main Password</Text>
+          <TextInput
+          style={styles.input}
+          onChangeText={setLoginPassword}
+          value={loginPassword}/>
 
-        <Text style={styles.inputTitle}>Erasure Password</Text>
-        <TextInput
-        style={styles.input}
-        onChangeText={setErasurePassword}
-        value={erasurePassword}/>
+          <Text style={styles.inputTitle}>Confirm Main Password</Text>
+          <TextInput
+          style={styles.input}
+          onChangeText={setConfirmLoginPassword}
+          value={confirmLoginPassword}/>
+          <FlashTextButton
 
-        <FlashTextButton
-        normalText="Save"
-        flashText="Saved!"
-        onPress={save}
-        timeout={500}
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}/>
+          normalText="Save"
+          flashText="Saved!"
+          onPress={saveMainPassword}
+          timeout={500}
+          buttonStyle={styles.button}
+          textStyle={styles.buttonText}/>
+        </View>
 
-      </View>
+        <View style={{...styles.card,marginTop : 10}}>
+          <Text multiline>
+            Entering this password when opening the app will cause all data
+            to be wiped from the application.
+          </Text>
+          <Text style={styles.inputTitle}>Erasure Password</Text>
+          <TextInput
+          style={styles.input}
+          onChangeText={setErasurePassword}
+          value={erasurePassword}/>
+          <Text style={styles.inputTitle}>Confirm Erasure Password</Text>
+          <TextInput
+          style={styles.input}
+          onChangeText={setConfirmErasurePassword}
+          value={confirmErasurePassword}/>
+
+          <FlashTextButton
+          normalText="Save"
+          flashText="Saved!"
+          onPress={saveErasurePassword}
+          timeout={500}
+          buttonStyle={styles.button}
+          textStyle={styles.buttonText}/>
+        </View>
+
+      </ScrollView>
     </>
   )
 }
@@ -46,7 +82,7 @@ const PasswordSettings = () => {
 const styles = {
   container : {
     padding : 20,
-    alignItems : "flex-start"
+    alignItems : "center",
   },
   button : {
     backgroundColor : "#E86252",
@@ -65,7 +101,7 @@ const styles = {
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom : 10,
-    width : Dimensions.get('window').width * 0.9,
+    width : Dimensions.get('window').width * 0.8,
     alignSelf : "center",
     padding : 10,
     backgroundColor : "white",
@@ -74,6 +110,14 @@ const styles = {
   inputTitle : {
     fontWeight : "bold",
     marginBottom : 5
+  },
+  card : {
+    backgroundColor : "white",
+    padding : 20,
+    borderRadius : 5,
+    alignItems : "center",
+    justifyContent : "center",
+    elevation : 2
   },
 }
 
