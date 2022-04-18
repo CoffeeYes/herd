@@ -7,14 +7,35 @@ import FlashTextButton from './FlashTextButton'
 const PasswordSettings = () => {
   const [loginPassword, setLoginPassword] = useState("");
   const [confirmLoginPassword, setConfirmLoginPassword] = useState("");
+  const [loginPasswordError, setLoginPasswordError] = useState("");
   const [erasurePassword, setErasurePassword] = useState("");
   const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
+  const [erasurePasswordError, setErasurePasswordError] = useState("");
+
+  const checkValidPassword = (password, confirmation) => {
+    const whitespace = /\s/;
+    if(whitespace.test(password) || whitespace.test(confirmation)) {
+      return {valid : false, error : "Passwords cannot contain spaces"}
+    }
+    if(password !== confirmation) {
+      return {valid : false, error : "Passwords do not match"};
+    }
+    return {valid : true};
+  }
 
   const saveMainPassword = () => {
-
+    setLoginPasswordError("");
+    const validate = checkValidPassword(loginPassword,confirmLoginPassword);
+    if(!validate.valid) {
+      return setLoginPasswordError(validate.error);
+    }
   }
   const saveErasurePassword = () => {
-
+    setErasurePasswordError("");
+    const validate = checkValidPassword(erasurePassword,confirmErasurePassword);
+    if(!validate.valid) {
+      return setErasurePasswordError(validate.error);
+    }
   }
 
   return (
@@ -28,14 +49,17 @@ const PasswordSettings = () => {
             You will be asked to enter this password when opening the app
             and accessing security-critical pages such as this one.
           </Text>
+          <Text style={styles.error}>{loginPasswordError}</Text>
           <Text style={styles.inputTitle}>Main Password</Text>
           <TextInput
+          secureTextEntry
           style={styles.input}
           onChangeText={setLoginPassword}
           value={loginPassword}/>
 
           <Text style={styles.inputTitle}>Confirm Main Password</Text>
           <TextInput
+          secureTextEntry
           style={styles.input}
           onChangeText={setConfirmLoginPassword}
           value={confirmLoginPassword}/>
@@ -54,13 +78,16 @@ const PasswordSettings = () => {
             Entering this password when opening the app will cause all data
             to be wiped from the application.
           </Text>
+          <Text style={styles.error}>{erasurePasswordError}</Text>
           <Text style={styles.inputTitle}>Erasure Password</Text>
           <TextInput
+          secureTextEntry
           style={styles.input}
           onChangeText={setErasurePassword}
           value={erasurePassword}/>
           <Text style={styles.inputTitle}>Confirm Erasure Password</Text>
           <TextInput
+          secureTextEntry
           style={styles.input}
           onChangeText={setConfirmErasurePassword}
           value={confirmErasurePassword}/>
@@ -119,6 +146,10 @@ const styles = {
     justifyContent : "center",
     elevation : 2
   },
+  error : {
+    color : "red",
+    fontWeight : "bold"
+  }
 }
 
 export default PasswordSettings;
