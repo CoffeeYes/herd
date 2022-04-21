@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, Text, TextInput, Dimensions } from 'react-native';
 
+import { createNewPassword, getPasswordHash, updatePassword } from '../realm/passwordRealm';
+
 import Header from './Header';
-import FlashTextButton from './FlashTextButton'
+import FlashTextButton from './FlashTextButton';
+
+import Crypto from '../nativeWrapper/Crypto';
 
 const PasswordSettings = () => {
   const [loginPassword, setLoginPassword] = useState("");
@@ -23,18 +27,33 @@ const PasswordSettings = () => {
     return {valid : true};
   }
 
-  const saveMainPassword = () => {
+  const saveMainPassword = async () => {
     setLoginPasswordError("");
     const validate = checkValidPassword(loginPassword,confirmLoginPassword);
     if(!validate.valid) {
       return setLoginPasswordError(validate.error);
     }
+    const hash = await Crypto.createHash(loginPassword);
+    if(getPasswordHash("mainPassword")) {
+      updatePassword("mainPassword",hash);
+    }
+    else {
+      createNewPassword("mainPassword",hash);
+    }
   }
+
   const saveErasurePassword = () => {
     setErasurePasswordError("");
     const validate = checkValidPassword(erasurePassword,confirmErasurePassword);
     if(!validate.valid) {
       return setErasurePasswordError(validate.error);
+    }
+    const hash = await Crypto.createHash(erasurePassword);
+    if(getPasswordHash("erasurePassword")) {
+      updatePassword("erasurePassword",hash);
+    }
+    else {
+      createNewPassword("erasurePassword",hash);
     }
   }
 
@@ -67,7 +86,7 @@ const PasswordSettings = () => {
 
           normalText="Save"
           flashText="Saved!"
-          onPress={saveMainPassword}
+          onPress={() => saveMainPassword()}
           timeout={500}
           buttonStyle={styles.button}
           textStyle={styles.buttonText}/>
