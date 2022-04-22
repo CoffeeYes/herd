@@ -18,6 +18,9 @@ const PasswordSettings = () => {
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
+    if(password.trim() === "" || confirmation.trim() === "") {
+      return {valid : false, error : "Fields cannot be empty"}
+    }
     if(whitespace.test(password) || whitespace.test(confirmation)) {
       return {valid : false, error : "Passwords cannot contain spaces"}
     }
@@ -27,33 +30,35 @@ const PasswordSettings = () => {
     return {valid : true};
   }
 
-  const saveMainPassword = async () => {
-    setLoginPasswordError("");
-    const validate = checkValidPassword(loginPassword,confirmLoginPassword);
+  const savePassword = async (name, password, confirmation, setError) => {
+    const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
-      return setLoginPasswordError(validate.error);
+      return setError(validate.error);
     }
-    const hash = await Crypto.createHash(loginPassword);
-    if(getPasswordHash("mainPassword")) {
-      updatePassword("mainPassword",hash);
-    }
-    else {
-      createNewPassword("mainPassword",hash);
-    }
-  }
+    const hash = await Crypto.createHash(password);
+    const loginHash = getPasswordHash("loginPassword");
+    const erasureHash = getPasswordHash("erasurePassword");
 
-  const saveErasurePassword = () => {
-    setErasurePasswordError("");
-    const validate = checkValidPassword(erasurePassword,confirmErasurePassword);
-    if(!validate.valid) {
-      return setErasurePasswordError(validate.error);
+    if(loginHash.length > 0 && erasureHash.length > 0  &&
+     name === "loginPassword" && await Crypto.compareHashes(hash,erasureHash) ||
+     name === "erasurePassword" && await Crypto.compareHashes(hash,loginHash)) {
+      return setError("Login and Erasure password cannot be the same");
     }
-    const hash = await Crypto.createHash(erasurePassword);
-    if(getPasswordHash("erasurePassword")) {
-      updatePassword("erasurePassword",hash);
+    if(name === "loginPassword") {
+      if(loginHash) {
+        updatePassword(name,hash);
+      }
+      else {
+        createNewPassword(name,hash);
+      }
     }
-    else {
-      createNewPassword("erasurePassword",hash);
+    else if(name === "erasurePassword") {
+      if(erasureHash) {
+        updatePassword(name,hash);
+      }
+      else {
+        createNewPassword(name,hash);
+      }
     }
   }
 
@@ -86,7 +91,12 @@ const PasswordSettings = () => {
 
           normalText="Save"
           flashText="Saved!"
-          onPress={() => saveMainPassword()}
+          onPress={() => savePassword(
+            "loginPassword",
+            loginPassword,
+            confirmLoginPassword,
+            setLoginPasswordError
+          )}
           timeout={500}
           buttonStyle={styles.button}
           textStyle={styles.buttonText}/>
@@ -114,7 +124,12 @@ const PasswordSettings = () => {
           <FlashTextButton
           normalText="Save"
           flashText="Saved!"
-          onPress={saveErasurePassword}
+          onPress={() => savePassword(
+            "erasurePassword",
+            erasurePassword,
+            confirmErasurePassword,
+            setErasurePasswordError
+          )}
           timeout={500}
           buttonStyle={styles.button}
           textStyle={styles.buttonText}/>

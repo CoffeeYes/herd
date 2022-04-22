@@ -18,7 +18,7 @@ const createNewPassword = (passwordName,passwordHash) => {
 
 const updatePassword = (passwordName,passwordHash) => {
   const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0];
-  
+
   password &&
   passwordRealm.write(() => {
     passwordRealm.create('Password',{
@@ -30,8 +30,8 @@ const updatePassword = (passwordName,passwordHash) => {
 }
 
 const getPasswordHash = name => {
-  const hash = passwordRealm.objects('Password').filtered(`name = '${name}'`)[0];
-  return hash;
+  const hash = passwordRealm.objects('Password').filtered(`name = '${name}'`);
+  return hash ? hash : "";
 }
 
 const deletePassword = id => {
