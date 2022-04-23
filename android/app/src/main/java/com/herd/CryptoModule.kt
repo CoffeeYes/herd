@@ -263,8 +263,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   @ReactMethod
   fun compareHashes(hash1 : String, hash2 : String, promise : Promise) {
-    val hash1Bytes = Base64.decode(hash1,Base64.DEFAULT);
-    val hash2Bytes = Base64.decode(hash2,Base64.DEFAULT);
+    val hash1Bytes : ByteArray = Base64.decode(hash1,Base64.DEFAULT);
+    val hash2Bytes : ByteArray = Base64.decode(hash2,Base64.DEFAULT);
     promise.resolve(MessageDigest.isEqual(hash1Bytes,hash2Bytes));
   }
 }

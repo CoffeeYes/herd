@@ -30,8 +30,8 @@ const updatePassword = (passwordName,passwordHash) => {
 }
 
 const getPasswordHash = name => {
-  const hash = passwordRealm.objects('Password').filtered(`name = '${name}'`);
-  return hash ? hash : "";
+  const hash = passwordRealm.objects('Password').filtered(`name = '${name}'`)[0]
+  return hash ? hash.hash : "";
 }
 
 const deletePassword = id => {

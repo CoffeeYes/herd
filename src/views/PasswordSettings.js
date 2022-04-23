@@ -31,6 +31,7 @@ const PasswordSettings = () => {
   }
 
   const savePassword = async (name, password, confirmation, setError) => {
+    setError("");
     const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
       return setError(validate.error);
