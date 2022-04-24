@@ -44,7 +44,9 @@ import LoadingScreen from './src/views/LoadingScreen';
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
-} from './src/realm/chatRealm'
+} from './src/realm/chatRealm';
+
+import { getPasswordHash } from './src/realm/passwordRealm';
 
 const Stack = createStackNavigator()
 
@@ -96,7 +98,7 @@ const App = ({ }) => {
 
   const determineEntryScreen = async () => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-    const userHasPassword = false;
+    const userHasPassword = getPasswordHash("loginPassword").length > 0;
     if(!key) {
       setInitialRoute("splash")
     }
@@ -128,7 +130,10 @@ const App = ({ }) => {
         <Stack.Screen name="customise" component={Customise}/>
         <Stack.Screen name="messageQueue" component={MessageQueue}/>
         <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
-        <Stack.Screen name="passwordLockScreen" component={PasswordLockScreen}/>
+        <Stack.Screen
+        name="passwordLockScreen"
+        component={PasswordLockScreen}
+        initialParams={{navigationTarget : "main"}}/>
       </Stack.Navigator>}
     </>
   );
