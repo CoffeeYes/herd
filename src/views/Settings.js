@@ -11,6 +11,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
+import { getPasswordHash } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 import CardButton from './CardButton';
 
@@ -29,6 +30,14 @@ const Settings = ({ navigation }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
   const [userHasPassword, setUserHasPassword] = useState(false);
+
+  useEffect(() => {
+    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+
+    const hash = getPasswordHash("loginPassword");
+    hash.length > 0 &&
+    setUserHasPassword(true);
+  },[])
 
   const copyKeyToClipboard = async () => {
     setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
@@ -138,10 +147,6 @@ const Settings = ({ navigation }) => {
       ServiceInterface.disableService();
     }
   }
-
-  useEffect(() => {
-    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
-  },[])
 
   return (
     <>
