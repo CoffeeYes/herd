@@ -3,26 +3,41 @@ import { View, Text, TextInput, Dimensions } from 'react-native';
 import CustomButton from './CustomButton';
 
 import { getPasswordHash } from '../realm/passwordRealm';
+import { deleteAllMessages } from '../realm/chatRealm';
+import { deleteAllContacts } from '../realm/contactRealm';
 
 import Crypto from '../nativeWrapper/Crypto';
 
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const [password, setPassword] = useState("");
-  const [savedHash, setSavedHash] = useState("");
+  const [loginHash, setLoginHash] = useState("");
+  const [erasureHash, setErasureHash] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const hash = getPasswordHash("loginPassword");
-    setSavedHash(hash);
+    const login = getPasswordHash("loginPassword");
+    setLoginHash(login);
+    const erasure = getPasswordHash("erasurePassword");
+    setErasureHash(erasure);
   },[])
 
   const checkPassword = async () => {
     setError("");
-    //determine if password is correct, and navigate to route.params.navigationTarget if so
     const passwordHash = await Crypto.createHash(password);
-    const correct = await Crypto.compareHashes(passwordHash,savedHash);
-    return correct ? navigation.navigate(route.params.navigationTarget) : setError("Incorrect Password");
+    const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
+    const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
+    if(isLoginPassword) {
+      navigation.navigate(route.params.navigationTarget)
+    }
+    else if (isErasurePassword) {
+      deleteAllMessages();
+      deleteAllContacts();
+      navigation.navigate(route.params.navigationTarget)
+    }
+    else {
+      setError("Incorrect Password")
+    }
   }
 
   return (
