@@ -40,9 +40,14 @@ const deletePassword = id => {
   })
 }
 
+const closePasswordRealm = () => {
+  passwordRealm.close();
+}
+
 export {
   createNewPassword,
   updatePassword,
   getPasswordHash,
-  deletePassword
+  deletePassword,
+  closePasswordRealm
 }

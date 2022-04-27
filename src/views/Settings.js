@@ -11,7 +11,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
-import { getPasswordHash } from '../realm/passwordRealm';
+import { getPasswordHash, closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 import CardButton from './CardButton';
 
@@ -148,6 +148,12 @@ const Settings = ({ navigation }) => {
     }
   }
 
+  const closeRealms = () => {
+    closeChatRealm();
+    closeContactRealm();
+    closePasswordRealm();
+  }
+
   return (
     <>
       <Header title="Settings"/>
@@ -235,10 +241,7 @@ const Settings = ({ navigation }) => {
         {__DEV__ &&
           <CustomButton
           buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
-          onPress={() => {
-            closeChatRealm();
-            closeContactRealm();
-          }}
+          onPress={closeRealms}
           text="Close Realm"/>
         }
 
