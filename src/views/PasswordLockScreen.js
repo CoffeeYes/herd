@@ -33,7 +33,9 @@ const PasswordLockScreen = ({ navigation, route }) => {
     else if (isErasurePassword) {
       deleteAllMessages();
       deleteAllContacts();
-      navigation.navigate(route.params.navigationTarget)
+      await Crypto.generateRSAKeyPair('herdPersonal');
+
+      navigation.navigate(route.params.navigationTarget);
     }
     else {
       setError("Incorrect Password")
