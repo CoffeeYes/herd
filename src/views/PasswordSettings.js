@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, TextInput, Dimensions } from 'react-native';
+import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-native';
 
-import { createNewPassword, getPasswordHash, updatePassword } from '../realm/passwordRealm';
+import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
@@ -63,6 +63,25 @@ const PasswordSettings = () => {
     }
   }
 
+  const resetPassword = passwordName => {
+    Alert.alert(
+      'Are you sure you want to reset this password?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Confirm',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            deletePassword(passwordName)
+          },
+        },
+      ]
+    );
+  }
+
   return (
     <>
       <Header title="Password Settings" allowGoBack/>
@@ -88,25 +107,36 @@ const PasswordSettings = () => {
           style={styles.input}
           onChangeText={setConfirmLoginPassword}
           value={confirmLoginPassword}/>
-          <FlashTextButton
 
-          normalText="Save"
-          flashText="Saved!"
-          onPress={() => savePassword(
-            "loginPassword",
-            loginPassword,
-            confirmLoginPassword,
-            setLoginPasswordError
-          )}
-          timeout={500}
-          buttonStyle={styles.button}
-          textStyle={styles.buttonText}/>
+          <View style={{flexDirection : "row"}}>
+            <FlashTextButton
+            normalText="Save"
+            flashText="Saved!"
+            onPress={() => savePassword(
+              "loginPassword",
+              loginPassword,
+              confirmLoginPassword,
+              setLoginPasswordError
+            )}
+            timeout={500}
+            buttonStyle={styles.button}
+            textStyle={styles.buttonText}/>
+
+            <FlashTextButton
+            normalText="Reset"
+            flashText="Reset"
+            onPress={() => resetPassword("loginPassword")}
+            timeout={0}
+            buttonStyle={{...styles.button, marginLeft : 10}}
+            textStyle={styles.buttonText}/>
+          </View>
         </View>
 
         <View style={{...styles.card,marginTop : 10}}>
           <Text multiline>
             Entering this password when opening the app will cause all data
-            to be wiped from the application.
+            to be wiped from the application. Your public key will also be changed,
+            meaning all contacts who have previously added you will need to add you again.
           </Text>
           <Text style={styles.error}>{erasurePasswordError}</Text>
           <Text style={styles.inputTitle}>Erasure Password</Text>
@@ -122,18 +152,27 @@ const PasswordSettings = () => {
           onChangeText={setConfirmErasurePassword}
           value={confirmErasurePassword}/>
 
-          <FlashTextButton
-          normalText="Save"
-          flashText="Saved!"
-          onPress={() => savePassword(
-            "erasurePassword",
-            erasurePassword,
-            confirmErasurePassword,
-            setErasurePasswordError
-          )}
-          timeout={500}
-          buttonStyle={styles.button}
-          textStyle={styles.buttonText}/>
+          <View style={{flexDirection : "row"}}>
+            <FlashTextButton
+            normalText="Save"
+            flashText="Saved!"
+            onPress={() => savePassword(
+              "erasurePassword",
+              erasurePassword,
+              confirmErasurePassword,
+              setErasurePasswordError
+            )}
+            timeout={500}
+            buttonStyle={styles.button}
+            textStyle={styles.buttonText}/>
+            <FlashTextButton
+            normalText="Reset"
+            flashText="Reset"
+            onPress={() => resetPassword("erasurePassword")}
+            timeout={0}
+            buttonStyle={{...styles.button, marginLeft : 10}}
+            textStyle={styles.buttonText}/>
+          </View>
         </View>
 
       </ScrollView>
