@@ -36,6 +36,7 @@ const getPasswordHash = name => {
 
 const deletePassword = name => {
   const password = passwordRealm.objects('Password').filtered(`name = '${name}'`)[0];
+  password && 
   passwordRealm.write(() => {
     passwordRealm.delete(password);
   })

@@ -33,11 +33,20 @@ const Settings = ({ navigation }) => {
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+    checkUserHasPassword();
+  },[]);
 
+  const checkUserHasPassword = () => {
     const hash = getPasswordHash("loginPassword");
-    hash.length > 0 &&
-    setUserHasPassword(true);
-  },[])
+    hash.length > 0 ? setUserHasPassword(true) : setUserHasPassword(false);
+  }
+
+  useEffect(() => {
+    const focusListener = navigation.addListener('focus', () => {
+      checkUserHasPassword();
+    });
+    return focusListener;
+  },[navigation])
 
   const copyKeyToClipboard = async () => {
     setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
