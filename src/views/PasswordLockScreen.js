@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Dimensions } from 'react-native';
-import CustomButton from './CustomButton';
+import { CommonActions } from '@react-navigation/native';
 
+import CustomButton from './CustomButton';
 import { getPasswordHash } from '../realm/passwordRealm';
 import { deleteAllMessages } from '../realm/chatRealm';
 import { deleteAllContacts } from '../realm/contactRealm';
@@ -28,6 +29,17 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
     if(isLoginPassword) {
+      route.params.navigationTarget === "passwordSettings" ?
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 1,
+          routes: [
+            { name: 'main', params : {initialRoute : "settings"}},
+            { name: 'passwordSettings'}
+          ],
+        })
+      )
+      :
       navigation.navigate(route.params.navigationTarget)
     }
     else if (isErasurePassword) {
