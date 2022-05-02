@@ -29,7 +29,7 @@ const Chats = ({ navigation }) => {
     var contactsWithChats = await getContactsWithChats();
     contactsWithChats = contactsWithChats.slice()
     .sort( (a,b) => a.timestamp > b.timestamp);
-    
+
     setChats(contactsWithChats);
   }
 
@@ -70,6 +70,8 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
+        subTextStyle={chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
+        rightTextStyle={chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
         deleteItem={() => deleteChat(chat.key)}
         rightText={chat.timestamp &&

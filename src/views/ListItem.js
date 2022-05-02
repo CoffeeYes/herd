@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
-                    imageContainerStyle, imageSize, rightText, subText, subTextStyle }) => {
+                    imageContainerStyle, imageSize, rightText, subText, subTextStyle,
+                    rightTextStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
 
   return (
@@ -32,7 +33,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
       </View>
 
       {rightText &&
-      <Text style={{marginLeft : "auto", marginRight : 10}}>{rightText}</Text>}
+      <Text style={{...styles.rightTextStyle,...rightTextStyle}}>{rightText}</Text>}
 
       {showDelete &&
       <TouchableOpacity
@@ -81,6 +82,10 @@ const styles = {
   },
   subText : {
     color : "grey"
+  },
+  rightTextStyle : {
+    marginLeft : "auto",
+    marginRight : 10
   }
 }
 
