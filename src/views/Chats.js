@@ -70,8 +70,11 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
-        subTextStyle={chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
-        rightTextStyle={chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
+        subTextStyle={!chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
+        rightTextStyle={!chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
+        rightIcon={!chat.lastMessageSentBySelf && "circle"}
+        rightIconSize={18}
+        rightIconStyle={{color : "#E86252"}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
         deleteItem={() => deleteChat(chat.key)}
         rightText={chat.timestamp &&

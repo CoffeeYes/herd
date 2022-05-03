@@ -6,7 +6,7 @@ import { imageValues } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
-                    rightTextStyle }) => {
+                    rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
 
   return (
@@ -34,6 +34,9 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
 
       {rightText &&
       <Text style={{...styles.rightTextStyle,...rightTextStyle}}>{rightText}</Text>}
+
+      {rightIcon &&
+      <Icon name={rightIcon} size={rightIconSize || 24} style={rightIconStyle}/>}
 
       {showDelete &&
       <TouchableOpacity
