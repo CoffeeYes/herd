@@ -29,18 +29,20 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
     if(isLoginPassword) {
-      route.params.navigationTarget === "passwordSettings" ?
       navigation.dispatch(
         CommonActions.reset({
           index: 1,
-          routes: [
+          routes: route.params.navigationTarget === "passwordSettings" ?
+          [
             { name: 'main', params : {initialRoute : "settings"}},
             { name: 'passwordSettings'}
-          ],
+          ]
+          :
+          [
+            {name : route.params.navigationTarget}
+          ]
         })
       )
-      :
-      navigation.navigate(route.params.navigationTarget)
     }
     else if (isErasurePassword) {
       deleteAllMessages();
