@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -7,7 +7,8 @@ import {
   Text,
   StatusBar,
   Button,
-  NativeEventEmitter
+  NativeEventEmitter,
+  AppState
 } from 'react-native';
 
 import {
@@ -18,6 +19,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import navigationRef from './src/NavigationRef.js'
@@ -53,6 +55,9 @@ const Stack = createStackNavigator()
 const App = ({ }) => {
   const [initialRoute, setInitialRoute] = useState("main");
   const [loading, setLoading] = useState(true);
+  const [previousAppState, setPreviousAppState] = useState(true);
+
+  const previousAppStateRef = useRef();
 
   useEffect(() => {
     (async () => {
@@ -75,7 +80,23 @@ const App = ({ }) => {
       addNewReceivedMessagesToRealm(messages);
     })
 
-    return messagesListener.remove;
+    const appStateListener = AppState.addEventListener("change",state => {
+      console.log(`state : ${state}, previous : ${previousAppStateRef.current}`)
+      if(state === "active" && previousAppStateRef.current === "background") {
+        navigationRef.current.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [ { name: 'passwordLockScreen'} ]
+          })
+        )
+      }
+      previousAppStateRef.current = state;
+    })
+
+    return () => {
+      messagesListener.remove();
+      appStateListener.remove();
+    }
   },[])
 
   const loadStoredMessages = async () => {
