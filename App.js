@@ -83,6 +83,8 @@ const App = ({ }) => {
     const appStateListener = AppState.addEventListener("change",state => {
       console.log(`state : ${state}, previous : ${previousAppStateRef.current}`)
       if(state === "active" && previousAppStateRef.current === "background") {
+        const userHasPassword = getPasswordHash("loginPassword").length > 0;
+        userHasPassword && 
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 1,
