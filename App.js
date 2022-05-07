@@ -81,16 +81,14 @@ const App = ({ }) => {
     })
 
     const appStateListener = AppState.addEventListener("change",state => {
-      console.log(`state : ${state}, previous : ${previousAppStateRef.current}`)
+      //switch to loading screen when backgrounded to prevent render from leaking
+      //during transition when tabbing back in
+      if(state === "background") {
+        setLoading(true);
+      }
       if(state === "active" && previousAppStateRef.current === "background") {
-        const userHasPassword = getPasswordHash("loginPassword").length > 0;
-        userHasPassword && 
-        navigationRef.current.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [ { name: 'passwordLockScreen'} ]
-          })
-        )
+        determineEntryScreen();
+        setLoading(false);
       }
       previousAppStateRef.current = state;
     })
