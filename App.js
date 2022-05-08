@@ -80,14 +80,14 @@ const App = ({ }) => {
       addNewReceivedMessagesToRealm(messages);
     })
 
-    const appStateListener = AppState.addEventListener("change",state => {
+    const appStateListener = AppState.addEventListener("change",async state => {
       //switch to loading screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
       if(state === "background") {
         setLoading(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        determineEntryScreen();
+        await determineEntryScreen();
         setLoading(false);
       }
       previousAppStateRef.current = state;
@@ -119,12 +119,16 @@ const App = ({ }) => {
 
   const determineEntryScreen = async () => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    const hash = getPasswordHash("loginPassword");
     const userHasPassword = getPasswordHash("loginPassword").length > 0;
     if(!key) {
       setInitialRoute("splash")
     }
     else if(userHasPassword) {
       setInitialRoute("passwordLockScreen")
+    }
+    else {
+      setInitialRoute("main");
     }
   }
 
