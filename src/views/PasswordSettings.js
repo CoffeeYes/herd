@@ -112,6 +112,7 @@ const PasswordSettings = () => {
             <FlashTextButton
             normalText="Save"
             flashText="Saved!"
+            disabled={loginPassword.trim().length === 0 || confirmLoginPassword.trim().length === 0}
             onPress={() => savePassword(
               "loginPassword",
               loginPassword,
@@ -156,6 +157,7 @@ const PasswordSettings = () => {
             <FlashTextButton
             normalText="Save"
             flashText="Saved!"
+            disabled={erasurePassword.trim().length === 0 || confirmErasurePassword.trim().length === 0}
             onPress={() => savePassword(
               "erasurePassword",
               erasurePassword,
