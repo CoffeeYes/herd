@@ -15,6 +15,14 @@ const PasswordSettings = () => {
   const [erasurePassword, setErasurePassword] = useState("");
   const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
   const [erasurePasswordError, setErasurePasswordError] = useState("");
+  const [hasErasurePassword, setHasErasurePassword] = useState(false);
+  const [hasLoginPassword, setHasLoginPassword] = useState(false);
+
+  useEffect(() => {
+    setHasErasurePassword(getPasswordHash("erasurePassword").length > 0);
+    console.log(getPasswordHash("erasurePassword"))
+    setHasLoginPassword(getPasswordHash("loginPassword").length > 0);
+  },[])
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
@@ -52,6 +60,7 @@ const PasswordSettings = () => {
       else {
         createNewPassword(name,hash);
       }
+      setHasLoginPassword(true);
     }
     else if(name === "erasurePassword") {
       if(erasureHash) {
@@ -60,6 +69,7 @@ const PasswordSettings = () => {
       else {
         createNewPassword(name,hash);
       }
+      setHasErasurePassword(true);
     }
   }
 
@@ -76,6 +86,11 @@ const PasswordSettings = () => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             deletePassword(passwordName)
+            passwordName === "erasurePassword" &&
+            setHasErasurePassword(false);
+
+            passwordName === "loginPassword" &&
+            setHasLoginPassword(false);
           },
         },
       ]
@@ -126,6 +141,7 @@ const PasswordSettings = () => {
             <FlashTextButton
             normalText="Reset"
             flashText="Reset"
+            disabled={!hasLoginPassword}
             onPress={() => resetPassword("loginPassword")}
             timeout={0}
             buttonStyle={{...styles.button, marginLeft : 10}}
@@ -170,6 +186,7 @@ const PasswordSettings = () => {
             <FlashTextButton
             normalText="Reset"
             flashText="Reset"
+            disabled={!hasErasurePassword}
             onPress={() => resetPassword("erasurePassword")}
             timeout={0}
             buttonStyle={{...styles.button, marginLeft : 10}}
