@@ -20,7 +20,6 @@ const PasswordSettings = () => {
 
   useEffect(() => {
     setHasErasurePassword(getPasswordHash("erasurePassword").length > 0);
-    console.log(getPasswordHash("erasurePassword"))
     setHasLoginPassword(getPasswordHash("loginPassword").length > 0);
   },[])
 
@@ -53,6 +52,11 @@ const PasswordSettings = () => {
      name === "erasurePassword" && await Crypto.compareHashes(hash,loginHash)) {
       return setError("Login and Erasure password cannot be the same");
     }
+
+    if(!hasLoginPassword && name === "erasurePassword") {
+      return setErasurePasswordError("You must set up a normal password before an erasure password can be used")
+    }
+    
     if(name === "loginPassword") {
       if(loginHash) {
         updatePassword(name,hash);
@@ -61,6 +65,8 @@ const PasswordSettings = () => {
         createNewPassword(name,hash);
       }
       setHasLoginPassword(true);
+      setLoginPassword("");
+      setConfirmLoginPassword("");
     }
     else if(name === "erasurePassword") {
       if(erasureHash) {
@@ -70,6 +76,8 @@ const PasswordSettings = () => {
         createNewPassword(name,hash);
       }
       setHasErasurePassword(true);
+      setErasurePassword("");
+      setConfirmErasurePassword("");
     }
   }
 
