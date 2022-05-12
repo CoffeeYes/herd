@@ -56,7 +56,7 @@ const PasswordSettings = () => {
     if(!hasLoginPassword && name === "erasurePassword") {
       return setErasurePasswordError("You must set up a normal password before an erasure password can be used")
     }
-    
+
     if(name === "loginPassword") {
       if(loginHash) {
         updatePassword(name,hash);
@@ -93,12 +93,12 @@ const PasswordSettings = () => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            deletePassword(passwordName)
-            passwordName === "erasurePassword" &&
+            deletePassword(passwordName);
             setHasErasurePassword(false);
-
-            passwordName === "loginPassword" &&
-            setHasLoginPassword(false);
+            if(passwordName === "loginPassword") {
+              setHasLoginPassword(false);
+              deletePassword("erasurePassword");
+            }
           },
         },
       ]
