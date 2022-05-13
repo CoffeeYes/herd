@@ -53,8 +53,20 @@ const EditContact = ({ route, navigation }) => {
     }
   }
 
-  const save = () => {
+  const save = async () => {
     setError("");
+    try {
+      const encryptedTest = await Crypto.encryptStringWithKey(
+        publicKey.trim(),
+        Crypto.algorithm.RSA,
+        Crypto.blockMode.ECB,
+        Crypto.padding.OAEP_SHA256_MGF1Padding,
+        "test"
+      )
+    }
+    catch(e) {
+      return setError("Invalid Public Key")
+    }
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     setOriginalContact(newInfo)
@@ -121,7 +133,6 @@ const EditContact = ({ route, navigation }) => {
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
       <ScrollView contentContainerStyle={styles.container}>
-        <Text>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={largeImageContainerStyle}>
@@ -132,6 +143,8 @@ const EditContact = ({ route, navigation }) => {
             imageHeight={Dimensions.get("window").height * 0.4}/>
           </View>
         </TouchableOpacity>
+
+        <Text style={styles.error}>{error}</Text>
 
         <Text style={styles.inputTitle}>Name</Text>
         <TextInput
@@ -153,7 +166,7 @@ const EditContact = ({ route, navigation }) => {
         timeout={500}
         disabled={
           (name.trim() === originalContact.name.trim() || name === originalContact.name) &&
-          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key) && 
+          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key) &&
           contactImage === originalContact.image
         }
         buttonStyle={styles.button}
@@ -195,6 +208,11 @@ const styles = {
     fontWeight : "bold",
     marginBottom : 5
   },
+  error : {
+    color : "red",
+    fontWeight : "bold",
+    alignSelf : "center"
+  }
 }
 
 export default EditContact;

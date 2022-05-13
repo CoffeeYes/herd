@@ -119,7 +119,6 @@ const App = ({ }) => {
 
   const determineEntryScreen = async () => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-    const hash = getPasswordHash("loginPassword");
     const userHasPassword = getPasswordHash("loginPassword").length > 0;
     if(!key) {
       setInitialRoute("splash")
