@@ -10,10 +10,14 @@ import moment from 'moment'
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [customStyles, setCustomStyles] = useState({});
 
   useEffect(() => {
     setLoading(true);
     loadContactsWithChats();
+    (async () => {
+      loadStyles();
+    })()
     setLoading(false);
   },[])
 
@@ -31,6 +35,15 @@ const Chats = ({ navigation }) => {
     .sort( (a,b) => a.timestamp > b.timestamp);
 
     setChats(contactsWithChats);
+  }
+
+  const loadStyles = async () => {
+    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+
+    if(styles) {
+      console.log(styles)
+      setCustomStyles(styles)
+    }
   }
 
   const deleteChat = async key => {
@@ -70,8 +83,14 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
-        subTextStyle={!chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
-        rightTextStyle={!chat.lastMessageSentBySelf && {fontWeight : "bold", color : "black"}}
+        subTextStyle={{
+          color : chat.lastMessageSentBySelf ? customStyles.sentTextColor : customStyles.receivedTextColor,
+          ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
+        }}
+        rightTextStyle={{
+          color : chat.lastMessageSentBySelf ? customStyles.sentTextColor : customStyles.receivedTextColor,
+          ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
+        }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
         rightIconSize={18}
         rightIconStyle={{color : "#E86252"}}
