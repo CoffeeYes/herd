@@ -5,12 +5,14 @@ import Header from './Header';
 import ListItem from './ListItem';
 import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
-import moment from 'moment'
+import moment from 'moment';
+import { toHsv } from 'react-native-color-picker';
 
 const Chats = ({ navigation }) => {
   const [chats,setChats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [customStyles, setCustomStyles] = useState({});
+  const [sentTextColor, setSentTextColor] = useState("");
+  const [receivedTextColor, setReceivedTextColor] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -24,6 +26,7 @@ const Chats = ({ navigation }) => {
   useEffect(() => {
     const focusListener = navigation.addListener('focus', () => {
       loadContactsWithChats();
+      loadStyles();
     });
     return focusListener;
   },[navigation])
@@ -41,8 +44,21 @@ const Chats = ({ navigation }) => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
     if(styles) {
-      console.log(styles)
-      setCustomStyles(styles)
+      const hsvSent = toHsv(styles.sentTextColor);
+      const hsvReceived = toHsv(styles.receivedTextColor);
+
+      if(hsvSent.h < 10 && hsvSent.s < 10 && hsvSent.v > 0.95) {
+        setSentTextColor("grey")
+      }
+      else {
+        setSentTextColor(styles.sentTextColor)
+      }
+      if(hsvReceived.h < 10 && hsvReceived.s < 10 && hsvReceived.v > 0.95) {
+        setReceivedTextColor("grey")
+      }
+      else {
+        setReceivedTextColor(styles.receivedTextColor)
+      }
     }
   }
 
@@ -84,11 +100,11 @@ const Chats = ({ navigation }) => {
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
         subTextStyle={{
-          color : chat.lastMessageSentBySelf ? customStyles.sentTextColor : customStyles.receivedTextColor,
+          color : chat.lastMessageSentBySelf ? sentTextColor : receivedTextColor,
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
-          color : chat.lastMessageSentBySelf ? customStyles.sentTextColor : customStyles.receivedTextColor,
+          color : chat.lastMessageSentBySelf ? sentTextColor : receivedTextColor,
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
