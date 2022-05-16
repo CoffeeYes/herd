@@ -6,12 +6,14 @@ const FlashTextButton = ({ onPress, flashText, normalText,
 
   const [buttonText, setButtonText] = useState(normalText)
 
-  const onButtonPress = () => {
-    onPress();
-    setButtonText(flashText);
-    setTimeout(() => {
-      setButtonText(normalText);
-    },timeout)
+  const onButtonPress = async () => {
+    const success = await onPress();
+    if(success) {
+      setButtonText(flashText);
+      setTimeout(() => {
+        setButtonText(normalText);
+      },timeout)
+    }
   }
 
   return (

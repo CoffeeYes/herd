@@ -41,7 +41,8 @@ const PasswordSettings = () => {
     setError("");
     const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
-      return setError(validate.error);
+      setError(validate.error);
+      return false;
     }
     const hash = await Crypto.createHash(password);
     const loginHash = getPasswordHash("loginPassword");
@@ -50,11 +51,13 @@ const PasswordSettings = () => {
     if(loginHash.length > 0 && erasureHash.length > 0  &&
      name === "loginPassword" && await Crypto.compareHashes(hash,erasureHash) ||
      name === "erasurePassword" && await Crypto.compareHashes(hash,loginHash)) {
-      return setError("Login and Erasure password cannot be the same");
+      setError("Login and Erasure password cannot be the same");
+      return false;
     }
 
     if(!hasLoginPassword && name === "erasurePassword") {
-      return setErasurePasswordError("You must set up a normal password before an erasure password can be used")
+      setErasurePasswordError("You must set up a normal password before an erasure password can be used")
+      return  false;
     }
 
     if(name === "loginPassword") {
@@ -79,6 +82,7 @@ const PasswordSettings = () => {
       setErasurePassword("");
       setConfirmErasurePassword("");
     }
+    return true;
   }
 
   const resetPassword = passwordName => {
