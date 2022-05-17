@@ -7,7 +7,6 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
-import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';

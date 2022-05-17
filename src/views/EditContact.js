@@ -65,7 +65,8 @@ const EditContact = ({ route, navigation }) => {
       )
     }
     catch(e) {
-      return setError("Invalid Public Key")
+      setError("Invalid Public Key")
+      return false;
     }
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);

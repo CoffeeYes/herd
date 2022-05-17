@@ -11,7 +11,6 @@ import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
 import CardButton from './CardButton';
-import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
