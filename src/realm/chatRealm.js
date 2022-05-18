@@ -1,5 +1,5 @@
 import Realm from 'realm';
-import Schemas from '../Schemas';
+import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import { getContactsByKey } from './contactRealm';
 import { cloneDeep } from 'lodash'

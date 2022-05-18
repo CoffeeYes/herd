@@ -6,12 +6,10 @@ import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ContactImage from './ContactImage';
-import Realm from 'realm';
-import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
 import CardButton from './CardButton';
-import CustomButton from './CustomButton';
+import FlashTextButton from './FlashTextButton';
 import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 

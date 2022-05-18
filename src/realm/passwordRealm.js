@@ -1,5 +1,5 @@
 import Realm from 'realm';
-import Schemas from '../Schemas';
+import Schemas from './Schemas';
 
 const passwordRealm = new Realm({
   path : 'passwords',
@@ -36,7 +36,7 @@ const getPasswordHash = name => {
 
 const deletePassword = name => {
   const password = passwordRealm.objects('Password').filtered(`name = '${name}'`)[0];
-  password && 
+  password &&
   passwordRealm.write(() => {
     passwordRealm.delete(password);
   })

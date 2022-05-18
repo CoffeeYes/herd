@@ -3,8 +3,6 @@ import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, Scr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import Realm from 'realm';
-import Schemas from '../Schemas';
 import { getAllContacts, deleteContact } from '../realm/contactRealm';
 import { getContactsWithChats } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';

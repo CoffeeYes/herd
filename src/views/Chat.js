@@ -4,7 +4,6 @@ import { Text, View, TextInput, ActivityIndicator, StatusBar,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
-import Realm from 'realm';
 import {PanGestureHandler  } from 'react-native-gesture-handler'
 import {
   getMessagesWithContact,
@@ -19,7 +18,6 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 
 import Crypto from '../nativeWrapper/Crypto';
-import Schemas from '../Schemas';
 const swipeSize = Dimensions.get('window').height * 0.25;
 
 const Chat = ({ route, navigation }) => {

@@ -1,5 +1,5 @@
 import Realm from 'realm';
-import Schemas from '../Schemas';
+import Schemas from './Schemas';
 import { deleteChat } from './chatRealm';
 import { cloneDeep } from 'lodash';
 
