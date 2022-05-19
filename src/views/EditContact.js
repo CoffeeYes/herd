@@ -10,7 +10,7 @@ import FlashTextButton from './FlashTextButton';
 
 import { getContactById, editContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
-
+import Crypto from '../nativeWrapper/Crypto'
 
 const EditContact = ({ route, navigation }) => {
   const [name, _setName] = useState("");
@@ -66,11 +66,13 @@ const EditContact = ({ route, navigation }) => {
     }
     catch(e) {
       setError("Invalid Public Key")
+      console.log(e)
       return false;
     }
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
-    setOriginalContact(newInfo)
+    setOriginalContact(newInfo);
+    return true;
   }
 
   const editImage = async () => {

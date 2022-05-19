@@ -62,8 +62,8 @@ const Customise = ({ navigation }) => {
       setSentTextColor(toHsv(styles.sentTextColor));
       setReceivedBoxColor(toHsv(styles.receivedBoxColor));
       setReceivedTextColor(toHsv(styles.receivedTextColor));
-      setFontSize(styles.fontSize)
-      setOriginalStyles(styles)
+      setFontSize(styles.fontSize);
+      setOriginalStyles(styles);
     }
   }
 
@@ -76,8 +76,9 @@ const Customise = ({ navigation }) => {
       fontSize : fontSize
     }
 
-    setOriginalStyles(style)
-    return await AsyncStorage.setItem("styles",JSON.stringify(style))
+    setOriginalStyles(style);
+    await AsyncStorage.setItem("styles",JSON.stringify(style));
+    return  true;
   }
 
   useEffect(() => {

@@ -9,7 +9,6 @@ import ContactImage from './ContactImage';
 
 import QRCodeModal from './QRCodeModal';
 import CardButton from './CardButton';
-import FlashTextButton from './FlashTextButton';
 import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 
