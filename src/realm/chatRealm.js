@@ -124,7 +124,7 @@ const getContactsWithChats = async () => {
       const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
       currentContact.timestamp = matchingMessage?.timestamp;
       currentContact.lastText = matchingMessage?.text;
-      currentContact.lastMessageSentBySelf = matchingMessage?.from === contact.key;
+      currentContact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
       contactsWithTimestamps.push(currentContact);
     })
     return contactsWithTimestamps;
