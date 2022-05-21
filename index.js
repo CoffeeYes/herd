@@ -10,11 +10,16 @@ import {name as appName} from './app.json';
 import { NavigationContainer } from '@react-navigation/native';
 import navigationRef from './src/NavigationRef';
 
+import store from './src/redux/store';
+import { Provider } from 'react-redux'
+
 const Index = () => {
   return (
-    <NavigationContainer ref={navigationRef}>
-      <App/>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer ref={navigationRef}>
+        <App/>
+      </NavigationContainer>
+    </Provider>
   )
 }
 
