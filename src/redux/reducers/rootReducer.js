@@ -1,6 +1,11 @@
+import { combineReducers } from 'redux';
 
-const rootReducer = state => {
-  return {};
-}
+import chatReducer from './chatReducer';
+import userReducer from './userReducer';
+
+const rootReducer = combineReducers({
+  chatReducer,
+  userReducer
+})
 
 export default rootReducer;

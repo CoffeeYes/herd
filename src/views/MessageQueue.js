@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,7 +14,7 @@ import FoldableMessage from './FoldableMessage';
 const MessageQueue = ({}) => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [ownPublicKey, setOwnPublicKey] = useState("");
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey);
 
   useEffect(() => {
     loadMessages();
@@ -21,8 +22,6 @@ const MessageQueue = ({}) => {
 
   const loadMessages = async () => {
     setLoading(true);
-    const ownPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-    setOwnPublicKey(ownPublicKey);
     const messageQueue = await getMessageQueue(true);
     var contactKeys = [];
     //get unique public keys from messages

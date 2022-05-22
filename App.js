@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   SafeAreaView,
   StyleSheet,
@@ -50,18 +51,25 @@ import {
 
 import { getPasswordHash } from './src/realm/passwordRealm';
 
+import { setPublicKey } from './src/redux/actions/userActions';
+
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
+  const dispatch = useDispatch();
   const [initialRoute, setInitialRoute] = useState("main");
   const [loading, setLoading] = useState(true);
   const [previousAppState, setPreviousAppState] = useState(true);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const previousAppStateRef = useRef();
 
   useEffect(() => {
     (async () => {
-      await determineEntryScreen();
+      const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+      dispatch(setPublicKey(key));
+      determineEntryScreen(key);
+      
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
         newMessages = await ServiceInterface.getReceivedMessages();
@@ -117,8 +125,7 @@ const App = ({ }) => {
     removeCompletedMessagesFromRealm(messagesToRemove);
   }
 
-  const determineEntryScreen = async () => {
-    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+  const determineEntryScreen = key => {
     const userHasPassword = getPasswordHash("loginPassword").length > 0;
     if(!key) {
       setInitialRoute("splash")

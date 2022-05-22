@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux'; 
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
          Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,7 +24,6 @@ const swipeSize = Dimensions.get('window').height * 0.25;
 const Chat = ({ route, navigation }) => {
   const [messages,setMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
-  const [ownPublicKey, setOwnPublicKey] = useState("");
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
   const [customStyle, setCustomStyle] = useState({});
@@ -38,11 +38,12 @@ const Chat = ({ route, navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
 
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey)
+
   const messageLoadingSize = 5;
 
   useEffect(() => {
     (async () => {
-      setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
       await loadMessages(-messageLoadingSize);
       await loadStyles();
       setLoading(false);

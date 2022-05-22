@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert, Dimensions } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
@@ -25,10 +26,11 @@ import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contact
 const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
   const [userHasPassword, setUserHasPassword] = useState(false);
+
+  const publicKey = useSelector(state => state.userReducer.publicKey)
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
@@ -52,8 +54,6 @@ const Settings = ({ navigation }) => {
   }
 
   const showQRCode = async () => {
-    const personalPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-    await setPublicKey(personalPublicKey)
     setQRCodeVisible(true);
   }
 
