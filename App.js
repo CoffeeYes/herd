@@ -69,7 +69,7 @@ const App = ({ }) => {
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
       dispatch(setPublicKey(key));
       determineEntryScreen(key);
-      
+
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
         newMessages = await ServiceInterface.getReceivedMessages();
@@ -95,7 +95,7 @@ const App = ({ }) => {
         setLoading(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        await determineEntryScreen();
+        await determineEntryScreen(publicKey);
         setLoading(false);
       }
       previousAppStateRef.current = state;

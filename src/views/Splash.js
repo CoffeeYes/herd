@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, Text, Button, Platform, Dimensions } from 'react-native';
 import Crypto from '../nativeWrapper/Crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from './CustomButton';
 
+import { setPublicKey } from '../redux/actions/userActions'
+
 const Splash = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [textWidth, setTextWidth] = useState(100);
 
   const setup = async () => {
     //generate keys
     await Crypto.generateRSAKeyPair('herdPersonal');
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    dispatch(setPublicKey(key));
 
     //set default styling
     const style = {
