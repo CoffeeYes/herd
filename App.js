@@ -63,6 +63,11 @@ const App = ({ }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const previousAppStateRef = useRef();
+  const publicKeyRef = useRef();
+
+  useEffect(() => {
+    publicKeyRef.current = publicKey
+  },[publicKey])
 
   useEffect(() => {
     (async () => {
@@ -95,7 +100,7 @@ const App = ({ }) => {
         setLoading(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        await determineEntryScreen(publicKey);
+        await determineEntryScreen(publicKeyRef.current);
         setLoading(false);
       }
       previousAppStateRef.current = state;
