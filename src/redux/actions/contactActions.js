@@ -1,18 +1,19 @@
 
 const addContact = contact => {
   return {
-    action : "ADD_CONTACT",
+    type : "ADD_CONTACT",
     payload : contact
   }
 }
 
 const setContacts = contacts => {
   return {
-    action : "SET_CONTACTS",
+    type : "SET_CONTACTS",
     payload : contacts
   }
 }
 
 export {
+  addContact,
   setContacts
 }

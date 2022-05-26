@@ -48,10 +48,14 @@ import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
+import { getAllContacts } from './src/realm/contactRealm';
+import { getContactsWithChats } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey } from './src/redux/actions/userActions';
+import { setContacts } from './src/redux/actions/contactActions';
+import { setChats } from './src/redux/actions/chatActions';
 
 const Stack = createStackNavigator()
 
@@ -71,8 +75,8 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
+      await loadInitialState();
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-      dispatch(setPublicKey(key));
       determineEntryScreen(key);
 
       let newMessages = []
@@ -111,6 +115,20 @@ const App = ({ }) => {
       appStateListener.remove();
     }
   },[])
+
+  const loadInitialState = async () => {
+    //load users key
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    dispatch(setPublicKey(key));
+
+    //load saved contacts
+    dispatch(setContacts(getAllContacts()))
+
+    //load Chats
+    var contactsWithChats = (await getContactsWithChats())
+    .sort( (a,b) => a.timestamp > b.timestamp);
+    dispatch(setChats(contactsWithChats))
+  }
 
   const loadStoredMessages = async () => {
     const newMessages = await ServiceInterface.getStoredMessages(
