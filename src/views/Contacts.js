@@ -1,46 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView, Alert} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getAllContacts, deleteContact } from '../realm/contactRealm';
+import { getAllContacts, deleteContact as deleteContactFromRealm } from '../realm/contactRealm';
 import { getContactsWithChats } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
+import { deleteContact } from '../redux/actions/contactActions';
+
 
 const Contacts = ({ route, navigation }) => {
-  const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-
-  useEffect(() => {
-    loadContacts();
-  },[])
-
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      loadContacts();
-    });
-    return focusListener;
-  },[navigation])
-
-  const loadContacts = async () => {
-    setLoading(true);
-    if(route.params.type === "newChat") {
-      const allContacts = await getAllContacts();
-      const contactsWithChats = await getContactsWithChats();
-
-      contactsWithChats.length > 0 ?
-      setContacts(allContacts.filter(contact => contactsWithChats.indexOf(contact) !== -1))
-      :
-      setContacts(allContacts)
-    }
-    else {
-      setContacts(getAllContacts());
-    }
-    setLoading(false);
-  }
+  const dispatch = useDispatch();
+  const chats = useSelector(state => state.chatReducer.chats);
+  const contacts = route.params.type === "newChat" ?
+  useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat.key === contact.id) !== undefined)
+  :
+  useSelector(state => state.contactReducer.contacts);
 
   const onPressDelete = async index => {
     Alert.alert(
@@ -54,8 +32,8 @@ const Contacts = ({ route, navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            deleteContact(contacts[index]);
-            loadContacts();
+            dispatch(deleteContact(contacts[index]))
+            deleteContactFromRealm(contacts[index]);
           },
         },
       ]
@@ -82,9 +60,6 @@ const Contacts = ({ route, navigation }) => {
       rightButtonOnClick={() => navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>
 
-      {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
-      :
       <ScrollView>
         {contacts?.map( (contact, index) =>
           <ListItem
@@ -101,7 +76,7 @@ const Contacts = ({ route, navigation }) => {
           deleteItem={() => onPressDelete(index)}
           />
         )}
-      </ScrollView>}
+      </ScrollView>
     </>
   )
 }

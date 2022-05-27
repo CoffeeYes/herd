@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
@@ -11,7 +12,10 @@ import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 import { createContact, getContactsByKey } from '../realm/contactRealm';
 
+import { addContact } from '../redux/actions/contactActions';
+
 const CreateContact = ({ navigation, route}) => {
+  const dispatch = useDispatch();
   const [username, _setUsername] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [error, setError] = useState("");
@@ -74,7 +78,10 @@ const CreateContact = ({ navigation, route}) => {
         name : username,
         image : contactImage
       }
-      createContact(newContact);
+      //create contact, add contact to state store, reset values and navigate back
+      const createdContact = createContact(newContact);
+      console.log(createdContact)
+      dispatch(addContact(createdContact));
       setUsername("");
       setPublicKey("");
       setContactImage("");

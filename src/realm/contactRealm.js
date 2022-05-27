@@ -20,9 +20,11 @@ const deleteContact = object => {
 }
 
 const createContact = object => {
+  let newContact;
   contactsRealm.write(() => {
-    contactsRealm.create('Contact',{...object,_id : Realm.BSON.ObjectId()});
+    newContact = contactsRealm.create('Contact',{...object,_id : Realm.BSON.ObjectId()});
   })
+  return newContact;
 }
 
 const getContactById = id => {

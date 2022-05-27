@@ -13,7 +13,15 @@ const setContacts = contacts => {
   }
 }
 
+const deleteContact = contact => {
+  return {
+    type : "DELETE_CONTACT",
+    payload : contact
+  }
+}
+
 export {
   addContact,
+  deleteContact,
   setContacts
 }
