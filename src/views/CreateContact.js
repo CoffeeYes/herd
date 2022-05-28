@@ -80,7 +80,6 @@ const CreateContact = ({ navigation, route}) => {
       }
       //create contact, add contact to state store, reset values and navigate back
       const createdContact = createContact(newContact);
-      console.log(createdContact)
       dispatch(addContact(createdContact));
       setUsername("");
       setPublicKey("");

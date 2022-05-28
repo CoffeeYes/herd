@@ -32,7 +32,6 @@ const BTDeviceList = () => {
     });
 
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
-      console.log(state)
       if(state === "DISCOVERY_STARTED") {
         scanningRef.current = true;
         setScanning(scanningRef.current);

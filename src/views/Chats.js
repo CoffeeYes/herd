@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image, ScrollView, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
@@ -8,15 +9,18 @@ import { parseRealmID } from '../realm/helper';
 import moment from 'moment';
 import { toHsv } from 'react-native-color-picker';
 
+import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
+
 const Chats = ({ navigation }) => {
-  const [chats,setChats] = useState([]);
+  const dispatch = useDispatch();
+
+  const chats = useSelector(state => state.chatReducer.chats);
   const [loading, setLoading] = useState(true);
   const [sentTextColor, setSentTextColor] = useState("");
   const [receivedTextColor, setReceivedTextColor] = useState("");
 
   useEffect(() => {
     setLoading(true);
-    loadContactsWithChats();
     (async () => {
       loadStyles();
     })()
@@ -25,20 +29,10 @@ const Chats = ({ navigation }) => {
 
   useEffect(() => {
     const focusListener = navigation.addListener('focus', () => {
-      loadContactsWithChats();
       loadStyles();
     });
     return focusListener;
   },[navigation])
-
-  const loadContactsWithChats = async () => {
-    //create array copy using slice, then sort by timestamp
-    var contactsWithChats = await getContactsWithChats();
-    contactsWithChats = contactsWithChats.slice()
-    .sort( (a,b) => a.timestamp > b.timestamp);
-
-    setChats(contactsWithChats);
-  }
 
   const loadStyles = async () => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
@@ -62,7 +56,7 @@ const Chats = ({ navigation }) => {
     }
   }
 
-  const deleteChat = async key => {
+  const deleteChat = chat => {
     Alert.alert(
       'Are you sure ?',
       '',
@@ -73,9 +67,9 @@ const Chats = ({ navigation }) => {
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            deleteChatFromRealm(key)
-            loadContactsWithChats();
+          onPress: () => {
+            dispatch(deleteChatFromState(chat))
+            deleteChatFromRealm(chat.key)
           },
         },
       ]
@@ -111,7 +105,7 @@ const Chats = ({ navigation }) => {
         rightIconSize={18}
         rightIconStyle={{color : "#E86252"}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
-        deleteItem={() => deleteChat(chat.key)}
+        deleteItem={() => deleteChat(chat)}
         rightText={chat.timestamp &&
           (moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
             "Today"
