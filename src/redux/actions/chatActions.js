@@ -12,7 +12,15 @@ const deleteChat = chat => {
   }
 }
 
+const addChat = chat => {
+  return {
+    type : "ADD_CHAT",
+    payload : chat
+  }
+}
+
 export {
   deleteChat,
+  addChat,
   setChats
 }

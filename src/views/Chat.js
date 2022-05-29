@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux'; 
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
          Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -13,15 +13,20 @@ import {
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
+
+import { addChat } from '../redux/actions/chatActions';
+
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
+import Crypto from '../nativeWrapper/Crypto';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
 
-import Crypto from '../nativeWrapper/Crypto';
 const swipeSize = Dimensions.get('window').height * 0.25;
 
 const Chat = ({ route, navigation }) => {
+  const dispatch = useDispatch();
+  const chats = useSelector(state => state.chatReducer.chats);
   const [messages,setMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
   const [loading, setLoading] = useState(true);
@@ -122,6 +127,21 @@ const Chat = ({ route, navigation }) => {
 
     messageDays.indexOf(newDate) === -1 &&
     setMessageDays([...messageDays,newDate]);
+
+    //add new chat to chats state in redux store if it isnt in chats state
+    if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
+      const newChat = {
+        _id : contactInfo._id,
+        image : contactInfo.image,
+        key : contactInfo.key,
+        lastMessageSentBySelf : true,
+        lastText : message,
+        name : contactInfo.name,
+        timestamp : metaData.timestamp
+      }
+      dispatch(addChat(newChat))
+    }
+
 
     setChatInput("");
     setInputDisabled(false);
