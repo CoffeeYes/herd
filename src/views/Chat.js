@@ -14,7 +14,7 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
-import { addChat } from '../redux/actions/chatActions';
+import { addChat, setLastText } from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
@@ -140,6 +140,14 @@ const Chat = ({ route, navigation }) => {
         timestamp : metaData.timestamp
       }
       dispatch(addChat(newChat))
+    }
+    else {
+      const newLastText = {
+        _id : contactInfo._id,
+        lastText : message,
+        timestamp : metaData.timestamp
+      }
+      dispatch(setLastText(newLastText))
     }
 
 

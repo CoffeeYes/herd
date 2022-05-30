@@ -19,8 +19,16 @@ const addChat = chat => {
   }
 }
 
+const setLastText = newText => {
+  return {
+    type : "SET_LAST_TEXT",
+    payload : newText
+  }
+}
+
 export {
   deleteChat,
   addChat,
-  setChats
+  setChats,
+  setLastText
 }
