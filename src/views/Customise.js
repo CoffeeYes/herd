@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +11,10 @@ import Slider from '@react-native-community/slider';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
 
+import { setStyles } from '../redux/actions/userActions';
+
 const Customise = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [sentBoxColor, _setSentBoxColor] = useState("");
   const [sentTextColor, _setSentTextColor] = useState("");
   const [receivedBoxColor, _setReceivedBoxColor] = useState("");
@@ -78,7 +82,8 @@ const Customise = ({ navigation }) => {
 
     setOriginalStyles(style);
     await AsyncStorage.setItem("styles",JSON.stringify(style));
-    return  true;
+    dispatch(setStyles(style));
+    return true;
   }
 
   useEffect(() => {
@@ -140,6 +145,7 @@ const Customise = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             await AsyncStorage.setItem("styles",JSON.stringify(style));
+            dispatch(setStyles(style))
             loadStyles();
           },
         },

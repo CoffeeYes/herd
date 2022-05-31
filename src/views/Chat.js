@@ -27,11 +27,11 @@ const swipeSize = Dimensions.get('window').height * 0.25;
 const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [messages,setMessages] = useState([]);
   const [contactInfo, setContactInfo] = useState({});
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
-  const [customStyle, setCustomStyle] = useState({});
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [messageDays, setMessageDays] = useState([]);
@@ -50,7 +50,6 @@ const Chat = ({ route, navigation }) => {
   useEffect(() => {
     (async () => {
       await loadMessages(-messageLoadingSize);
-      await loadStyles();
       setLoading(false);
     })()
   },[]);
@@ -77,11 +76,6 @@ const Chat = ({ route, navigation }) => {
       dates.push(messageDate)
     }
     return dates
-  }
-
-  const loadStyles = async () => {
-    const style = JSON.parse(await AsyncStorage.getItem("styles"));
-    setCustomStyle(style)
   }
 
   const sendMessage = async message => {
@@ -316,7 +310,7 @@ const Chat = ({ route, navigation }) => {
       style={{
         ...styles.chatInput,
         backgroundColor : inputDisabled ? "#c6c6c6" : "white",
-        fontSize : customStyle.fontSize
+        fontSize : customStyle?.fontSize
       }}
       value={chatInput}
       editable={!inputDisabled}

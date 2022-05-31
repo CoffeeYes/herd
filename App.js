@@ -55,7 +55,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats } from './src/redux/actions/chatActions';
+import { setChats, setStyles } from './src/redux/actions/chatActions';
 
 const Stack = createStackNavigator()
 
@@ -128,6 +128,9 @@ const App = ({ }) => {
     var contactsWithChats = (await getContactsWithChats())
     .sort( (a,b) => a.timestamp > b.timestamp);
     dispatch(setChats(contactsWithChats))
+
+    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    dispatch(setStyles(styles));
   }
 
   const loadStoredMessages = async () => {

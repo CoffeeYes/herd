@@ -26,9 +26,17 @@ const setLastText = newText => {
   }
 }
 
+const setStyles = styles => {
+  return {
+    type : "SET_STYLES",
+    payload : styles
+  }
+}
+
 export {
   deleteChat,
   addChat,
   setChats,
+  setStyles,
   setLastText
 }

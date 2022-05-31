@@ -1,14 +1,25 @@
 const initialState = {
-  chats : []
+  chats : [],
+  styles : {
+    fontSize : 14,
+    sentTextColor : "red",
+    receivedTextColor : "red",
+    sentBoxColor : "red",
+    receivedBoxColor : "red"
+  }
 }
+
 const chatReducer = (state = initialState,action) => {
   switch(action.type) {
     case "SET_CHATS":
       return {...state, chats : action.payload};
+      break;
     case "DELETE_CHAT":
       return {...state, chats : [...state.chats].filter(chat => chat._id !== action.payload._id)};
+      break;
     case "ADD_CHAT":
       return {...state, chats : [...state.chats, action.payload]};
+      break;
     case "SET_LAST_TEXT":
       let chat = state.chats.find(chat => chat._id == action.payload._id);
       if(chat) {
@@ -19,6 +30,10 @@ const chatReducer = (state = initialState,action) => {
         chats[chatIndex] = chat;
         return {...state,chats : chats};
       }
+      break;
+    case "SET_STYLES":
+      return {...state,styles : action.payload}
+      break;
     default:
       return state
   }
