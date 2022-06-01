@@ -20,8 +20,16 @@ const deleteContact = contact => {
   }
 }
 
+const updateContact = contact => {
+  return {
+    type : "UPDATE_CONTACT",
+    payload : contact
+  }
+}
+
 export {
   addContact,
   deleteContact,
+  updateContact,
   setContacts
 }

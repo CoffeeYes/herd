@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -10,9 +11,12 @@ import FlashTextButton from './FlashTextButton';
 
 import { getContactById, editContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
-import Crypto from '../nativeWrapper/Crypto'
+import Crypto from '../nativeWrapper/Crypto';
+
+import { updateContact } from '../redux/actions/contactActions';
 
 const EditContact = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const [name, _setName] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
@@ -71,6 +75,7 @@ const EditContact = ({ route, navigation }) => {
     }
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
+    dispatch(updateContact({...newInfo,_id : route.params.id}));
     setOriginalContact(newInfo);
     return true;
   }

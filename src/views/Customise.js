@@ -11,7 +11,7 @@ import Slider from '@react-native-community/slider';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
 
-import { setStyles } from '../redux/actions/userActions';
+import { setStyles } from '../redux/actions/chatActions';
 
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();

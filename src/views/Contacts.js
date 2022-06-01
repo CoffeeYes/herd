@@ -19,7 +19,6 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat.key === contact.id) !== undefined)
   :
   useSelector(state => state.contactReducer.contacts);
-
   const onPressDelete = async index => {
     Alert.alert(
       'Are you sure ?',
