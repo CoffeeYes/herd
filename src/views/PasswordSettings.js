@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-native';
 
 import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
+
+import { setPassword } from '../redux/actions/userActions'
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
@@ -9,6 +12,7 @@ import FlashTextButton from './FlashTextButton';
 import Crypto from '../nativeWrapper/Crypto';
 
 const PasswordSettings = () => {
+  const dispatch = useDispatch();
   const [loginPassword, setLoginPassword] = useState("");
   const [confirmLoginPassword, setConfirmLoginPassword] = useState("");
   const [loginPasswordError, setLoginPasswordError] = useState("");
@@ -67,6 +71,7 @@ const PasswordSettings = () => {
       else {
         createNewPassword(name,hash);
       }
+      dispatch(setPassword("login",hash));
       setHasLoginPassword(true);
       setLoginPassword("");
       setConfirmLoginPassword("");
@@ -78,6 +83,7 @@ const PasswordSettings = () => {
       else {
         createNewPassword(name,hash);
       }
+      dispatch(setPassword("erasure",hash));
       setHasErasurePassword(true);
       setErasurePassword("");
       setConfirmErasurePassword("");
