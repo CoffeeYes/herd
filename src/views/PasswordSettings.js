@@ -19,13 +19,9 @@ const PasswordSettings = () => {
   const [erasurePassword, setErasurePassword] = useState("");
   const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
   const [erasurePasswordError, setErasurePasswordError] = useState("");
-  const [hasErasurePassword, setHasErasurePassword] = useState(false);
-  const [hasLoginPassword, setHasLoginPassword] = useState(false);
 
-  useEffect(() => {
-    setHasErasurePassword(getPasswordHash("erasurePassword").length > 0);
-    setHasLoginPassword(getPasswordHash("loginPassword").length > 0);
-  },[])
+  const hasErasurePassword = useSelector(state => state.userReducer.erasurePasswordHash)?.length > 0;
+  const hasLoginPassword = useSelector(state => state.userReducer.loginPasswordHash)?.length > 0;
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
@@ -105,8 +101,10 @@ const PasswordSettings = () => {
           onPress: async () => {
             deletePassword(passwordName);
             setHasErasurePassword(false);
+            dispatch(setPassword("erasure",""));
             if(passwordName === "loginPassword") {
               setHasLoginPassword(false);
+              dispatch(setPassword("login",""));
               deletePassword("erasurePassword");
             }
           },
