@@ -28,26 +28,13 @@ const Settings = ({ navigation }) => {
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
-  const [userHasPassword, setUserHasPassword] = useState(false);
 
-  const publicKey = useSelector(state => state.userReducer.publicKey)
+  const publicKey = useSelector(state => state.userReducer.publicKey);
+  const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
-    checkUserHasPassword();
   },[]);
-
-  const checkUserHasPassword = () => {
-    const hash = getPasswordHash("loginPassword");
-    hash.length > 0 ? setUserHasPassword(true) : setUserHasPassword(false);
-  }
-
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      checkUserHasPassword();
-    });
-    return focusListener;
-  },[navigation])
 
   const copyKeyToClipboard = async () => {
     setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))

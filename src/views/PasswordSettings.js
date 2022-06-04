@@ -68,7 +68,6 @@ const PasswordSettings = () => {
         createNewPassword(name,hash);
       }
       dispatch(setPassword("login",hash));
-      setHasLoginPassword(true);
       setLoginPassword("");
       setConfirmLoginPassword("");
     }
@@ -80,7 +79,6 @@ const PasswordSettings = () => {
         createNewPassword(name,hash);
       }
       dispatch(setPassword("erasure",hash));
-      setHasErasurePassword(true);
       setErasurePassword("");
       setConfirmErasurePassword("");
     }
@@ -100,12 +98,10 @@ const PasswordSettings = () => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             deletePassword(passwordName);
-            setHasErasurePassword(false);
             dispatch(setPassword("erasure",""));
             if(passwordName === "loginPassword") {
-              setHasLoginPassword(false);
-              dispatch(setPassword("login",""));
               deletePassword("erasurePassword");
+              dispatch(setPassword("login",""));
             }
           },
         },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
@@ -14,23 +14,19 @@ import { setPublicKey } from '../redux/actions/userActions'
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const [password, setPassword] = useState("");
-  const [loginHash, setLoginHash] = useState("");
-  const [erasureHash, setErasureHash] = useState("");
-  const [error, setError] = useState("");
+  const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
+  const erasureHash = useSelector(state => state.userReducer.erasurePasswordHash);
 
-  useEffect(() => {
-    const login = getPasswordHash("loginPassword");
-    setLoginHash(login);
-    const erasure = getPasswordHash("erasurePassword");
-    setErasureHash(erasure);
-  },[])
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const checkPassword = async () => {
     setError("");
     const passwordHash = await Crypto.createHash(password);
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
+
+    console.log(loginHash)
     if(isLoginPassword) {
       navigation.dispatch(
         CommonActions.reset({

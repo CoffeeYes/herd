@@ -53,7 +53,7 @@ import { getContactsWithChats } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
 
-import { setPublicKey } from './src/redux/actions/userActions';
+import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles } from './src/redux/actions/chatActions';
 
@@ -131,6 +131,15 @@ const App = ({ }) => {
 
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
     dispatch(setStyles(styles));
+
+    const loginPassword = getPasswordHash("loginPassword");
+    const erasurePassword = getPasswordHash("erasurePassword");
+
+    loginPassword.length > 0 &&
+    dispatch(setPassword("login",loginPassword));
+
+    erasurePassword.length > 0 &&
+    dispatch(setPassword("erasure",erasurePassword));
   }
 
   const loadStoredMessages = async () => {

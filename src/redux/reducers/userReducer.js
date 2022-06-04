@@ -11,9 +11,9 @@ const userReducer = (state = initialState, action) => {
     case "SET_PUBLIC_KEY":
       return {...state,publicKey : action.payload}
     case "SET_LOGIN_PASSWORD":
-      return {...state,publicKey : action.payload}
+      return {...state,loginPasswordHash : action.payload}
     case "SET_ERASURE_PASSWORD":
-      return {...state,publicKey : action.payload}
+      return {...state,erasurePasswordHash : action.payload}
     default:
       return state
   }
