@@ -65,6 +65,7 @@ const App = ({ }) => {
   const [loading, setLoading] = useState(true);
   const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
+  const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
 
   const previousAppStateRef = useRef();
   const publicKeyRef = useRef();
@@ -74,10 +75,18 @@ const App = ({ }) => {
   },[publicKey])
 
   useEffect(() => {
+    if(passwordHash.length > 0) {
+      setInitialRoute("passwordLockScreen")
+    }
+    else {
+      setInitialRoute(publicKey.length > 0 ? "main" : "splash")
+    }
+  },[passwordHash])
+
+  useEffect(() => {
     (async () => {
       await loadInitialState();
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-      determineEntryScreen(key);
 
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
@@ -104,7 +113,7 @@ const App = ({ }) => {
         setLoading(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        await determineEntryScreen(publicKeyRef.current);
+        // await determineEntryScreen(publicKeyRef.current);
         setLoading(false);
       }
       previousAppStateRef.current = state;
@@ -158,19 +167,6 @@ const App = ({ }) => {
 
     messagesToRemove.length > 0 &&
     removeCompletedMessagesFromRealm(messagesToRemove);
-  }
-
-  const determineEntryScreen = key => {
-    const userHasPassword = getPasswordHash("loginPassword").length > 0;
-    if(!key) {
-      setInitialRoute("splash")
-    }
-    else if(userHasPassword) {
-      setInitialRoute("passwordLockScreen")
-    }
-    else {
-      setInitialRoute("main");
-    }
   }
 
   return (
