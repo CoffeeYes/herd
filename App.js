@@ -56,37 +56,23 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles } from './src/redux/actions/chatActions';
+import { setInitialRoute } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
   const dispatch = useDispatch();
-  const [initialRoute, setInitialRoute] = useState("main");
+  const initialRoute = useSelector(state => state.appStateReducer.initialRoute);
   const [loading, setLoading] = useState(true);
   const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
 
   const previousAppStateRef = useRef();
-  const publicKeyRef = useRef();
-
-  useEffect(() => {
-    publicKeyRef.current = publicKey
-  },[publicKey])
-
-  useEffect(() => {
-    if(passwordHash.length > 0) {
-      setInitialRoute("passwordLockScreen")
-    }
-    else {
-      setInitialRoute(publicKey.length > 0 ? "main" : "splash")
-    }
-  },[passwordHash])
 
   useEffect(() => {
     (async () => {
       await loadInitialState();
-      const key = await Crypto.loadKeyFromKeystore("herdPersonal");
 
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
@@ -113,7 +99,6 @@ const App = ({ }) => {
         setLoading(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        // await determineEntryScreen(publicKeyRef.current);
         setLoading(false);
       }
       previousAppStateRef.current = state;
@@ -126,24 +111,33 @@ const App = ({ }) => {
   },[])
 
   const loadInitialState = async () => {
-    //load users key
+    //get stored data
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    const loginPassword = getPasswordHash("loginPassword");
+    const erasurePassword = getPasswordHash("erasurePassword");
+
+    //determine the entry screen
+    if(key.length > 0) {
+      dispatch(setInitialRoute(loginPassword.length > 0 ? "passwordLockScreen" : "main"))
+    }
+    else {
+      dispatch(setInitialRoute("splash"))
+    }
     dispatch(setPublicKey(key));
 
-    //load saved contacts
+    //load saved contacts into store
     dispatch(setContacts(getAllContacts()))
 
-    //load Chats
+    //load saved chats into store
     var contactsWithChats = (await getContactsWithChats())
     .sort( (a,b) => a.timestamp > b.timestamp);
     dispatch(setChats(contactsWithChats))
 
+    //load styles into store
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
     dispatch(setStyles(styles));
 
-    const loginPassword = getPasswordHash("loginPassword");
-    const erasurePassword = getPasswordHash("erasurePassword");
-
+    //load password hashes into store
     loginPassword.length > 0 &&
     dispatch(setPassword("login",loginPassword));
 
