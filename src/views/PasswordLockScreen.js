@@ -10,7 +10,9 @@ import { deleteAllContacts } from '../realm/contactRealm';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-import { setPublicKey } from '../redux/actions/userActions'
+import { setPublicKey } from '../redux/actions/userActions';
+import { setContacts } from '../redux/actions/contactActions';
+import { setChats } from '../redux/actions/chatActions';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -49,7 +51,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
       await Crypto.generateRSAKeyPair('herdPersonal');
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
       dispatch(setPublicKey(key));
-
+      dispatch(setContacts([]));
+      dispatch(setChats([]));
       navigation.navigate(route.params.navigationTarget);
     }
     else {
