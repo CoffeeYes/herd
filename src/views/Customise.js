@@ -272,10 +272,10 @@ const Customise = ({ navigation }) => {
           timeout={500}
           buttonStyle={{...styles.buttonHeight,width : 100}}
           disabled={
-            fromHsv(sentBoxColor) == originalStyles.sentBoxColor &&
-            fromHsv(sentTextColor) == originalStyles.sentTextColor &&
-            fromHsv(receivedBoxColor) == originalStyles.receivedBoxColor &&
-            fromHsv(receivedTextColor) == originalStyles.receivedTextColor &&
+            fromHsv(sentBoxColor).toLowerCase() == originalStyles.sentBoxColor.toLowerCase() &&
+            fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
+            fromHsv(receivedBoxColor).toLowerCase() == originalStyles.receivedBoxColor.toLowerCase() &&
+            fromHsv(receivedTextColor).toLowerCase() == originalStyles.receivedTextColor.toLowerCase() &&
             fontSize === originalStyles.fontSize
           }/>
 
