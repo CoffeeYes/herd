@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,10 +11,12 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import FoldableMessage from './FoldableMessage';
 
+import { setMessageQueue } from '../redux/actions/chatActions';
 const MessageQueue = ({}) => {
-  const [messages, setMessages] = useState([]);
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
+  const messageQueue = useSelector(state => state.chatReducer.messageQueue);
 
   useEffect(() => {
     loadMessages();
@@ -40,7 +42,7 @@ const MessageQueue = ({}) => {
         :
         contacts.find(contact => message.from === contact.key)?.name
     })
-    setMessages(messageQueue)
+    dispatch(setMessageQueue(messageQueue))
     setLoading(false);
   }
 
@@ -54,7 +56,7 @@ const MessageQueue = ({}) => {
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
-        {messages.map((message,index) =>
+        {messageQueue.map((message,index) =>
           message.to === ownPublicKey || message.from === ownPublicKey ?
           <FoldableMessage
           to={message.toContactName}

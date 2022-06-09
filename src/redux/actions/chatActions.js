@@ -33,10 +33,18 @@ const setStyles = styles => {
   }
 }
 
+const setMessageQueue = queue => {
+  return {
+    type : "SET_MESSAGE_QUEUE",
+    payload : queue
+  }
+}
+
 export {
   deleteChat,
   addChat,
   setChats,
   setStyles,
-  setLastText
+  setLastText,
+  setMessageQueue
 }
