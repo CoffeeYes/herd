@@ -283,10 +283,10 @@ const Customise = ({ navigation }) => {
           text={"Restore Default"}
           onPress={restoreDefault}
           disabled={
-            fromHsv(sentBoxColor) == "#c6c6c6" &&
-            fromHsv(sentTextColor) == "#f5f5f5" &&
-            fromHsv(receivedBoxColor) == "#e86252" &&
-            fromHsv(receivedTextColor) == "#f5f5f5" &&
+            fromHsv(originalStyles.sentBoxColor).toLowerCase() == "#c6c6c6" &&
+            fromHsv(originalStyles.sentTextColor).toLowerCase() == "#f5f5f5" &&
+            fromHsv(originalStyles.receivedBoxColor).toLowerCase() == "#e86252" &&
+            fromHsv(originalStyles.receivedTextColor).toLowerCase() == "#f5f5f5" &&
             fontSize === 14
           }
           buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
