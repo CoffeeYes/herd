@@ -50,8 +50,9 @@ const Contact = ({route, navigation}) => {
     }
   }
 
-  const copyKeyToClipboard = async () => {
+  const copyKeyToClipboard = () => {
     setClipboard(contactKey)
+    return true;
   }
 
   const shareContact = async () => {

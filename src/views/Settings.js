@@ -37,7 +37,8 @@ const Settings = ({ navigation }) => {
   },[]);
 
   const copyKeyToClipboard = async () => {
-    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
+    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"));
+    return true;
   }
 
   const showQRCode = async () => {
