@@ -15,45 +15,16 @@ const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const chats = useSelector(state => state.chatReducer.chats);
-  const [loading, setLoading] = useState(true);
-  const [sentTextColor, setSentTextColor] = useState("");
-  const [receivedTextColor, setReceivedTextColor] = useState("");
+  const styles = useSelector(state => state.chatReducer.styles);
 
-  useEffect(() => {
-    setLoading(true);
-    (async () => {
-      loadStyles();
-    })()
-    setLoading(false);
-  },[])
-
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      loadStyles();
-    });
-    return focusListener;
-  },[navigation])
-
-  const loadStyles = async () => {
-    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-
-    if(styles) {
-      const hsvSent = toHsv(styles.sentTextColor);
-      const hsvReceived = toHsv(styles.receivedTextColor);
-
-      if(hsvSent.h < 10 && hsvSent.s < 10 && hsvSent.v > 0.95) {
-        setSentTextColor("grey")
+  const checkStyleReadable = style => {
+      const hsv = toHsv(style);
+      if(hsv.h < 10 && hsv.s < 10 && hsv.v > 0.95) {
+        return "grey"
       }
       else {
-        setSentTextColor(styles.sentTextColor)
+        style
       }
-      if(hsvReceived.h < 10 && hsvReceived.s < 10 && hsvReceived.v > 0.95) {
-        setReceivedTextColor("grey")
-      }
-      else {
-        setReceivedTextColor(styles.receivedTextColor)
-      }
-    }
   }
 
   const deleteChat = chat => {
@@ -83,8 +54,6 @@ const Chats = ({ navigation }) => {
       title="Chats"
       rightButtonIcon="add"
       rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
-
-      {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
       <ScrollView>
       {chats?.map( (chat, index) =>
         <ListItem
@@ -94,11 +63,11 @@ const Chats = ({ navigation }) => {
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
         subTextStyle={{
-          color : chat.lastMessageSentBySelf ? sentTextColor : receivedTextColor,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
-          color : chat.lastMessageSentBySelf ? sentTextColor : receivedTextColor,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
