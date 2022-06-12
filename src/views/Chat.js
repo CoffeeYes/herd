@@ -29,7 +29,7 @@ const Chat = ({ route, navigation }) => {
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [messages,setMessages] = useState([]);
-  const [contactInfo, setContactInfo] = useState({});
+  const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
   const [highlightedMessages, setHighlightedMessages] = useState([]);
@@ -55,9 +55,7 @@ const Chat = ({ route, navigation }) => {
   },[]);
 
   const loadMessages = async (messageStart, messageEnd) => {
-    const contact = getContactById(route.params.contactID);
-    setContactInfo(contact);
-    var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
+    var newMessages = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
     if(newMessages.length === 0 && messages.length != 0) {
       setAllowScrollToLoadMessages(false);
       showNoMoreMessagePopup();
