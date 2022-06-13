@@ -14,7 +14,7 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
-import { addChat, setLastText } from '../redux/actions/chatActions';
+import { addChat, setLastText, setMessagesForContact } from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
@@ -28,7 +28,7 @@ const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [messages,setMessages] = useState([]);
+  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
@@ -61,9 +61,10 @@ const Chat = ({ route, navigation }) => {
       showNoMoreMessagePopup();
       return;
     }
-    const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
+    const allMessages = [...messages.filter(message => newMessages.indexOf(message) !== -1),...newMessages].sort((a,b) => a.timestamp > b.timestamp)
     setMessageDays(calculateMessageDays(allMessages));
-    setMessages(allMessages);
+    dispatch(setMessagesForContact(route.params.contactID,allMessages));
+    // setMessages(allMessages);
   }
 
   const calculateMessageDays = messages => {
@@ -114,7 +115,6 @@ const Chat = ({ route, navigation }) => {
     }
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
-    setMessages([...messages,{...plainText,_id : messageID}]);
     const newDate = moment(metaData.timestamp).format("DD/MM");
 
     messageDays.indexOf(newDate) === -1 &&

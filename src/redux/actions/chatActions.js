@@ -40,11 +40,19 @@ const setMessageQueue = queue => {
   }
 }
 
+const setMessagesForContact = (id, messages) => {
+  return{
+    type : "SET_MESSAGES_FOR_CONTACT",
+    payload : {id : id, messages : messages}
+  }
+}
+
 export {
   deleteChat,
   addChat,
   setChats,
   setStyles,
   setLastText,
-  setMessageQueue
+  setMessageQueue,
+  setMessagesForContact
 }

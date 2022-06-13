@@ -7,7 +7,8 @@ const initialState = {
     sentBoxColor : "red",
     receivedBoxColor : "red"
   },
-  messageQueue : []
+  messageQueue : [],
+  messages : {}
 }
 
 const chatReducer = (state = initialState,action) => {
@@ -37,6 +38,10 @@ const chatReducer = (state = initialState,action) => {
       break;
     case "SET_MESSAGE_QUEUE":
       return {...state, messageQueue : action.payload}
+      break;
+    case "SET_MESSAGES_FOR_CONTACT":
+      return {...state,messages : {...state.messages,[action.payload.id] : action.payload.messages}}
+      break;
     default:
       return state
   }
