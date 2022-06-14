@@ -42,6 +42,19 @@ const chatReducer = (state = initialState,action) => {
     case "SET_MESSAGES_FOR_CONTACT":
       return {...state,messages : {...state.messages,[action.payload.id] : action.payload.messages}}
       break;
+    case "PREPEND_MESSAGES_FOR_CONTACT":
+      let newState = {...state}
+      if(!state.messages[action.payload.id]) {
+        newState.messages[action.payload.id] = []
+      }
+      return {...newState, messages : {
+        ...newState.messages,
+        [action.payload.id] : [
+          ...action.payload.messages,
+          ...newState.messages[action.payload.id]
+        ]
+      }}
+      break;
     default:
       return state
   }

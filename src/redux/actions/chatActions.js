@@ -47,6 +47,14 @@ const setMessagesForContact = (id, messages) => {
   }
 }
 
+const prependMessagesForContact = (id, messages) => {
+  console.log(id)
+  return {
+    type : "PREPEND_MESSAGES_FOR_CONTACT",
+    payload : {id : id,messages : messages}
+  }
+}
+
 export {
   deleteChat,
   addChat,
@@ -54,5 +62,6 @@ export {
   setStyles,
   setLastText,
   setMessageQueue,
-  setMessagesForContact
+  setMessagesForContact,
+  prependMessagesForContact
 }

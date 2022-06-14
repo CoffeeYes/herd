@@ -14,7 +14,7 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
-import { addChat, setLastText, setMessagesForContact } from '../redux/actions/chatActions';
+import { addChat, setLastText, prependMessagesForContact } from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
@@ -49,7 +49,13 @@ const Chat = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      await loadMessages(-messageLoadingSize);
+      if(messages.length === 0) {
+        await loadMessages(-messageLoadingSize);
+      }
+      else {
+        setMessageDays(calculateMessageDays(messages));
+        setMessageStart(-messages.length)
+      }
       setLoading(false);
     })()
   },[]);
@@ -63,8 +69,7 @@ const Chat = ({ route, navigation }) => {
     }
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) !== -1),...newMessages].sort((a,b) => a.timestamp > b.timestamp)
     setMessageDays(calculateMessageDays(allMessages));
-    dispatch(setMessagesForContact(route.params.contactID,allMessages));
-    // setMessages(allMessages);
+    dispatch(prependMessagesForContact(route.params.contactID,newMessages));
   }
 
   const calculateMessageDays = messages => {
@@ -199,6 +204,9 @@ const Chat = ({ route, navigation }) => {
     //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
     await loadMessages(messageStart - (messageLoadingSize + 1), messageStart);
     setMessageStart(messageStart - (messageLoadingSize + 1));
+    console.log(`messageStart : ${messageStart}`);
+    console.log(`messageLoadingSize : ${messageStart}`);
+    console.log(`combined : ${messageStart - (messageLoadingSize + 1)}`);
 
     setLoadingMoreMessages(false);
     scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
