@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-const FoldableMessage = ({to, from, timestamp, text, style}) => {
+const FoldableMessage = ({to, from, timestamp, text, style, overRideOpen}) => {
   const [open, setOpen] = useState(false);
   const [decryptedText, setDecryptedText] = useState("");
 
@@ -19,7 +19,7 @@ const FoldableMessage = ({to, from, timestamp, text, style}) => {
 
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={() => setOpen(!open)}>
-      {open ?
+      {open || overRideOpen ?
       <View style={styles.open}>
         <View style={styles.closed}>
           <Text>To: {to}</Text>

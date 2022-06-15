@@ -10,11 +10,13 @@ import moment from 'moment';
 import Crypto from '../nativeWrapper/Crypto';
 
 import FoldableMessage from './FoldableMessage';
+import CustomButton from './CustomButton';
 
 import { setMessageQueue } from '../redux/actions/chatActions';
 const MessageQueue = ({}) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const [allOpen, setAllOpen] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
 
@@ -55,11 +57,17 @@ const MessageQueue = ({}) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
+      <>
+      <CustomButton
+      text={allOpen ? "Close All" : "Open All"}
+      onPress={() => setAllOpen(!allOpen)}
+      buttonStyle={{marginTop : 15}}/>
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {messageQueue.map((message,index) =>
           message.to === ownPublicKey || message.from === ownPublicKey ?
           <FoldableMessage
           to={message.toContactName}
+          overRideOpen={allOpen}
           from={message.fromContactName}
           key={index}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
@@ -67,7 +75,8 @@ const MessageQueue = ({}) => {
           :
           <Text key={index}>Encrypted Message for Other User</Text>
         )}
-      </ScrollView>}
+      </ScrollView>
+      </>}
     </View>
   )
 }
