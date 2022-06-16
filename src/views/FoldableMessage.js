@@ -17,9 +17,13 @@ const FoldableMessage = ({to, from, timestamp, text, style, overRideOpen}) => {
     ).then(result => setDecryptedText(result))
   },[])
 
+  useEffect(() => {
+    setOpen(overRideOpen)
+  },[overRideOpen])
+
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={() => setOpen(!open)}>
-      {open || overRideOpen ?
+      {open ?
       <View style={styles.open}>
         <View style={styles.closed}>
           <Text>To: {to}</Text>
