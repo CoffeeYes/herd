@@ -72,7 +72,6 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
-      await loadInitialState();
 
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
@@ -84,12 +83,14 @@ const App = ({ }) => {
       else {
         loadStoredMessages();
       }
+      await loadInitialState();
       setLoading(false);
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
       addNewReceivedMessagesToRealm(messages);
+      dispatch(setChats(loadContactsWithChats()))
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {

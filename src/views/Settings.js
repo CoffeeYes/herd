@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert, Dimensions } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
@@ -9,11 +9,15 @@ import QRCodeModal from './QRCodeModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
+import CardButton from './CardButton';
+
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
 import { getPasswordHash, closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
-import CardButton from './CardButton';
+
+import { setChats } from '../redux/actions/chatActions';
+import { setContacts } from '../redux/actions/contactActions';
 
 import {
   getMessageQueue,
@@ -24,6 +28,7 @@ import {
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
 const Settings = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -57,7 +62,8 @@ const Settings = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            deleteAllChatsFromRealm()
+            deleteAllChatsFromRealm();
+            dispatch(setChats([]));
           },
         },
       ]
@@ -79,6 +85,8 @@ const Settings = ({ navigation }) => {
           onPress: async () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
+            dispatch(setChats([]));
+            dispatch(setContacts([]));
           },
         },
       ]
@@ -98,6 +106,7 @@ const Settings = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             deleteAllMessagesFromRealm();
+            dispatch(setChats([]));
           },
         },
       ]
