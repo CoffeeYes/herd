@@ -83,6 +83,7 @@ const App = ({ }) => {
       else {
         loadStoredMessages();
       }
+      console.log("App Mount")
       await loadInitialState();
       setLoading(false);
     })()
@@ -126,7 +127,7 @@ const App = ({ }) => {
     }
     dispatch(setPublicKey(key));
 
-    //load saved contacts into store
+    //load saved contacts into store)
     dispatch(setContacts(getAllContacts()))
 
     //load saved chats into store
