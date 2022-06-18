@@ -126,7 +126,7 @@ const App = ({ }) => {
     }
     dispatch(setPublicKey(key));
 
-    //load saved contacts into store
+    //load saved contacts into store)
     dispatch(setContacts(getAllContacts()))
 
     //load saved chats into store

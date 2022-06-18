@@ -20,6 +20,7 @@ const CreateContact = ({ navigation, route}) => {
   const [publicKey, _setPublicKey] = useState("");
   const [error, setError] = useState("");
   const [contactImage, _setContactImage] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
 
   const usernameRef = useRef();
   const publicKeyRef = useRef();
@@ -47,6 +48,7 @@ const CreateContact = ({ navigation, route}) => {
   },[])
 
   const createNewContact = async () => {
+    setDisableButton(true);
     setError("");
 
     if(username.trim() === "" || publicKey.trim() === "") {
@@ -64,6 +66,7 @@ const CreateContact = ({ navigation, route}) => {
         )
       }
       catch(e) {
+        setDisableButton(false);
         return setError("Invalid Public Key")
       }
 
@@ -86,6 +89,7 @@ const CreateContact = ({ navigation, route}) => {
       setContactImage("");
       navigation.navigate('main');
     }
+    setDisableButton(false);
   }
 
   const editImage = async () => {
@@ -171,7 +175,7 @@ const CreateContact = ({ navigation, route}) => {
         <CustomButton
         text="Import"
         onPress={createNewContact}
-        disabled={username.trim().length === 0 || publicKey.trim().length === 0}/>
+        disabled={username.trim().length === 0 || publicKey.trim().length === 0 || disableButton}/>
 
       </ScrollView>
   </>
