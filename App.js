@@ -83,7 +83,6 @@ const App = ({ }) => {
       else {
         loadStoredMessages();
       }
-      console.log("App Mount")
       await loadInitialState();
       setLoading(false);
     })()

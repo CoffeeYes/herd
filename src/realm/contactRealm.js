@@ -9,7 +9,11 @@ const contactsRealm = new Realm({
 })
 
 const getAllContacts = () => {
-  return contactsRealm.objects('Contact');
+  const allContacts = contactsRealm.objects("Contact");
+  return allContacts.length > 0 ?
+  allContacts
+  :
+  []
 }
 
 const deleteContact = object => {

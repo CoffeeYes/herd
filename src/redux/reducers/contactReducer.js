@@ -9,12 +9,7 @@ const contactReducer = (state = initialState,action) => {
       return {...state, contacts : action.payload}
       break;
     case "ADD_CONTACT":
-      if(state.contacts.indexOf(action.payload) === -1) {
-        return {...state, contacts : [...state.contacts,action.payload]}
-      }
-      else {
-        return state
-      }
+      return {...state, contacts : [...state.contacts,action.payload]};
       break;
     case "DELETE_CONTACT":
       return {...state, contacts : [...state.contacts].filter(contact => contact.id !== action.payload.id)}
