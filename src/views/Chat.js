@@ -183,7 +183,6 @@ const Chat = ({ route, navigation }) => {
             }
 
             setMessageDays(calculateMessageDays(updatedMessages));
-            setMessages(updatedMessages);
             setHighlightedMessages([]);
             setInputDisabled(false);
           },
@@ -204,9 +203,6 @@ const Chat = ({ route, navigation }) => {
     //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
     await loadMessages(messageStart - (messageLoadingSize + 1), messageStart);
     setMessageStart(messageStart - (messageLoadingSize + 1));
-    console.log(`messageStart : ${messageStart}`);
-    console.log(`messageLoadingSize : ${messageStart}`);
-    console.log(`combined : ${messageStart - (messageLoadingSize + 1)}`);
 
     setLoadingMoreMessages(false);
     scrollRef.current.scrollTo({x : 0, y : 20, animated : true})

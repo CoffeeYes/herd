@@ -33,13 +33,15 @@ const createContact = object => {
 
 const getContactById = id => {
   let oid = Realm.BSON.ObjectId(id)
-  return contactsRealm.objectForPrimaryKey("Contact",oid);
+  const contact = contactsRealm.objectForPrimaryKey("Contact",oid);
+  return contact._id ? contact : {}
 }
 
 const getContactsByKey = keys => {
   if(keys.length > 0) {
     const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
-    return contactsRealm.objects('Contact').filtered(keyQuery);
+    const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
+    return contactsByKey.length > 0 ? contactsByKey : []
   }
   else {
     return []
