@@ -22,6 +22,11 @@ const chatReducer = (state = initialState,action) => {
     case "ADD_CHAT":
       return {...state, chats : [...state.chats, action.payload]};
       break;
+    case "ADD_MESSAGE":
+      return {...state, messages : {...state.messages,[action.payload.id] : [...state.messages[action.payload.id],action.payload.message]}}
+      break;
+    case "DELETE_MESSAGES":
+      break;
     case "SET_LAST_TEXT":
       let chat = state.chats.find(chat => chat._id == action.payload._id);
       if(chat) {
@@ -32,6 +37,7 @@ const chatReducer = (state = initialState,action) => {
         chats[chatIndex] = chat;
         return {...state,chats : chats};
       }
+      return state;
       break;
     case "SET_STYLES":
       return {...state,styles : action.payload}

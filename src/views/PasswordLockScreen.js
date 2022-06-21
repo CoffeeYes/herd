@@ -27,8 +27,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const passwordHash = await Crypto.createHash(password);
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
-
-    console.log(loginHash)
+    
     if(isLoginPassword) {
       navigation.dispatch(
         CommonActions.reset({

@@ -14,7 +14,7 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
-import { addChat, setLastText, prependMessagesForContact } from '../redux/actions/chatActions';
+import { addChat, setLastText, prependMessagesForContact, addMessage } from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
@@ -146,6 +146,7 @@ const Chat = ({ route, navigation }) => {
       }
       dispatch(setLastText(newLastText))
     }
+    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}))
 
 
     setChatInput("");

@@ -19,6 +19,20 @@ const addChat = chat => {
   }
 }
 
+const addMessage = (id, message) => {
+  return {
+    type : "ADD_MESSAGE",
+    payload : {id,message}
+  }
+}
+
+const deleteMessages = (id, messages) => {
+  return {
+    type : "DELETE_MESSAGES",
+    payload : {id,messages}
+  }
+}
+
 const setLastText = newText => {
   return {
     type : "SET_LAST_TEXT",
@@ -41,14 +55,13 @@ const setMessageQueue = queue => {
 }
 
 const setMessagesForContact = (id, messages) => {
-  return{
+  return {
     type : "SET_MESSAGES_FOR_CONTACT",
     payload : {id : id, messages : messages}
   }
 }
 
 const prependMessagesForContact = (id, messages) => {
-  console.log(id)
   return {
     type : "PREPEND_MESSAGES_FOR_CONTACT",
     payload : {id : id,messages : messages}
@@ -59,6 +72,8 @@ export {
   deleteChat,
   addChat,
   setChats,
+  addMessage,
+  deleteMessages,
   setStyles,
   setLastText,
   setMessageQueue,
