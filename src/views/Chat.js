@@ -14,7 +14,12 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
-import { addChat, setLastText, prependMessagesForContact, addMessage } from '../redux/actions/chatActions';
+import {
+  addChat,
+  setLastText,
+  prependMessagesForContact,
+  addMessage,
+  deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
@@ -171,6 +176,7 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
+            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages))
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
             const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -10)
             .map(message => ({...message,_id : parseRealmID(message)}))

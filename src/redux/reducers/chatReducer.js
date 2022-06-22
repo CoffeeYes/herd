@@ -26,6 +26,13 @@ const chatReducer = (state = initialState,action) => {
       return {...state, messages : {...state.messages,[action.payload.id] : [...state.messages[action.payload.id],action.payload.message]}}
       break;
     case "DELETE_MESSAGES":
+      return {...state,
+        messages : {
+          ...state.messages,
+           [action.payload.id] : [...state.messages[action.payload.id]].filter
+           (message => action.payload.messages.find(messageID => messageID == message._id) === undefined)
+         }
+       }
       break;
     case "SET_LAST_TEXT":
       let chat = state.chats.find(chat => chat._id == action.payload._id);
