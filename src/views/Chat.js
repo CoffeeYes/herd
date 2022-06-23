@@ -19,6 +19,7 @@ import {
   setLastText,
   prependMessagesForContact,
   addMessage,
+  deleteChat,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -176,7 +177,18 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages))
+            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
+            //update last text or delete chat
+            dispatch(
+              messages.length > 1 ?
+              setLastText({
+                _id : contactInfo._id,
+                timestamp : messages[messages.length -2].timestamp,
+                lastText : messages[messages.length -2].text
+              })
+              :
+              deleteChat({_id : contactInfo._id})
+            )
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
             const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -10)
             .map(message => ({...message,_id : parseRealmID(message)}))
