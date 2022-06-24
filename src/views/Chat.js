@@ -134,7 +134,7 @@ const Chat = ({ route, navigation }) => {
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
       const newChat = {
-        _id : contactInfo._id,
+        _id : route.params.contactID,
         image : contactInfo.image,
         key : contactInfo.key,
         lastMessageSentBySelf : true,
@@ -146,14 +146,13 @@ const Chat = ({ route, navigation }) => {
     }
     else {
       const newLastText = {
-        _id : contactInfo._id,
+        _id : route.params.contactID,
         lastText : message,
         timestamp : metaData.timestamp
       }
       dispatch(setLastText(newLastText))
     }
-    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}))
-
+    dispatch(addMessage(route.params.contactID,{...plainText,_id : messageID}))
 
     setChatInput("");
     setInputDisabled(false);
