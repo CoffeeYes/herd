@@ -19,8 +19,11 @@ const getAllContacts = () => {
 
 const deleteContact = object => {
   deleteChat(object.key);
+  const contacts = contactsRealm.objects("Contact");
+  const contactToDelete = contacts.find(contact => contact._id == object._id);
+  contactToDelete &&
   contactsRealm.write(() => {
-    contactsRealm.delete(object);
+    contactsRealm.delete(contactToDelete);
   })
 }
 
