@@ -10,6 +10,7 @@ import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
 import { deleteContact } from '../redux/actions/contactActions';
+import { deleteChat } from '../redux/actions/chatActions';
 
 
 const Contacts = ({ route, navigation }) => {
@@ -32,6 +33,7 @@ const Contacts = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             dispatch(deleteContact(contacts[index]))
+            dispatch(deleteChat({_id : contacts[index]._id}))
             deleteContactFromRealm(contacts[index]);
           },
         },
