@@ -43,6 +43,7 @@ import MessageQueue from './src/views/MessageQueue';
 import PasswordSettings from './src/views/PasswordSettings';
 import PasswordLockScreen from './src/views/PasswordLockScreen';
 import LoadingScreen from './src/views/LoadingScreen';
+import LockedScreen from './src/views/LockedScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
@@ -64,6 +65,7 @@ const App = ({ }) => {
   const dispatch = useDispatch();
   const initialRoute = useSelector(state => state.appStateReducer.initialRoute);
   const [loading, setLoading] = useState(true);
+  const [locked, setLocked] = useState(false);
   const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -97,10 +99,10 @@ const App = ({ }) => {
       //switch to loading screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
       if(state === "background") {
-        setLoading(true);
+        setLocked(true);
       }
       if(state === "active" && previousAppStateRef.current === "background") {
-        setLoading(false);
+        setLocked(false);
       }
       previousAppStateRef.current = state;
     })
@@ -168,6 +170,9 @@ const App = ({ }) => {
     <>
       {loading ?
       <LoadingScreen/>
+      :
+      locked ?
+      <LockedScreen/>
       :
       <Stack.Navigator
       initialRouteName={initialRoute}
