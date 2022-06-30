@@ -217,7 +217,7 @@ const Settings = ({ navigation }) => {
         text="Password Protection"
         rightIcon="lock"
         onPress={() => userHasPassword ?
-          navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
+          navigation.navigate("passwordLockScreen2",{navigationTarget : "passwordSettings"})
           :
           navigation.navigate("passwordSettings")}
         />

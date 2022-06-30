@@ -13,6 +13,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import { setPublicKey } from '../redux/actions/userActions';
 import { setContacts } from '../redux/actions/contactActions';
 import { setChats } from '../redux/actions/chatActions';
+import { setLocked } from '../redux/actions/appStateActions';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -27,22 +28,22 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const passwordHash = await Crypto.createHash(password);
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
-    
+
     if(isLoginPassword) {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 1,
-          routes: route.params.navigationTarget === "passwordSettings" ?
-          [
-            { name: 'main', params : {initialRoute : "settings"}},
-            { name: 'passwordSettings'}
-          ]
-          :
-          [
-            {name : route.params.navigationTarget}
-          ]
-        })
-      )
+      if(route?.params?.navigationTarget === "passwordSettings") {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              { name: 'main', params : {initialRoute : "settings"}},
+              { name: 'passwordSettings'}
+            ]
+          })
+        )
+      }
+      else {
+        dispatch(setLocked(false));
+      }
     }
     else if (isErasurePassword) {
       deleteAllMessages();
@@ -52,7 +53,6 @@ const PasswordLockScreen = ({ navigation, route }) => {
       dispatch(setPublicKey(key));
       dispatch(setContacts([]));
       dispatch(setChats([]));
-      navigation.navigate(route.params.navigationTarget);
     }
     else {
       setError("Incorrect Password")

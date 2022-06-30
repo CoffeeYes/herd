@@ -57,7 +57,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles } from './src/redux/actions/chatActions';
-import { setInitialRoute } from './src/redux/actions/appStateActions';
+import { setInitialRoute, setLocked } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator()
 
@@ -65,12 +65,13 @@ const App = ({ }) => {
   const dispatch = useDispatch();
   const initialRoute = useSelector(state => state.appStateReducer.initialRoute);
   const [loading, setLoading] = useState(true);
-  const [locked, setLocked] = useState(false);
+  // const [locked, setLocked] = useState(false);
   const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
+  const locked = useSelector(state => state.appStateReducer.locked);
 
-  const previousAppStateRef = useRef();
+  const passwordSetRef = useRef();
 
   useEffect(() => {
     (async () => {
@@ -96,15 +97,11 @@ const App = ({ }) => {
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
-      //switch to loading screen when backgrounded to prevent render from leaking
+      //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
-      if(state === "background") {
-        setLocked(true);
+      if(state === "background" && passwordSetRef.current) {
+        dispatch(setLocked(true))
       }
-      if(state === "active" && previousAppStateRef.current === "background") {
-        setLocked(false);
-      }
-      previousAppStateRef.current = state;
     })
 
     return () => {
@@ -112,6 +109,10 @@ const App = ({ }) => {
       appStateListener.remove();
     }
   },[])
+
+  useEffect(() => {
+    passwordSetRef.current = passwordHash.length > 0;
+  },[passwordHash])
 
   const loadInitialState = async () => {
     //get stored data
@@ -121,11 +122,17 @@ const App = ({ }) => {
 
     //determine the entry screen
     if(key.length > 0) {
-      dispatch(setInitialRoute(loginPassword.length > 0 ? "passwordLockScreen" : "main"))
+      dispatch(setInitialRoute("main"))
     }
     else {
       dispatch(setInitialRoute("splash"))
     }
+
+    if(loginPassword.length > 0) {
+      console.log(loginPassword)
+      dispatch(setLocked(true));
+    }
+
     dispatch(setPublicKey(key));
 
     //load saved contacts into store)
@@ -171,31 +178,34 @@ const App = ({ }) => {
       {loading ?
       <LoadingScreen/>
       :
-      locked ?
-      <LockedScreen/>
-      :
       <Stack.Navigator
       initialRouteName={initialRoute}
       screenOptions={{headerShown : false}}>
-        <Stack.Screen name="contacts" component={Contacts}/>
-        <Stack.Screen name="addContact" component={AddContact}/>
-        <Stack.Screen name="chats" component={Chats}/>
-        <Stack.Screen name="splash" component={Splash}/>
-        <Stack.Screen name="main" component={Main}/>
-        <Stack.Screen name="chat" component={Chat}/>
-        <Stack.Screen name="contact" component={Contact}/>
-        <Stack.Screen name="createcontact" component={CreateContact}/>
-        <Stack.Screen name="newChat" component={Contacts}/>
-        <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
-        <Stack.Screen name="QRScanner" component={QRScanner}/>
-        <Stack.Screen name="editContact" component={EditContact}/>
-        <Stack.Screen name="customise" component={Customise}/>
-        <Stack.Screen name="messageQueue" component={MessageQueue}/>
-        <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
+      {locked ?
         <Stack.Screen
         name="passwordLockScreen"
-        component={PasswordLockScreen}
-        initialParams={{navigationTarget : "main"}}/>
+        component={PasswordLockScreen}/>
+        :
+        <>
+          <Stack.Screen name="contacts" component={Contacts}/>
+          <Stack.Screen name="addContact" component={AddContact}/>
+          <Stack.Screen name="chats" component={Chats}/>
+          <Stack.Screen name="splash" component={Splash}/>
+          <Stack.Screen name="main" component={Main}/>
+          <Stack.Screen name="chat" component={Chat}/>
+          <Stack.Screen name="contact" component={Contact}/>
+          <Stack.Screen name="createcontact" component={CreateContact}/>
+          <Stack.Screen name="newChat" component={Contacts}/>
+          <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
+          <Stack.Screen name="QRScanner" component={QRScanner}/>
+          <Stack.Screen name="editContact" component={EditContact}/>
+          <Stack.Screen name="customise" component={Customise}/>
+          <Stack.Screen name="messageQueue" component={MessageQueue}/>
+          <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
+          <Stack.Screen
+          name="passwordLockScreen2"
+          component={PasswordLockScreen}/>
+        </>}
       </Stack.Navigator>}
     </>
   );

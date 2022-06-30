@@ -5,6 +5,14 @@ const setInitialRoute = route => {
   }
 }
 
+const setLocked = locked => {
+  return {
+    type : "SET_LOCKED",
+    payload : locked
+  }
+}
+
 export {
-  setInitialRoute
+  setInitialRoute,
+  setLocked
 }

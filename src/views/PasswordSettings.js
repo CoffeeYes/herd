@@ -5,7 +5,7 @@ import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-nati
 import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import { setPassword } from '../redux/actions/userActions';
-import { setInitialRoute } from '../redux/actions/appStateActions';
+import { setLocked } from '../redux/actions/appStateActions';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
@@ -70,7 +70,6 @@ const PasswordSettings = () => {
       }
       //update state store
       dispatch(setPassword("login",hash));
-      dispatch(setInitialRoute("passwordLockScreen"))
       //reset form
       setLoginPassword("");
       setConfirmLoginPassword("");
@@ -105,8 +104,6 @@ const PasswordSettings = () => {
             dispatch(setPassword("erasure",""));
             if(passwordName === "loginPassword") {
               deletePassword("erasurePassword");
-              
-              dispatch(setInitialRoute("main"));
               dispatch(setPassword("login",""));
             }
           },
