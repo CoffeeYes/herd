@@ -57,15 +57,14 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles } from './src/redux/actions/chatActions';
-import { setInitialRoute, setLocked } from './src/redux/actions/appStateActions';
+import { setLocked } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
   const dispatch = useDispatch();
-  const initialRoute = useSelector(state => state.appStateReducer.initialRoute);
+  const [initialRoute, setInitialRoute] = useState("main");
   const [loading, setLoading] = useState(true);
-  // const [locked, setLocked] = useState(false);
   const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -121,11 +120,11 @@ const App = ({ }) => {
     const erasurePassword = getPasswordHash("erasurePassword");
 
     //determine the entry screen
-    if(key.length > 0) {
-      dispatch(setInitialRoute("main"))
+    if(key?.length > 0) {
+      setInitialRoute("main")
     }
     else {
-      dispatch(setInitialRoute("splash"))
+      setInitialRoute("splash")
     }
 
     if(loginPassword.length > 0) {
