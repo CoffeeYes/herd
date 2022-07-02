@@ -16,7 +16,7 @@ import { closeContactRealm } from '../realm/contactRealm';
 import { getPasswordHash, closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 
-import { setChats } from '../redux/actions/chatActions';
+import { setChats, resetMessages } from '../redux/actions/chatActions';
 import { setContacts } from '../redux/actions/contactActions';
 
 import {
@@ -64,6 +64,7 @@ const Settings = ({ navigation }) => {
           onPress: () => {
             deleteAllChatsFromRealm();
             dispatch(setChats([]));
+            dispatch(resetMessages());
           },
         },
       ]
@@ -87,6 +88,7 @@ const Settings = ({ navigation }) => {
             deleteAllChatsFromRealm();
             dispatch(setChats([]));
             dispatch(setContacts([]));
+            dispatch(resetMessages());
           },
         },
       ]

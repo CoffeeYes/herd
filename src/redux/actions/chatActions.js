@@ -33,6 +33,12 @@ const deleteMessages = (id, messages) => {
   }
 }
 
+const resetMessages = () => {
+  return {
+    type : "RESET_MESSAGES"
+  }
+}
+
 const setLastText = newText => {
   return {
     type : "SET_LAST_TEXT",
@@ -74,6 +80,7 @@ export {
   setChats,
   addMessage,
   deleteMessages,
+  resetMessages,
   setStyles,
   setLastText,
   setMessageQueue,
