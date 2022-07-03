@@ -53,6 +53,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       dispatch(setPublicKey(key));
       dispatch(setContacts([]));
       dispatch(setChats([]));
+      dispatch(setLocked(false));
     }
     else {
       setError("Incorrect Password")

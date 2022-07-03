@@ -65,7 +65,6 @@ const App = ({ }) => {
   const dispatch = useDispatch();
   const [initialRoute, setInitialRoute] = useState("main");
   const [loading, setLoading] = useState(true);
-  const [previousAppState, setPreviousAppState] = useState(true);
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const locked = useSelector(state => state.appStateReducer.locked);
