@@ -2,7 +2,7 @@ import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChat } from './chatRealm';
 import { cloneDeep } from 'lodash';
-import { parseRealmObjects } from './helper'
+import { parseRealmObject, parseRealmObjects} from './helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -32,7 +32,7 @@ const createContact = object => {
   contactsRealm.write(() => {
     newContact = contactsRealm.create('Contact',{...object,_id : Realm.BSON.ObjectId()});
   })
-  return newContact;
+  return parseRealmObject(newContact);
 }
 
 const getContactById = id => {
