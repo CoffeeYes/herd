@@ -64,7 +64,6 @@ const Settings = ({ navigation }) => {
           onPress: () => {
             deleteAllChatsFromRealm();
             dispatch(setChats([]));
-            dispatch(resetMessages());
           },
         },
       ]
@@ -88,7 +87,6 @@ const Settings = ({ navigation }) => {
             deleteAllChatsFromRealm();
             dispatch(setChats([]));
             dispatch(setContacts([]));
-            dispatch(resetMessages());
           },
         },
       ]
