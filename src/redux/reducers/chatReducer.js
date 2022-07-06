@@ -40,7 +40,10 @@ const chatReducer = (state = initialState,action) => {
        }
       break;
     case "RESET_MESSAGES":
-      return {...state, messages : {}};
+      return {...state,
+        messages : {},
+        chats : []
+      };
       break;
     case "SET_LAST_TEXT":
       let chat = state.chats.find(chat => chat._id == action.payload._id);

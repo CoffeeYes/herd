@@ -1,3 +1,4 @@
+import { resetMessages } from './chatActions';
 
 const addContact = contact => {
   return {
@@ -27,9 +28,18 @@ const updateContact = contact => {
   }
 }
 
+const resetContacts = (dispatch) => {
+  dispatch({
+    type : "SET_CONTACTS",
+    payload : []
+  });
+  dispatch(resetMessages());
+}
+
 export {
   addContact,
   deleteContact,
   updateContact,
-  setContacts
+  setContacts,
+  resetContacts
 }
