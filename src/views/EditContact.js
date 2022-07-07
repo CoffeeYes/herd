@@ -73,6 +73,10 @@ const EditContact = ({ route, navigation }) => {
       console.log(e)
       return false;
     }
+    if(name.trim().length === 0) {
+      setError("Username can not be empty");
+      return false;
+    }
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     dispatch(updateContact({...newInfo,_id : route.params.id}));
