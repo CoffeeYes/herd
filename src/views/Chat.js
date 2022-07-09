@@ -19,6 +19,7 @@ import {
   setLastText,
   prependMessagesForContact,
   addMessage,
+  addMessageToQueue,
   deleteChat,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
@@ -152,7 +153,16 @@ const Chat = ({ route, navigation }) => {
       }
       dispatch(setLastText(newLastText))
     }
-    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}))
+    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}));
+    dispatch(addMessageToQueue({
+      _id : messageID,
+      fromContactName : "You",
+      toContactName : contactInfo.name,
+      to : contactInfo.key,
+      from : ownPublicKey,
+      timestamp : metaData.timestamp,
+      text : newMessageEncryptedCopy
+    }));
 
     setChatInput("");
     setInputDisabled(false);
