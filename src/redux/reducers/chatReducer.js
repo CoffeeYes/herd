@@ -38,6 +38,13 @@ const chatReducer = (state = initialState,action) => {
         messageQueue : [...state.messageQueue, action.payload.message]
       }
       break;
+    case "REMOVE_MESSAGES_FROM_QUEUE":
+      return {
+        ...state,
+        messageQueue : [...state.messageQueue].filter
+        (message => action.payload.find(dMessage => dMessage._id == message._id) === undefined)
+      }
+      break;
     case "DELETE_MESSAGES":
       return {...state,
         messages : {

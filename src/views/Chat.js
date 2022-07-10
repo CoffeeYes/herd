@@ -20,6 +20,7 @@ import {
   prependMessagesForContact,
   addMessage,
   addMessageToQueue,
+  removeMessagesFromQueue,
   deleteChat,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
@@ -198,6 +199,7 @@ const Chat = ({ route, navigation }) => {
               :
               deleteChat({_id : contactInfo._id})
             )
+            dispatch(removeMessagesFromQueue(highlightedMessages))
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
             const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -10)
             .map(message => ({...message,_id : parseRealmID(message)}))
