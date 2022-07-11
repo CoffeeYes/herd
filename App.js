@@ -50,13 +50,13 @@ import {
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
 import { getAllContacts } from './src/realm/contactRealm';
-import { getContactsWithChats } from './src/realm/chatRealm';
+import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats, setStyles } from './src/redux/actions/chatActions';
+import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
 import { setLocked } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator()
@@ -151,6 +151,9 @@ const App = ({ }) => {
 
     erasurePassword.length > 0 &&
     dispatch(setPassword("erasure",erasurePassword));
+
+    const messageQueue = await getMessageQueue(true);
+    dispatch(setMessageQueue(messageQueue))
   }
 
   const loadStoredMessages = async () => {
