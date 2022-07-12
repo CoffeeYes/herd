@@ -32,6 +32,13 @@ const addMessageToQueue = message => {
   }
 }
 
+const addMessagesToQueue = messages => {
+  return {
+    type : "ADD_MESSAGES_TO_QUEUE",
+    payload : messages
+  }
+}
+
 const removeMessagesFromQueue = messages => {
   return {
     type : "REMOVE_MESSAGES_FROM_QUEUE",
@@ -93,6 +100,7 @@ export {
   setChats,
   addMessage,
   addMessageToQueue,
+  addMessagesToQueue,
   removeMessagesFromQueue,
   deleteMessages,
   resetMessages,

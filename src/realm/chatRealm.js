@@ -4,6 +4,8 @@ import Crypto from '../nativeWrapper/Crypto';
 import { getContactsByKey } from './contactRealm';
 import { cloneDeep } from 'lodash'
 
+import { addMessagesToQueue } from '../redux/actions/chatActions';
+
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
   schema: [Schemas.MessageSchema],
@@ -85,7 +87,7 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   return messageID.toString();
 }
 
-const addNewReceivedMessages = messages => {
+const addNewReceivedMessages = (messages,dispatch) => {
   const receivedMessages = messageReceivedRealm.objects("Message");
   const deletedReceivedMessage = deletedReceivedRealm.objects("Message");
   const newMessages = messages.filter(nMessage =>
@@ -95,6 +97,9 @@ const addNewReceivedMessages = messages => {
   messageReceivedRealm.write(() => {
     newMessages.map(message => messageReceivedRealm.create("Message",{...message,_id : Realm.BSON.ObjectId(message._id)},true))
   })
+  if(dispatch) {
+    dispatch(addMessagesToQueue(newMessages));
+  }
 }
 
 const getContactsWithChats = async () => {

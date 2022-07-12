@@ -79,7 +79,7 @@ const App = ({ }) => {
         newMessages = await ServiceInterface.getReceivedMessages();
 
         newMessages.length > 0 &&
-        addNewReceivedMessagesToRealm(newMessages);
+        addNewReceivedMessagesToRealm(newMessages,dispatch);
       }
       else {
         loadStoredMessages();
@@ -90,7 +90,7 @@ const App = ({ }) => {
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
-      addNewReceivedMessagesToRealm(messages);
+      addNewReceivedMessagesToRealm(messages,dispatch);
       dispatch(setChats(loadContactsWithChats()))
     })
 

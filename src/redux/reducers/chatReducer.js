@@ -38,6 +38,12 @@ const chatReducer = (state = initialState,action) => {
         messageQueue : [...state.messageQueue, action.payload.message]
       }
       break;
+    case "ADD_MESSAGES_TO_QUEUE":
+      return {
+        ...state,
+        messageQueue : [...state.messageQueue, ...action.payload]
+      }
+      break;
     case "REMOVE_MESSAGES_FROM_QUEUE":
       return {
         ...state,
