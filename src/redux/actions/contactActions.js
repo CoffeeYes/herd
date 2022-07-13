@@ -14,11 +14,15 @@ const setContacts = contacts => {
   }
 }
 
-const deleteContact = contact => {
-  return {
+const deleteContact = (contact,dispatch) => {
+  dispatch({
     type : "DELETE_CONTACT",
     payload : contact
-  }
+  })
+  dispatch({
+    type : "DELETE_CHAT",
+    payload : {_id : contact._id}
+  })
 }
 
 const updateContact = contact => {
