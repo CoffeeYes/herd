@@ -16,7 +16,8 @@ const chatReducer = (state = initialState,action) => {
     case "SET_CHATS":
       return {...state,
         chats : action.payload,
-        messages : action.payload.length === 0 ? {} : {...state.messages}};
+        messages : action.payload.length === 0 ? {} : {...state.messages}
+      }
       break;
     case "DELETE_CHAT":
       return {...state,
@@ -28,9 +29,12 @@ const chatReducer = (state = initialState,action) => {
       return {...state, chats : [...state.chats, action.payload]};
       break;
     case "ADD_MESSAGE":
-      console.log(state.messages[action.payload.id][0]);
-      console.log(state.messageQueue[0]);
-      return {...state, messages : {...state.messages,[action.payload.id] : [...state.messages[action.payload.id],action.payload.message]}}
+      return {
+        ...state,
+        messages : {
+          ...state.messages,
+          [action.payload.id] : [...state.messages[action.payload.id],action.payload.message]}
+      }
       break;
     case "ADD_MESSAGE_TO_QUEUE":
       return {

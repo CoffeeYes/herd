@@ -12,7 +12,7 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import { setPublicKey } from '../redux/actions/userActions';
 import { setContacts } from '../redux/actions/contactActions';
-import { setChats } from '../redux/actions/chatActions';
+import { setChats, setMessageQueue } from '../redux/actions/chatActions';
 import { setLocked } from '../redux/actions/appStateActions';
 
 const PasswordLockScreen = ({ navigation, route }) => {
@@ -53,6 +53,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       dispatch(setPublicKey(key));
       dispatch(setContacts([]));
       dispatch(setChats([]));
+      dispatch(setMessageQueue([]));
       dispatch(setLocked(false));
     }
     else {
