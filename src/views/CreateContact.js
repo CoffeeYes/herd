@@ -77,8 +77,8 @@ const CreateContact = ({ navigation, route}) => {
       }
 
       const newContact = {
-        key : publicKey,
-        name : username,
+        key : publicKey.trim(),
+        name : username.trim(),
         image : contactImage
       }
       //create contact, add contact to state store, reset values and navigate back

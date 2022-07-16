@@ -127,7 +127,6 @@ const App = ({ }) => {
     }
 
     if(loginPassword.length > 0) {
-      console.log(loginPassword)
       dispatch(setLocked(true));
     }
 
