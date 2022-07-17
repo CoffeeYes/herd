@@ -58,7 +58,6 @@ const EditContact = ({ route, navigation }) => {
   }
 
   const save = async () => {
-    setError("");
     try {
       const encryptedTest = await Crypto.encryptStringWithKey(
         publicKey.trim(),
@@ -77,6 +76,7 @@ const EditContact = ({ route, navigation }) => {
       setError("Username can not be empty");
       return false;
     }
+    setError("");
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     dispatch(updateContact({...newInfo,_id : route.params.id}));

@@ -49,7 +49,6 @@ const CreateContact = ({ navigation, route}) => {
 
   const createNewContact = async () => {
     setDisableButton(true);
-    setError("");
 
     if(username.trim() === "" || publicKey.trim() === "") {
       setError("Fields Cannot be empty")
@@ -71,10 +70,11 @@ const CreateContact = ({ navigation, route}) => {
       }
 
       //check for duplicate contacts
-      const contactExists = getContactsByKey([publicKey]);
+      const contactExists = getContactsByKey([publicKey.trim()]);
       if(contactExists != "") {
         return setError("A contact with this key already exists")
       }
+      setError("");
 
       const newContact = {
         key : publicKey.trim(),
