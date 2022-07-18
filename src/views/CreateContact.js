@@ -72,7 +72,8 @@ const CreateContact = ({ navigation, route}) => {
       //check for duplicate contacts
       const contactExists = getContactsByKey([publicKey.trim()]);
       if(contactExists != "") {
-        return setError("A contact with this key already exists")
+        setDisableButton(false);
+        return setError("A contact with this key already exists");
       }
       setError("");
 
