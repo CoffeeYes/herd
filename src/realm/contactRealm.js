@@ -52,6 +52,15 @@ const getContactsByKey = keys => {
   }
 }
 
+const getContactByName = name => {
+  const contact = contactsRealm.objects('Contact').filtered(`name = '${name}'`);
+  
+  return contact ?
+  parseRealmObject(contact)
+  :
+  false
+}
+
 const editContact = (id, values) => {
   const contact = getContactById(Realm.BSON.ObjectId(id));
   contactsRealm.write(() => {
@@ -74,6 +83,7 @@ export {
   deleteContact,
   createContact,
   getContactById,
+  getContactByName,
   getContactsByKey,
   editContact,
   deleteAllContacts,

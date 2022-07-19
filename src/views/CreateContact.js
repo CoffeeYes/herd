@@ -10,7 +10,7 @@ import CustomButton from './CustomButton';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { createContact, getContactsByKey } from '../realm/contactRealm';
+import { createContact, getContactsByKey, getContactByName } from '../realm/contactRealm';
 
 import { addContact } from '../redux/actions/contactActions';
 
@@ -70,10 +70,15 @@ const CreateContact = ({ navigation, route}) => {
       }
 
       //check for duplicate contacts
-      const contactExists = getContactsByKey([publicKey.trim()]);
-      if(contactExists != "") {
+      const keyExists = getContactsByKey([publicKey.trim()]);
+      const nameExists = getContactByName(username.trim());
+      if(keyExists != "") {
         setDisableButton(false);
         return setError("A contact with this key already exists");
+      }
+      if(nameExists) {
+        setDisableButton(false);
+        return setError("A contact with that name already exists");
       }
       setError("");
 
