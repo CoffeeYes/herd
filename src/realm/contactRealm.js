@@ -55,8 +55,8 @@ const getContactsByKey = keys => {
 const getContactByName = name => {
   const contact = contactsRealm.objects('Contact').filtered(`name = '${name}'`);
   
-  return contact ?
-  parseRealmObject(contact)
+  return contact.length > 0 ?
+  parseRealmObject(contact[0])
   :
   false
 }
