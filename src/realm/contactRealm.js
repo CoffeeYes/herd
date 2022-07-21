@@ -53,8 +53,8 @@ const getContactsByKey = keys => {
 }
 
 const getContactByName = name => {
-  const contact = contactsRealm.objects('Contact').filtered(`name = '${name}'`);
-  
+  const contact = contactsRealm.objects('Contact').filtered(`name =[c] '${name}'`);
+
   return contact.length > 0 ?
   parseRealmObject(contact[0])
   :
