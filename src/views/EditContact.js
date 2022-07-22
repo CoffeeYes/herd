@@ -9,7 +9,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 
-import { getContactById, editContact } from '../realm/contactRealm';
+import { getContactById, editContact, getContactByName, getContactsByKey } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -74,6 +74,17 @@ const EditContact = ({ route, navigation }) => {
     }
     if(name.trim().length === 0) {
       setError("Username can not be empty");
+      return false;
+    }
+    const keyExists = getContactsByKey([publicKey.trim()]);
+    const nameExists = getContactByName(name.trim());
+    
+    if(keyExists != "" && keyExists[0].key != originalContact.key) {
+      setError("A user with this key already exists");
+      return false;
+    }
+    if(nameExists && nameExists.name != originalContact.name) {
+      setError("A user with this name already exists");
       return false;
     }
     setError("");
