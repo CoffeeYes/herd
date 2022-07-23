@@ -46,6 +46,13 @@ const removeMessagesFromQueue = messages => {
   }
 }
 
+const filterMessageQueueByContact = id => {
+  return {
+    type : "FILTER_QUEUE_BY_CONTACT",
+    payload : id
+  }
+}
+
 const deleteMessages = (id, messages) => {
   return {
     type : "DELETE_MESSAGES",
@@ -102,6 +109,7 @@ export {
   addMessageToQueue,
   addMessagesToQueue,
   removeMessagesFromQueue,
+  filterMessageQueueByContact,
   deleteMessages,
   resetMessages,
   setStyles,

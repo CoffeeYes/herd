@@ -23,6 +23,10 @@ const deleteContact = (contact,dispatch) => {
     type : "DELETE_CHAT",
     payload : {_id : contact._id}
   })
+  dispatch({
+    type : "FILTER_QUEUE_BY_CONTACT",
+    payload : contact.key
+  })
 }
 
 const updateContact = contact => {
