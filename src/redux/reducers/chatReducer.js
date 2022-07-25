@@ -53,7 +53,7 @@ const chatReducer = (state = initialState,action) => {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => action.payload.find(dMessage => dMessage._id == message._id) === undefined)
+        (message => action.payload.find(id => id == message._id) === undefined)
       }
       break;
     case "FILTER_QUEUE_BY_CONTACT":
