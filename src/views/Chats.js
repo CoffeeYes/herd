@@ -55,7 +55,7 @@ const Chats = ({ navigation }) => {
       rightButtonIcon="add"
       rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
       <ScrollView>
-      {chats?.map( (chat, index) =>
+      {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
         <ListItem
         name={chat.name}
         key={index}
