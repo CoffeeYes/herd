@@ -1,11 +1,11 @@
 const initialState = {
   chats : [],
   styles : {
-    fontSize : 14,
-    sentTextColor : "red",
-    receivedTextColor : "red",
-    sentBoxColor : "red",
-    receivedBoxColor : "red"
+    sentBoxColor : "#c6c6c6",
+    sentTextColor : "#f5f5f5",
+    receivedBoxColor : "#E86252",
+    receivedTextColor : "#f5f5f5",
+    fontSize : 14
   },
   messageQueue : [],
   messages : {}

@@ -142,6 +142,7 @@ const App = ({ }) => {
 
     //load styles into store
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    styles &&
     dispatch(setStyles(styles));
 
     //load password hashes into store

@@ -23,7 +23,7 @@ const Chats = ({ navigation }) => {
         return "grey"
       }
       else {
-        style
+        return style
       }
   }
 
