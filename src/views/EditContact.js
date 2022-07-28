@@ -14,6 +14,7 @@ import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
 import { updateContact } from '../redux/actions/contactActions';
+import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -78,7 +79,7 @@ const EditContact = ({ route, navigation }) => {
     }
     const keyExists = getContactsByKey([publicKey.trim()]);
     const nameExists = getContactByName(name.trim());
-    
+
     if(keyExists != "" && keyExists[0].key != originalContact.key) {
       setError("A user with this key already exists");
       return false;
@@ -90,7 +91,7 @@ const EditContact = ({ route, navigation }) => {
     setError("");
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
-    dispatch(updateContact({...newInfo,_id : route.params.id}));
+    updateContactAndReferences(dispatch, {...newInfo,_id : route.params.id});
     setOriginalContact(newInfo);
     return true;
   }

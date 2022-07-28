@@ -19,6 +19,13 @@ const addChat = chat => {
   }
 }
 
+const updateChatName = contact => {
+  return {
+    type : "UPDATE_CHAT_NAME",
+    payload : contact
+  }
+}
+
 const addMessage = (id, message) => {
   return {
     type : "ADD_MESSAGE",
@@ -104,6 +111,7 @@ const prependMessagesForContact = (id, messages) => {
 export {
   deleteChat,
   addChat,
+  updateChatName,
   setChats,
   addMessage,
   addMessageToQueue,

@@ -29,6 +29,22 @@ const chatReducer = (state = initialState,action) => {
     case "ADD_CHAT":
       return {...state, chats : [...state.chats, action.payload]};
       break;
+    case "UPDATE_CHAT_NAME":
+      const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
+      if(chatToUpdate) {
+        const chatIndex = state.chats.indexOf(chatToUpdate);
+        let newChats = [...state.chats];
+        newChats[chatIndex] = {...chatToUpdate,name : action.payload.name};
+        return {
+          ...state,
+          chats : newChats
+        }
+      }
+      else {
+        console.log("NO CHAT TO UPDATE NAME WAS FOUND");
+        return state
+      }
+      break;
     case "ADD_MESSAGE":
       return {
         ...state,

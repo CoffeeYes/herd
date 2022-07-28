@@ -1,5 +1,5 @@
-import { setContacts } from './contactActions';
-import { setMessageQueue, setChats } from './chatActions';
+import { setContacts, updateContact } from './contactActions';
+import { setMessageQueue, setChats, updateChatName } from './chatActions';
 import { setLocked } from './appStateActions';
 
 const eraseState = dispatch => {
@@ -9,6 +9,12 @@ const eraseState = dispatch => {
   dispatch(setLocked(false));
 }
 
+const updateContactAndReferences = (dispatch,contact) => {
+  dispatch(updateContact(contact));
+  dispatch(updateChatName(contact));
+}
+
 export {
-  eraseState
+  eraseState,
+  updateContactAndReferences
 }
