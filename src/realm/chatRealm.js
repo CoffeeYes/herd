@@ -2,6 +2,7 @@ import Realm from 'realm';
 import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import { getContactsByKey } from './contactRealm';
+import { parseRealmObject, parseRealmObjects} from './helper'
 import { cloneDeep } from 'lodash'
 
 import { addMessagesToQueue } from '../redux/actions/chatActions';
@@ -253,6 +254,61 @@ const removeCompletedMessagesFromRealm = messages => {
   })
 }
 
+const updateMessagesWithContact = async (oldKey, newKey) => {
+  //load existing messages
+  const sentMessages = messageSentRealm.objects('Message').filtered(`to == '${oldKey}'`);
+  const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
+  const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
+
+  //decrypt, re-encrpyt with new key and write to DB
+  let newTexts = [];
+  await Promise.all(sentMessagesCopy.map(async message => {
+    const decryptedText = await Crypto.decryptString(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      parseRealmObject(message).text
+    )
+    const newEncryptedString = await Crypto.encryptStringWithKey(
+      newKey,
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      decryptedText
+    )
+    newTexts.push({[message._id] : newEncryptedString});
+  }))
+
+  messageCopyRealm.write(() => {
+    const messages = messageCopyRealm.objects('Message');
+    messages.map(message => {
+      if(message.to == oldKey) {
+        message.to = newKey;
+      }
+    })
+  })
+
+  messageSentRealm.write(() => {
+    const sentMessages = messageSentRealm.objects('Message');
+    sentMessages.map(message => {
+      if(message.to == oldKey) {
+        message.to = newKey;
+        message.text = newTexts[message._id]
+      }
+    })
+  })
+
+  messageReceivedRealm.write(() => {
+    const receivedMessages = messageReceivedRealm.objects('Message');
+    receivedMessages.map(message => {
+      if(message.from == oldKey) {
+        message.from = newKey
+      }
+    })
+  })
+}
+
 const deleteAllMessages = () => {
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
@@ -277,6 +333,7 @@ const closeChatRealm = () => {
 
 export {
   getMessagesWithContact,
+  updateMessagesWithContact,
   sendMessageToContact,
   addNewReceivedMessages,
   getContactsWithChats,

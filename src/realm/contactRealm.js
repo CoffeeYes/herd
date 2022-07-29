@@ -1,6 +1,6 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
-import { deleteChat } from './chatRealm';
+import { deleteChat, updateMessagesWithContact } from './chatRealm';
 import { cloneDeep } from 'lodash';
 import { parseRealmObject, parseRealmObjects} from './helper'
 
@@ -61,8 +61,10 @@ const getContactByName = name => {
   false
 }
 
-const editContact = (id, values) => {
+const editContact = async (id, values) => {
   const contact = getContactById(Realm.BSON.ObjectId(id));
+  const oldKey = contact.key;
+  await updateMessagesWithContact(oldKey,values.key);
   contactsRealm.write(() => {
     contact.name = values.name;
     contact.key = values.key;
