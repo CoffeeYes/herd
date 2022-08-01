@@ -37,7 +37,16 @@ const chatReducer = (state = initialState,action) => {
         newChats[chatIndex] = {...chatToUpdate,name : action.payload.name,key : action.payload.key};
         return {
           ...state,
-          chats : newChats
+          chats : newChats,
+          messageQueue : [...state.messageQueue].map(message => {
+            if(message.to == chatToUpdate.key) {
+              return {
+                ...message,
+                to : action.payload.key,
+                toContactName : action.payload.name
+              }
+            }
+          })
         }
       }
       else {
