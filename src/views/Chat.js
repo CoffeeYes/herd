@@ -94,12 +94,14 @@ const Chat = ({ route, navigation }) => {
     if(message.trim() === "") return;
     setInputDisabled(true);
 
+    const timestamp = Date.now();
+
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
       from : ownPublicKey,
       text : message,
-      timestamp : Date.now(),
+      timestamp : timestamp
     }
 
     //encrypt the message to be sent using the other users public key
@@ -124,14 +126,15 @@ const Chat = ({ route, navigation }) => {
     const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      timestamp : Date.now()
+      timestamp : timestamp
     }
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
-    const newDate = moment(metaData.timestamp).format("DD/MM");
+    const newDate = moment(timestamp).format("DD/MM");
 
     messageDays.indexOf(newDate) === -1 &&
     setMessageDays([...messageDays,newDate]);
+    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}));
 
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
@@ -142,7 +145,7 @@ const Chat = ({ route, navigation }) => {
         lastMessageSentBySelf : true,
         lastText : message,
         name : contactInfo.name,
-        timestamp : metaData.timestamp
+        timestamp : timestamp
       }
       dispatch(addChat(newChat))
     }
@@ -150,18 +153,17 @@ const Chat = ({ route, navigation }) => {
       const newLastText = {
         _id : contactInfo._id,
         lastText : message,
-        timestamp : metaData.timestamp
+        timestamp : timestamp
       }
       dispatch(setLastText(newLastText))
     }
-    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}));
     dispatch(addMessageToQueue({
       _id : messageID,
       fromContactName : "You",
       toContactName : contactInfo.name,
       to : contactInfo.key,
       from : ownPublicKey,
-      timestamp : metaData.timestamp,
+      timestamp : timestamp,
       text : newMessageEncryptedCopy
     }));
 

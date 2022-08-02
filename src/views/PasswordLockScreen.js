@@ -12,7 +12,7 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import { setPublicKey } from '../redux/actions/userActions';
 import { setLocked } from '../redux/actions/appStateActions';
-import { erasteState } from '../redux/actions/combinedActions';
+import { eraseState } from '../redux/actions/combinedActions';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
