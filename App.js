@@ -161,9 +161,8 @@ const App = ({ }) => {
       "savedMessageQueue",
       "savedMessageQueueSizes"
     )
-
     newMessages.length > 0 &&
-    addNewReceivedMessagesToRealm(newMessages);
+    addNewReceivedMessagesToRealm(newMessages,dispatch);
 
     const messagesToRemove = await ServiceInterface.getStoredMessages(
       "messagesToRemove",

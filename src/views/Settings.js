@@ -137,7 +137,7 @@ const Settings = ({ navigation }) => {
         setBackgroundTransfer(true);
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
-        const publicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
+        const publicKey = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
         const receivedMessagesForSelf = getReceivedMessagesForSelf(publicKey);
         ServiceInterface.enableService(
           messageQueue,
