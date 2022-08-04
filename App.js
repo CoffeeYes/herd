@@ -91,7 +91,7 @@ const App = ({ }) => {
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
       addNewReceivedMessagesToRealm(messages,dispatch);
-      dispatch(setChats(loadContactsWithChats()))
+      dispatch(setChats(getContactsWithChats()))
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {

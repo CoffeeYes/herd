@@ -31,8 +31,8 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
   // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
   const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
-  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key}' AND to = '${ownKey}'`).slice(startIndex,endIndex);
-
+  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}'`).slice(startIndex,endIndex);
+  // const receivedMessages = messageReceivedRealm.objects("Message").filter(message => message.from.trim() == key.trim() && message.to.trim() == ownKey.trim());
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
@@ -96,7 +96,12 @@ const addNewReceivedMessages = (messages,dispatch) => {
     deletedReceivedMessage.find(dMessage => dMessage._id === nMessage.id) === undefined
   );
   messageReceivedRealm.write(() => {
-    newMessages.map(message => messageReceivedRealm.create("Message",{...message,_id : Realm.BSON.ObjectId(message._id)},true))
+    newMessages.map(message => messageReceivedRealm.create("Message",{
+      ...message,
+      _id : Realm.BSON.ObjectId(message._id),
+      from : message.from.trim(),
+      to : message.to.trim()
+    },true))
   })
   if(dispatch) {
     dispatch(addMessagesToQueue(newMessages));
@@ -108,10 +113,9 @@ const getContactsWithChats = async () => {
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
   var keys = [];
-
   //get unique keys in all messages
-  sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
-  receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
+  sentMessages.map(message => keys.indexOf(message.to.trim()) === -1 && keys.push(message.to));
+  receivedMessages.map(message => keys.indexOf(message.from.trim()) === -1 && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
     var lastMessages = [];
@@ -259,7 +263,7 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessages = messageSentRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
-  
+
   //decrypt, re-encrpyt with new key and write to DB
   let newTexts = [];
   await Promise.all(sentMessagesCopy.map(async message => {
