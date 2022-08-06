@@ -2,10 +2,10 @@ import Realm from 'realm';
 import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import { getContactsByKey } from './contactRealm';
-import { parseRealmObject, parseRealmObjects} from './helper'
-import { cloneDeep } from 'lodash'
+import { parseRealmObject, parseRealmObjects} from './helper';
+import { cloneDeep } from 'lodash';
 
-import { addMessagesToQueue } from '../redux/actions/chatActions';
+import { addMessagesToQueue, addMessage } from '../redux/actions/chatActions';
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -104,7 +104,26 @@ const addNewReceivedMessages = (messages,dispatch) => {
     },true))
   })
   if(dispatch) {
+    //add messages to queue
     dispatch(addMessagesToQueue(newMessages));
+    //add new messages meant for this user to their corresponding chats
+    const keys = newMessages.map(message => message.from.trim());
+    const contacts = getContactsByKey(keys);
+    newMessages.map(message => {
+      const contact = contacts.find(contact => contact.key.trim() == message.from.trim());
+      if(contact) {
+        Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          message.text
+        ).then(decrypted => dispatch(addMessage(contact._id,{
+          ...message,
+          text : decrypted
+        })))
+      }
+    })
   }
 }
 
