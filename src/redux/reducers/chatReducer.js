@@ -59,7 +59,8 @@ const chatReducer = (state = initialState,action) => {
         ...state,
         messages : {
           ...state.messages,
-          [action.payload.id] : [...state.messages[action.payload.id],action.payload.message]}
+          [action.payload.id] : [...state.messages[action.payload.id],action.payload.message].sort((a,b) => a.timestamp > b.timestamp)
+        }
       }
       break;
     case "ADD_MESSAGE_TO_QUEUE":
