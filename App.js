@@ -82,7 +82,7 @@ const App = ({ }) => {
         addNewReceivedMessagesToRealm(newMessages,dispatch);
       }
       else {
-        loadStoredMessages();
+        await loadStoredMessages();
       }
       await loadInitialState();
       setLoading(false);
@@ -162,7 +162,7 @@ const App = ({ }) => {
       "savedMessageQueueSizes"
     )
     newMessages.length > 0 &&
-    addNewReceivedMessagesToRealm(newMessages,dispatch);
+    addNewReceivedMessagesToRealm(newMessages);
 
     const messagesToRemove = await ServiceInterface.getStoredMessages(
       "messagesToRemove",
