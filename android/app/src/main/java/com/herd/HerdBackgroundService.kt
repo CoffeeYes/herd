@@ -844,19 +844,21 @@ class HerdBackgroundService : Service() {
   }
 
   public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
-    val lengthBefore : Int? = messageQueue?.size;
+    val lengthBefore : Int = messageQueue?.size as Int;
     messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
-    val lengthAfter : Int? = messageQueue?.size;
+    val lengthAfter : Int = messageQueue?.size as Int;
 
-    var deleted : Boolean = false;
-    if(lengthBefore != null && lengthAfter != null) {
-      deleted = (lengthBefore - lengthAfter) == messages.size
-    }
+    //check if deletion was successful
+    var deleted : Boolean = (lengthBefore - lengthAfter) == messages.size
+
     //if deleted message was last message update pointer to prevent OOB error.
     val messageQueueSize : Int = messageQueue?.size as Int
     if(messagePointer >= messageQueueSize) {
       messagePointer = messageQueueSize - 1;
     }
+
+    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
+    
     return deleted;
   }
 

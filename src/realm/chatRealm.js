@@ -1,6 +1,7 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey } from './contactRealm';
 import { parseRealmObject, parseRealmObjects} from './helper';
 import { cloneDeep } from 'lodash';
@@ -168,6 +169,8 @@ const deleteChat = key => {
   const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filtered("to = " + "'" + key + "'");
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("from = " + "'" + key + "'");
 
+  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
+
   messageSentRealm.write(() => {
     messageSentRealm.delete(sentMessagesToDelete)
   })
@@ -182,6 +185,9 @@ const deleteChat = key => {
 const deleteAllChats = async () => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal')
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered(`to = '${ownKey}'`);
+  const sentMessages = messageSentRealm.objects('Message');
+
+  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessages))
 
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
@@ -332,6 +338,11 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
 }
 
 const deleteAllMessages = () => {
+  const sentMessages = parseRealmObjects(messageSentRealm.objects('Message'));
+  const receivedMessages = parseRealmObjects(messageReceivedRealm.objects('Message'));
+
+  ServiceInterface.removeMessagesFromService([...sentMessages,...receivedMessages]);
+
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
   })
