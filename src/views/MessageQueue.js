@@ -58,10 +58,15 @@ const MessageQueue = ({}) => {
           overRideOpen={allOpen}
           from={message.fromContactName}
           key={index}
+          textEncrypted={true}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text={message.text}/>
           :
-          <Text key={index}>Encrypted Message for Other User</Text>
+          <FoldableMessage
+          overRideOpen={allOpen}
+          key={index}
+          timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
+          text="Encrypted Message for Other User"/>
         )}
       </ScrollView>
     </View>
