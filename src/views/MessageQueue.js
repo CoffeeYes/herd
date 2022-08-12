@@ -18,24 +18,19 @@ const MessageQueue = ({}) => {
   const [allOpen, setAllOpen] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
+  const contacts = useSelector(state => state.contactReducer.contacts);
 
   const parseMessageQueue = queue => {
-    var contactKeys = [];
-    //get unique public keys from messages
-    contactKeys = queue.map(message => contactKeys.indexOf(message.to) === -1 && message.to);
-    //find relevant contacts based on public keys
-    const contacts = getContactsByKey(contactKeys);
-    //add contact names to messages using matching contact and message public key
     queue.map(message => {
-      message.toContactName = message.to === ownPublicKey ?
+      message.toContactName = message.to.trim() === ownPublicKey.trim() ?
         "You"
         :
-        contacts.find(contact => message.to === contact.key)?.name
+        contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown"
 
-      message.fromContactName = message.from === ownPublicKey ?
+      message.fromContactName = message.from.trim() === ownPublicKey.trim() ?
         "You"
         :
-        contacts.find(contact => message.from === contact.key)?.name
+        contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown"
     })
     return queue
   }
@@ -52,7 +47,7 @@ const MessageQueue = ({}) => {
       buttonStyle={{marginTop : 15}}/>
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {parseMessageQueue(messageQueue).map((message,index) =>
-          message.to === ownPublicKey || message.from === ownPublicKey ?
+          message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim() ?
           <FoldableMessage
           to={message.toContactName}
           overRideOpen={allOpen}
@@ -63,6 +58,8 @@ const MessageQueue = ({}) => {
           text={message.text}/>
           :
           <FoldableMessage
+          to="N/A"
+          from="N/A"
           overRideOpen={allOpen}
           key={index}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
