@@ -2,11 +2,12 @@ import Realm from 'realm';
 import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
-import { getContactsByKey } from './contactRealm';
+import { getContactsByKey, createContact } from './contactRealm';
 import { parseRealmObject, parseRealmObjects} from './helper';
 import { cloneDeep } from 'lodash';
 
-import { addMessagesToQueue, addMessage } from '../redux/actions/chatActions';
+import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
+import { addContact } from '../redux/actions/contactActions';
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -89,9 +90,10 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   return messageID.toString();
 }
 
-const addNewReceivedMessages = (messages,dispatch) => {
+const addNewReceivedMessages = async (messages,dispatch) => {
   const receivedMessages = messageReceivedRealm.objects("Message");
   const deletedReceivedMessage = deletedReceivedRealm.objects("Message");
+  const ownPublicKey = await Crypto.loadKeyFromKeystore('herdPersonal');
   const newMessages = messages.filter(nMessage =>
     receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined &&
     deletedReceivedMessage.find(dMessage => dMessage._id === nMessage.id) === undefined
@@ -111,7 +113,17 @@ const addNewReceivedMessages = (messages,dispatch) => {
     const keys = newMessages.map(message => message.from.trim());
     const contacts = getContactsByKey(keys);
     newMessages.map(message => {
-      const contact = contacts.find(contact => contact.key.trim() == message.from.trim());
+      let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
+      //if the message is for this user, but no contact exists create the contact
+      if(contact === undefined && message.to.trim() == ownPublicKey.trim()) {
+        contact = createContact({
+          name : "Unknown User",
+          key : message.from.trim(),
+          image : ""
+        });
+        contacts.push(contact);
+        dispatch(addContact(contact));
+      }
       if(contact) {
         Crypto.decryptString(
           "herdPersonal",
@@ -125,6 +137,8 @@ const addNewReceivedMessages = (messages,dispatch) => {
         })))
       }
     })
+    const chats = await getContactsWithChats();
+    dispatch(setChats(chats))
   }
 }
 
