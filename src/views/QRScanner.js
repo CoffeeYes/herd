@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import CameraMarker from './CameraMarker';
@@ -6,9 +7,11 @@ import CustomButton from './CustomButton';
 import Orientation from "react-native-orientation-locker";
 
 const QRScanner = ({ navigation }) => {
+  const [active, setActive] = useState(true);
 
   const handleRead = scanResult => {
     const result = JSON.parse(scanResult?.data)
+    setActive(false);
     navigation.navigate("createcontact", {
       ...(result.key && {publicKey : result.key}),
       ...(result.name && {name : result.name})
@@ -16,12 +19,18 @@ const QRScanner = ({ navigation }) => {
     )
   }
 
+  useFocusEffect(() => {
+    setActive(true)
+  })
+
   useEffect(() => {
     Orientation.lockToPortrait();
     return Orientation.unlockAllOrientations;
   },[])
 
   return (
+    <>
+    {active &&
     <QRCodeScanner
     showMarker
     onRead={handleRead}
@@ -34,7 +43,8 @@ const QRScanner = ({ navigation }) => {
       text="Cancel"
       onPress={() => navigation.goBack()}
       buttonStyle={{marginTop : 30}}/>
-    }/>
+    }/>}
+    </>
   )
 }
 
