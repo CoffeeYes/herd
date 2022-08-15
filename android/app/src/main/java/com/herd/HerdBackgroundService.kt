@@ -319,7 +319,7 @@ class HerdBackgroundService : Service() {
            //check if message has been previously deleted by user
            val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
-           if(message.to == publicKey) {
+           if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
                receivedMessagesForUser = true;
                receivedMessagesForSelf?.add(message);
@@ -618,11 +618,14 @@ class HerdBackgroundService : Service() {
           val device : BluetoothDevice = result.getDevice();
           val name = device.getName();
           val address = device.getAddress();
+          Log.i(TAG, "device name : " + name);
+          Log.i(TAG, "device Address : " + address);
+          Log.i(TAG,"Device List Length : " + bleDeviceList.size);
 
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
             if(bleDeviceList.contains(device)) {
               bleDeviceList.remove(device);
-              Log.i(TAG,"Device removed from device list");
+              Log.i(TAG,"Device removed from device list, address : $address, name : $name");
               if(gattInstance != null) {
                 gattInstance?.close();
               }
@@ -645,9 +648,6 @@ class HerdBackgroundService : Service() {
               }
             }
           }
-          Log.i(TAG, "device name : " + name);
-          Log.i(TAG, "device Address : " + address);
-          Log.i(TAG,"Device List Length : " + bleDeviceList.size);
       }
   }
 
@@ -858,7 +858,7 @@ class HerdBackgroundService : Service() {
     }
 
     Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
-    
+
     return deleted;
   }
 
