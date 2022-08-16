@@ -79,7 +79,7 @@ const App = ({ }) => {
         newMessages = await ServiceInterface.getReceivedMessages();
 
         newMessages.length > 0 &&
-        addNewReceivedMessagesToRealm(newMessages,dispatch);
+        await addNewReceivedMessagesToRealm(newMessages,dispatch);
       }
       else {
         await loadStoredMessages();
@@ -89,8 +89,8 @@ const App = ({ }) => {
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
-    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
-      addNewReceivedMessagesToRealm(messages,dispatch);
+    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
+      await addNewReceivedMessagesToRealm(messages,dispatch);
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
@@ -161,7 +161,7 @@ const App = ({ }) => {
       "savedMessageQueueSizes"
     )
     newMessages.length > 0 &&
-    addNewReceivedMessagesToRealm(newMessages);
+    await addNewReceivedMessagesToRealm(newMessages);
 
     const messagesToRemove = await ServiceInterface.getStoredMessages(
       "messagesToRemove",

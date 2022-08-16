@@ -124,7 +124,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
         contacts.push(contact);
         dispatch(addContact(contact));
       }
-      if(contact) {
+      if(contact && message.to.trim() === ownPublicKey.trim()) {
         Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
