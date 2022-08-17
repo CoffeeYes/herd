@@ -314,10 +314,10 @@ class HerdBackgroundService : Service() {
            val message : HerdMessage = createMessageFromBytes(totalBytes);
            //check if message has been received before, either in this instance of the background service
            //or another instance where it has already been passed up to JS side
-           val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id == message._id}  != null) ||
+           val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id.equals(message._id)}  != null) ||
            (receivedMessagesForSelf?.find{it -> it._id == message._id} != null)
            //check if message has been previously deleted by user
-           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
+           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id.equals(message._id)} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
@@ -328,7 +328,7 @@ class HerdBackgroundService : Service() {
            //if message is destined for other user add it directly to messageQueue
            else {
              Log.i(TAG,"Received Message is for another user, adding it to Queue");
-             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id == message._id} != null;
+             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id.equals(message._id)} != null;
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
