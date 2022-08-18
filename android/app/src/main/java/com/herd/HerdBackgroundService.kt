@@ -238,7 +238,7 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
-      });
+      } + ", Thread : ${Thread.currentThread()}");
       if(newState === BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
@@ -475,6 +475,8 @@ class HerdBackgroundService : Service() {
         }
         else {
           Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
+          writebackComplete = true;
+          remoteHasReadMessages = true;
           gatt.close();
         }
       }
@@ -491,7 +493,7 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
-      });
+      } + ", Thread : ${Thread.currentThread()}");
       //reset values on disconnect to ensure values are not carried forward
       //when unexpected disconnect occurs.
       if(newState == BluetoothProfile.STATE_DISCONNECTED) {
@@ -562,7 +564,7 @@ class HerdBackgroundService : Service() {
          val messageID : String = String(value);
          Log.i(TAG,"Message ID Received : $messageID")
          if(messageID != "COMPLETE") {
-           val message = messageQueue?.find {it -> it._id == messageID};
+           val message = messageQueue?.find {it -> it._id.equals(messageID)};
            if(message != null) {
              val removed = messageQueue?.remove(message)
              Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
@@ -845,7 +847,7 @@ class HerdBackgroundService : Service() {
 
   public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
     val lengthBefore : Int = messageQueue?.size as Int;
-    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
+    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id.equals(msg._id)} == null} as ArrayList<HerdMessage>;
     val lengthAfter : Int = messageQueue?.size as Int;
 
     //check if deletion was successful
@@ -898,6 +900,7 @@ class HerdBackgroundService : Service() {
       running = true;
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
+      Log.i(TAG,"Queue size on start : ${messageQueue?.size}");
       deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
       receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
       publicKey = bundle?.getString("publicKey");
