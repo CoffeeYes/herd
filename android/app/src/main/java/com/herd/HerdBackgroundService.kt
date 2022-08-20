@@ -635,19 +635,20 @@ class HerdBackgroundService : Service() {
           }
           else {
             if(!(bleDeviceList.contains(device))) {
+              Log.i(TAG,"Device was not in device list, adding it.");
               bleDeviceList.add(device);
-              if(address != null) {
-                val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
-                if(gattInstance != null) {
-                  gattInstance?.close();
-                }
-                remoteDeviceInstance?.connectGatt(
-                  context,
-                  false,
-                  bluetoothGattClientCallback,
-                  BluetoothDevice.TRANSPORT_LE
-                );
+            }
+            if(address != null) {
+              val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
+              if(gattInstance != null) {
+                gattInstance?.close();
               }
+              remoteDeviceInstance?.connectGatt(
+                context,
+                false,
+                bluetoothGattClientCallback,
+                BluetoothDevice.TRANSPORT_LE
+              );
             }
           }
       }
