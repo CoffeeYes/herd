@@ -425,6 +425,7 @@ class HerdBackgroundService : Service() {
            writebackComplete = true;
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
+           receivedMessagesForSelf?.clear();
            gatt.close()
          }
        }
