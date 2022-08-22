@@ -242,6 +242,7 @@ class HerdBackgroundService : Service() {
       if(newState === BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
+        stopLeScan();
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
