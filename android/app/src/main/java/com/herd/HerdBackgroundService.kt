@@ -393,6 +393,7 @@ class HerdBackgroundService : Service() {
              }
              else {
                Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
+               gatt.disconnect();
                gatt.close();
              }
            }
@@ -400,6 +401,7 @@ class HerdBackgroundService : Service() {
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e);
            //reset connection variables for next connection
+           gatt.disconnect();
            gatt.close();
            totalMessagesRead = 0;
            totalBytes = byteArrayOf();
@@ -427,7 +429,8 @@ class HerdBackgroundService : Service() {
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
            receivedMessagesForSelf?.clear();
-           gatt.close()
+           gatt.disconnect();
+           gatt.close();
          }
        }
     }
@@ -444,6 +447,7 @@ class HerdBackgroundService : Service() {
             }
             else {
               writebackComplete = true;
+              gatt.disconnect();
               gatt.close();
             }
           }
@@ -479,6 +483,7 @@ class HerdBackgroundService : Service() {
           Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
           writebackComplete = true;
           remoteHasReadMessages = true;
+          gatt.disconnect();
           gatt.close();
         }
       }
@@ -631,6 +636,7 @@ class HerdBackgroundService : Service() {
               bleDeviceList.remove(device);
               Log.i(TAG,"Device removed from device list, address : $address, name : $name");
               if(gattInstance != null) {
+                gattInstance?.disconnect();
                 gattInstance?.close();
               }
             }
@@ -643,6 +649,7 @@ class HerdBackgroundService : Service() {
             if(address != null) {
               val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
               if(gattInstance != null) {
+                gattInstance?.disconnect();
                 gattInstance?.close();
               }
               remoteDeviceInstance?.connectGatt(
