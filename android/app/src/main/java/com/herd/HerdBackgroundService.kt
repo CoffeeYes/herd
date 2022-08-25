@@ -246,7 +246,7 @@ class HerdBackgroundService : Service() {
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
-        if(writebackComplete && remoteHasReadMessages) {
+        if(writebackComplete && remoteHasReadMessages || status != 0) {
           writebackComplete = false;
           remoteHasReadMessages = false;
           bleDeviceList.remove(gatt.getDevice());
@@ -504,7 +504,7 @@ class HerdBackgroundService : Service() {
       //reset values on disconnect to ensure values are not carried forward
       //when unexpected disconnect occurs.
       if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        if(!(writebackComplete && remoteHasReadMessages)) {
+        if(!(writebackComplete && remoteHasReadMessages) && status == 0) {
           device.connectGatt(
             context,
             false,
