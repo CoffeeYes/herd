@@ -239,6 +239,18 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
       } + ", Thread : ${Thread.currentThread()}");
+      if(status == 133) {
+        Log.i(TAG,"Bluetooth Gatt client error 133, stopping service");
+        //let the user know the service is stopping
+        sendNotification(
+          "Herd has stopped sending messages in the background",
+          "There was an error with bluetooth, please turn bluetooth off and on and restart the background service in settings"
+        )
+        //stop this service and remove constant notification
+        stopForeground(true);
+        running = false;
+        return;
+      }
       if(newState === BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
