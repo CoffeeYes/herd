@@ -252,7 +252,7 @@ const deleteMessages = messages => {
 //when passing messageQueue to the background service these messages are not desired
 const getMessageQueue = async useMessageCopies => {
   let sentMessages;
-  let key = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
+  let key = (await Crypto.loadKeyFromKeystore("herdPersonal"))?.trim();
   if(useMessageCopies) {
     sentMessages = messageCopyRealm.objects('Message')
   }
