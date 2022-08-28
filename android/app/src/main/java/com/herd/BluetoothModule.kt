@@ -46,6 +46,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val MESSAGE_WRITE: Int = 1
     private val MESSAGE_TOAST: Int = 2
 
+    private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
+    private val BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE : Int = 2;
+    private val LOCATION_PERMISSION_REQUEST_CODE : Int = 3;
+
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
@@ -59,7 +63,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private final val activityListener = object : BaseActivityEventListener() {
       override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
         //request bluetooth
-        if(requestCode == 1) {
+        if(requestCode == BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE) {
           if(resultCode == Activity.RESULT_OK) {
             bluetoothEnabledPromise?.resolve(true);
           }
@@ -69,7 +73,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         //request make discoverable
-        if(requestCode == 2) {
+        if(requestCode == BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE) {
           //result code is equal to the requested duration when "yes", RESULT_CANCELLED when "no"
           if(resultCode == bluetoothDiscoverableDuration) {
             bluetoothDiscoverablePromise?.resolve(true);
@@ -79,7 +83,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
         }
 
-        if(requestCode == 3) {
+        if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+          Log.i(TAG,"location permisson resultCode : $resultCode, granted : ${resultCode === PackageManager.PERMISSION_GRANTED}")
           locationPermissionPromise?.resolve(resultCode)
         }
 
@@ -256,7 +261,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         bluetoothDiscoverablePromise = promise;
-        activity.startActivityForResult(discoverableIntent,2)
+        activity.startActivityForResult(discoverableIntent,BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE)
       }
     }
 
@@ -265,14 +270,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val backgroundLocationAllowed = ContextCompat.checkSelfPermission(
         getReactApplicationContext(),
         permission.ACCESS_BACKGROUND_LOCATION
-      )
+      ) === PackageManager.PERMISSION_GRANTED
+
       val fineLocationAllowed = ContextCompat.checkSelfPermission(
         getReactApplicationContext(),
         permission.ACCESS_FINE_LOCATION
-      )
+      ) === PackageManager.PERMISSION_GRANTED
 
-      if(backgroundLocationAllowed === PackageManager.PERMISSION_GRANTED &&
-        fineLocationAllowed === PackageManager.PERMISSION_GRANTED) {
+      if(backgroundLocationAllowed && fineLocationAllowed) {
           promise.resolve(true)
       }
       else {
@@ -287,7 +292,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         locationPermissionPromise = promise;
         ActivityCompat.requestPermissions(
           activity,
-          arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_FINE_LOCATION),
+          arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
           3
         )
       }
@@ -304,7 +309,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity !== null) {
-        activity.startActivityForResult(intent,3);
+        activity.startActivityForResult(intent,LOCATION_PERMISSION_REQUEST_CODE);
         locationPermissionPromise = promise
       }
       else {
