@@ -39,7 +39,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-    private final val TAG : String = "BluetoothModule";
+    private final val TAG : String = "HerdBluetoothModule";
     val context = reactContext
 
     private val MESSAGE_READ: Int = 0
@@ -48,12 +48,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
     private val BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE : Int = 2;
-    private val LOCATION_PERMISSION_REQUEST_CODE : Int = 3;
+    private val LOCATION_ENABLED_REQUEST_CODE : Int = 3;
+    private val LOCATION_PERMISSION_REQUEST_CODE : Int = 4;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
     var locationPermissionPromise : Promise? = null;
+    var locationEnabledPromise : Promise? = null;
 
     override fun getName(): String {
         return "BluetoothModule"
@@ -83,13 +85,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
         }
 
-        if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-          Log.i(TAG,"location permisson resultCode : $resultCode, granted : ${resultCode === PackageManager.PERMISSION_GRANTED}")
-          locationPermissionPromise?.resolve(resultCode)
+        if(requestCode == LOCATION_ENABLED_REQUEST_CODE) {
+          val granted = resultCode === PackageManager.PERMISSION_GRANTED;
+          Log.i(TAG,"location enabled resultCode : $resultCode, granted : $granted")
+          locationEnabledPromise?.resolve(granted)
         }
 
         bluetoothEnabledPromise = null;
-        locationPermissionPromise = null;
+        locationEnabledPromise = null;
       }
     }
 
@@ -293,7 +296,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         ActivityCompat.requestPermissions(
           activity,
           arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
-          3
+          LOCATION_PERMISSION_REQUEST_CODE
         )
       }
     }
@@ -309,8 +312,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
       val activity : Activity? = getReactApplicationContext().getCurrentActivity();
       if(activity !== null) {
-        activity.startActivityForResult(intent,LOCATION_PERMISSION_REQUEST_CODE);
-        locationPermissionPromise = promise
+        activity.startActivityForResult(intent,LOCATION_ENABLED_REQUEST_CODE);
+        locationEnabledPromise = promise
       }
       else {
         promise.reject("Activity is NULL");
