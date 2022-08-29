@@ -61,9 +61,9 @@ class HerdCryptoModule : NSObject {
     func deleteKeyPair(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
         resolve(nil);
     }
-  
-    func loadRSAPublicKey(_ alias : String) -> SecKey? {
-      let getquery: [String: Any] = [
+
+    func loadRSAPrivateKey(_ alias : String) -> SecKey? {
+        let getquery: [String: Any] = [
           kSecClass as String: kSecClassKey,
           kSecAttrApplicationTag as String: alias,
           kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
@@ -76,8 +76,18 @@ class HerdCryptoModule : NSObject {
         return nil;
       }
       let privateKey = storedKey as! SecKey
-      let publicKey = SecKeyCopyPublicKey(privateKey);
-      return publicKey;
+      return privateKey
+    }
+  
+    func loadRSAPublicKey(_ alias : String) -> SecKey? {
+        let privateKey = loadRSAPrivateKey(alias)
+        if(privateKey != nil) {
+            let publicKey = SecKeyCopyPublicKey(privateKey as! SecKey);
+            return publicKey;
+        }
+        else {
+            return nil;
+        }
     }
 
     @objc
@@ -111,7 +121,7 @@ class HerdCryptoModule : NSObject {
             NSLog("Encryption error, key algorithm is not supported")
             return resolve(nil);
         }
-        guard (stringToEncrypt.count < (SecKeyGetBlockSize(publicKey!) - 130)) else {
+        guard (base64Data.count < (SecKeyGetBlockSize(publicKey!) - 130)) else {
             NSLog("String is too long to be encrypted with key")
             return resolve(nil);
         }
@@ -131,7 +141,32 @@ class HerdCryptoModule : NSObject {
     stringToDecrypt : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(nil);
+        let privateKey = loadRSAPrivateKey(alias);
+        let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256
+        if(privateKey != nil) {
+            guard let base64Data = Data(base64Encoded : stringToDecrypt) else {
+                NSLog("Error converting string to base64")
+                return resolve(nil);
+            }
+            guard SecKeyIsAlgorithmSupported(privateKey!, .decrypt, algorithm) else {
+                NSLog("Decryption error error, key algorithm is not supported")
+                return resolve(nil);
+            }
+            guard (base64Data.count == SecKeyGetBlockSize(privateKey!)) else {
+                NSLog("String is wrong size to be decrypted with key")
+                return resolve(nil);
+            }
+            var error : Unmanaged<CFError>?
+            guard let plainTextData = SecKeyCreateDecryptedData(privateKey!,algorithm,base64Data as CFData, &error) as Data? else {
+                NSLog("Error decrypting string")
+                return resolve(nil);
+            }
+            let plainTextString = plainTextData.base64EncodedString();
+            resolve(plainTextString);
+        }
+        else {
+            resolve("no private key");
+        }
     }
 
     @objc
