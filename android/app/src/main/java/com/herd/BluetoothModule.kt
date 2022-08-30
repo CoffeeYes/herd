@@ -9,6 +9,8 @@ import com.facebook.react.bridge.BaseActivityEventListener
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import com.facebook.react.modules.core.PermissionListener
+import com.facebook.react.modules.core.PermissionAwareActivity
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothProfile
@@ -38,7 +40,7 @@ import java.util.UUID
 import java.io.InputStream
 import java.io.OutputStream
 
-class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), PermissionListener {
     private final val TAG : String = "HerdBluetoothModule";
     val context = reactContext
 
@@ -152,6 +154,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
+      if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+        Log.i(TAG,"onRequestPermissionsResult location permission request code");
+        var allPermissionsGranted = true;
+        for(item in grantResults) {
+          if(item != PackageManager.PERMISSION_GRANTED) {
+            allPermissionsGranted = false;
+          }
+        }
+        locationPermissionPromise?.resolve(allPermissionsGranted);
+      }
+      locationPermissionPromise = null;
+      return true;
     }
 
     @ReactMethod
@@ -290,13 +307,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun requestLocationPermissions(promise : Promise) {
-      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+      val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
       if(activity !== null) {
         locationPermissionPromise = promise;
-        ActivityCompat.requestPermissions(
-          activity,
+        activity.requestPermissions(
           arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
-          LOCATION_PERMISSION_REQUEST_CODE
+          LOCATION_PERMISSION_REQUEST_CODE,
+          this
         )
       }
     }
