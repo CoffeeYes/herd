@@ -159,12 +159,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
       if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
         Log.i(TAG,"onRequestPermissionsResult location permission request code");
+        for(i in 0..(permissions.size -1)) {
+          Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
+        }
         var allPermissionsGranted = true;
         for(item in grantResults) {
           if(item != PackageManager.PERMISSION_GRANTED) {
             allPermissionsGranted = false;
           }
         }
+        Log.i(TAG,"All Location Permissions granted : $allPermissionsGranted")
         locationPermissionPromise?.resolve(allPermissionsGranted);
       }
       locationPermissionPromise = null;

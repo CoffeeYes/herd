@@ -6,6 +6,8 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
+import CustomModal from './CustomModal';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
@@ -32,6 +34,7 @@ const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
@@ -118,9 +121,13 @@ const Settings = ({ navigation }) => {
       var locationPermissionsGranted = await Bluetooth.checkLocationPermission();
       var btEnabled = await Bluetooth.checkBTEnabled();
       var locationEnabled = await Bluetooth.checkLocationEnabled();
-      
+
       if(!locationPermissionsGranted) {
-        await Bluetooth.requestLocationPermissions();
+        const grantLocationPermissions = await Bluetooth.requestLocationPermissions();
+        if(!grantLocationPermissions) {
+          setShowLocationModal(true);
+          return;
+        }
       }
 
       if(!btEnabled) {
@@ -261,6 +268,23 @@ const Settings = ({ navigation }) => {
         title="My Key"
         setVisible={setQRCodeVisible}/>
 
+        {showLocationModal &&
+        <CustomModal
+        setVisible={setShowLocationModal}>
+          <View style={styles.modalContentContainer}>
+            <Icon name="location-on" size={48}/>
+            <Text>
+              In order to transfer messages in the background, herd requires
+              location permissions to be allowed all the time.
+            </Text>
+
+            <Text style={{fontWeight : "bold", marginTop : 20}}>
+            Please go into the permission settings for Herd and select "Allow all the time"
+            in order to allow Herd to function correctly.
+            </Text>
+          </View>
+        </CustomModal>}
+
       </ScrollView>
     </>
   )
@@ -274,7 +298,21 @@ const styles = {
   },
   buttonMargin : {
     marginTop : 10
-  }
+  },
+  modalMainContainer : {
+    alignItems : "center",
+    justifyContent : "center",
+    flex : 1,
+    backgroundColor : "rgba(0,0,0,0.4)"
+  },
+  modalContentContainer : {
+    backgroundColor : "white",
+    borderRadius : 5,
+    padding : 30,
+    alignItems : "center",
+    maxWidth : Dimensions.get('window').width * 0.8,
+    maxHeight : Dimensions.get('window').height * 0.8
+  },
 }
 
 export default Settings;
