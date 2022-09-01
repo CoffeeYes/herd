@@ -154,7 +154,7 @@ class HerdBackgroundService : Service() {
         }
 
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
-            PendingIntent.getActivity(this, 0, notificationIntent, 0)
+            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
         //create service notification channel
@@ -203,7 +203,7 @@ class HerdBackgroundService : Service() {
 
   private fun sendNotification(title : String, text : String) {
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
-        PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     //create notification

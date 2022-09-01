@@ -35,6 +35,7 @@ import android.util.Log
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.os.Build
 
 import java.util.UUID
 import java.io.InputStream
@@ -50,12 +51,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
     private val BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE : Int = 2;
-    private val LOCATION_ENABLED_REQUEST_CODE : Int = 3;
-    private val LOCATION_PERMISSION_REQUEST_CODE : Int = 4;
+    private val BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE : Int = 3;
+    private val LOCATION_ENABLED_REQUEST_CODE : Int = 4;
+    private val LOCATION_PERMISSION_REQUEST_CODE : Int = 5;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
+    var bluetoothScanPermissionPromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
     var locationEnabledPromise : Promise? = null;
 
@@ -157,19 +160,30 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
+      for(i in 0..(permissions.size -1)) {
+        Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
+      }
       if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
         Log.i(TAG,"onRequestPermissionsResult location permission request code");
-        for(i in 0..(permissions.size -1)) {
-          Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
-        }
-        var allPermissionsGranted = true;
+        var allLocationPermissionsGranted = true;
         for(item in grantResults) {
           if(item != PackageManager.PERMISSION_GRANTED) {
-            allPermissionsGranted = false;
+            allLocationPermissionsGranted = false;
           }
         }
-        Log.i(TAG,"All Location Permissions granted : $allPermissionsGranted")
-        locationPermissionPromise?.resolve(allPermissionsGranted);
+        Log.i(TAG,"All Location Permissions granted : $allLocationPermissionsGranted")
+        locationPermissionPromise?.resolve(allLocationPermissionsGranted);
+      }
+      else if(requestCode == BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE) {
+        Log.i(TAG,"onRequestPermissionsResult bluetooth scan permission request code");
+        var allBluetoothScanPermissionsGranted = true;
+        for(item in grantResults) {
+          if(item != PackageManager.PERMISSION_GRANTED) {
+            allBluetoothScanPermissionsGranted = false;
+          }
+        }
+        Log.i(TAG,"All Bluetooth Scan Permissions granted : $allBluetoothScanPermissionsGranted")
+        bluetoothScanPermissionPromise?.resolve(allBluetoothScanPermissionsGranted);
       }
       locationPermissionPromise = null;
       return true;
@@ -242,6 +256,25 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         promise.resolve(true);
+      }
+    }
+
+    @ReactMethod
+    fun requestBTPermissions(promise : Promise) {
+      val targetSdkVersion : Int = context.getApplicationInfo().targetSdkVersion;
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
+        if(activity !== null) {
+          bluetoothScanPermissionPromise = promise;
+          activity.requestPermissions(
+            arrayOf(permission.BLUETOOTH_SCAN,permission.BLUETOOTH_CONNECT,permission.BLUETOOTH_ADVERTISE),
+            BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE,
+            this
+            )
+          }
+      }
+      else {
+        promise.resolve(true)
       }
     }
 
