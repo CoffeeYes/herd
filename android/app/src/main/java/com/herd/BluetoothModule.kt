@@ -54,6 +54,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE : Int = 3;
     private val LOCATION_ENABLED_REQUEST_CODE : Int = 4;
     private val LOCATION_PERMISSION_REQUEST_CODE : Int = 5;
+    private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 6;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
@@ -163,6 +164,23 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       for(i in 0..(permissions.size -1)) {
         Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
       }
+      if(requestCode == BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE) {
+        Log.i(TAG,"access background location request")
+        if(grantResults.get(0) == PackageManager.PERMISSION_GRANTED) {
+          Log.i(TAG,"Background location request granted, requestin coarse and fine location access")
+          val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
+          activity.requestPermissions(
+            arrayOf(permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
+            LOCATION_PERMISSION_REQUEST_CODE,
+            this
+          )
+        }
+        else {
+          Log.i(TAG,"access background location permission request denied")
+          locationPermissionPromise?.resolve(false);
+          locationPermissionPromise = null;
+        }
+      }
       if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
         Log.i(TAG,"onRequestPermissionsResult location permission request code");
         var allLocationPermissionsGranted = true;
@@ -173,6 +191,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
         Log.i(TAG,"All Location Permissions granted : $allLocationPermissionsGranted")
         locationPermissionPromise?.resolve(allLocationPermissionsGranted);
+        locationPermissionPromise = null;
       }
       else if(requestCode == BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE) {
         Log.i(TAG,"onRequestPermissionsResult bluetooth scan permission request code");
@@ -185,7 +204,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         Log.i(TAG,"All Bluetooth Scan Permissions granted : $allBluetoothScanPermissionsGranted")
         bluetoothScanPermissionPromise?.resolve(allBluetoothScanPermissionsGranted);
       }
-      locationPermissionPromise = null;
+      bluetoothScanPermissionPromise = null;
       return true;
     }
 
@@ -261,7 +280,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun requestBTPermissions(promise : Promise) {
-      val targetSdkVersion : Int = context.getApplicationInfo().targetSdkVersion;
       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
         if(activity !== null) {
@@ -270,8 +288,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             arrayOf(permission.BLUETOOTH_SCAN,permission.BLUETOOTH_CONNECT,permission.BLUETOOTH_ADVERTISE),
             BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE,
             this
-            )
-          }
+          )
+        }
       }
       else {
         promise.resolve(true)
@@ -348,8 +366,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       if(activity !== null) {
         locationPermissionPromise = promise;
         activity.requestPermissions(
-          arrayOf(permission.ACCESS_BACKGROUND_LOCATION,permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
-          LOCATION_PERMISSION_REQUEST_CODE,
+          arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
+          BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE,
           this
         )
       }
