@@ -119,12 +119,16 @@ const Settings = ({ navigation }) => {
   const toggleBackgroundTransfer = async value => {
     if(value) {
       var locationPermissionsGranted = await Bluetooth.checkLocationPermission();
-      var bluetoothScanPermissionsGranted = await Bluetooth.requestBTPermissions();
+      const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
       var btEnabled = await Bluetooth.checkBTEnabled();
       var locationEnabled = await Bluetooth.checkLocationEnabled();
 
+
       if(!bluetoothScanPermissionsGranted) {
-        return;
+        const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
+        if(!grantBluetoothScanPermissions) {
+          return;
+        }
       }
 
       if(!locationPermissionsGranted) {
