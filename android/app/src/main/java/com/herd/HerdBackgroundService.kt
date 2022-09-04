@@ -267,7 +267,7 @@ class HerdBackgroundService : Service() {
       }
     }
 
-    private val bleScanTimeoutHandler = Handler();
+    /* private val bleScanTimeoutHandler = Handler(); */
     override fun onMtuChanged(gatt : BluetoothGatt, mtu : Int, status : Int) {
       if(status == BluetoothGatt.GATT_SUCCESS) {
         Log.i(TAG,"MTU Succesfully changed to : $mtu");
@@ -276,14 +276,14 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"MTU Request failed, MTU changed to $mtu");
       }
       Log.i(TAG,"Discovering GATT Services");
-      stopLeScan();
+      /* stopLeScan();
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
       bleScanTimeoutHandler.removeCallbacksAndMessages(null);
       bleScanTimeoutHandler.postDelayed({
           Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
           allowBleScan = true;
-      },30000)
+      },30000) */
       gatt.discoverServices();
     }
 
@@ -513,10 +513,13 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
       } + ", Thread : ${Thread.currentThread()}");
-      //reset values on disconnect to ensure values are not carried forward
-      //when unexpected disconnect occurs.
-      if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+
+      if(newState == BluetoothProfile.STATE_CONNECTED) {
+        stopLeScan();
+      }
+      else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(!(writebackComplete && remoteHasReadMessages) && status == 0) {
+          Log.i(TAG,"GattServerCallback attempting to connect to device as client")
           device.connectGatt(
             context,
             false,
@@ -525,6 +528,7 @@ class HerdBackgroundService : Service() {
           );
         }
         else {
+          Log.i(TAG,"GattServerCallback not attempting to connect to device as client, resetting and scanning")
           currentPacket = 0;
           offsetSize = 0;
           writebackComplete = false;
@@ -676,6 +680,7 @@ class HerdBackgroundService : Service() {
   }
 
   private fun scanLeDevice() {
+      Log.i(TAG,"scanLeDevice() called")
       /* var scanning = false;
       val handler = Handler();
 
@@ -708,6 +713,7 @@ class HerdBackgroundService : Service() {
       .build()
 
       if(!bleScanningThreadActive.get()) {
+        Log.i(TAG,"ble Scanning thread is not active, starting scanning thread")
         Thread({
           bleScanningThreadActive.set(true);
           //wait 30 seconds before starting scan again after stopping
@@ -725,11 +731,24 @@ class HerdBackgroundService : Service() {
           }
         }).start()
       }
+      else {
+        Log.i(TAG,"ble scanning thread is already active")
+      }
   }
-
+  private val bleScanTimeoutHandler = Handler();
   private fun stopLeScan() {
+    Log.i(TAG,"stopLeScan() called")
     BLEScanner?.stopScan(leScanCallback);
     bleScanningThreadActive.set(false);
+    if(allowBleScan) {
+      allowBleScan = false;
+      Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
+      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+      bleScanTimeoutHandler.postDelayed({
+        Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
+        allowBleScan = true;
+        },30000)
+    }
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
