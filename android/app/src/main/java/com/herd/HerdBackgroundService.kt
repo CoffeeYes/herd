@@ -230,6 +230,7 @@ class HerdBackgroundService : Service() {
 
   private var writebackComplete = false;
   private var remoteHasReadMessages = false;
+  private val gattClientHandler = Handler()
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -251,7 +252,7 @@ class HerdBackgroundService : Service() {
         running = false;
         return;
       }
-      if(newState === BluetoothProfile.STATE_CONNECTED) {
+      else if(newState === BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
         stopLeScan();
@@ -284,7 +285,16 @@ class HerdBackgroundService : Service() {
           Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
           allowBleScan = true;
       },30000) */
-      gatt.discoverServices();
+
+      val bondState : Int = gatt.getDevice().getBondState();
+      if(bondState == BluetoothDevice.BOND_NONE || bondState == BluetoothDevice.BOND_BONDED) {
+        gatt.discoverServices();
+      }
+      else {
+        gattClientHandler.postDelayed({
+          gatt.discoverServices();
+        },2000)
+      }
     }
 
     var totalBytes : ByteArray = byteArrayOf();
@@ -518,7 +528,7 @@ class HerdBackgroundService : Service() {
         stopLeScan();
       }
       else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        if(!(writebackComplete && remoteHasReadMessages) && status == 0) {
+        if(!writebackComplete && status == 0) {
           Log.i(TAG,"GattServerCallback attempting to connect to device as client")
           device.connectGatt(
             context,
