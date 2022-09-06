@@ -36,6 +36,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.Build
+import android.net.Uri
 
 import java.util.UUID
 import java.io.InputStream
@@ -95,6 +96,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val granted = resultCode === PackageManager.PERMISSION_GRANTED;
           Log.i(TAG,"location enabled resultCode : $resultCode, granted : $granted")
           locationEnabledPromise?.resolve(granted)
+        }
+
+        if(requestCode == 18) {
+          Log.i(TAG,"Navigate to settings request code")
         }
 
         bluetoothEnabledPromise = null;
@@ -412,6 +417,17 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       else {
         promise.reject("Activity is NULL");
       }
+    }
+
+    @ReactMethod
+    fun navigateToApplicationSettings(promise : Promise) {
+      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      val uri = Uri.fromParts("package", activity?.getPackageName(), null);
+      intent.setData(uri);
+      activity?.startActivity(intent);
+      promise.resolve(true);
     }
 
     private var connectionThread : BTConnectionThread? = null;

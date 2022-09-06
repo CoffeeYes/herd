@@ -291,6 +291,10 @@ const Settings = ({ navigation }) => {
             Please go into the permission settings for Herd and select "Allow all the time"
             in order to allow Herd to function correctly.
             </Text>
+
+            <CustomButton
+            onPress={() => Bluetooth.navigateToApplicationSettings()}
+            text="Go To Settings"/>
           </View>
         </CustomModal>}
 
