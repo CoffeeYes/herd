@@ -56,6 +56,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val LOCATION_ENABLED_REQUEST_CODE : Int = 4;
     private val LOCATION_PERMISSION_REQUEST_CODE : Int = 5;
     private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 6;
+    private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
@@ -63,6 +64,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     var bluetoothScanPermissionPromise : Promise? = null;
     var locationPermissionPromise : Promise? = null;
     var locationEnabledPromise : Promise? = null;
+    var navigateToSettingsPromise : Promise? = null;
 
     override fun getName(): String {
         return "BluetoothModule"
@@ -98,8 +100,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           locationEnabledPromise?.resolve(granted)
         }
 
-        if(requestCode == 18) {
-          Log.i(TAG,"Navigate to settings request code")
+        if(requestCode == NAVIGATE_TO_SETTINGS_REQUEST_CODE) {
+          Log.i(TAG,"Navigate to settings request code");
+          navigateToSettingsPromise?.resolve(true);
+          navigateToSettingsPromise = null;
         }
 
         bluetoothEnabledPromise = null;
@@ -426,8 +430,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       val uri = Uri.fromParts("package", activity?.getPackageName(), null);
       intent.setData(uri);
-      activity?.startActivity(intent);
-      promise.resolve(true);
+      activity?.startActivityForResult(intent,NAVIGATE_TO_SETTINGS_REQUEST_CODE);
+      navigateToSettingsPromise = promise;
+      /* promise.resolve(true); */
     }
 
     private var connectionThread : BTConnectionThread? = null;

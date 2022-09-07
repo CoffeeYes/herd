@@ -123,7 +123,6 @@ const Settings = ({ navigation }) => {
       var btEnabled = await Bluetooth.checkBTEnabled();
       var locationEnabled = await Bluetooth.checkLocationEnabled();
 
-
       if(!bluetoothScanPermissionsGranted) {
         const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
         if(!grantBluetoothScanPermissions) {
@@ -293,7 +292,10 @@ const Settings = ({ navigation }) => {
             </Text>
 
             <CustomButton
-            onPress={() => Bluetooth.navigateToApplicationSettings()}
+            onPress={() => {
+              setShowLocationModal(false);
+              Bluetooth.navigateToApplicationSettings();
+            }}
             text="Go To Settings"/>
           </View>
         </CustomModal>}
