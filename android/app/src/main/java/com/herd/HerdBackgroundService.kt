@@ -814,8 +814,18 @@ class HerdBackgroundService : Service() {
 
         advertisingParameters
         .setLegacyMode(false)
-        .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
+
+        if(bluetoothAdapter?.isLeCodedPhySupported() as Boolean) {
+          Log.i(TAG,"Coded PHY supported, using it")
+          advertisingParameters
+          .setPrimaryPhy(BluetoothDevice.PHY_LE_CODED)
+        }
+        else {
+          Log.i(TAG,"Coded PHY not supported, using 1M PHY")
+          advertisingParameters
+          .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+        }
       }
       else {
         Log.i(TAG,"Using Legacy BLE advertising")
