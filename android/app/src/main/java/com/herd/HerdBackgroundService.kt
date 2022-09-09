@@ -240,25 +240,15 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
       } + ", Thread : ${Thread.currentThread()}");
-      if(status == 133) {
-        Log.i(TAG,"Bluetooth Gatt client error 133, stopping service");
-        //let the user know the service is stopping
-        sendNotification(
-          "Herd has stopped sending messages in the background",
-          "There was an error with bluetooth, please turn bluetooth off and on and restart the background service in settings"
-        )
-        //stop this service and remove constant notification
-        stopForeground(true);
-        running = false;
-        return;
-      }
-      else if(newState === BluetoothProfile.STATE_CONNECTED) {
+
+      if(newState === BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
         stopLeScan();
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
+        gattClient = null;
         if(writebackComplete && remoteHasReadMessages || status != 0) {
           writebackComplete = false;
           remoteHasReadMessages = false;
@@ -514,6 +504,7 @@ class HerdBackgroundService : Service() {
 
   var offsetSize : Int = 0;
   var currentPacket : Int = 0;
+  var gattClient : BluetoothGatt? = null;
   private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
     override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
       Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -530,12 +521,14 @@ class HerdBackgroundService : Service() {
       else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(!writebackComplete && status == 0) {
           Log.i(TAG,"GattServerCallback attempting to connect to device as client")
-          device.connectGatt(
-            context,
-            false,
-            bluetoothGattClientCallback,
-            BluetoothDevice.TRANSPORT_LE
-          );
+          if(gattClient == null) {
+            gattClient = device.connectGatt(
+              context,
+              false,
+              bluetoothGattClientCallback,
+              BluetoothDevice.TRANSPORT_LE
+            );
+          }
         }
         else {
           Log.i(TAG,"GattServerCallback not attempting to connect to device as client, resetting and scanning")
@@ -543,6 +536,7 @@ class HerdBackgroundService : Service() {
           offsetSize = 0;
           writebackComplete = false;
           remoteHasReadMessages = false;
+          gattClient = null;
           scanLeDevice();
         }
       }
