@@ -787,14 +787,17 @@ class HerdBackgroundService : Service() {
           useLegacyMode = true;
       }
 
+      //default settings for legacy advertisement
       var advertisingParameters = AdvertisingSetParameters.Builder()
       .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
       .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
       .setConnectable(true)
+      .setScannable(true)
+      .setLegacyMode(true)
 
       var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(parcelServiceUUID)
-      .setIncludeDeviceName(true);
+      .setIncludeDeviceName(false);
 
       if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
         Log.e(TAG, "LE Extended Advertising not supported!");
@@ -803,11 +806,14 @@ class HerdBackgroundService : Service() {
         useLegacyMode = true;
       }
 
+      //override default advertising settings if extended advertising
+      //and ble5 PHYs are supported
       if(!useLegacyMode) {
         Log.i(TAG,"Using BLE 5 2MPHY with extended advertising")
 
         advertisingParameters
         .setLegacyMode(false)
+        .setScannable(false)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
 
         if(bluetoothAdapter?.isLeCodedPhySupported() as Boolean) {
@@ -820,13 +826,9 @@ class HerdBackgroundService : Service() {
           advertisingParameters
           .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
         }
-      }
-      else {
-        Log.i(TAG,"Using Legacy BLE advertising")
 
-        advertisingParameters
-        .setLegacyMode(true)
-        .setScannable(true);
+        advertisingData
+        .setIncludeDeviceName(true);
       }
       BLEAdvertiser?.startAdvertisingSet(
         advertisingParameters.build(),
