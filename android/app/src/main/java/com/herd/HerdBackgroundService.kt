@@ -520,7 +520,7 @@ class HerdBackgroundService : Service() {
       }
       else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(!writebackComplete && status == 0) {
-          Log.i(TAG,"GattServerCallback attempting to connect to device as client")
+          Log.i(TAG,"GattServerCallback attempting to connect to device as client, address : ${device.getAddress()}, name : ${device.getName()}")
           if(gattClient == null) {
             gattClient = device.connectGatt(
               context,

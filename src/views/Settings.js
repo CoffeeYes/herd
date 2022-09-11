@@ -140,6 +140,9 @@ const Settings = ({ navigation }) => {
 
       if(!btEnabled) {
         btEnabled = await Bluetooth.requestBTEnable();
+        if(!btEnabled) {
+          return;
+        }
       }
 
       if(!locationEnabled) {
@@ -151,6 +154,9 @@ const Settings = ({ navigation }) => {
             {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
           ]
         )
+        if(!locationEnabled) {
+          return;
+        }
       }
 
       if(btEnabled && locationEnabled) {
