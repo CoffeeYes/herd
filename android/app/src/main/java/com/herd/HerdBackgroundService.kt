@@ -230,7 +230,8 @@ class HerdBackgroundService : Service() {
 
   private var writebackComplete = false;
   private var remoteHasReadMessages = false;
-  private val gattClientHandler = Handler()
+  private val gattClientHandler = Handler();
+  private var clientRetryCount : Int = 0;
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -248,10 +249,21 @@ class HerdBackgroundService : Service() {
         gatt.requestMtu(301);
       }
       else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
-        gattClient = null;
-        if(writebackComplete && remoteHasReadMessages || status != 0) {
+        if(status == 133 && clientRetryCount < 7) {
+          gattClient?.close();
+          gattClient = gatt.getDevice().connectGatt(
+            context,
+            false,
+            this,
+            BluetoothDevice.TRANSPORT_LE
+          );
+          clientRetryCount += 1;
+        }
+        else if((writebackComplete && remoteHasReadMessages) || clientRetryCount >= 7) {
+          gattClient = null;
           writebackComplete = false;
           remoteHasReadMessages = false;
+          clientRetryCount = 0;
           bleDeviceList.remove(gatt.getDevice());
           scanLeDevice();
         }
