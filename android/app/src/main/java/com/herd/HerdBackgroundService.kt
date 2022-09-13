@@ -418,7 +418,7 @@ class HerdBackgroundService : Service() {
              else {
                Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
                gatt.disconnect();
-               gatt.close();
+               /* gatt.close(); */
              }
            }
          }
@@ -454,7 +454,7 @@ class HerdBackgroundService : Service() {
            writeMessageIndex = 0;
            receivedMessagesForSelf?.clear();
            gatt.disconnect();
-           gatt.close();
+           /* gatt.close(); */
          }
        }
     }
@@ -472,7 +472,7 @@ class HerdBackgroundService : Service() {
             else {
               writebackComplete = true;
               gatt.disconnect();
-              gatt.close();
+              /* gatt.close(); */
             }
           }
           catch(e : Exception) {
@@ -504,11 +504,11 @@ class HerdBackgroundService : Service() {
           gatt.readDescriptor(messageCharacteristic.getDescriptor(messageQueueDescriptorUUID));
         }
         else {
-          Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
+          Log.i(TAG,"No Matching service/characteristic found, disconnecting");
           writebackComplete = true;
           remoteHasReadMessages = true;
           gatt.disconnect();
-          gatt.close();
+          /* gatt.close(); */
         }
       }
     }
@@ -531,7 +531,7 @@ class HerdBackgroundService : Service() {
         stopLeScan();
       }
       else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        if(!writebackComplete && status == 0) {
+        /* if(!writebackComplete && status == 0) {
           Log.i(TAG,"GattServerCallback attempting to connect to device as client, address : ${device.getAddress()}, name : ${device.getName()}")
           if(gattClient == null) {
             gattClient = device.connectGatt(
@@ -542,7 +542,7 @@ class HerdBackgroundService : Service() {
             );
           }
         }
-        else {
+        else { */
           Log.i(TAG,"GattServerCallback not attempting to connect to device as client, resetting and scanning")
           currentPacket = 0;
           offsetSize = 0;
@@ -550,7 +550,7 @@ class HerdBackgroundService : Service() {
           remoteHasReadMessages = false;
           gattClient = null;
           scanLeDevice();
-        }
+        /* } */
       }
     }
 
@@ -619,6 +619,13 @@ class HerdBackgroundService : Service() {
              "messagesToRemove",
              "messagesToRemoveSizes"
            );
+
+           device.connectGatt(
+              context,
+              false,
+              bluetoothGattClientCallback,
+              BluetoothDevice.TRANSPORT_LE
+           )
          }
     }
 
@@ -634,6 +641,21 @@ class HerdBackgroundService : Service() {
           );
           if((messageQueue?.size as Int) == 0) {
             remoteHasReadMessages = true;
+            if(!writebackComplete) {
+              Log.i(TAG,"writeback not complete, connecting as client")
+              if(gattClient == null) {
+                gattClient = device.connectGatt(
+                  context,
+                  false,
+                  bluetoothGattClientCallback,
+                  BluetoothDevice.TRANSPORT_LE
+                );
+              }
+            }
+            else {
+              Log.i(TAG,"writeback and remoteRead complete, scanning for new devices")
+              scanLeDevice();
+            }
           }
         }
     }
