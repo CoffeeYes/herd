@@ -175,7 +175,9 @@ const Settings = ({ navigation }) => {
     }
     else {
       setBackgroundTransfer(false);
-      ServiceInterface.disableService();
+      if(await ServiceInterface.isRunning()) {
+        ServiceInterface.disableService();
+      }
     }
   }
 

@@ -55,8 +55,6 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     case "ADD_MESSAGE":
-      console.log(state.messages);
-      console.log(state.messages[action.payload.id])
       return {
         ...state,
         messages : {
