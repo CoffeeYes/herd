@@ -15,8 +15,7 @@ const chatReducer = (state = initialState,action) => {
   switch(action.type) {
     case "SET_CHATS":
       return {...state,
-        chats : action.payload,
-        messages : action.payload.length === 0 ? {} : action.payload.map(chat => ({...state.messages,[chat._id] : []}))
+        chats : action.payload
       }
       break;
     case "DELETE_CHAT":
