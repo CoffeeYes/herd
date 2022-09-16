@@ -813,6 +813,7 @@ class HerdBackgroundService : Service() {
     //https://source.android.com/devices/bluetooth/ble_advertising
     BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
+      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
       var useLegacyMode : Boolean = false;
       Log.i(TAG,"Bluetooth LE Advertiser Found");
       // Check if all features are supported
@@ -864,6 +865,7 @@ class HerdBackgroundService : Service() {
         advertisingData
         .setIncludeDeviceName(true);
       }
+
       BLEAdvertiser?.startAdvertisingSet(
         advertisingParameters.build(),
         advertisingData?.build(),

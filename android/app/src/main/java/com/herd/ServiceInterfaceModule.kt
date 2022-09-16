@@ -243,9 +243,19 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun disableService() {
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
-    context.unbindService(serviceConnection);
-    context.stopService(serviceIntent);
-    context.unregisterReceiver(messageReceiver);
+    try {
+      context.unbindService(serviceConnection);
+      context.stopService(serviceIntent);
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error unbinding and stopping service service : $e")
+    }
+    try {
+      context.unregisterReceiver(messageReceiver);
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"error unregistering message receiver : $e")
+    }
     bound = false;
   }
 
