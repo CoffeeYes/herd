@@ -70,6 +70,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         return "BluetoothModule"
     }
 
+    @ReactMethod
+    fun addListener(eventName: String) {
+        Log.i(TAG,"addListener called, eventName : $eventName")
+    }
+
+    @ReactMethod
+    fun removeListeners(count: Int) {
+        Log.i(TAG,"removeListeners called, count : $count")
+    }
+
     //anonymous inner function to override class functions
     private final val activityListener = object : BaseActivityEventListener() {
       override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {

@@ -109,6 +109,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       return "ServiceInterfaceModule"
   }
 
+  @ReactMethod
+  fun addListener(eventName: String) {
+      Log.i(TAG,"addListener called, eventName : $eventName")
+  }
+
+  @ReactMethod
+  fun removeListeners(count: Int) {
+      Log.i(TAG,"removeListeners called, count : $count")
+  }
+
   fun createMessageFromObject(messageObject : ReadableMap) : HerdMessage {
     val message : HerdMessage = HerdMessage(
       messageObject.getString("_id") as String,
