@@ -58,6 +58,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 6;
     private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
 
+    private lateinit var originalAdapterName : String;
+
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
@@ -126,21 +128,28 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         val action : String? = intent.action
         when(action) {
           BluetoothDevice.ACTION_FOUND -> {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
-                val device: BluetoothDevice? =
-                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                val deviceName = device?.name
-                val deviceHardwareAddress = device?.address // MAC address
-
+            // Discovery has found a device. Get the BluetoothDevice
+            // object and its info from the Intent.
+            val device: BluetoothDevice? =
+                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+            val deviceName = device?.name
+            val deviceHardwareAddress = device?.address // MAC address
+            if(deviceName != null) {
+              if(deviceName.contains("_HERD")) {
+                Log.i(TAG,"Device containing '_HERD' found, emitting device to JS")
                 //create object to pass to javascript
                 val deviceObject : WritableMap = Arguments.createMap();
-                deviceObject.putString("name",deviceName);
+                deviceObject.putString("name",deviceName.replace("_HERD",""));
                 deviceObject.putString("macAddress",deviceHardwareAddress);
 
                 //pass object to JS through event emitter
                 reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
                 .emit("newBTDeviceFound",deviceObject)
+              }
+              else {
+                Log.i(TAG,"Device found, doesn't contain '_HERD' in name, not emitting")
+              }
+            }
           }
         }
       }
@@ -155,6 +164,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             .emit("BTStateChange","DISCOVERY_STARTED")
           }
           BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
+            BluetoothAdapter.getDefaultAdapter().setName(originalAdapterName);
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("BTStateChange","DISCOVERY_FINISHED")
           }
@@ -175,8 +185,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
       val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-      reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter)
-      reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter)
+      reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter);
+      reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter);
+      originalAdapterName = BluetoothAdapter.getDefaultAdapter().getName();
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
@@ -239,8 +250,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           if(adapter.isDiscovering()) {
             adapter.cancelDiscovery();
           }
+          adapter?.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
+            adapter?.setName(originalAdapterName);
             promise.reject("Device Discovery could not be started")
           }
           else {
@@ -256,7 +269,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun cancelScanForDevices(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
-
+      adapter?.setName(originalAdapterName);
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found");
       }
