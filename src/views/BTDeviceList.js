@@ -108,8 +108,8 @@ const BTDeviceList = () => {
         </ScrollView>
 
         <CustomButton
-        text="Re-Scan"
-        onPress={restartScan}
+        text={scanning ? "Cancel Scan" : "Re-Scan"}
+        onPress={() => {scanning ? Bluetooth.cancelScanForDevices() : restartScan()}}
         buttonStyle={{marginTop : 10}}/>
 
         <BTExchangeModal
