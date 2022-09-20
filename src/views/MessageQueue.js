@@ -15,7 +15,7 @@ import CustomButton from './CustomButton';
 import { setMessageQueue } from '../redux/actions/chatActions';
 const MessageQueue = ({}) => {
   const dispatch = useDispatch();
-  const [allOpen, setAllOpen] = useState(false);
+  const [openMessages, setOpenMessages] = useState([]);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
@@ -35,6 +35,14 @@ const MessageQueue = ({}) => {
     return queue
   }
 
+  const onMessagePress = index => {
+    const newOpenMessages = openMessages.indexOf(index) == -1 ?
+      [...openMessages,index]
+      :
+      openMessages.filter(item => item != index)
+    setOpenMessages(newOpenMessages)
+  }
+
   return (
     <View style={{flex : 1}}>
       <Header
@@ -42,15 +50,18 @@ const MessageQueue = ({}) => {
       title="Message Queue"/>
 
       <CustomButton
-      text={allOpen ? "Close All" : "Open All"}
-      onPress={() => setAllOpen(!allOpen)}
+      text={openMessages.length > 0 ? "Close All" : "Open All"}
+      onPress={() => {
+        setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
+      }}
       buttonStyle={{marginTop : 15}}/>
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {parseMessageQueue(messageQueue).map((message,index) =>
           message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim() ?
           <FoldableMessage
           to={message.toContactName}
-          overRideOpen={allOpen}
+          open={openMessages.indexOf(index) != -1}
+          onPress={() => onMessagePress(index)}
           from={message.fromContactName}
           key={index}
           textEncrypted={true}
