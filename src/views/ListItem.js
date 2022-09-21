@@ -64,6 +64,10 @@ const styles = {
     backgroundColor : "#e05e3f",
     padding : 13,
     paddingVertical : 20,
+    height : "100%",
+    alignItems : "center",
+    justifyContent : "center",
+    paddingHorizontal : Dimensions.get("window").width * 0.05
   },
   imageContainer : {
     borderWidth : 1,
