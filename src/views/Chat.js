@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
+         Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
@@ -29,6 +29,7 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
+import ContactImage from './ContactImage';
 
 const swipeSize = Dimensions.get('window').height * 0.25;
 
@@ -291,9 +292,11 @@ const Chat = ({ route, navigation }) => {
     preText={
       contactInfo?.image?.length > 0 &&
       <View style={styles.imageContainer}>
-      <Image
-      source={{uri : contactInfo.image}}
-      style={styles.image}/>
+        <ContactImage
+        imageURI={contactInfo.image}
+        iconSize={24}
+        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
+        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
     }/>
     <View style={{flex : 1}}>
