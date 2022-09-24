@@ -388,6 +388,7 @@ class HerdBackgroundService : Service() {
                "savedMessageQueue",
                "savedMessageQueueSizes"
              );
+             receivedMessages?.clear();
 
              //start write-back phase to let server know which messages have
              //reached their final destination and can be removed from message queue
