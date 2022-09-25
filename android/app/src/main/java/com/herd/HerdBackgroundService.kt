@@ -143,7 +143,8 @@ class HerdBackgroundService : Service() {
       messageQueueDescriptorUUID = UUID.fromString(getString(R.string.messageQueueDescriptorUUID));
       transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID))
       try {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager?.getAdapter();
         if(bluetoothAdapter === null) {
           throw Exception("No Bluetooth Adapter Found");
         }
@@ -230,7 +231,7 @@ class HerdBackgroundService : Service() {
 
   private var writebackComplete = false;
   private var remoteHasReadMessages = false;
-  private val gattClientHandler = Handler();
+  private val gattClientHandler = Handler(Looper.getMainLooper());
   private var clientRetryCount : Int = 0;
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
@@ -242,13 +243,13 @@ class HerdBackgroundService : Service() {
           else -> "UNKNOWN STATE"
       } + ", Thread : ${Thread.currentThread()}");
 
-      if(newState === BluetoothProfile.STATE_CONNECTED) {
+      if(newState == BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
         stopLeScan();
         gatt.requestMtu(301);
       }
-      else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
+      else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(status == 133 && clientRetryCount < 7) {
           gattClient?.close();
           gattClient = gatt.getDevice().connectGatt(
@@ -304,7 +305,7 @@ class HerdBackgroundService : Service() {
     var receivedMessagesForUser : Boolean = false;
     var messageReadTimeout : Boolean = false;
     var messageTimeoutRegistered : Boolean = false;
-    val handler : Handler = Handler();
+    val handler : Handler = Handler(Looper.getMainLooper());
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
@@ -325,7 +326,7 @@ class HerdBackgroundService : Service() {
        //check if message transfer is over, signified by 0 size array being received
        if(messageBytes.size != 0 && !messageReadTimeout) {
          //continue reading until 0 size array is received
-         gatt?.readCharacteristic(characteristic)
+         gatt.readCharacteristic(characteristic)
        }
        //transfer is done, assemble message and save to array
        else {
@@ -370,7 +371,7 @@ class HerdBackgroundService : Service() {
            if(totalMessagesRead < remoteMessageQueueSize) {
              Log.i(TAG,"Messages Read : $totalMessagesRead/$remoteMessageQueueSize");
              Log.i(TAG,"Starting to read next Message");
-             gatt?.readCharacteristic(characteristic);
+             gatt.readCharacteristic(characteristic);
            }
            else {
              //send a notificaiton if messages destined for this user were received
@@ -388,7 +389,7 @@ class HerdBackgroundService : Service() {
                "savedMessageQueue",
                "savedMessageQueueSizes"
              );
-             receivedMessages?.clear();
+             receivedMessages.clear();
 
              //start write-back phase to let server know which messages have
              //reached their final destination and can be removed from message queue
@@ -399,7 +400,7 @@ class HerdBackgroundService : Service() {
              };
 
              val transferCompleteCharacteristic = messageService?.characteristics?.find {
-               characteristic -> characteristic.uuid.equals(transferCompleteCharacteristicUUID)
+               currentCharacteristic -> currentCharacteristic.uuid.equals(transferCompleteCharacteristicUUID)
              };
 
              if(transferCompleteCharacteristic != null) {
@@ -407,7 +408,7 @@ class HerdBackgroundService : Service() {
                val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) +
                (receivedMessagesForSelf as ArrayList<HerdMessage>);
 
-               if((messagesToAvoid.size as Int) > 0) {
+               if(messagesToAvoid.size > 0) {
                  transferCompleteCharacteristic.setValue(messagesToAvoid.get(0)._id.toByteArray());
                }
                else {
@@ -774,7 +775,7 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"ble scanning thread is already active")
       }
   }
-  private val bleScanTimeoutHandler = Handler();
+  private val bleScanTimeoutHandler = Handler(Looper.getMainLooper());
   private fun stopLeScan() {
     Log.i(TAG,"stopLeScan() called")
     BLEScanner?.stopScan(leScanCallback);
@@ -812,7 +813,7 @@ class HerdBackgroundService : Service() {
 
   private fun advertiseLE() {
     //https://source.android.com/devices/bluetooth/ble_advertising
-    BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+    BLEAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
       BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
       var useLegacyMode : Boolean = false;
@@ -1002,7 +1003,7 @@ class HerdBackgroundService : Service() {
       if((messageQueue?.size as Int) > 0) {
         createCurrentMessageBytes(messageQueue?.get(0))
       }
-      bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+      /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
       startGATTService();
       scanLeDevice();
       advertiseLE();
@@ -1018,7 +1019,7 @@ class HerdBackgroundService : Service() {
 
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
-      if(BluetoothAdapter.getDefaultAdapter().isEnabled()) {
+      if(bluetoothAdapter?.isEnabled() as Boolean) {
         stopLeScan()
         BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
         gattServer?.close();
