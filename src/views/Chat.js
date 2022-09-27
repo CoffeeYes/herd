@@ -313,7 +313,7 @@ const Chat = ({ route, navigation }) => {
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
         <ScrollView
-        contentContainerStyle={styles.messageContainer}
+        contentContainerStyle={{paddingVertical : 20}}
         onScroll={allowScrollToLoadMessages && handleScroll}
         ref={scrollRef}
         onContentSizeChange={handleContentSizeChange}
