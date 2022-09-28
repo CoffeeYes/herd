@@ -76,7 +76,10 @@ const Chat = ({ route, navigation }) => {
       showNoMoreMessagePopup();
       return;
     }
-    const allMessages = [...messages.filter(message => newMessages.indexOf(message) !== -1),...newMessages].sort((a,b) => a.timestamp > b.timestamp)
+    const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
+    .sort((a,b) => a.timestamp > b.timestamp)
+
+    console.log(allMessages);
     setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
   }
