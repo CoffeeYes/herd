@@ -79,7 +79,6 @@ const Chat = ({ route, navigation }) => {
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
 
-    console.log(allMessages);
     setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
   }
@@ -174,6 +173,8 @@ const Chat = ({ route, navigation }) => {
     setChatInput("");
     setInputDisabled(false);
     scrollRef.current.scrollToEnd({animated : true});
+
+    setMessageStart(messageStart - 1)
 
     await ServiceInterface.isRunning() &&
     ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted,_id : messageID});

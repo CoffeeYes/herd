@@ -137,7 +137,7 @@ const chatReducer = (state = initialState,action) => {
         [action.payload.id] : [
           ...action.payload.messages,
           ...newState.messages[action.payload.id]
-        ]
+        ].sort((a,b) => a.timestamp > b.timestamp)
       }}
       break;
     default:
