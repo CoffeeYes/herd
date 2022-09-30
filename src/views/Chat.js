@@ -81,6 +81,10 @@ const Chat = ({ route, navigation }) => {
 
     setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
+    //if this is the first load, more messages can be returned that expected
+    //in order to ensure correct message order. As such, adjust the message
+    //loading size so that the correct messages are loaded on the next load attempt
+    messageStart == -5 && setMessageStart(-newMessages.length + 1)
   }
 
   const calculateMessageDays = messages => {

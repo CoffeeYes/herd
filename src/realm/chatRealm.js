@@ -31,10 +31,25 @@ const deletedReceivedRealm = new Realm({
 
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
-  // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
-  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
-  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}'`).slice(startIndex,endIndex);
-  // const receivedMessages = messageReceivedRealm.objects("Message").filter(message => message.from.trim() == key.trim() && message.to.trim() == ownKey.trim());
+
+  let sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
+  let receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}'`).slice(startIndex,endIndex);
+
+  //on initial load, ensure messages up to the earliest timestamp are loaded so that
+  //they aren't only loaded much later and dont make the message order incorrect
+  if(startIndex == -5) {
+    const firstSent = sentMessagesCopy[0];
+    const firstReceived = receivedMessages[0];
+
+    if(firstReceived.timestamp < firstSent.timestamp) {
+      sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`timestamp > '${firstReceived.timestamp}'`)
+    }
+    else {
+      receivedMessages = messageReceivedRealm.objects("Message")?
+      .filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}' AND timestamp > '${firstSent.timestamp}'`)
+    }
+  }
+
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
