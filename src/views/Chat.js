@@ -199,6 +199,7 @@ const Chat = ({ route, navigation }) => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
+            setMessageStart(messageStart + highlightedMessages.length)
             //update last text or delete chat
             dispatch(
               messages.length > 1 ?

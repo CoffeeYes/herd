@@ -45,8 +45,8 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
       sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`timestamp > '${firstReceived.timestamp}'`)
     }
     else {
-      receivedMessages = messageReceivedRealm.objects("Message")?
-      .filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}' AND timestamp > '${firstSent.timestamp}'`)
+      receivedMessages = messageReceivedRealm.objects("Message")
+      ?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}' AND timestamp > '${firstSent.timestamp}'`)
     }
   }
 
