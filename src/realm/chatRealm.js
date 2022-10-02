@@ -37,10 +37,9 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
 
   //on initial load, ensure messages up to the earliest timestamp are loaded so that
   //they aren't only loaded much later and dont make the message order incorrect
+  const firstSent = sentMessagesCopy[0];
+  const firstReceived = receivedMessages[0];
   if(startIndex == -5) {
-    const firstSent = sentMessagesCopy[0];
-    const firstReceived = receivedMessages[0];
-
     if(firstReceived.timestamp < firstSent.timestamp) {
       sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`timestamp > '${firstReceived.timestamp}'`)
     }
@@ -79,7 +78,19 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
       initialSentMessages.push({...currentMessage,text : decrypted});
     }
   }
-  return [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
+  return {
+    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
+    ...(startIndex == -5 && {newStart : firstReceived.timestamp < firstSent.timestamp ?
+      -initialSentMessages.length
+      :
+      -initialReceivedMessages.length}
+    ),
+    ...(startIndex == -5 && {newEnd : firstReceived.timestamp < firstSent.timestamp ?
+      -initialReceivedMessages.length
+      :
+      -initialSentMessages.length}
+    )
+  }
 }
 
 const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
@@ -169,7 +180,7 @@ const getContactsWithChats = async () => {
     //get timestamp of last message for each key
     var lastMessages = [];
     for(const key of keys) {
-      const messages = (await getMessagesWithContact(key,-1));
+      const messages = (await getMessagesWithContact(key,-1)).messages;
       const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
       currentLastMessage &&
       lastMessages.push({key : key, message : currentLastMessage});

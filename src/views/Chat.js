@@ -46,6 +46,7 @@ const Chat = ({ route, navigation }) => {
   const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-5);
+  const [messageEnd, setMessageEnd] = useState(undefined);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
@@ -70,7 +71,8 @@ const Chat = ({ route, navigation }) => {
   },[]);
 
   const loadMessages = async (messageStart, messageEnd) => {
-    var newMessages = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
+    const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
+    var newMessages = messagePackage.messages
     if(newMessages.length === 0 && messages.length != 0) {
       setAllowScrollToLoadMessages(false);
       showNoMoreMessagePopup();
@@ -84,7 +86,10 @@ const Chat = ({ route, navigation }) => {
     //if this is the first load, more messages can be returned that expected
     //in order to ensure correct message order. As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
-    messageStart == -5 && setMessageStart(-newMessages.length + 1)
+    if(messageStart == -5) {
+      setMessageStart(messagePackage.newStart);
+      setMessageEnd(messagePackage.newEnd);
+    }
   }
 
   const calculateMessageDays = messages => {
@@ -243,7 +248,8 @@ const Chat = ({ route, navigation }) => {
   const loadMoreMessages = async () => {
     setLoadingMoreMessages(true)
     //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
-    await loadMessages(messageStart - (messageLoadingSize + 1), messageStart);
+    await loadMessages(messageStart - (messageLoadingSize + 1), messageEnd);
+    setMessageEnd(messageStart);
     setMessageStart(messageStart - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);

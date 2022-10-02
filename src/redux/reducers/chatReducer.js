@@ -132,10 +132,16 @@ const chatReducer = (state = initialState,action) => {
       if(!state.messages[action.payload.id]) {
         newState.messages[action.payload.id] = []
       }
+
+      const newMessages = [...action.payload.messages]
+      .filter(message => newState.messages[action.payload.id].find(
+        existingMessage => existingMessage._id == message._id) == undefined
+      );
+      
       return {...newState, messages : {
         ...newState.messages,
         [action.payload.id] : [
-          ...action.payload.messages,
+          ...newMessages,
           ...newState.messages[action.payload.id]
         ].sort((a,b) => a.timestamp > b.timestamp)
       }}
