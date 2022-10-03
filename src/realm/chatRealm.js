@@ -39,7 +39,12 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   //they aren't only loaded much later and dont make the message order incorrect
   const firstSent = sentMessagesCopy[0];
   const firstReceived = receivedMessages[0];
-  if(startIndex == -5) {
+
+  //check if there are messages and this is the first load
+  const haveMessages = firstSent && firstReceived;
+  const initialLoad = startIndex == -5 && haveMessages;
+
+  if(startIndex == -5 && haveMessages) {
     if(firstReceived.timestamp < firstSent.timestamp) {
       sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`timestamp > '${firstReceived.timestamp}'`)
     }
@@ -80,12 +85,12 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   }
   return {
     messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
-    ...(startIndex == -5 && {newStart : firstReceived.timestamp < firstSent.timestamp ?
+    ...(initialLoad && {newStart : firstReceived.timestamp < firstSent.timestamp ?
       -initialSentMessages.length
       :
       -initialReceivedMessages.length}
     ),
-    ...(startIndex == -5 && {newEnd : firstReceived.timestamp < firstSent.timestamp ?
+    ...(initialLoad && {newEnd : firstReceived.timestamp < firstSent.timestamp ?
       -initialReceivedMessages.length
       :
       -initialSentMessages.length}
