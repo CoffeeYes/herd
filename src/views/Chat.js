@@ -324,18 +324,20 @@ const Chat = ({ route, navigation }) => {
       {loading ?
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
+      <>
+      {loadingMoreMessages &&
+      <ActivityIndicator size="large" color="#e05e3f"/>}
+
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
+
         <ScrollView
         contentContainerStyle={{paddingVertical : 20}}
         onScroll={allowScrollToLoadMessages && handleScroll}
         ref={scrollRef}
-        onContentSizeChange={handleContentSizeChange}
-        onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
+        onContentSizeChange={handleContentSizeChange}>
 
-          {loadingMoreMessages &&
-          <ActivityIndicator size="large" color="#e05e3f"/>}
 
           {messageDays.map((day,index) =>
             <View key={index}>
@@ -355,7 +357,8 @@ const Chat = ({ route, navigation }) => {
             </View>
           )}
         </ScrollView>
-      </PanGestureHandler>}
+      </PanGestureHandler>
+      </>}
 
       <TextInput
       placeholder="Send a Message"
