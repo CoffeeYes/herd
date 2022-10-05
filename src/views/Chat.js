@@ -87,8 +87,8 @@ const Chat = ({ route, navigation }) => {
     //in order to ensure correct message order. As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
     if(messageStart == -5) {
-      setMessageStart(messagePackage.newStart);
-      setMessageEnd(messagePackage.newEnd);
+      setMessageStart(messagePackage?.newStart ? messagePackage.newStart : -messageLoadingSize);
+      setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
     }
   }
 
