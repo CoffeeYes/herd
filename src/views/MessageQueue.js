@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, Dimensions } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageQueue } from '../realm/chatRealm';

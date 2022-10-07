@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
+import { Text, View, TouchableOpacity, Dimensions, Image } from 'react-native';
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues } from '../assets/palette';
