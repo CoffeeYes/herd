@@ -61,7 +61,6 @@ const Chat = ({ route, navigation }) => {
     (async () => {
       if(messages.length === 0) {
         await loadMessages(-messageLoadingSize);
-        scrollRef.current.scrollToEnd({animated : true})
       }
       else {
         setMessageDays(calculateMessageDays(messages));
@@ -254,7 +253,7 @@ const Chat = ({ route, navigation }) => {
     setMessageStart(messageStart - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);
-    scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
+    scrollRef?.current?.scrollTo({x : 0, y : 20, animated : true})
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
@@ -322,6 +321,11 @@ const Chat = ({ route, navigation }) => {
         <Text style={styles.popupText}>No More messages to load</Text>
       </View>}
 
+      {loading ?
+      <ActivityIndicator
+      size="large"
+      color="#e05e3f"/>
+      :
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
@@ -335,7 +339,7 @@ const Chat = ({ route, navigation }) => {
           <ActivityIndicator
           size="large"
           color="#e05e3f"
-          animating={loadingMoreMessages || loading}/>
+          animating={loadingMoreMessages}/>
 
           {messageDays.map((day,index) =>
             <View key={index}>
@@ -356,7 +360,7 @@ const Chat = ({ route, navigation }) => {
           )}
 
         </ScrollView>
-      </PanGestureHandler>
+      </PanGestureHandler>}
 
       <TextInput
       placeholder="Send a Message"
