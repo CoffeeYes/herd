@@ -87,7 +87,7 @@ const Chat = ({ route, navigation }) => {
     //in order to ensure correct message order. As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
     if(messageStart == -5) {
-      setMessageStart(messagePackage?.newStart ? messagePackage.newStart : -messageLoadingSize);
+      setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -messageLoadingSize);
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
     }
   }
@@ -248,7 +248,7 @@ const Chat = ({ route, navigation }) => {
   const loadMoreMessages = async () => {
     setLoadingMoreMessages(true)
     //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
-    await loadMessages(messageStart - (messageLoadingSize + 1), messageEnd);
+    await loadMessages(messageStart, messageEnd);
     setMessageEnd(messageStart);
     setMessageStart(messageStart - (messageLoadingSize + 1));
 
