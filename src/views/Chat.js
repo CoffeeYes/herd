@@ -64,7 +64,8 @@ const Chat = ({ route, navigation }) => {
       }
       else {
         setMessageDays(calculateMessageDays(messages));
-        setMessageStart(-messages.length)
+        setMessageStart(-messages.length - messageLoadingSize)
+        setMessageEnd(-messages.length)
       }
       setLoading(false);
     })()
