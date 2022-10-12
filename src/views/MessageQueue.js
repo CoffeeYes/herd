@@ -64,15 +64,16 @@ const MessageQueue = ({}) => {
           onPress={() => onMessagePress(index)}
           from={message.fromContactName}
           key={index}
-          textEncrypted={true}
+          textEncrypted={message.to == ownPublicKey || message.from == ownPublicKey}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-          text={message.text}/>
+          text={message.to == ownPublicKey || message.from == ownPublicKey ? message.text : "Message for another user"}/>
           :
           <FoldableMessage
           to="N/A"
           from="N/A"
           overRideOpen={allOpen}
           key={index}
+          textEncrypted={false}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text="Encrypted Message for Other User"/>
         )}
