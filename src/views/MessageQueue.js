@@ -71,7 +71,7 @@ const MessageQueue = ({}) => {
           <FoldableMessage
           to="N/A"
           from="N/A"
-          overRideOpen={allOpen}
+          open={openMessages.indexOf(index) != -1}
           key={index}
           textEncrypted={false}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
