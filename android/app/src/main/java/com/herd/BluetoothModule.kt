@@ -164,7 +164,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             .emit("BTStateChange","DISCOVERY_STARTED")
           }
           BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-            BluetoothAdapter.getDefaultAdapter().setName(originalAdapterName);
+            val adapter = BluetoothAdapter.getDefaultAdapter();
+            adapter.setName(adapter.getName().replace("_HERD",""));
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("BTStateChange","DISCOVERY_FINISHED")
           }
@@ -253,7 +254,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           adapter?.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
-            adapter?.setName(originalAdapterName);
+            adapter?.setName(adapter.getName().replace("_HERD",""));
             promise.reject("Device Discovery could not be started")
           }
           else {
@@ -269,7 +270,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun cancelScanForDevices(promise : Promise) {
       val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
-      adapter?.setName(originalAdapterName);
+      adapter?.setName(adapter.getName().replace("_HERD",""));
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found");
       }
