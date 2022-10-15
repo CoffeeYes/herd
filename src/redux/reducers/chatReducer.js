@@ -92,12 +92,17 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     case "DELETE_MESSAGES":
+      const chatWithMessagesRemoved = [...state.messages[action.payload.id]].filter
+      (message => action.payload.messages.find(messageID => messageID == message._id) === undefined);
+
+      const chatEmpty = chatWithMessagesRemoved.length === 0;
+      
       return {...state,
         messages : {
           ...state.messages,
-           [action.payload.id] : [...state.messages[action.payload.id]].filter
-           (message => action.payload.messages.find(messageID => messageID == message._id) === undefined)
-         }
+           [action.payload.id] : chatWithMessagesRemoved
+         },
+         ...(chatEmpty && {chats : [...state.chats].filter(chat => chat._id !== action.payload.id)})
        }
       break;
     case "RESET_MESSAGES":
@@ -137,7 +142,7 @@ const chatReducer = (state = initialState,action) => {
       .filter(message => newState.messages[action.payload.id].find(
         existingMessage => existingMessage._id == message._id) == undefined
       );
-      
+
       return {...newState, messages : {
         ...newState.messages,
         [action.payload.id] : [
