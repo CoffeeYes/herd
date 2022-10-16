@@ -54,7 +54,8 @@ const styles = {
     height : "100%",
     alignItems : "center",
     justifyContent : "center",
-    paddingHorizontal : Dimensions.get("window").width * 0.05
+    width : Dimensions.get("window").width * 0.20,
+    maxWidth : 150
   },
   pressContainer : {
     flex : 1,
