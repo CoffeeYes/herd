@@ -375,7 +375,6 @@ const Chat = ({ route, navigation }) => {
       onChangeText={setChatInput}
       multiline={true}
       blurOnSubmit={true}
-      onKeyPress={({nativeEvent}) => nativeEvent.key === "Enter" && this.submit()}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
     </>

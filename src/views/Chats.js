@@ -67,6 +67,10 @@ const Chats = ({ navigation }) => {
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
+          width: Dimensions.get('window').width * 0.20,
+          maxWidth : 150,
+          marginRight : 0,
+          textAlign : "center",
           color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}

@@ -85,7 +85,7 @@ const styles = {
     fontSize : 16,
   },
   subTextContainer : {
-    paddingRight : 10,
+    
   },
   subText : {
     color : "grey"
