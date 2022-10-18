@@ -204,22 +204,13 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             setMessageStart(messageStart + highlightedMessages.length)
-            //update last text or delete chat
-            dispatch(
-              messages.length > 1 ?
-              setLastText({
-                _id : contactInfo._id,
-                timestamp : messages[messages.length -2].timestamp,
-                lastText : messages[messages.length -2].text
-              })
-              :
-              deleteChat({_id : contactInfo._id})
-            )
+
+            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
+
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
-            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -10)
+            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
             .map(message => ({...message,_id : parseRealmID(message)}))
 
             const deletedReceivedMessages = [...highlightedMessages].filter(message => message.to === ownPublicKey)
