@@ -204,7 +204,6 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            setMessageStart(messageStart + highlightedMessages.length)
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
@@ -221,7 +220,14 @@ const Chat = ({ route, navigation }) => {
               await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
             }
 
-            setMessageDays(calculateMessageDays(updatedMessages));
+            if(highlightedMessages.length === messages.length) {
+              await loadMoreMessages(true,messageStart + 5);
+            }
+            else {
+              //only re-calculate messageDays here if not all messages were deleted
+              //if all messages were deleted, this happens in the loadMessages function
+              setMessageDays(calculateMessageDays(updatedMessages));
+            }
             setHighlightedMessages([]);
             setInputDisabled(false);
           },
@@ -237,12 +243,11 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const loadMoreMessages = async () => {
+  const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     setLoadingMoreMessages(true)
-    //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
-    await loadMessages(messageStart, messageEnd);
-    setMessageEnd(messageStart);
-    setMessageStart(messageStart - (messageLoadingSize + 1));
+    overrideLoadInitial ? loadMessages(start) : loadMessages(start,end)
+    setMessageEnd(start);
+    setMessageStart(start - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);
     scrollRef?.current?.scrollTo({x : 0, y : 20, animated : true})
