@@ -45,7 +45,7 @@ const Chat = ({ route, navigation }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [messageStart, setMessageStart] = useState(-5);
+  const [messageStart, setMessageStart] = useState(-messageLoadingSize);
   const [messageEnd, setMessageEnd] = useState(undefined);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
@@ -87,9 +87,15 @@ const Chat = ({ route, navigation }) => {
     //if this is the first load, more messages can be returned that expected
     //in order to ensure correct message order. As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
-    if(messageStart == -5) {
+    if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
+      let newLastText = {...newMessages[newMessages.length-1]}
+      dispatch(setLastText({
+        _id : contactInfo._id,
+        timestamp : newLastText.timestamp,
+        lastText : newLastText.text,
+      }))
     }
   }
 
@@ -221,7 +227,7 @@ const Chat = ({ route, navigation }) => {
             }
 
             if(highlightedMessages.length === messages.length) {
-              await loadMoreMessages(true,messageStart + 5);
+              await loadMoreMessages(true,messageStart + messageLoadingSize);
             }
             else {
               //only re-calculate messageDays here if not all messages were deleted

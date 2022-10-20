@@ -108,16 +108,15 @@ const chatReducer = (state = initialState,action) => {
 
       let chatToUpdate = [...state.chats].find(chat => chat._id === action.payload.id);
       let newChats = [...state.chats];
-      if(chatEmpty) {
-        newChats = [...state.chats].filter(chat => chat._id !== action.payload.id)
-      }
-      else {
+
+      if(!chatEmpty) {
         const last = chatWithMessagesRemoved.length -1
         const updateIndex = state.chats.indexOf(chatToUpdate);
         chatToUpdate.lastText = chatWithMessagesRemoved[last].text;
         chatToUpdate.timestamp = chatWithMessagesRemoved[last].timestamp;
-        updateIndex &&
-        (newChats = [...state.chats][updateIndex] = chatToUpdate);
+        if(updateIndex) {
+          newChats[updateIndex] = chatToUpdate;
+        }
       }
       return {...state,
         messages : {
