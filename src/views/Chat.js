@@ -71,13 +71,29 @@ const Chat = ({ route, navigation }) => {
     })()
   },[]);
 
+  //use a ref for messages length because when calling loadMoreMessages
+  //during deleteMessages process messages state is outdated, leading to wrong
+  //length being used for decision making in deleting chat
+  const messageLengthRef = useRef();
+  useEffect(() => {
+    messageLengthRef.current = messages.length
+  },[messages])
+
   const loadMessages = async (messageStart, messageEnd) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
     var newMessages = messagePackage.messages
-    if(newMessages.length === 0 && messages.length != 0) {
-      setAllowScrollToLoadMessages(false);
-      showNoMoreMessagePopup();
-      return;
+    if(newMessages.length === 0) {
+      if(messageLengthRef.current === 0) {
+        dispatch(deleteChat(contactInfo))
+      }
+      else {
+        //show popup that no more messages can be loaded, but only do so when
+        //there are already messages in the chat to prevent the popup from showing
+        //when a new chat is started
+        setAllowScrollToLoadMessages(false);
+        showNoMoreMessagePopup();
+        return;
+      }
     }
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
