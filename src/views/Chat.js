@@ -243,7 +243,7 @@ const Chat = ({ route, navigation }) => {
             }
 
             if(highlightedMessages.length === messages.length) {
-              await loadMoreMessages(true,messageStart + messageLoadingSize);
+              await loadMoreMessages(true,messageStart + highlightedMessages.length);
             }
             else {
               //only re-calculate messageDays here if not all messages were deleted
