@@ -226,6 +226,7 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
+            setMessageStart(messageStart + highlightedMessages.length);
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
