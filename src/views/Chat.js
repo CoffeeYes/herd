@@ -97,7 +97,7 @@ const Chat = ({ route, navigation }) => {
     }
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
-
+    
     setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned that expected
@@ -106,7 +106,8 @@ const Chat = ({ route, navigation }) => {
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
-      let newLastText = {...newMessages[newMessages.length-1]}
+      let newLastText = {...newMessages[newMessages.length-1]};
+      setMessageDays(calculateMessageDays(messagePackage.messages));
       dispatch(setLastText({
         _id : contactInfo._id,
         timestamp : newLastText.timestamp,
