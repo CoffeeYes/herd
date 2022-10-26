@@ -85,6 +85,7 @@ const Chat = ({ route, navigation }) => {
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
         dispatch(deleteChat(contactInfo))
+        setMessageDays([]);
       }
       else {
         //show popup that no more messages can be loaded, but only do so when
@@ -92,12 +93,12 @@ const Chat = ({ route, navigation }) => {
         //when a new chat is started
         setAllowScrollToLoadMessages(false);
         showNoMoreMessagePopup();
-        return;
       }
+      return;
     }
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
-    
+
     setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned that expected
