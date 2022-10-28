@@ -228,7 +228,18 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            setMessageStart(messageStart + highlightedMessages.length);
+            const sentLength = messages.filter(message =>
+              highlightedMessages.indexOf(message._id) !== -1 &&
+              message.from === ownPublicKey
+            ).length;
+
+            const receivedLength = messages.filter(message =>
+              highlightedMessages.indexOf(message._id) !== -1 &&
+              message.from !== ownPublicKey
+            ).length;
+
+            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+            setMessageStart(messageStart + messageLoadingExtension);
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
