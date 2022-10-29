@@ -315,9 +315,6 @@ const Chat = ({ route, navigation }) => {
   }
 
   const showNoMoreMessagePopup = () => {
-    if(!showedPopup) {
-
-    }
     setShowPopup(true)
     setTimeout(() => {
       setShowPopup(false);
