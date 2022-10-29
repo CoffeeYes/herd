@@ -183,7 +183,7 @@ const styles = {
     fontWeight : "bold",
     alignSelf : "center",
     marginBottom : 10,
-    fontFamily : "Open-Sans"
+    ...(Platform.OS === 'android' && { fontFamily: "Open-Sans" })
   },
   imageContainer : {
     alignSelf : "center",
