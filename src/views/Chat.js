@@ -292,10 +292,12 @@ const Chat = ({ route, navigation }) => {
   const handleContentSizeChange = (contentWidth, contentHeight) => {
     let windowHeight = Dimensions.get('window').height;
     if(contentHeight < windowHeight * 0.8 ) {
+      console.log("gesture handler enabled")
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
     }
     else {
+      console.log("gesture handler disabled")
       setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
     }
@@ -303,15 +305,8 @@ const Chat = ({ route, navigation }) => {
 
   const handleGesture = event => {
     const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
-    if(allow) {
-      if(messages.length >= messageLoadingSize) {
-        setEnableGestureHandler(false);
-        loadMoreMessages();
-      }
-      else if (!showedPopup) {
-        showNoMoreMessagePopup();
-      }
-    }
+    allow &&
+    loadMoreMessages();
   }
 
   const showNoMoreMessagePopup = () => {
