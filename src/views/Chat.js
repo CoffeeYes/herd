@@ -257,7 +257,7 @@ const Chat = ({ route, navigation }) => {
             }
 
             if(highlightedMessages.length === messages.length) {
-              await loadMoreMessages(true,messageStart + highlightedMessages.length);
+              await loadMoreMessages(true,messageStart + messageLoadingExtension);
             }
             else {
               //only re-calculate messageDays here if not all messages were deleted
@@ -292,12 +292,10 @@ const Chat = ({ route, navigation }) => {
   const handleContentSizeChange = (contentWidth, contentHeight) => {
     let windowHeight = Dimensions.get('window').height;
     if(contentHeight < windowHeight * 0.8 ) {
-      console.log("gesture handler enabled")
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
     }
     else {
-      console.log("gesture handler disabled")
       setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
     }
@@ -305,16 +303,19 @@ const Chat = ({ route, navigation }) => {
 
   const handleGesture = event => {
     const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
-    allow &&
+    allow && !showedPopup &&
     loadMoreMessages();
   }
 
   const showNoMoreMessagePopup = () => {
-    setShowPopup(true)
-    setTimeout(() => {
-      setShowPopup(false);
-    },1000)
-    setShowedPopup(true);
+    if(!showedPopup) {
+      setShowPopup(true)
+      setTimeout(() => {
+        setShowPopup(false);
+      },1000)
+      setShowedPopup(true);
+      setEnableGestureHandler(false);
+    }
   }
 
   const scrollRef = useRef();
