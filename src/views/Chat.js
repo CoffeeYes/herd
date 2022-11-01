@@ -281,7 +281,12 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     setLoadingMoreMessages(true)
-    overrideLoadInitial ? await loadMessages(start) : await loadMessages(start,end)
+    if(messages.length < messageLoadingSize || overrideLoadInitial) {
+      await loadMessages(start)
+    }
+    else {
+      await loadMessages(start,end)
+    }
     setMessageEnd(start);
     setMessageStart(start - (messageLoadingSize + 1));
 
