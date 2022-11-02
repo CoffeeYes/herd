@@ -119,8 +119,8 @@ const Chat = ({ route, navigation }) => {
 
   const calculateMessageDays = messages => {
     var dates = [];
-    for(var message in messages) {
-      let messageDate = moment(messages[message].timestamp).format("DD/MM");
+    for(let message of messages) {
+      let messageDate = moment(message.timestamp).format("DD/MM");
       dates.indexOf(messageDate) === -1 &&
       dates.push(messageDate)
     }
@@ -308,7 +308,7 @@ const Chat = ({ route, navigation }) => {
 
   const handleGesture = event => {
     const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
-    allow && !showedPopup &&
+    allow && !showedPopup && messages.length > 0 &&
     loadMoreMessages();
   }
 
