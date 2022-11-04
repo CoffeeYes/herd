@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
+         Dimensions, ScrollView, TouchableOpacity, Alert, SectionList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
@@ -83,7 +83,7 @@ const Chat = ({ route, navigation }) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
     const newMessages = messagePackage.messages
     .filter(nMessage => messages.find(message => nMessage._id === message._id) === undefined)
-    
+
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
         dispatch(deleteChat(contactInfo))
@@ -121,8 +121,13 @@ const Chat = ({ route, navigation }) => {
     var dates = [];
     for(let message of messages) {
       let messageDate = moment(message.timestamp).format("DD/MM");
-      dates.indexOf(messageDate) === -1 &&
-      dates.push(messageDate)
+      const existingDate = dates.find(item => item.day === messageDate)
+      if(existingDate) {
+        existingDate.data.push(message)
+      }
+      else {
+        dates.push({day : messageDate, data : [message]})
+      }
     }
     return dates
   }
@@ -273,8 +278,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleScroll = async event => {
-    let pos = event.nativeEvent.contentOffset.y
-    if(pos === 0 && !showedPopup) {
+    if(!showedPopup) {
       loadMoreMessages();
     }
   }
@@ -291,7 +295,6 @@ const Chat = ({ route, navigation }) => {
     setMessageStart(start - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);
-    scrollRef?.current?.scrollTo({x : 0, y : 20, animated : true})
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
@@ -324,6 +327,20 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
+
+  const renderItem = ({item}) => {
+    return (
+      <ChatBubble
+      text={item.text}
+      timestamp={moment(item.timestamp).format("HH:mm")}
+      messageFrom={item.from === ownPublicKey}
+      identifier={parseRealmID(item)}
+      customStyle={customStyle}
+      highlightedMessages={highlightedMessages}
+      setHighlightedMessages={setHighlightedMessages}
+      />
+    )
+  }
 
   return (
     <>
@@ -360,8 +377,23 @@ const Chat = ({ route, navigation }) => {
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
-
-        <ScrollView
+        <View>
+          <ActivityIndicator
+          size="large"
+          color="#e05e3f"
+          animating={loadingMoreMessages}/>
+          <SectionList
+          sections={messageDays}
+          ref={scrollRef}
+          onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
+          keyExtractor={item => item._id}
+          renderItem={renderItem}
+          onContentSizeChange={handleContentSizeChange}
+          renderSectionHeader={({ section: { day } }) => (
+            <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
+          )}/>
+        </View>
+        {/*<ScrollView
         onScroll={allowScrollToLoadMessages && handleScroll}
         ref={scrollRef}
         onContentSizeChange={handleContentSizeChange}
@@ -390,7 +422,7 @@ const Chat = ({ route, navigation }) => {
             </View>
           )}
 
-        </ScrollView>
+        </ScrollView>*/}
       </PanGestureHandler>}
 
       <TextInput
