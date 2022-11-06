@@ -170,14 +170,20 @@ const Chat = ({ route, navigation }) => {
       from : ownPublicKey,
       timestamp : timestamp
     }
+
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
+    const newMessage = {...plainText,_id : messageID};
     const newDate = moment(timestamp).format("DD/MM");
+    const existingDate = messageDays.find(item => item.day === newDate);
 
-    messageDays.indexOf(newDate) === -1 &&
-    setMessageDays([...messageDays,newDate]);
-    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}));
+    existingDate === undefined?
+    setMessageDays([...messageDays,{day : newDate, data : [newMessage]}])
+    :
+    setMessageDays(messageDays.map(item => item === existingDate && ({...existingDate, data : [...existingDate.data, newMessage]})))
 
+
+    dispatch(addMessage(contactInfo._id,message));
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
       const newChat = {
@@ -211,7 +217,7 @@ const Chat = ({ route, navigation }) => {
 
     setChatInput("");
     setInputDisabled(false);
-    scrollRef.current.scrollToEnd({animated : true});
+    scrollRef.current.scrollToLocation({animated : true, itemIndex : messages.length -1});
 
     setMessageStart(messageStart - 1)
 
