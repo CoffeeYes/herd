@@ -43,7 +43,6 @@ const Chat = ({ route, navigation }) => {
   const [chatInput, setChatInput] = useState("");
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
-  const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-messageLoadingSize);
   const [messageEnd, setMessageEnd] = useState(undefined);
@@ -63,7 +62,6 @@ const Chat = ({ route, navigation }) => {
         await loadMessages(-messageLoadingSize);
       }
       else {
-        setMessageDays(calculateMessageDays(messages));
         setMessageStart(-messages.length - messageLoadingSize)
         setMessageEnd(-messages.length)
       }
@@ -76,7 +74,9 @@ const Chat = ({ route, navigation }) => {
   //length being used for decision making in deleting chat
   const messageLengthRef = useRef();
   useEffect(() => {
-    messageLengthRef.current = messages.length
+    let messageLength = 0;
+    messages.map(section => messageLength += section.data.length)
+    messageLengthRef.current = messageLength
   },[messages])
 
   const loadMessages = async (messageStart, messageEnd) => {
@@ -87,7 +87,6 @@ const Chat = ({ route, navigation }) => {
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
         dispatch(deleteChat(contactInfo))
-        setMessageDays([]);
       }
       //show popup that no more messages can be loaded, but only do so when
       //there are already messages in the chat to prevent the popup from showing
@@ -99,7 +98,6 @@ const Chat = ({ route, navigation }) => {
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
 
-    setMessageDays(calculateMessageDays(allMessages));
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned that expected
     //in order to ensure correct message order. As such, adjust the message
@@ -108,28 +106,12 @@ const Chat = ({ route, navigation }) => {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
       let newLastText = {...newMessages[newMessages.length-1]};
-      setMessageDays(calculateMessageDays(messagePackage.messages));
       dispatch(setLastText({
         _id : contactInfo._id,
         timestamp : newLastText.timestamp,
         lastText : newLastText.text,
       }))
     }
-  }
-
-  const calculateMessageDays = messages => {
-    var dates = [];
-    for(let message of messages) {
-      let messageDate = moment(message.timestamp).format("DD/MM");
-      const existingDate = dates.find(item => item.day === messageDate)
-      if(existingDate) {
-        existingDate.data.push(message)
-      }
-      else {
-        dates.push({day : messageDate, data : [message]})
-      }
-    }
-    return dates
   }
 
   const sendMessage = async message => {
@@ -174,16 +156,8 @@ const Chat = ({ route, navigation }) => {
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
     const newMessage = {...plainText,_id : messageID};
-    const newDate = moment(timestamp).format("DD/MM");
-    const existingDate = messageDays.find(item => item.day === newDate);
 
-    existingDate === undefined?
-    setMessageDays([...messageDays,{day : newDate, data : [newMessage]}])
-    :
-    setMessageDays(messageDays.map(item => item === existingDate && ({...existingDate, data : [...existingDate.data, newMessage]})))
-
-
-    dispatch(addMessage(contactInfo._id,message));
+    dispatch(addMessage(contactInfo._id,newMessage));
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
       const newChat = {
@@ -217,6 +191,8 @@ const Chat = ({ route, navigation }) => {
 
     setChatInput("");
     setInputDisabled(false);
+
+    messages.length > 0 &&
     scrollRef.current.scrollToLocation({animated : true, itemIndex : messages.length -1});
 
     setMessageStart(messageStart - 1)
@@ -270,11 +246,6 @@ const Chat = ({ route, navigation }) => {
             if(highlightedMessages.length === messages.length) {
               await loadMoreMessages(true,messageStart + messageLoadingExtension);
             }
-            else {
-              //only re-calculate messageDays here if not all messages were deleted
-              //if all messages were deleted, this happens in the loadMessages function
-              setMessageDays(calculateMessageDays(updatedMessages));
-            }
             setHighlightedMessages([]);
             setInputDisabled(false);
           },
@@ -291,7 +262,7 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     setLoadingMoreMessages(true)
-    if(messages.length < messageLoadingSize || overrideLoadInitial) {
+    if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
       await loadMessages(start)
     }
     else {
@@ -389,7 +360,7 @@ const Chat = ({ route, navigation }) => {
           color="#e05e3f"
           animating={loadingMoreMessages}/>
           <SectionList
-          sections={messageDays}
+          sections={messages}
           ref={scrollRef}
           onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
           keyExtractor={item => item._id}

@@ -1,3 +1,26 @@
+import moment from 'moment';
+
+const generateMessageDays = (existingMessages = [], newMessages) => {
+  let dates = [...existingMessages]
+  for(let message of newMessages) {
+    if(message) {
+      let messageDate = moment(message.timestamp).format("DD/MM");
+      const existingDate = dates.find(item => item.day === messageDate)
+      if(existingDate) {
+        existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
+        existingDate.data.push(message)
+      }
+      else {
+        dates.push({day : messageDate, data : [message]})
+      }
+    }
+  }
+  for (date of dates) {
+    date.data = date.data.sort((a,b) => a.timestamp > b.timestamp)
+  }
+  return dates.sort((a,b) => a.data[a.data.length -1].timestamp > b.data[b.data.length -1].timestamp)
+}
+
 const initialState = {
   chats : [],
   styles : {
@@ -58,16 +81,15 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "ADD_MESSAGE": {
-      return {
+      const { message, id } = action.payload
+      const newState = {
         ...state,
         messages : {
           ...state.messages,
-          [action.payload.id] : state.messages?.[action.payload.id] ?
-            [...state.messages[action.payload.id],action.payload.message].sort((a,b) => a.timestamp > b.timestamp)
-            :
-            [action.payload.message]
+          [id] : generateMessageDays(state.messages[id],[message])
         }
-      }
+      };
+      return newState;
       break;
     }
     case "ADD_MESSAGE_TO_QUEUE": {
@@ -160,23 +182,15 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {
-      let newState = {...state}
-      if(!state.messages[action.payload.id]) {
-        newState.messages[action.payload.id] = []
+      const {id, messages} = action.payload
+      const newState = {
+        ...state,
+        messages : {
+          ...state.messages,
+          [id] : generateMessageDays(state.messages[id],messages)
+        }
       }
-
-      const newMessages = [...action.payload.messages]
-      .filter(message => newState.messages[action.payload.id].find(
-        existingMessage => existingMessage._id == message._id) == undefined
-      );
-
-      return {...newState, messages : {
-        ...newState.messages,
-        [action.payload.id] : [
-          ...newMessages,
-          ...newState.messages[action.payload.id]
-        ].sort((a,b) => a.timestamp > b.timestamp)
-      }}
+      return newState;
       break;
     }
     default:
