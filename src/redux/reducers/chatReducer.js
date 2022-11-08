@@ -123,30 +123,18 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "DELETE_MESSAGES": {
-      const chatWithMessagesRemoved = [...state.messages[action.payload.id]].filter
-      (message => action.payload.messages.find(messageID => messageID == message._id) === undefined);
-
-      const chatEmpty = chatWithMessagesRemoved.length === 0;
-
-      let chatToUpdate = [...state.chats].find(chat => chat._id === action.payload.id);
-      let newChats = [...state.chats];
-
-      if(!chatEmpty) {
-        const last = chatWithMessagesRemoved.length -1
-        const updateIndex = state.chats.indexOf(chatToUpdate);
-        chatToUpdate.lastText = chatWithMessagesRemoved[last].text;
-        chatToUpdate.timestamp = chatWithMessagesRemoved[last].timestamp;
-        if(updateIndex) {
-          newChats[updateIndex] = chatToUpdate;
-        }
-      }
-      return {...state,
+      const { id, messages } = action.payload;
+      const newState = {
+        ...state,
         messages : {
           ...state.messages,
-           [action.payload.id] : chatWithMessagesRemoved
-         },
-         chats : newChats
-       }
+          [id] : state.messages[id].map(section => ({
+            ...section,
+            data : [...section.data].filter(message => messages.indexOf(message._id) == -1)
+          }))
+        }
+      }
+      return newState;
       break;
     }
     case "RESET_MESSAGES": {
