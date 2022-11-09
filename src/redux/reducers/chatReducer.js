@@ -124,14 +124,18 @@ const chatReducer = (state = initialState,action) => {
     }
     case "DELETE_MESSAGES": {
       const { id, messages } = action.payload;
+      
+      const newSections = state.messages[id].map(section => ({
+        ...section,
+        data : [...section.data].filter(message => messages.indexOf(message._id) == -1 )}
+      ))
+      .filter(section => section.data.length !== 0)
+
       const newState = {
         ...state,
         messages : {
           ...state.messages,
-          [id] : state.messages[id].map(section => ({
-            ...section,
-            data : [...section.data].filter(message => messages.indexOf(message._id) == -1)
-          }))
+          [id] : newSections
         }
       }
       return newState;
