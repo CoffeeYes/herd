@@ -193,7 +193,12 @@ const Chat = ({ route, navigation }) => {
     setInputDisabled(false);
 
     messages.length > 0 &&
-    scrollRef.current.scrollToLocation({animated : true, itemIndex : messages.length -1});
+    messages[messages.length -1].data.length -1 > 0 &&
+    scrollRef.current.scrollToLocation({
+      animated : true,
+      sectionIndex : messages.length -1,
+      itemIndex : messages[messages.length -1].data.length -1
+    });
 
     setMessageStart(messageStart - 1)
 
@@ -354,11 +359,12 @@ const Chat = ({ route, navigation }) => {
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
-        <View>
+        <View style={{flex : 1}}>
           <ActivityIndicator
           size="large"
           color="#e05e3f"
           animating={loadingMoreMessages}/>
+
           <SectionList
           sections={messages}
           ref={scrollRef}
@@ -370,36 +376,6 @@ const Chat = ({ route, navigation }) => {
             <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
           )}/>
         </View>
-        {/*<ScrollView
-        onScroll={allowScrollToLoadMessages && handleScroll}
-        ref={scrollRef}
-        onContentSizeChange={handleContentSizeChange}
-        onLayout={e => scrollRef.current.scrollToEnd({animated : true})}>
-
-          <ActivityIndicator
-          size="large"
-          color="#e05e3f"
-          animating={loadingMoreMessages}/>
-
-          {messageDays.map((day,index) =>
-            <View key={index}>
-              <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
-              {messages.map(message => moment(message.timestamp).format("DD/MM") === day &&
-                <ChatBubble
-                text={message.text}
-                timestamp={moment(message.timestamp).format("HH:mm")}
-                messageFrom={message.from === ownPublicKey}
-                key={parseRealmID(message)}
-                identifier={parseRealmID(message)}
-                customStyle={customStyle}
-                highlightedMessages={highlightedMessages}
-                setHighlightedMessages={setHighlightedMessages}
-                />
-              )}
-            </View>
-          )}
-
-        </ScrollView>*/}
       </PanGestureHandler>}
 
       <TextInput
