@@ -277,6 +277,14 @@ const Chat = ({ route, navigation }) => {
     setMessageStart(start - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);
+
+    messages.length > 0 &&
+    scrollRef.current.scrollToLocation({
+      animated : true,
+      sectionIndex : 0,
+      itemIndex : 0,
+      viewOffset : -20
+    })
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
