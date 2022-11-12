@@ -82,18 +82,19 @@ const Chat = ({ route, navigation }) => {
   const loadMessages = async (messageStart, messageEnd) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
     const newMessages = messagePackage.messages
-    .filter(nMessage => messages.find(message => nMessage._id === message._id) === undefined)
 
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
         dispatch(deleteChat(contactInfo))
       }
-      //show popup that no more messages can be loaded, but only do so when
-      //there are already messages in the chat to prevent the popup from showing
-      //when a new chat is started
+      else {
+        //show popup that no more messages can be loaded, but only do so when
+        //there are already messages in the chat to prevent the popup from showing
+        //when a new chat is started
+        showNoMoreMessagePopup();
+        return;
+      }
       setAllowScrollToLoadMessages(false);
-      showNoMoreMessagePopup();
-      return;
     }
     const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
     .sort((a,b) => a.timestamp > b.timestamp)
