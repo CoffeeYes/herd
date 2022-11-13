@@ -104,7 +104,7 @@ const Chat = ({ route, navigation }) => {
     //in order to ensure correct message order. As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
     if(messageStart == -messageLoadingSize) {
-      setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -(2*messageLoadingSize));
+      setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
       let newLastText = {...newMessages[newMessages.length-1]};
       dispatch(setLastText({
@@ -267,6 +267,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
+    console.log(`override : ${overrideLoadInitial}, start : ${start}, end : ${end}`)
     setLoadingMoreMessages(true)
     if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
       await loadMessages(start)
@@ -275,7 +276,7 @@ const Chat = ({ route, navigation }) => {
       await loadMessages(start,end)
     }
     setMessageEnd(start);
-    setMessageStart(start - (messageLoadingSize + 1));
+    setMessageStart(start - messageLoadingSize);
 
     setLoadingMoreMessages(false);
 
