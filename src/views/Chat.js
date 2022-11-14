@@ -39,7 +39,7 @@ const Chat = ({ route, navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
@@ -59,24 +59,31 @@ const Chat = ({ route, navigation }) => {
   useEffect(() => {
     (async () => {
       if(messages.length === 0) {
+        setLoading(true);
         await loadMessages(-messageLoadingSize);
       }
       else {
-        setMessageStart(-messages.length - messageLoadingSize)
-        setMessageEnd(-messages.length)
+        const messageLength = getMessageLength();
+        setMessageStart(-messageLength - messageLoadingSize)
+        setMessageEnd(-messageLength)
       }
       setLoading(false);
     })()
   },[]);
+
+  //calculate actual number of messages by extracting them from sections
+  const getMessageLength = () => {
+    let messageLength = 0;
+    messages.map(section => messageLength += section.data.length)
+    return messageLength;
+  }
 
   //use a ref for messages length because when calling loadMoreMessages
   //during deleteMessages process messages state is outdated, leading to wrong
   //length being used for decision making in deleting chat
   const messageLengthRef = useRef();
   useEffect(() => {
-    let messageLength = 0;
-    messages.map(section => messageLength += section.data.length)
-    messageLengthRef.current = messageLength
+    messageLengthRef.current = getMessageLength();
   },[messages])
 
   const loadMessages = async (messageStart, messageEnd) => {
@@ -193,13 +200,7 @@ const Chat = ({ route, navigation }) => {
     setChatInput("");
     setInputDisabled(false);
 
-    messages.length > 0 &&
-    messages[messages.length -1].data.length -1 > 0 &&
-    scrollRef.current.scrollToLocation({
-      animated : true,
-      sectionIndex : messages.length -1,
-      itemIndex : messages[messages.length -1].data.length -1
-    });
+    scrollToBottom();
 
     setMessageStart(messageStart - 1)
 
@@ -319,6 +320,16 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
+
+  const scrollToBottom = () => {
+    messages.length > 0 &&
+    messages[messages.length -1].data.length -1 > 0 &&
+    scrollRef.current.scrollToLocation({
+      animated : true,
+      sectionIndex : messages.length -1,
+      itemIndex : messages[messages.length -1].data.length -1
+    });
+  }
 
   const renderItem = ({item}) => {
     return (
