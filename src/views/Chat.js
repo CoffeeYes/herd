@@ -63,19 +63,31 @@ const Chat = ({ route, navigation }) => {
         await loadMessages(-messageLoadingSize);
       }
       else {
-        const messageLength = getMessageLength();
-        setMessageStart(-messageLength - messageLoadingSize)
-        setMessageEnd(-messageLength)
+        const messageLengths = getMessageLength(splitBySender = true);
+        const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
+        setMessageStart(-longest - messageLoadingSize)
+        setMessageEnd(-longest)
       }
       setLoading(false);
     })()
   },[]);
 
   //calculate actual number of messages by extracting them from sections
-  const getMessageLength = () => {
-    let messageLength = 0;
-    messages.map(section => messageLength += section.data.length)
-    return messageLength;
+  const getMessageLength = (splitBySender = false) => {
+    let sentMessageLength = 0;
+    let receivedMessageLength = 0;
+    let totalMessageLength = 0;
+    splitBySender ?
+    messages.map(section => section.data.map(message => {
+        message.from === ownPublicKey ?
+        sentMessageLength += 1
+        :
+        receivedMessageLength += 1
+      })
+    )
+    :
+    messages.map(section => totalMessageLength += section.data.length)
+    return splitBySender ? [sentMessageLength,receivedMessageLength] : totalMessageLength;
   }
 
   //use a ref for messages length because when calling loadMoreMessages
@@ -268,7 +280,6 @@ const Chat = ({ route, navigation }) => {
   }
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
-    console.log(`override : ${overrideLoadInitial}, start : ${start}, end : ${end}`)
     setLoadingMoreMessages(true)
     if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
       await loadMessages(start)
