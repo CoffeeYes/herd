@@ -234,15 +234,14 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            const sentLength = messages.filter(message =>
-              highlightedMessages.indexOf(message._id) !== -1 &&
-              message.from === ownPublicKey
-            ).length;
+            const messageLengths = getMessageLength(splitBySender = true);
+            const sentLength = messageLengths[0];
+            const receivedLength = messageLengths[1];
 
-            const receivedLength = messages.filter(message =>
-              highlightedMessages.indexOf(message._id) !== -1 &&
-              message.from !== ownPublicKey
-            ).length;
+            const newMessages = messages.filter(section => ({
+              ...section,
+              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
+            }))
 
             const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
             setMessageStart(messageStart + messageLoadingExtension);
@@ -250,7 +249,18 @@ const Chat = ({ route, navigation }) => {
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
 
-            const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
+            const updatedMessages = messages.map(section => ({
+              ...section,
+              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
+            }))
+            if(messages.length > 0) {
+              const lastMessage = updatedMessages[updatedMessages.length -1].data[updatedMessages[updatedMessages.length -1].data.length -1]
+              dispatch(setLastText({
+                _id : contactInfo._id,
+                lastText : lastMessage.text,
+                timestamp : lastMessage.timestamp
+              }))
+            }
             const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
             .map(message => ({...message,_id : parseRealmID(message)}))
 
