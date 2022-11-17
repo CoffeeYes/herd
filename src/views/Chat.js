@@ -63,7 +63,7 @@ const Chat = ({ route, navigation }) => {
         await loadMessages(-messageLoadingSize);
       }
       else {
-        const messageLengths = getMessageLength(splitBySender = true);
+        const messageLengths = getMessageLength(true);
         const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
@@ -234,14 +234,9 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            const messageLengths = getMessageLength(splitBySender = true);
+            const messageLengths = getMessageLength(true);
             const sentLength = messageLengths[0];
             const receivedLength = messageLengths[1];
-
-            const newMessages = messages.filter(section => ({
-              ...section,
-              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
-            }))
 
             const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
             setMessageStart(messageStart + messageLoadingExtension);
@@ -253,7 +248,9 @@ const Chat = ({ route, navigation }) => {
               ...section,
               data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
             }))
-            if(messages.length > 0) {
+            .filter(section => section.data.length > 0);
+
+            if(updatedMessages.length > 0) {
               const lastMessage = updatedMessages[updatedMessages.length -1].data[updatedMessages[updatedMessages.length -1].data.length -1]
               dispatch(setLastText({
                 _id : contactInfo._id,
@@ -261,10 +258,16 @@ const Chat = ({ route, navigation }) => {
                 timestamp : lastMessage.timestamp
               }))
             }
-            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
-            .map(message => ({...message,_id : parseRealmID(message)}))
+            //pull only messages out of structured data for deletion in service
+            const extractedMessages = messages.map(section => section.data)[0];
 
-            const deletedReceivedMessages = [...highlightedMessages].filter(message => message.to === ownPublicKey)
+            const messagesToDelete = extractedMessages.filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
+            .map(message => ({...message,_id : parseRealmID(message)}));
+
+            const deletedReceivedMessages = extractedMessages.filter(message =>
+              message.to === ownPublicKey &&
+              highlightedMessages.indexOf(parseRealmID(message)) !== -1
+            )
             .map(message => ({...message,_id : parseRealmID(message)}));
 
             if(await ServiceInterface.isRunning()) {
@@ -272,7 +275,8 @@ const Chat = ({ route, navigation }) => {
               await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
             }
 
-            if(highlightedMessages.length === messages.length) {
+            //if all messages were deleted attempt to load more
+            if(updatedMessages.length === 0) {
               await loadMoreMessages(true,messageStart + messageLoadingExtension);
             }
             setHighlightedMessages([]);
