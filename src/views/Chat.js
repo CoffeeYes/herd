@@ -238,8 +238,10 @@ const Chat = ({ route, navigation }) => {
             const sentLength = messageLengths[0];
             const receivedLength = messageLengths[1];
 
-            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
-            setMessageStart(messageStart + messageLoadingExtension);
+            if((sentLength + receivedLength) > messageLoadingSize) {
+              const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+              setMessageStart(messageStart + messageLoadingExtension);
+            }
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
@@ -294,6 +296,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
+    console.log(`override : ${overrideLoadInitial}, start : ${start}, end : ${end}`)
     setLoadingMoreMessages(true)
     if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
       await loadMessages(start)
