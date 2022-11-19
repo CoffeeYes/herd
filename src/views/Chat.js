@@ -73,12 +73,12 @@ const Chat = ({ route, navigation }) => {
   },[]);
 
   //calculate actual number of messages by extracting them from sections
-  const getMessageLength = (splitBySender = false) => {
+  const getMessageLength = (splitBySender = false, customMessages = messages) => {
     let sentMessageLength = 0;
     let receivedMessageLength = 0;
     let totalMessageLength = 0;
     splitBySender ?
-    messages.map(section => section.data.map(message => {
+    customMessages.map(section => section.data.map(message => {
         message.from === ownPublicKey ?
         sentMessageLength += 1
         :
@@ -86,7 +86,7 @@ const Chat = ({ route, navigation }) => {
       })
     )
     :
-    messages.map(section => totalMessageLength += section.data.length)
+    customMessages.map(section => totalMessageLength += section.data.length)
     return splitBySender ? [sentMessageLength,receivedMessageLength] : totalMessageLength;
   }
 
@@ -234,18 +234,29 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
-            const messageLengths = getMessageLength(true);
+
+            //get full messages that were deleted from messages array as opposed to just the ID
+            //we need this to calculate the  number of received and sent messages that were deleted
+            //in order to correctly update the loading index
+            const deletedMessages = messages.map(section => ({
+              ...section,
+              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
+            }))
+            .filter(section => section.data.length > 0);
+
+            //get new loading offset based on lengths of deleted messages
+            const messageLengths = getMessageLength(true, deletedMessages);
             const sentLength = messageLengths[0];
             const receivedLength = messageLengths[1];
 
-            if((sentLength + receivedLength) > messageLoadingSize) {
-              const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
-              setMessageStart(messageStart + messageLoadingExtension);
-            }
+            //set new loading index
+            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+            setMessageStart(messageStart + messageLoadingExtension);
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
             dispatch(removeMessagesFromQueue(highlightedMessages))
 
+            //get remaining messages
             const updatedMessages = messages.map(section => ({
               ...section,
               data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
@@ -260,6 +271,7 @@ const Chat = ({ route, navigation }) => {
                 timestamp : lastMessage.timestamp
               }))
             }
+
             //pull only messages out of structured data for deletion in service
             const extractedMessages = messages.map(section => section.data)[0];
 
@@ -296,7 +308,6 @@ const Chat = ({ route, navigation }) => {
   }
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
-    console.log(`override : ${overrideLoadInitial}, start : ${start}, end : ${end}`)
     setLoadingMoreMessages(true)
     if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
       await loadMessages(start)
