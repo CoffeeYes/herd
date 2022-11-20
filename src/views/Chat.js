@@ -370,16 +370,31 @@ const Chat = ({ route, navigation }) => {
     });
   }
 
+  const longPressMessage = item => {
+    setHighlightedMessages([...highlightedMessages,item]);
+  }
+
+  const shortPressMessage = item => {
+    if(highlightedMessages.length > 0) {
+      setHighlightedMessages(
+        highlightedMessages.indexOf(item) == -1 ?
+        [...highlightedMessages,item]
+        :
+        highlightedMessages.filter(message => message !== item)
+      );
+    }
+  }
+
   const renderItem = ({item}) => {
     return (
       <ChatBubble
       text={item.text}
+      onLongPress={() => longPressMessage(item)}
+      onPress={() => shortPressMessage(item)}
+      highlighted={highlightedMessages.indexOf(item) !== -1}
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
-      identifier={parseRealmID(item)}
       customStyle={customStyle}
-      highlightedMessages={highlightedMessages}
-      setHighlightedMessages={setHighlightedMessages}
       />
     )
   }
