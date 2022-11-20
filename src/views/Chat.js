@@ -233,21 +233,18 @@ const Chat = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             setInputDisabled(true);
-            deleteMessagesFromRealm(highlightedMessages);
+            deleteMessagesFromRealm(highlightedMessages.map(message => parseRealmID(message)));
 
-            //get full messages that were deleted from messages array as opposed to just the ID
-            //we need this to calculate the  number of received and sent messages that were deleted
-            //in order to correctly update the loading index
-            const deletedMessages = messages.map(section => ({
-              ...section,
-              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
-            }))
-            .filter(section => section.data.length > 0);
-
-            //get new loading offset based on lengths of deleted messages
-            const messageLengths = getMessageLength(true, deletedMessages);
-            const sentLength = messageLengths[0];
-            const receivedLength = messageLengths[1];
+            let sentLength = 0;
+            let receivedLength = 0;
+            for(let message of highlightedMessages) {
+              if(message.from === ownPublicKey) {
+                sentLength += 1;
+              }
+              else {
+                receivedLength += 1;
+              }
+            }
 
             //set new loading index
             const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
@@ -259,7 +256,7 @@ const Chat = ({ route, navigation }) => {
             //get remaining messages
             const updatedMessages = messages.map(section => ({
               ...section,
-              data : section.data.filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1)
+              data : section.data.filter(message => highlightedMessages.indexOf(message) === -1)
             }))
             .filter(section => section.data.length > 0);
 
@@ -271,28 +268,23 @@ const Chat = ({ route, navigation }) => {
                 timestamp : lastMessage.timestamp
               }))
             }
+            else {
+              //if all messages were deleted attempt to load more
+              await loadMoreMessages(true,messageStart + messageLoadingExtension);
+            }
 
-            //pull only messages out of structured data for deletion in service
-            const extractedMessages = messages.map(section => section.data)[0];
+            const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));
 
-            const messagesToDelete = extractedMessages.filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
-            .map(message => ({...message,_id : parseRealmID(message)}));
-
-            const deletedReceivedMessages = extractedMessages.filter(message =>
-              message.to === ownPublicKey &&
-              highlightedMessages.indexOf(parseRealmID(message)) !== -1
+            const deletedReceivedMessages = highlightedMessages.filter(message =>
+              message.to === ownPublicKey
             )
             .map(message => ({...message,_id : parseRealmID(message)}));
 
             if(await ServiceInterface.isRunning()) {
-              await ServiceInterface.removeMessagesFromService(messagesToDelete);
+              await ServiceInterface.removeMessagesFromService(highlightedMessages);
               await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
             }
 
-            //if all messages were deleted attempt to load more
-            if(updatedMessages.length === 0) {
-              await loadMoreMessages(true,messageStart + messageLoadingExtension);
-            }
             setHighlightedMessages([]);
             setInputDisabled(false);
           },
@@ -406,7 +398,7 @@ const Chat = ({ route, navigation }) => {
     touchStyle={{backgroundColor : "#f46758"}}
     textStyle={{marginLeft : 10}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
-    rightButtonOnClick={deleteMessages}
+    rightButtonOnClick={() => deleteMessages()}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {id : parseRealmID(contactInfo)})}
     preText={

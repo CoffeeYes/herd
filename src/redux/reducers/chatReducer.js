@@ -110,7 +110,7 @@ const chatReducer = (state = initialState,action) => {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => action.payload.find(id => id == message._id) === undefined)
+        (message => action.payload.find(item => item._id == message._id) === undefined)
       }
       break;
     }
@@ -124,10 +124,10 @@ const chatReducer = (state = initialState,action) => {
     }
     case "DELETE_MESSAGES": {
       const { id, messages } = action.payload;
-      
+
       const newSections = state.messages[id].map(section => ({
         ...section,
-        data : [...section.data].filter(message => messages.indexOf(message._id) == -1 )}
+        data : [...section.data].filter(message => messages.indexOf(message) === -1 )}
       ))
       .filter(section => section.data.length !== 0)
 
