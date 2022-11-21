@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, Share,
          Image, Dimensions , ActivityIndicator, Modal} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -17,76 +18,43 @@ import { largeImageContainerStyle } from '../assets/styles';
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showQRCode, setShowQRCode] = useState(false);
-  const [contactID, setContactID] = useState("");
-  const [contactName, setContactName] = useState("");
-  const [contactKey, setContactKey] = useState("");
-  const [contactImage, setContactImage] = useState("");
-  const [loading, setLoading] = useState(true);
   const [showLargeImage, setShowLargeImage] = useState(false);
-
-
-  useEffect(() => {
-    loadContact().then(() => setLoading(false))
-  },[])
-
-  useEffect(() => {
-    const focusListener = navigation.addListener('focus', () => {
-      setLoading(true)
-      loadContact().then(() => setLoading(false));
-    });
-
-    return focusListener;
-  },[navigation])
-
-  const loadContact = async () => {
-    const contact = getContactById(route.params.id);
-    if(contact) {
-      setContactKey(contact.key);
-      setContactName(contact.name);
-      setContactID(contact._id[1])
-      if(contact.image) {
-        setContactImage(contact.image);
-      }
-    }
-  }
+  const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
 
   const copyKeyToClipboard = () => {
-    setClipboard(contactKey)
+    setClipboard(contact.key)
     return true;
   }
 
   const shareContact = async () => {
     const shared = await Share.share({
       title : "I'd like to share my Herd Contact with you!",
-      message : contactKey
+      message : contact.key
     })
   }
 
   return (
     <>
       <Header
-      title={contactName}
+      title={contact.name}
       allowGoBack
       rightButtonIcon="edit"
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
-      {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
-      :
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={largeImageContainerStyle}>
-          {contactImage !== "" ?
+          {contact.image !== "" ?
           <TouchableOpacity
-          onPress={() => contactImage != "" && setShowLargeImage(true)}>
+          onPress={() => contact.image != "" && setShowLargeImage(true)}>
             <ContactImage
-            imageURI={contactImage}
+            imageURI={contact.image}
             iconSize={64}
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
           </TouchableOpacity>
           :
           <ContactImage
-          imageURI={contactImage}
+          imageURI={contact.image}
           iconSize={64}
           imageWidth={Dimensions.get("window").width * 0.4}
           imageHeight={Dimensions.get("window").height * 0.4}/>}
@@ -116,21 +84,20 @@ const Contact = ({route, navigation}) => {
           text="Show Contact's QR Code"/>
 
         </View>
+      </ScrollView>
 
-        <QRCodeModal
-        visible={showQRCode}
-        setVisible={setShowQRCode}
-        value={{name : contactName, key : contactKey}}
-        title={contactName}
-        />
+      <QRCodeModal
+      visible={showQRCode}
+      setVisible={setShowQRCode}
+      value={{name : contact.name, key : contact.key}}
+      title={contact.name}
+      />
 
-        <CustomModal visible={showLargeImage} setVisible={setShowLargeImage}>
-            <Image
-            source={{uri : contactImage}}
-            style={styles.largeImage}/>
-        </CustomModal>
-
-      </ScrollView>}
+      <CustomModal visible={showLargeImage} setVisible={setShowLargeImage}>
+        <Image
+        source={{uri : contact.image}}
+        style={styles.largeImage}/>
+      </CustomModal>
     </>
   )
 }
