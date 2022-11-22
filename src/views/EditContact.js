@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -18,17 +18,16 @@ import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const [name, _setName] = useState("");
-  const [publicKey, _setPublicKey] = useState("");
+  const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route.params.id))
+  const [name, _setName] = useState(originalContact.name);
+  const [publicKey, _setPublicKey] = useState(originalContact.key);
   const [savedContacts,setSavedContacts] = useState([]);
-  const [originalContact, setOriginalContact] = useState({});
-  const [contactImage, _setContactImage] = useState("");
+  const [contactImage, _setContactImage] = useState(originalContact.image);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
 
-  const nameRef = useRef();
-  const keyRef = useRef();
-  const imageRef = useRef();
+  const nameRef = useRef(originalContact.name);
+  const keyRef = useRef(originalContact.key);
+  const imageRef = useRef(originalContact.image);
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
@@ -42,20 +41,6 @@ const EditContact = ({ route, navigation }) => {
   const setContactImage = data => {
     imageRef.current = data;
     _setContactImage(data)
-  }
-
-  useEffect(() => {
-    loadContactInfo().then(() => setLoading(false));
-  },[])
-
-  const loadContactInfo = async () => {
-    const contact = getContactById(route.params.id)
-    setOriginalContact(contact);
-    if(contact) {
-      setName(contact.name)
-      setPublicKey(contact.key);
-      setContactImage(contact.image);
-    }
   }
 
   const save = async () => {
@@ -92,7 +77,6 @@ const EditContact = ({ route, navigation }) => {
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     updateContactAndReferences(dispatch, {...newInfo,_id : route.params.id});
-    setOriginalContact(newInfo);
     return true;
   }
 
@@ -153,9 +137,6 @@ const EditContact = ({ route, navigation }) => {
   return (
     <>
       <Header title="Edit Contact" allowGoBack/>
-      {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
-      :
       <ScrollView contentContainerStyle={styles.container}>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
@@ -195,7 +176,7 @@ const EditContact = ({ route, navigation }) => {
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
-      </ScrollView>}
+      </ScrollView>
     </>
   )
 }
