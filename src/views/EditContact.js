@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
@@ -21,7 +20,6 @@ const EditContact = ({ route, navigation }) => {
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route.params.id))
   const [name, _setName] = useState(originalContact.name);
   const [publicKey, _setPublicKey] = useState(originalContact.key);
-  const [savedContacts,setSavedContacts] = useState([]);
   const [contactImage, _setContactImage] = useState(originalContact.image);
   const [error, setError] = useState("");
 
@@ -100,34 +98,30 @@ const EditContact = ({ route, navigation }) => {
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
-      const contact = getContactById(route.params.id);
+      const unsavedChanges = (
+        originalContact.name.trim() != nameRef.current.trim() ||
+        originalContact.key.trim() != keyRef.current.trim() ||
+        originalContact.image != imageRef.current
+      )
 
-      if(contact) {
-        const unsavedChanges = (
-          contact.name.trim() != nameRef.current.trim() ||
-          contact.key.trim() != keyRef.current.trim() ||
-          contact.image != imageRef.current
-        )
-
-        if(unsavedChanges) {
-          Alert.alert(
-            'Discard changes?',
-            'You have unsaved changes. Are you sure to discard them and leave the screen?',
-            [
-              {
-                text: 'Discard',
-                style: 'destructive',
-                // If the user confirmed, then we dispatch the action we blocked earlier
-                // This will continue the action that had triggered the removal of the screen
-                onPress: () => navigation.dispatch(e.data.action),
-              },
-              { text: "Stay", style: 'cancel', onPress: () => {} },
-            ]
-          );
-        }
-        else {
-          navigation.dispatch(e.data.action);
-        }
+      if(unsavedChanges) {
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure to discard them and leave the screen?',
+          [
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+            { text: "Stay", style: 'cancel', onPress: () => {} },
+          ]
+        );
+      }
+      else {
+        navigation.dispatch(e.data.action);
       }
     })
 
