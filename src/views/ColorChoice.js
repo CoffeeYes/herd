@@ -4,7 +4,7 @@ import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 
-const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
+const ColorChoice = ({ style, setColor, color, oldColor }) => {
 
   return (
     <View style={styles.colorPickerContainer}>
@@ -36,10 +36,6 @@ const styles = {
     backgroundColor : "white",
     paddingVertical : 20,
     flexDirection : "row"
-  },
-  title : {
-    marginLeft : "auto",
-    marginRight : "auto"
   },
   icon : {
     marginRight : 10

@@ -42,9 +42,9 @@ const CreateContact = ({ navigation, route}) => {
   }
 
   useEffect(() => {
-    imageRef.current = "";
-    route?.params?.publicKey ? setPublicKey(route.params.publicKey) : publicKeyRef.current = "";
-    route?.params?.name ? setUsername(route.params.name) : usernameRef.current = "";
+    setContactImage("")
+    setPublicKey(route?.params?.publicKey || "");
+    setUsername(route?.params?.name || "");
   },[])
 
   const createNewContact = async () => {

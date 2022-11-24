@@ -4,17 +4,6 @@ import { fromHsv, toHsv } from 'react-native-color-picker';
 
 const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
                       onLongPress, onPress, notTouchable, highlighted }) => {
-
-  const invertColor = color => {
-    var temp = toHsv(color);
-    temp.h = 0.3 + (0.1* temp.h);
-    temp.s = 0.3 + (0.1* temp.s);
-    temp.v = 0.3 + (0.1* temp.v);
-    temp.a = 0.3 + (0.1* temp.a);
-    temp = fromHsv(temp);
-    return temp;
-  }
-
   return (
     <TouchableOpacity
     disabled={notTouchable}

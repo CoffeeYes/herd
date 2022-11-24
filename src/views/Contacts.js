@@ -20,6 +20,7 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
   :
   useSelector(state => state.contactReducer.contacts);
+
   const onPressDelete = async index => {
     Alert.alert(
       'Are you sure ?',
@@ -80,10 +81,6 @@ const Contacts = ({ route, navigation }) => {
       </ScrollView>
     </>
   )
-}
-
-const styles = {
-
 }
 
 export default Contacts;
