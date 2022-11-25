@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { View, ScrollView, Text, Dimensions } from 'react-native';
 import Header from './Header';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getMessageQueue } from '../realm/chatRealm';
-import { getContactsByKey } from '../realm/contactRealm';
 import moment from 'moment';
 
 import Crypto from '../nativeWrapper/Crypto';
@@ -64,9 +61,9 @@ const MessageQueue = ({}) => {
           onPress={() => onMessagePress(index)}
           from={message.fromContactName}
           key={index}
-          textEncrypted={message.to == ownPublicKey || message.from == ownPublicKey}
+          textEncrypted={true}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-          text={message.to == ownPublicKey || message.from == ownPublicKey ? message.text : "Message for another user"}/>
+          text={message.text}/>
           :
           <FoldableMessage
           to="N/A"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
@@ -49,6 +49,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       deleteAllContacts();
       await Crypto.generateRSAKeyPair('herdPersonal');
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+      dispatch(setPublicKey(key));
       eraseState(dispatch)
     }
     else {
