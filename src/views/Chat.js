@@ -115,8 +115,6 @@ const Chat = ({ route, navigation }) => {
       }
       setAllowScrollToLoadMessages(false);
     }
-    const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
-    .sort((a,b) => a.timestamp > b.timestamp)
 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned that expected
@@ -301,7 +299,7 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     setLoadingMoreMessages(true)
-    if(messageLengthRef.current < messageLoadingSize || overrideLoadInitial) {
+    if(overrideLoadInitial) {
       await loadMessages(start)
     }
     else {
