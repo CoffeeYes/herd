@@ -175,7 +175,6 @@ const Chat = ({ route, navigation }) => {
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
     const newMessage = {...plainText,_id : messageID};
 
-    dispatch(addMessage(contactInfo._id,newMessage));
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
       const newChat = {
@@ -190,12 +189,7 @@ const Chat = ({ route, navigation }) => {
       dispatch(addChat(newChat))
     }
     else {
-      const newLastText = {
-        _id : contactInfo._id,
-        lastText : message,
-        timestamp : timestamp
-      }
-      dispatch(setLastText(newLastText))
+      dispatch(addMessage(contactInfo._id,newMessage));
     }
     dispatch(addMessageToQueue({
       _id : messageID,

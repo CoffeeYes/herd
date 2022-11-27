@@ -87,7 +87,15 @@ const chatReducer = (state = initialState,action) => {
         messages : {
           ...state.messages,
           [id] : generateMessageDays(state.messages[id],[message])
-        }
+        },
+        chats : state.chats.map(chat => chat._id === id ? ({
+          ...chat,
+          lastText : message.text,
+          timestamp : message.timestamp
+        })
+        :
+        chat
+        )
       };
       return newState;
       break;
