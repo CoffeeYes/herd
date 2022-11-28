@@ -73,10 +73,10 @@ const resetMessages = () => {
   }
 }
 
-const setLastText = newText => {
+const setLastText = (id, message) => {
   return {
     type : "SET_LAST_TEXT",
-    payload : newText
+    payload : {id,message}
   }
 }
 

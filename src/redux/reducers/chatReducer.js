@@ -34,6 +34,21 @@ const initialState = {
   messages : {}
 }
 
+const setLastText = (state, id, message) => {
+  let chat = state.chats.find(chat => chat._id == id);
+  if(chat) {
+    let chats = [...state.chats];
+    const chatIndex = chats.indexOf(chat);
+    chat.lastText = message.text;
+    chat.timestamp = message.timestamp;
+    chats[chatIndex] = chat;
+    return chats;
+  }
+  else {
+    return state.chats
+  }
+}
+
 const chatReducer = (state = initialState,action) => {
   switch(action.type) {
     case "SET_CHATS": {
@@ -88,14 +103,7 @@ const chatReducer = (state = initialState,action) => {
           ...state.messages,
           [id] : generateMessageDays(state.messages[id],[message])
         },
-        chats : state.chats.map(chat => chat._id === id ? ({
-          ...chat,
-          lastText : message.text,
-          timestamp : message.timestamp
-        })
-        :
-        chat
-        )
+        chats : setLastText(state,id,message)
       };
       return newState;
       break;
@@ -157,16 +165,11 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "SET_LAST_TEXT": {
-      let chat = state.chats.find(chat => chat._id == action.payload._id);
-      if(chat) {
-        let chats = [...state.chats];
-        const chatIndex = chats.indexOf(chat);
-        chat.lastText = action.payload.lastText;
-        chat.timestamp = action.payload.timestamp;
-        chats[chatIndex] = chat;
-        return {...state,chats : chats};
+      const {id, message} = action.payload;
+      return {
+        ...state,
+        chats : setLastText(state,id,message)
       }
-      return state;
       break;
     }
     case "SET_STYLES": {

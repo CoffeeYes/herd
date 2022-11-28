@@ -254,11 +254,7 @@ const Chat = ({ route, navigation }) => {
 
             if(updatedMessages.length > 0) {
               const lastMessage = updatedMessages[updatedMessages.length -1].data[updatedMessages[updatedMessages.length -1].data.length -1]
-              dispatch(setLastText({
-                _id : contactInfo._id,
-                lastText : lastMessage.text,
-                timestamp : lastMessage.timestamp
-              }))
+              dispatch(setLastText(contactInfo._id,lastMessage))
             }
             else {
               //if all messages were deleted attempt to load more
