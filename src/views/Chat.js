@@ -186,11 +186,10 @@ const Chat = ({ route, navigation }) => {
         name : contactInfo.name,
         timestamp : timestamp
       }
-      dispatch(addChat(newChat))
+      dispatch(addChat(newChat));
     }
-    else {
-      dispatch(addMessage(contactInfo._id,newMessage));
-    }
+    dispatch(addMessage(contactInfo._id,newMessage));
+
     dispatch(addMessageToQueue({
       _id : messageID,
       fromContactName : "You",
