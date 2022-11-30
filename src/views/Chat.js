@@ -282,7 +282,8 @@ const Chat = ({ route, navigation }) => {
 
   const handleScroll = async event => {
     if(!showedPopup) {
-      loadMoreMessages();
+      const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
+      loadMoreMessages(overrideLoadInitial);
     }
   }
 
@@ -321,9 +322,10 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleGesture = event => {
+    const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
     const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
     allow && !showedPopup && messages.length > 0 &&
-    loadMoreMessages();
+    loadMoreMessages(overrideLoadInitial);
   }
 
   const showNoMoreMessagePopup = () => {
