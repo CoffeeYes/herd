@@ -115,6 +115,16 @@ const Chat = ({ route, navigation }) => {
       }
       setAllowScrollToLoadMessages(false);
     }
+    else {
+      //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
+      //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
+      // if there are any present in the database.
+      const extractedMessages = messages.map(section => section.data)[0];
+      if(extractedMessages?.filter(message => newMessages.indexOf(message) != -1).length == 0) {
+        showNoMoreMessagePopup();
+        return;
+      }
+    }
 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned that expected
