@@ -120,7 +120,7 @@ const Chat = ({ route, navigation }) => {
       //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
       // if there are any present in the database.
       const extractedMessages = messages.map(section => section.data)[0];
-      if(extractedMessages?.filter(message => newMessages.indexOf(message) != -1).length == 0) {
+      if(JSON.stringify(extractedMessages) == JSON.stringify(newMessages)) {
         showNoMoreMessagePopup();
         return;
       }
