@@ -310,7 +310,7 @@ const Chat = ({ route, navigation }) => {
 
     setLoadingMoreMessages(false);
 
-    messages.length > 0 &&
+    messageLengthRef.current > 0 &&
     scrollRef.current.scrollToLocation({
       animated : true,
       sectionIndex : 0,
