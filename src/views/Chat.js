@@ -133,12 +133,8 @@ const Chat = ({ route, navigation }) => {
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
-      let newLastText = {...newMessages[newMessages.length-1]};
-      dispatch(setLastText({
-        _id : contactInfo._id,
-        timestamp : newLastText.timestamp,
-        lastText : newLastText.text,
-      }))
+      const newLastText = {...newMessages[newMessages.length-1]};
+      dispatch(setLastText(contactInfo._id, newLastText));
     }
   }
 
