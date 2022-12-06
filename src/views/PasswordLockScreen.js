@@ -28,29 +28,30 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
 
-    if(isLoginPassword) {
-      if(route?.params?.navigationTarget === "passwordSettings") {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [
-              { name: 'main', params : {initialRoute : "settings"}},
-              { name: 'passwordSettings'}
-            ]
-          })
-        )
-      }
-      else {
-        dispatch(setLocked(false));
-      }
-    }
-    else if (isErasurePassword) {
+    if(isErasurePassword) {
       deleteAllMessages();
       deleteAllContacts();
       await Crypto.generateRSAKeyPair('herdPersonal');
       const key = await Crypto.loadKeyFromKeystore("herdPersonal");
       dispatch(setPublicKey(key));
       eraseState(dispatch)
+    }
+
+    if(isErasurePassword || isLoginPassword) {
+      dispatch(setLocked(false));
+      if(route?.params?.navigationTarget === "passwordSettings") {
+        if(isLoginPassword || isErasurePassword) {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [
+                { name: 'main', params : {initialRoute : "settings"}},
+                { name: 'passwordSettings'}
+              ]
+            })
+          )
+        }
+      }
     }
     else {
       setError("Incorrect Password")
