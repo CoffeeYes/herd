@@ -67,6 +67,7 @@ const Chat = ({ route, navigation }) => {
         const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
+        scrollToBottom(false);
       }
       setLoading(false);
     })()
@@ -347,11 +348,11 @@ const Chat = ({ route, navigation }) => {
 
   const scrollRef = useRef();
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (animated = true) => {
     messages.length > 0 &&
     messages[messages.length -1].data.length -1 > 0 &&
     scrollRef.current.scrollToLocation({
-      animated : true,
+      animated : animated,
       sectionIndex : messages.length -1,
       itemIndex : messages[messages.length -1].data.length -1
     });
@@ -434,6 +435,7 @@ const Chat = ({ route, navigation }) => {
           keyExtractor={item => item._id}
           renderItem={renderItem}
           onContentSizeChange={handleContentSizeChange}
+          getItemLayout={(data, index) => ({length : 80, offset : 80 * index, index})}
           renderSectionHeader={({ section: { day } }) => (
             <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
           )}/>
