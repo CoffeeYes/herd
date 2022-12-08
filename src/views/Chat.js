@@ -451,7 +451,7 @@ const Chat = ({ route, navigation }) => {
       }}
       value={chatInput}
       editable={!inputDisabled}
-      onChangeText={setChatInput}
+      onChangeText={text => setChatInput(text.slice(0,190))}
       multiline={true}
       blurOnSubmit={true}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
