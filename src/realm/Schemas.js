@@ -19,6 +19,15 @@ const Schemas = {
       name : 'string',
       image : 'string'
     }
+  },
+  PasswordSchema : {
+    name : "Password",
+    primaryKey : "_id",
+    properties : {
+      _id : "objectId",
+      name : "string",
+      hash : "string",
+    }
   }
 }
 

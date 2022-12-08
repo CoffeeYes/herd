@@ -6,13 +6,9 @@ import { useClipboard } from '@react-native-community/clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ContactImage from './ContactImage';
-import Realm from 'realm';
-import Schemas from '../Schemas';
 
 import QRCodeModal from './QRCodeModal';
 import CardButton from './CardButton';
-import FlashTextButton from './FlashTextButton';
-import CustomButton from './CustomButton';
 import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 
@@ -54,8 +50,9 @@ const Contact = ({route, navigation}) => {
     }
   }
 
-  const copyKeyToClipboard = async () => {
+  const copyKeyToClipboard = () => {
     setClipboard(contactKey)
+    return true;
   }
 
   const shareContact = async () => {

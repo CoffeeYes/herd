@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Image, Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
+         Dimensions, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
-import Realm from 'realm';
 import {PanGestureHandler  } from 'react-native-gesture-handler'
 import {
   getMessagesWithContact,
@@ -13,56 +13,108 @@ import {
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
+
+import {
+  addChat,
+  setLastText,
+  prependMessagesForContact,
+  addMessage,
+  addMessageToQueue,
+  removeMessagesFromQueue,
+  deleteChat,
+  deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
+
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
+import Crypto from '../nativeWrapper/Crypto';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
+import ContactImage from './ContactImage';
 
-import Crypto from '../nativeWrapper/Crypto';
-import Schemas from '../Schemas';
 const swipeSize = Dimensions.get('window').height * 0.25;
 
 const Chat = ({ route, navigation }) => {
-  const [messages,setMessages] = useState([]);
-  const [contactInfo, setContactInfo] = useState({});
-  const [ownPublicKey, setOwnPublicKey] = useState("");
+  const dispatch = useDispatch();
+  const chats = useSelector(state => state.chatReducer.chats);
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
+  const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(true);
   const [chatInput, setChatInput] = useState("");
-  const [customStyle, setCustomStyle] = useState({});
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [messageDays, setMessageDays] = useState([]);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [messageStart, setMessageStart] = useState(-5);
+  const [messageStart, setMessageStart] = useState(-messageLoadingSize);
+  const [messageEnd, setMessageEnd] = useState(undefined);
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
 
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey)
+
   const messageLoadingSize = 5;
 
   useEffect(() => {
     (async () => {
-      setOwnPublicKey(await Crypto.loadKeyFromKeystore("herdPersonal"))
-      await loadMessages(-messageLoadingSize);
-      await loadStyles();
+      if(messages.length === 0) {
+        await loadMessages(-messageLoadingSize);
+      }
+      else {
+        setMessageDays(calculateMessageDays(messages));
+        setMessageStart(-messages.length - messageLoadingSize)
+        setMessageEnd(-messages.length)
+      }
       setLoading(false);
     })()
   },[]);
 
+  //use a ref for messages length because when calling loadMoreMessages
+  //during deleteMessages process messages state is outdated, leading to wrong
+  //length being used for decision making in deleting chat
+  const messageLengthRef = useRef();
+  useEffect(() => {
+    messageLengthRef.current = messages.length
+  },[messages])
+
   const loadMessages = async (messageStart, messageEnd) => {
-    const contact = getContactById(route.params.contactID);
-    setContactInfo(contact);
-    var newMessages = await getMessagesWithContact(contact.key,messageStart,messageEnd);
-    if(newMessages.length === 0 && messages.length != 0) {
-      setAllowScrollToLoadMessages(false);
-      showNoMoreMessagePopup();
+    const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
+    var newMessages = messagePackage.messages
+    if(newMessages.length === 0) {
+      if(messageLengthRef.current === 0) {
+        dispatch(deleteChat(contactInfo))
+        setMessageDays([]);
+      }
+      else {
+        //show popup that no more messages can be loaded, but only do so when
+        //there are already messages in the chat to prevent the popup from showing
+        //when a new chat is started
+        setAllowScrollToLoadMessages(false);
+        showNoMoreMessagePopup();
+      }
       return;
     }
-    const allMessages = [...messages,...newMessages].sort((a,b) => a.timestamp > b.timestamp)
+    const allMessages = [...messages.filter(message => newMessages.indexOf(message) == -1),...newMessages]
+    .sort((a,b) => a.timestamp > b.timestamp)
+
     setMessageDays(calculateMessageDays(allMessages));
-    setMessages(allMessages);
+    dispatch(prependMessagesForContact(route.params.contactID,newMessages));
+    //if this is the first load, more messages can be returned that expected
+    //in order to ensure correct message order. As such, adjust the message
+    //loading size so that the correct messages are loaded on the next load attempt
+    if(messageStart == -messageLoadingSize) {
+      setMessageStart(messagePackage?.newStart ? messagePackage.newStart - (messageLoadingSize + 1) : -(2*messageLoadingSize));
+      setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
+      let newLastText = {...newMessages[newMessages.length-1]};
+      setMessageDays(calculateMessageDays(messagePackage.messages));
+      dispatch(setLastText({
+        _id : contactInfo._id,
+        timestamp : newLastText.timestamp,
+        lastText : newLastText.text,
+      }))
+    }
   }
 
   const calculateMessageDays = messages => {
@@ -75,21 +127,18 @@ const Chat = ({ route, navigation }) => {
     return dates
   }
 
-  const loadStyles = async () => {
-    const style = JSON.parse(await AsyncStorage.getItem("styles"));
-    setCustomStyle(style)
-  }
-
   const sendMessage = async message => {
     if(message.trim() === "") return;
     setInputDisabled(true);
+
+    const timestamp = Date.now();
 
     //plaintext copy of the message to immediatly append to chat state
     const plainText = {
       to : contactInfo.key,
       from : ownPublicKey,
       text : message,
-      timestamp : Date.now(),
+      timestamp : timestamp
     }
 
     //encrypt the message to be sent using the other users public key
@@ -114,19 +163,52 @@ const Chat = ({ route, navigation }) => {
     const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      timestamp : Date.now()
+      timestamp : timestamp
     }
     //add message to UI
     let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
-    setMessages([...messages,{...plainText,_id : messageID}]);
-    const newDate = moment(metaData.timestamp).format("DD/MM");
+    const newDate = moment(timestamp).format("DD/MM");
 
     messageDays.indexOf(newDate) === -1 &&
     setMessageDays([...messageDays,newDate]);
+    dispatch(addMessage(contactInfo._id,{...plainText,_id : messageID}));
+
+    //add new chat to chats state in redux store if it isnt in chats state
+    if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
+      const newChat = {
+        _id : contactInfo._id,
+        image : contactInfo.image,
+        key : contactInfo.key,
+        lastMessageSentBySelf : true,
+        lastText : message,
+        name : contactInfo.name,
+        timestamp : timestamp
+      }
+      dispatch(addChat(newChat))
+    }
+    else {
+      const newLastText = {
+        _id : contactInfo._id,
+        lastText : message,
+        timestamp : timestamp
+      }
+      dispatch(setLastText(newLastText))
+    }
+    dispatch(addMessageToQueue({
+      _id : messageID,
+      fromContactName : "You",
+      toContactName : contactInfo.name,
+      to : contactInfo.key,
+      from : ownPublicKey,
+      timestamp : timestamp,
+      text : newMessageEncryptedCopy
+    }));
 
     setChatInput("");
     setInputDisabled(false);
     scrollRef.current.scrollToEnd({animated : true});
+
+    setMessageStart(messageStart - 1)
 
     await ServiceInterface.isRunning() &&
     ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted,_id : messageID});
@@ -146,8 +228,24 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
+            const sentLength = messages.filter(message =>
+              highlightedMessages.indexOf(message._id) !== -1 &&
+              message.from === ownPublicKey
+            ).length;
+
+            const receivedLength = messages.filter(message =>
+              highlightedMessages.indexOf(message._id) !== -1 &&
+              message.from !== ownPublicKey
+            ).length;
+
+            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+            setMessageStart(messageStart + messageLoadingExtension);
+
+            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
+            dispatch(removeMessagesFromQueue(highlightedMessages))
+
             const updatedMessages = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) === -1);
-            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -10)
+            const messagesToDelete = [...messages].filter(message => highlightedMessages.indexOf(parseRealmID(message)) !== -1)
             .map(message => ({...message,_id : parseRealmID(message)}))
 
             const deletedReceivedMessages = [...highlightedMessages].filter(message => message.to === ownPublicKey)
@@ -158,8 +256,14 @@ const Chat = ({ route, navigation }) => {
               await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
             }
 
-            setMessageDays(calculateMessageDays(updatedMessages));
-            setMessages(updatedMessages);
+            if(highlightedMessages.length === messages.length) {
+              await loadMoreMessages(true,messageStart + highlightedMessages.length);
+            }
+            else {
+              //only re-calculate messageDays here if not all messages were deleted
+              //if all messages were deleted, this happens in the loadMessages function
+              setMessageDays(calculateMessageDays(updatedMessages));
+            }
             setHighlightedMessages([]);
             setInputDisabled(false);
           },
@@ -175,14 +279,14 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const loadMoreMessages = async () => {
+  const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     setLoadingMoreMessages(true)
-    //add 1 to each end of the messages being loaded to prevent "edge" messages from being loaded twice
-    await loadMessages(messageStart - (messageLoadingSize + 1), messageStart);
-    setMessageStart(messageStart - (messageLoadingSize + 1));
+    overrideLoadInitial ? await loadMessages(start) : await loadMessages(start,end)
+    setMessageEnd(start);
+    setMessageStart(start - (messageLoadingSize + 1));
 
     setLoadingMoreMessages(false);
-    scrollRef.current.scrollTo({x : 0, y : 20, animated : true})
+    scrollRef?.current?.scrollTo({x : 0, y : 20, animated : true})
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
@@ -211,9 +315,6 @@ const Chat = ({ route, navigation }) => {
   }
 
   const showNoMoreMessagePopup = () => {
-    if(!showedPopup) {
-
-    }
     setShowPopup(true)
     setTimeout(() => {
       setShowPopup(false);
@@ -236,9 +337,11 @@ const Chat = ({ route, navigation }) => {
     preText={
       contactInfo?.image?.length > 0 &&
       <View style={styles.imageContainer}>
-      <Image
-      source={{uri : contactInfo.image}}
-      style={styles.image}/>
+        <ContactImage
+        imageURI={contactInfo.image}
+        iconSize={24}
+        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
+        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
     }/>
     <View style={{flex : 1}}>
@@ -249,20 +352,24 @@ const Chat = ({ route, navigation }) => {
       </View>}
 
       {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      <ActivityIndicator
+      size="large"
+      color="#e05e3f"/>
       :
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
+
         <ScrollView
-        contentContainerStyle={styles.messageContainer}
         onScroll={allowScrollToLoadMessages && handleScroll}
         ref={scrollRef}
         onContentSizeChange={handleContentSizeChange}
-        onLayout={() => scrollRef.current.scrollToEnd({animated : true})}>
+        onLayout={e => scrollRef.current.scrollToEnd({animated : true})}>
 
-          {loadingMoreMessages &&
-          <ActivityIndicator size="large" color="#e05e3f"/>}
+          <ActivityIndicator
+          size="large"
+          color="#e05e3f"
+          animating={loadingMoreMessages}/>
 
           {messageDays.map((day,index) =>
             <View key={index}>
@@ -281,6 +388,7 @@ const Chat = ({ route, navigation }) => {
               )}
             </View>
           )}
+
         </ScrollView>
       </PanGestureHandler>}
 
@@ -289,14 +397,13 @@ const Chat = ({ route, navigation }) => {
       style={{
         ...styles.chatInput,
         backgroundColor : inputDisabled ? "#c6c6c6" : "white",
-        fontSize : customStyle.fontSize
+        fontSize : customStyle?.fontSize
       }}
       value={chatInput}
       editable={!inputDisabled}
       onChangeText={setChatInput}
       multiline={true}
       blurOnSubmit={true}
-      onKeyPress={({nativeEvent}) => nativeEvent.key === "Enter" && this.submit()}
       onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
     </View>
     </>

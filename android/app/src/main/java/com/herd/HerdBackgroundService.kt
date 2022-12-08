@@ -34,6 +34,7 @@ import android.os.Handler
 import android.os.ParcelUuid
 import java.util.UUID
 import java.util.ArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -76,6 +77,7 @@ class HerdBackgroundService : Service() {
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
+  private val bleScanningThreadActive = AtomicBoolean(false);
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -141,7 +143,8 @@ class HerdBackgroundService : Service() {
       messageQueueDescriptorUUID = UUID.fromString(getString(R.string.messageQueueDescriptorUUID));
       transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID))
       try {
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        bluetoothAdapter = bluetoothManager?.getAdapter();
         if(bluetoothAdapter === null) {
           throw Exception("No Bluetooth Adapter Found");
         }
@@ -152,7 +155,7 @@ class HerdBackgroundService : Service() {
         }
 
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
-            PendingIntent.getActivity(this, 0, notificationIntent, 0)
+            PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
         //create service notification channel
@@ -201,12 +204,12 @@ class HerdBackgroundService : Service() {
 
   private fun sendNotification(title : String, text : String) {
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
-        PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     //create notification
     val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
-    .setOngoing(true)
+    .setOngoing(false)
     .setContentTitle(title)
     .setContentText(text)
     .setContentIntent(pendingIntent)
@@ -226,6 +229,10 @@ class HerdBackgroundService : Service() {
     sendBroadcast(intent);
   }
 
+  private var writebackComplete = false;
+  private var remoteHasReadMessages = false;
+  private val gattClientHandler = Handler(Looper.getMainLooper());
+  private var clientRetryCount : Int = 0;
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
       Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -234,17 +241,37 @@ class HerdBackgroundService : Service() {
           BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
           BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
           else -> "UNKNOWN STATE"
-      });
-      if(newState === BluetoothProfile.STATE_CONNECTED) {
+      } + ", Thread : ${Thread.currentThread()}");
+
+      if(newState == BluetoothProfile.STATE_CONNECTED) {
         //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
         //that fits in MTU
+        stopLeScan();
         gatt.requestMtu(301);
       }
-      else if (newState === BluetoothProfile.STATE_DISCONNECTED) {
-        scanLeDevice();
+      else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+        if(status == 133 && clientRetryCount < 7) {
+          gattClient?.close();
+          gattClient = gatt.getDevice().connectGatt(
+            context,
+            false,
+            this,
+            BluetoothDevice.TRANSPORT_LE
+          );
+          clientRetryCount += 1;
+        }
+        else if((writebackComplete && remoteHasReadMessages) || clientRetryCount >= 7) {
+          gattClient = null;
+          writebackComplete = false;
+          remoteHasReadMessages = false;
+          clientRetryCount = 0;
+          bleDeviceList.remove(gatt.getDevice());
+          scanLeDevice();
+        }
       }
     }
 
+    /* private val bleScanTimeoutHandler = Handler(); */
     override fun onMtuChanged(gatt : BluetoothGatt, mtu : Int, status : Int) {
       if(status == BluetoothGatt.GATT_SUCCESS) {
         Log.i(TAG,"MTU Succesfully changed to : $mtu");
@@ -253,14 +280,24 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"MTU Request failed, MTU changed to $mtu");
       }
       Log.i(TAG,"Discovering GATT Services");
-      BLEScanner?.stopScan(leScanCallback);
+      /* stopLeScan();
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
-      Handler(Looper.getMainLooper()).postDelayed({
+      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+      bleScanTimeoutHandler.postDelayed({
           Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
           allowBleScan = true;
-      },30000)
-      gatt.discoverServices();
+      },30000) */
+
+      val bondState : Int = gatt.getDevice().getBondState();
+      if(bondState == BluetoothDevice.BOND_NONE || bondState == BluetoothDevice.BOND_BONDED) {
+        gatt.discoverServices();
+      }
+      else {
+        gattClientHandler.postDelayed({
+          gatt.discoverServices();
+        },2000)
+      }
     }
 
     var totalBytes : ByteArray = byteArrayOf();
@@ -268,7 +305,7 @@ class HerdBackgroundService : Service() {
     var receivedMessagesForUser : Boolean = false;
     var messageReadTimeout : Boolean = false;
     var messageTimeoutRegistered : Boolean = false;
-    val handler : Handler = Handler();
+    val handler : Handler = Handler(Looper.getMainLooper());
     override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
@@ -289,7 +326,7 @@ class HerdBackgroundService : Service() {
        //check if message transfer is over, signified by 0 size array being received
        if(messageBytes.size != 0 && !messageReadTimeout) {
          //continue reading until 0 size array is received
-         gatt?.readCharacteristic(characteristic)
+         gatt.readCharacteristic(characteristic)
        }
        //transfer is done, assemble message and save to array
        else {
@@ -303,12 +340,12 @@ class HerdBackgroundService : Service() {
            val message : HerdMessage = createMessageFromBytes(totalBytes);
            //check if message has been received before, either in this instance of the background service
            //or another instance where it has already been passed up to JS side
-           val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id == message._id}  != null) ||
+           val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id.equals(message._id)}  != null) ||
            (receivedMessagesForSelf?.find{it -> it._id == message._id} != null)
            //check if message has been previously deleted by user
-           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id == message._id} != null;
+           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id.equals(message._id)} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
-           if(message.to == publicKey) {
+           if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
                receivedMessagesForUser = true;
                receivedMessagesForSelf?.add(message);
@@ -317,7 +354,7 @@ class HerdBackgroundService : Service() {
            //if message is destined for other user add it directly to messageQueue
            else {
              Log.i(TAG,"Received Message is for another user, adding it to Queue");
-             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id == message._id} != null;
+             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id.equals(message._id)} != null;
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
@@ -334,7 +371,7 @@ class HerdBackgroundService : Service() {
            if(totalMessagesRead < remoteMessageQueueSize) {
              Log.i(TAG,"Messages Read : $totalMessagesRead/$remoteMessageQueueSize");
              Log.i(TAG,"Starting to read next Message");
-             gatt?.readCharacteristic(characteristic);
+             gatt.readCharacteristic(characteristic);
            }
            else {
              //send a notificaiton if messages destined for this user were received
@@ -345,15 +382,14 @@ class HerdBackgroundService : Service() {
              }
              //reset flag
              receivedMessagesForUser = false;
-             //end connection with this device
-             bleDeviceList.remove(gatt.getDevice())
-             /* gatt.close(); */
+
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
                receivedMessages,
                "savedMessageQueue",
                "savedMessageQueueSizes"
              );
+             receivedMessages.clear();
 
              //start write-back phase to let server know which messages have
              //reached their final destination and can be removed from message queue
@@ -364,37 +400,39 @@ class HerdBackgroundService : Service() {
              };
 
              val transferCompleteCharacteristic = messageService?.characteristics?.find {
-               characteristic -> characteristic.uuid.equals(transferCompleteCharacteristicUUID)
+               currentCharacteristic -> currentCharacteristic.uuid.equals(transferCompleteCharacteristicUUID)
              };
 
              if(transferCompleteCharacteristic != null) {
                Log.i(TAG,"Transfer complete characteristic found");
-               if((deletedMessages?.size as Int) > 0) {
-                 transferCompleteCharacteristic.setValue(deletedMessages?.get(0)?._id?.toByteArray());
+               val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) +
+               (receivedMessagesForSelf as ArrayList<HerdMessage>);
+
+               if(messagesToAvoid.size > 0) {
+                 transferCompleteCharacteristic.setValue(messagesToAvoid.get(0)._id.toByteArray());
                }
                else {
                  transferCompleteCharacteristic.setValue("COMPLETE".toByteArray());
+                 writebackComplete = true;
                }
                gatt.writeCharacteristic(transferCompleteCharacteristic);
              }
              else {
                Log.i(TAG,"No transferComplete service/characteristic found, removing device and restarting scan");
-               bleDeviceList.remove(gatt.getDevice());
-               gatt.close();
-               scanLeDevice();
+               gatt.disconnect();
+               /* gatt.close(); */
              }
            }
          }
          catch(e : Exception) {
            Log.d(TAG,"Error creating message from parcel : ",e);
            //reset connection variables for next connection
-           bleDeviceList.remove(gatt.getDevice())
+           gatt.disconnect();
            gatt.close();
            totalMessagesRead = 0;
            totalBytes = byteArrayOf();
            messageReadTimeout = false;
            messageTimeoutRegistered = false;
-           scanLeDevice();
          }
        }
     }
@@ -406,18 +444,19 @@ class HerdBackgroundService : Service() {
          val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) + (receivedMessagesForSelf as ArrayList<HerdMessage>);
          writeMessageIndex += 1;
          if(writeMessageIndex < messagesToAvoid.size) {
-           Log.i(TAG,"Writing message id $writeMessageIndex/${(messagesToAvoid.size - 1)}")
+           Log.i(TAG,"Writing message id ${writeMessageIndex + 1}/${messagesToAvoid.size}")
            characteristic.setValue(messagesToAvoid.get(writeMessageIndex)._id.toByteArray());
            gatt.writeCharacteristic(characteristic);
          }
          else {
            Log.i(TAG,"Write-back phase complete");
            characteristic.setValue("COMPLETE".toByteArray());
+           writebackComplete = true;
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
-           bleDeviceList.remove(gatt.getDevice());
-           gatt.close();
-           scanLeDevice();
+           receivedMessagesForSelf?.clear();
+           gatt.disconnect();
+           /* gatt.close(); */
          }
        }
     }
@@ -429,7 +468,14 @@ class HerdBackgroundService : Service() {
             //receive remote messageQueue size and start reading messages
             remoteMessageQueueSize = descriptor.getValue().get(0).toInt();
             Log.i(TAG,"Remote Message Queue Size : $remoteMessageQueueSize");
-            gatt.readCharacteristic(descriptor.getCharacteristic());
+            if(remoteMessageQueueSize > 0) {
+              gatt.readCharacteristic(descriptor.getCharacteristic());
+            }
+            else {
+              writebackComplete = true;
+              gatt.disconnect();
+              /* gatt.close(); */
+            }
           }
           catch(e : Exception) {
             Log.i(TAG,"Error getting remote message queue size.",e);
@@ -460,12 +506,170 @@ class HerdBackgroundService : Service() {
           gatt.readDescriptor(messageCharacteristic.getDescriptor(messageQueueDescriptorUUID));
         }
         else {
-          Log.i(TAG,"No Matching service/characteristic found, removing device and restarting scan");
-          bleDeviceList.remove(gatt.getDevice());
-          gatt.close();
-          scanLeDevice();
+          Log.i(TAG,"No Matching service/characteristic found, disconnecting");
+          writebackComplete = true;
+          remoteHasReadMessages = true;
+          gatt.disconnect();
+          /* gatt.close(); */
         }
       }
+    }
+  }
+
+  var offsetSize : Int = 0;
+  var currentPacket : Int = 0;
+  var gattClient : BluetoothGatt? = null;
+  private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
+    override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
+      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+          else -> "UNKNOWN STATE"
+      } + ", Thread : ${Thread.currentThread()}");
+
+      if(newState == BluetoothProfile.STATE_CONNECTED) {
+        stopLeScan();
+      }
+      else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+        /* if(!writebackComplete && status == 0) {
+          Log.i(TAG,"GattServerCallback attempting to connect to device as client, address : ${device.getAddress()}, name : ${device.getName()}")
+          if(gattClient == null) {
+            gattClient = device.connectGatt(
+              context,
+              false,
+              bluetoothGattClientCallback,
+              BluetoothDevice.TRANSPORT_LE
+            );
+          }
+        }
+        else { */
+          Log.i(TAG,"GattServerCallback not attempting to connect to device as client, resetting and scanning")
+          currentPacket = 0;
+          offsetSize = 0;
+          writebackComplete = false;
+          remoteHasReadMessages = false;
+          gattClient = null;
+          scanLeDevice();
+        /* } */
+      }
+    }
+
+    override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
+      Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
+      offsetSize = mtu - 1;
+    }
+
+    override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, characteristic : BluetoothGattCharacteristic) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
+        try {
+          if((messageQueue?.size as Int) > messagePointer){
+            //increment packet for offset calculation
+            currentPacket += 1;
+            Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
+            //calculate current offset in total array for sending current chunk
+            val currentOffset : Int = offsetSize * (currentPacket - 1);
+            Log.i(TAG,"Current Message Offset : $currentOffset");
+            if(currentOffset < currentMessageBytes.size) {
+              //create current subArray starting from offset
+              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex + 1);
+              /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
+              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
+            }
+            else {
+              remoteHasReadMessages = true;
+              //send empty array to indicate that transfer is done to client
+              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
+              //reset currentPacket counter for next message
+              currentPacket = 0;
+              //update message pointer to point to next message with boundary check
+              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              //create new byteArray for next message to be sent
+              createCurrentMessageBytes(messageQueue?.get(messagePointer));
+              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
+            }
+          }
+        }
+        catch(e : Exception) {
+          Log.d(TAG,"Error sending onCharacteristicReadRequest response : ",e);
+        }
+    }
+
+    override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
+       characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
+       responseNeeded : Boolean, offset : Int, value : ByteArray) {
+         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
+         Log.i(TAG,"characteristic value size : ${value.size}");
+         val messageID : String = String(value);
+         Log.i(TAG,"Message ID Received : $messageID")
+         if(messageID != "COMPLETE") {
+           val message = messageQueue?.find {it -> it._id.equals(messageID)};
+           if(message != null) {
+             val removed = messageQueue?.remove(message)
+             Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
+             messagesToRemoveFromQueue.add(message);
+           }
+           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
+         }
+         else {
+           Log.i(TAG,"Server message writeback complete");
+           //store deleted messages in case service is cancelled before app is opened
+           StorageInterface(context).writeMessagesToStorage(
+             messagesToRemoveFromQueue,
+             "messagesToRemove",
+             "messagesToRemoveSizes"
+           );
+
+           device.connectGatt(
+              context,
+              false,
+              bluetoothGattClientCallback,
+              BluetoothDevice.TRANSPORT_LE
+           )
+         }
+    }
+
+    override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, descriptor : BluetoothGattDescriptor) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
+        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
+          gattServer?.sendResponse(
+            device,
+            requestId,BluetoothGatt.GATT_SUCCESS,
+            0,
+            byteArrayOf((messageQueue?.size as Int).toByte())
+          );
+          if((messageQueue?.size as Int) == 0) {
+            remoteHasReadMessages = true;
+            if(!writebackComplete) {
+              Log.i(TAG,"writeback not complete, connecting as client")
+              if(gattClient == null) {
+                gattClient = device.connectGatt(
+                  context,
+                  false,
+                  bluetoothGattClientCallback,
+                  BluetoothDevice.TRANSPORT_LE
+                );
+              }
+            }
+            else {
+              Log.i(TAG,"writeback and remoteRead complete, scanning for new devices")
+              scanLeDevice();
+            }
+          }
+        }
+    }
+
+    override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
+      descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
+      responseNeeded : Boolean, offset : Int, value : ByteArray) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
+    }
+
+    override fun onServiceAdded(status : Int, service : BluetoothGattService) {
+      Log.i(TAG,"GATT Server onServiceAdded, status : $status");
     }
   }
 
@@ -479,40 +683,44 @@ class HerdBackgroundService : Service() {
           val device : BluetoothDevice = result.getDevice();
           val name = device.getName();
           val address = device.getAddress();
+          Log.i(TAG, "device name : " + name);
+          Log.i(TAG, "device Address : " + address);
+          Log.i(TAG,"Device List Length : " + bleDeviceList.size);
 
           if(callbackType == ScanSettings.CALLBACK_TYPE_MATCH_LOST) {
             if(bleDeviceList.contains(device)) {
               bleDeviceList.remove(device);
-              Log.i(TAG,"Device removed from device list");
+              Log.i(TAG,"Device removed from device list, address : $address, name : $name");
               if(gattInstance != null) {
+                gattInstance?.disconnect();
                 gattInstance?.close();
               }
             }
           }
           else {
             if(!(bleDeviceList.contains(device))) {
+              Log.i(TAG,"Device was not in device list, adding it.");
               bleDeviceList.add(device);
-              if(address != null) {
-                val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
-                if(gattInstance != null) {
-                  gattInstance?.close();
-                }
-                remoteDeviceInstance?.connectGatt(
-                  context,
-                  false,
-                  bluetoothGattClientCallback,
-                  BluetoothDevice.TRANSPORT_LE
-                );
+            }
+            if(address != null) {
+              val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
+              if(gattInstance != null) {
+                gattInstance?.disconnect();
+                gattInstance?.close();
               }
+              remoteDeviceInstance?.connectGatt(
+                context,
+                false,
+                bluetoothGattClientCallback,
+                BluetoothDevice.TRANSPORT_LE
+              );
             }
           }
-          Log.i(TAG, "device name : " + name);
-          Log.i(TAG, "device Address : " + address);
-          Log.i(TAG,"Device List Length : " + bleDeviceList.size);
       }
   }
 
   private fun scanLeDevice() {
+      Log.i(TAG,"scanLeDevice() called")
       /* var scanning = false;
       val handler = Handler();
 
@@ -544,19 +752,43 @@ class HerdBackgroundService : Service() {
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
-      //wait 30 seconds before starting scan again after stopping
-      while(!allowBleScan){};
-      //double check service is still running before starting scan
-      //as blocking call above could prevent this section from being notified
-      if(running) {
-        try {
-          BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
-          Log.i(TAG,"BLE Scanning started");
-        }
-        catch(e : Exception) {
-          Log.e(TAG,"Error starting BLE scan",e);
-        }
+      if(!bleScanningThreadActive.get()) {
+        Log.i(TAG,"ble Scanning thread is not active, starting scanning thread")
+        Thread({
+          bleScanningThreadActive.set(true);
+          //wait 30 seconds before starting scan again after stopping
+          while(!allowBleScan && bleScanningThreadActive.get()){};
+          //double check service is still running before starting scan
+          //as blocking call above could prevent this section from being notified
+          if(running && bleScanningThreadActive.get()) {
+            try {
+              BLEScanner?.startScan(listOf(filter),settings,leScanCallback);
+              Log.i(TAG,"BLE Scanning started");
+            }
+            catch(e : Exception) {
+              Log.e(TAG,"Error starting BLE scan",e);
+            }
+          }
+        }).start()
       }
+      else {
+        Log.i(TAG,"ble scanning thread is already active")
+      }
+  }
+  private val bleScanTimeoutHandler = Handler(Looper.getMainLooper());
+  private fun stopLeScan() {
+    Log.i(TAG,"stopLeScan() called")
+    BLEScanner?.stopScan(leScanCallback);
+    bleScanningThreadActive.set(false);
+    if(allowBleScan) {
+      allowBleScan = false;
+      Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
+      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+      bleScanTimeoutHandler.postDelayed({
+        Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
+        allowBleScan = true;
+        },30000)
+    }
   }
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
@@ -581,8 +813,9 @@ class HerdBackgroundService : Service() {
 
   private fun advertiseLE() {
     //https://source.android.com/devices/bluetooth/ble_advertising
-    BLEAdvertiser = BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser();
+    BLEAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
     if(BLEAdvertiser != null) {
+      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
       var useLegacyMode : Boolean = false;
       Log.i(TAG,"Bluetooth LE Advertiser Found");
       // Check if all features are supported
@@ -591,14 +824,17 @@ class HerdBackgroundService : Service() {
           useLegacyMode = true;
       }
 
+      //default settings for legacy advertisement
       var advertisingParameters = AdvertisingSetParameters.Builder()
       .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
       .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
       .setConnectable(true)
+      .setScannable(true)
+      .setLegacyMode(true)
 
       var advertisingData = AdvertiseData.Builder()
       .addServiceUuid(parcelServiceUUID)
-      .setIncludeDeviceName(true);
+      .setIncludeDeviceName(false);
 
       if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
         Log.e(TAG, "LE Extended Advertising not supported!");
@@ -607,21 +843,31 @@ class HerdBackgroundService : Service() {
         useLegacyMode = true;
       }
 
+      //override default advertising settings if extended advertising
+      //and ble5 PHYs are supported
       if(!useLegacyMode) {
         Log.i(TAG,"Using BLE 5 2MPHY with extended advertising")
 
         advertisingParameters
         .setLegacyMode(false)
-        .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+        .setScannable(false)
         .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
-      }
-      else {
-        Log.i(TAG,"Using Legacy BLE advertising")
 
-        advertisingParameters
-        .setLegacyMode(true)
-        .setScannable(true);
+        if(bluetoothAdapter?.isLeCodedPhySupported() as Boolean) {
+          Log.i(TAG,"Coded PHY supported, using it")
+          advertisingParameters
+          .setPrimaryPhy(BluetoothDevice.PHY_LE_CODED)
+        }
+        else {
+          Log.i(TAG,"Coded PHY not supported, using 1M PHY")
+          advertisingParameters
+          .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+        }
+
+        advertisingData
+        .setIncludeDeviceName(true);
       }
+
       BLEAdvertiser?.startAdvertisingSet(
         advertisingParameters.build(),
         advertisingData?.build(),
@@ -630,111 +876,6 @@ class HerdBackgroundService : Service() {
       )
     }
   }
-
-  var offsetSize : Int = 0;
-  var currentPacket : Int = 0;
-  private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
-    override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
-      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-          else -> "UNKNOWN STATE"
-      });
-      //reset values on disconnect to ensure values are not carried forward
-      //when unexpected disconnect occurs.
-      if(newState == BluetoothProfile.STATE_DISCONNECTED) {
-        currentPacket = 0;
-        offsetSize = 0;
-      }
-    }
-
-    override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
-      Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
-      offsetSize = mtu - 1;
-    }
-
-    override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
-      offset : Int, characteristic : BluetoothGattCharacteristic) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
-        try {
-          if((messageQueue?.size as Int) > messagePointer){
-            //increment packet for offset calculation
-            currentPacket += 1;
-            Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
-            //calculate current offset in total array for sending current chunk
-            val currentOffset : Int = offsetSize * (currentPacket - 1);
-            Log.i(TAG,"Current Message Offset : $currentOffset");
-            if(currentOffset < currentMessageBytes.size) {
-              //create current subArray starting from offset
-              val currentCopy = currentMessageBytes.copyOfRange(currentOffset,currentMessageBytes.lastIndex + 1);
-              /* gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,offsetSize * requestId - 1,parcelBytes); */
-              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,currentCopy);
-            }
-            else {
-              //send empty array to indicate that transfer is done to client
-              gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf());
-              //reset currentPacket counter for next message
-              currentPacket = 0;
-              //update message pointer to point to next message with boundary check
-              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
-              //create new byteArray for next message to be sent
-              createCurrentMessageBytes(messageQueue?.get(messagePointer));
-              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
-            }
-          }
-        }
-        catch(e : Exception) {
-          Log.d(TAG,"Error sending onCharacteristicReadRequest response : ",e);
-        }
-    }
-
-    override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
-       characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
-       responseNeeded : Boolean, offset : Int, value : ByteArray) {
-         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
-         Log.i(TAG,"characteristic value size : ${value.size}");
-         val messageID : String = String(value);
-         if(messageID != "COMPLETE") {
-           val message = messageQueue?.find {it -> it._id == messageID};
-           if(message != null) {
-             val removed = messageQueue?.remove(message)
-             Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
-             messagesToRemoveFromQueue.add(message);
-           }
-           gattServer?.sendResponse(device,requestId,0,0,byteArrayOf());
-         }
-         else {
-           Log.i(TAG,"Server message writeback complete");
-           //store deleted messages in case service is cancelled before app is opened
-           StorageInterface(context).writeMessagesToStorage(
-             messagesToRemoveFromQueue,
-             "messagesToRemove",
-             "messagesToRemoveSizes"
-           );
-         }
-    }
-
-    override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
-      offset : Int, descriptor : BluetoothGattDescriptor) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
-        if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
-          gattServer?.sendResponse(device,requestId,BluetoothGatt.GATT_SUCCESS,0,byteArrayOf((messageQueue?.size as Int).toByte()))
-        }
-    }
-
-    override fun onDescriptorWriteRequest(device : BluetoothDevice, requestId : Int,
-      descriptor : BluetoothGattDescriptor, preparedWrite : Boolean,
-      responseNeeded : Boolean, offset : Int, value : ByteArray) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorWriteRequest");
-    }
-
-    override fun onServiceAdded(status : Int, service : BluetoothGattService) {
-      Log.i(TAG,"GATT Server onServiceAdded, status : $status");
-    }
-  }
-
 
   private fun startGATTService() {
     try {
@@ -800,19 +941,21 @@ class HerdBackgroundService : Service() {
   }
 
   public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
-    val lengthBefore : Int? = messageQueue?.size;
-    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id == msg._id} == null} as ArrayList<HerdMessage>;
-    val lengthAfter : Int? = messageQueue?.size;
+    val lengthBefore : Int = messageQueue?.size as Int;
+    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id.equals(msg._id)} == null} as ArrayList<HerdMessage>;
+    val lengthAfter : Int = messageQueue?.size as Int;
 
-    var deleted : Boolean = false;
-    if(lengthBefore != null && lengthAfter != null) {
-      deleted = (lengthBefore - lengthAfter) == messages.size
-    }
+    //check if deletion was successful
+    var deleted : Boolean = (lengthBefore - lengthAfter) == messages.size
+
     //if deleted message was last message update pointer to prevent OOB error.
     val messageQueueSize : Int = messageQueue?.size as Int
     if(messagePointer >= messageQueueSize) {
       messagePointer = messageQueueSize - 1;
     }
+
+    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
+
     return deleted;
   }
 
@@ -852,6 +995,7 @@ class HerdBackgroundService : Service() {
       running = true;
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
+      Log.i(TAG,"Queue size on start : ${messageQueue?.size}");
       deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
       receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
       publicKey = bundle?.getString("publicKey");
@@ -859,7 +1003,7 @@ class HerdBackgroundService : Service() {
       if((messageQueue?.size as Int) > 0) {
         createCurrentMessageBytes(messageQueue?.get(0))
       }
-      bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+      /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
       startGATTService();
       scanLeDevice();
       advertiseLE();
@@ -875,8 +1019,8 @@ class HerdBackgroundService : Service() {
 
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
-      if(BluetoothAdapter.getDefaultAdapter().isEnabled()) {
-        BLEScanner?.stopScan(leScanCallback)
+      if(bluetoothAdapter?.isEnabled() as Boolean) {
+        stopLeScan()
         BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
         gattServer?.close();
       }

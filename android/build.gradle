@@ -5,8 +5,8 @@ buildscript {
     ext {
         buildToolsVersion = "29.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 29
-        targetSdkVersion = 29
+        compileSdkVersion = 31
+        targetSdkVersion = 31
         kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['kotlin_version']
     }
     repositories {

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -10,9 +10,12 @@ import Settings from './Settings';
 
 const Tab = createBottomTabNavigator();
 
-const Main = ({ navigation }) => {
+const Main = ({ navigation, route }) => {
+
     return(
-      <Tab.Navigator screenOptions={({ route }) => ({
+      <Tab.Navigator
+      initialRouteName={route?.params?.initialRoute || "chats"}
+      screenOptions={({ route }) => ({
         headerShown : false,
         tabBarShowLabel : false,
         tabBarInactiveTintColor: 'black',

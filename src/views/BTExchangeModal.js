@@ -96,7 +96,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     setVisible={setVisible}
     disableHideOnPress>
         <View style={styles.modalContentContainer}>
-          {loading && <ActivityIndicator size="large" color="#e05e3f"/>}
+          <ActivityIndicator size="large" color="#e05e3f" animating={loading}/>
           <Text>{activityText}</Text>
           <CustomButton
           onPress={cancel}

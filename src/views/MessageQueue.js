@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { View, ScrollView, Text, Dimensions } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getMessageQueue } from '../realm/chatRealm';
@@ -9,40 +10,37 @@ import moment from 'moment';
 import Crypto from '../nativeWrapper/Crypto';
 
 import FoldableMessage from './FoldableMessage';
+import CustomButton from './CustomButton';
 
+import { setMessageQueue } from '../redux/actions/chatActions';
 const MessageQueue = ({}) => {
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [ownPublicKey, setOwnPublicKey] = useState("");
+  const dispatch = useDispatch();
+  const [openMessages, setOpenMessages] = useState([]);
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey);
+  const messageQueue = useSelector(state => state.chatReducer.messageQueue);
+  const contacts = useSelector(state => state.contactReducer.contacts);
 
-  useEffect(() => {
-    loadMessages();
-  },[])
-
-  const loadMessages = async () => {
-    setLoading(true);
-    const ownPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-    setOwnPublicKey(ownPublicKey);
-    const messageQueue = await getMessageQueue(true);
-    var contactKeys = [];
-    //get unique public keys from messages
-    contactKeys = messageQueue.map(message => contactKeys.indexOf(message.to) === -1 && message.to);
-    //find relevant contacts based on public keys
-    const contacts = getContactsByKey(contactKeys);
-    //add contact names to messages using matching contact and message public key
-    messageQueue.map(message => {
-      message.toContactName = message.to === ownPublicKey ?
+  const parseMessageQueue = queue => {
+    queue.map(message => {
+      message.toContactName = message.to.trim() === ownPublicKey.trim() ?
         "You"
         :
-        contacts.find(contact => message.to === contact.key)?.name
+        contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown"
 
-      message.fromContactName = message.from === ownPublicKey ?
+      message.fromContactName = message.from.trim() === ownPublicKey.trim() ?
         "You"
         :
-        contacts.find(contact => message.from === contact.key)?.name
+        contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown"
     })
-    setMessages(messageQueue)
-    setLoading(false);
+    return queue
+  }
+
+  const onMessagePress = index => {
+    const newOpenMessages = openMessages.indexOf(index) == -1 ?
+      [...openMessages,index]
+      :
+      openMessages.filter(item => item != index)
+    setOpenMessages(newOpenMessages)
   }
 
   return (
@@ -51,22 +49,35 @@ const MessageQueue = ({}) => {
       allowGoBack
       title="Message Queue"/>
 
-      {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
-      :
+      <CustomButton
+      text={openMessages.length > 0 ? "Close All" : "Open All"}
+      onPress={() => {
+        setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
+      }}
+      buttonStyle={{marginTop : 15}}/>
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
-        {messages.map((message,index) =>
-          message.to === ownPublicKey || message.from === ownPublicKey ?
+        {parseMessageQueue(messageQueue).map((message,index) =>
+          message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim() ?
           <FoldableMessage
           to={message.toContactName}
+          open={openMessages.indexOf(index) != -1}
+          onPress={() => onMessagePress(index)}
           from={message.fromContactName}
           key={index}
+          textEncrypted={message.to == ownPublicKey || message.from == ownPublicKey}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-          text={message.text}/>
+          text={message.to == ownPublicKey || message.from == ownPublicKey ? message.text : "Message for another user"}/>
           :
-          <Text key={index}>Encrypted Message for Other User</Text>
+          <FoldableMessage
+          to="N/A"
+          from="N/A"
+          open={openMessages.indexOf(index) != -1}
+          key={index}
+          textEncrypted={false}
+          timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
+          text="Encrypted Message for Other User"/>
         )}
-      </ScrollView>}
+      </ScrollView>
     </View>
   )
 }

@@ -79,8 +79,10 @@ const styles = {
   },
   message : {
     padding : 20,
-    marginVertical : 5,
+    marginVertical : 3,
     borderRadius : 10,
+    borderWidth : 2,
+    borderColor : "transparent"
   },
   messageText : {
     color : "#f5f5f5"

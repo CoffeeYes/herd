@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -11,11 +12,9 @@ import QRCodeModal from './QRCodeModal'
 const AddContact = ({ navigation }) => {
   const [BTError,setBTError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
+  const publicKey = useSelector(state => state.userReducer.publicKey)
 
   useEffect(() => {
-    Crypto.loadKeyFromKeystore("herdPersonal").then(key => setPublicKey(key))
-
     initialBTCheck();
   },[])
 

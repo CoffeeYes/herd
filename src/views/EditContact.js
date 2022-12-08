@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -8,11 +9,15 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 
-import { getContactById, editContact } from '../realm/contactRealm';
+import { getContactById, editContact, getContactByName, getContactsByKey } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
+import Crypto from '../nativeWrapper/Crypto';
 
+import { updateContact } from '../redux/actions/contactActions';
+import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 const EditContact = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const [name, _setName] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [savedContacts,setSavedContacts] = useState([]);
@@ -53,11 +58,42 @@ const EditContact = ({ route, navigation }) => {
     }
   }
 
-  const save = () => {
+  const save = async () => {
+    try {
+      const encryptedTest = await Crypto.encryptStringWithKey(
+        publicKey.trim(),
+        Crypto.algorithm.RSA,
+        Crypto.blockMode.ECB,
+        Crypto.padding.OAEP_SHA256_MGF1Padding,
+        "test"
+      )
+    }
+    catch(e) {
+      setError("Invalid Public Key")
+      console.log(e)
+      return false;
+    }
+    if(name.trim().length === 0) {
+      setError("Username can not be empty");
+      return false;
+    }
+    const keyExists = getContactsByKey([publicKey.trim()]);
+    const nameExists = getContactByName(name.trim());
+
+    if(keyExists != "" && keyExists[0].key != originalContact.key) {
+      setError("A user with this key already exists");
+      return false;
+    }
+    if(nameExists && nameExists.name != originalContact.name) {
+      setError("A user with this name already exists");
+      return false;
+    }
     setError("");
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
-    setOriginalContact(newInfo)
+    updateContactAndReferences(dispatch, {...newInfo,_id : route.params.id});
+    setOriginalContact(newInfo);
+    return true;
   }
 
   const editImage = async () => {
@@ -121,7 +157,6 @@ const EditContact = ({ route, navigation }) => {
       <ActivityIndicator size="large" color="#e05e3f"/>
       :
       <ScrollView contentContainerStyle={styles.container}>
-        <Text>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={largeImageContainerStyle}>
@@ -132,6 +167,8 @@ const EditContact = ({ route, navigation }) => {
             imageHeight={Dimensions.get("window").height * 0.4}/>
           </View>
         </TouchableOpacity>
+
+        <Text style={styles.error}>{error}</Text>
 
         <Text style={styles.inputTitle}>Name</Text>
         <TextInput
@@ -153,7 +190,7 @@ const EditContact = ({ route, navigation }) => {
         timeout={500}
         disabled={
           (name.trim() === originalContact.name.trim() || name === originalContact.name) &&
-          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key) && 
+          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key) &&
           contactImage === originalContact.image
         }
         buttonStyle={styles.button}
@@ -195,6 +232,11 @@ const styles = {
     fontWeight : "bold",
     marginBottom : 5
   },
+  error : {
+    color : "red",
+    fontWeight : "bold",
+    alignSelf : "center"
+  }
 }
 
 export default EditContact;

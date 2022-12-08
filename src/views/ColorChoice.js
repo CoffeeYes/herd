@@ -12,6 +12,7 @@ const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
         color={color}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
+        sliderComponent={Slider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
       />
     </View>

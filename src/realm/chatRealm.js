@@ -1,8 +1,13 @@
 import Realm from 'realm';
-import Schemas from '../Schemas';
+import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
-import { getContactsByKey } from './contactRealm';
-import { cloneDeep } from 'lodash'
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
+import { getContactsByKey, createContact } from './contactRealm';
+import { parseRealmObject, parseRealmObjects} from './helper';
+import { cloneDeep } from 'lodash';
+
+import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
+import { addContact } from '../redux/actions/contactActions';
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -26,9 +31,28 @@ const deletedReceivedRealm = new Realm({
 
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
-  // const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered("to = " + "'" + key + "'").slice(startIndex,endIndex);
-  const sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
-  const receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key}' AND to = '${ownKey}'`).slice(startIndex,endIndex);
+
+  let sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`to = '${key}'`).slice(startIndex,endIndex);
+  let receivedMessages = messageReceivedRealm.objects("Message")?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}'`).slice(startIndex,endIndex);
+
+  //on initial load, ensure messages up to the earliest timestamp are loaded so that
+  //they aren't only loaded much later and dont make the message order incorrect
+  const firstSent = sentMessagesCopy[0];
+  const firstReceived = receivedMessages[0];
+
+  //check if there are messages and this is the first load
+  const haveMessages = firstSent && firstReceived;
+  const initialLoad = startIndex == -5 && haveMessages;
+
+  if(startIndex == -5 && haveMessages) {
+    if(firstReceived.timestamp < firstSent.timestamp) {
+      sentMessagesCopy = messageCopyRealm.objects("Message")?.filtered(`timestamp > '${firstReceived.timestamp}'`)
+    }
+    else {
+      receivedMessages = messageReceivedRealm.objects("Message")
+      ?.filtered(`from = '${key.trim()}' AND to = '${ownKey.trim()}' AND timestamp > '${firstSent.timestamp}'`)
+    }
+  }
 
   var initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
@@ -59,7 +83,19 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
       initialSentMessages.push({...currentMessage,text : decrypted});
     }
   }
-  return [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
+  return {
+    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
+    ...(initialLoad && {newStart : firstReceived.timestamp < firstSent.timestamp ?
+      -initialSentMessages.length
+      :
+      -initialReceivedMessages.length}
+    ),
+    ...(initialLoad && {newEnd : firstReceived.timestamp < firstSent.timestamp ?
+      -initialReceivedMessages.length
+      :
+      -initialSentMessages.length}
+    )
+  }
 }
 
 const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
@@ -85,16 +121,56 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   return messageID.toString();
 }
 
-const addNewReceivedMessages = messages => {
-  const receivedMessages = messageReceivedRealm.objects("Message");
-  const deletedReceivedMessage = deletedReceivedRealm.objects("Message");
+const addNewReceivedMessages = async (messages,dispatch) => {
+  const receivedMessages = parseRealmObjects(messageReceivedRealm.objects("Message"));
+  const deletedReceivedMessage = parseRealmObjects(deletedReceivedRealm.objects("Message"));
+  const ownPublicKey = await Crypto.loadKeyFromKeystore('herdPersonal');
   const newMessages = messages.filter(nMessage =>
-    receivedMessages.find(rMessage => rMessage._id === nMessage._id) === undefined &&
-    deletedReceivedMessage.find(dMessage => dMessage._id === nMessage.id) === undefined
+    receivedMessages.find(rMessage => rMessage._id == nMessage._id) === undefined &&
+    deletedReceivedMessage.find(dMessage => dMessage._id == nMessage.id) === undefined
   );
   messageReceivedRealm.write(() => {
-    newMessages.map(message => messageReceivedRealm.create("Message",{...message,_id : Realm.BSON.ObjectId(message._id)},true))
+    newMessages.map(message => messageReceivedRealm.create("Message",{
+      ...message,
+      _id : Realm.BSON.ObjectId(message._id),
+      from : message.from.trim(),
+      to : message.to.trim()
+    },true))
   })
+  if(dispatch) {
+    //add messages to queue
+    dispatch(addMessagesToQueue(newMessages));
+    //add new messages meant for this user to their corresponding chats
+    const keys = newMessages.map(message => message.from.trim());
+    const contacts = getContactsByKey(keys);
+    newMessages.map(message => {
+      let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
+      //if the message is for this user, but no contact exists create the contact
+      if(contact === undefined && message.to.trim() == ownPublicKey.trim()) {
+        contact = createContact({
+          name : "Unknown User",
+          key : message.from.trim(),
+          image : ""
+        });
+        contacts.push(contact);
+        dispatch(addContact(contact));
+      }
+      if(contact && message.to.trim() === ownPublicKey.trim()) {
+        Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          message.text
+        ).then(decrypted => dispatch(addMessage(contact._id,{
+          ...message,
+          text : decrypted
+        })))
+      }
+    })
+    const chats = await getContactsWithChats();
+    dispatch(setChats(chats))
+  }
 }
 
 const getContactsWithChats = async () => {
@@ -102,18 +178,17 @@ const getContactsWithChats = async () => {
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
   var keys = [];
-
   //get unique keys in all messages
-  sentMessages.map(message => keys.indexOf(message.to) === -1 && keys.push(message.to));
-  receivedMessages.map(message => keys.indexOf(message.from) === -1 && keys.push(message.from));
+  sentMessages.map(message => keys.indexOf(message.to.trim()) === -1 && keys.push(message.to));
+  receivedMessages.map(message => keys.indexOf(message.from.trim()) === -1 && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
     var lastMessages = [];
-    for(var key in keys) {
-      const currentKey = keys[key];
-      const currentLastMessage = (await getMessagesWithContact(currentKey,-1))[0];
+    for(const key of keys) {
+      const messages = (await getMessagesWithContact(key,-1)).messages;
+      const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
       currentLastMessage &&
-      lastMessages.push({key : currentKey, message : currentLastMessage});
+      lastMessages.push({key : key, message : currentLastMessage});
     }
     //create new contacts array with last message text and timestamp
     // because realm doesnt allow mutation in place
@@ -124,6 +199,7 @@ const getContactsWithChats = async () => {
       const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
       currentContact.timestamp = matchingMessage?.timestamp;
       currentContact.lastText = matchingMessage?.text;
+      currentContact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
       contactsWithTimestamps.push(currentContact);
     })
     return contactsWithTimestamps;
@@ -138,6 +214,8 @@ const deleteChat = key => {
   const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filtered("to = " + "'" + key + "'");
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("from = " + "'" + key + "'");
 
+  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
+
   messageSentRealm.write(() => {
     messageSentRealm.delete(sentMessagesToDelete)
   })
@@ -149,7 +227,13 @@ const deleteChat = key => {
   })
 }
 
-const deleteAllChats = () => {
+const deleteAllChats = async () => {
+  const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal')
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered(`to = '${ownKey}'`);
+  const sentMessages = messageSentRealm.objects('Message');
+
+  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessages))
+
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
   })
@@ -157,7 +241,7 @@ const deleteAllChats = () => {
     messageCopyRealm.deleteAll();
   })
   messageReceivedRealm.write(() => {
-    messageReceivedRealm.deleteAll();
+    messageReceivedRealm.delete(receivedMessagesToDelete);
   })
 }
 
@@ -199,14 +283,14 @@ const deleteMessages = messages => {
 //when passing messageQueue to the background service these messages are not desired
 const getMessageQueue = async useMessageCopies => {
   let sentMessages;
-  let key = await Crypto.loadKeyFromKeystore("herdPersonal")
+  let key = (await Crypto.loadKeyFromKeystore("herdPersonal"))?.trim();
   if(useMessageCopies) {
     sentMessages = messageCopyRealm.objects('Message')
   }
   else {
-    sentMessages = messageSentRealm.objects('Message').filtered("to != " + "'" + key + "'")
+    sentMessages = messageSentRealm.objects('Message').filtered(`to != '${key}'`)
   }
-  const receivedMessages= messageReceivedRealm.objects('Message').filtered("to != " + "'" + key + "'")
+  const receivedMessages= messageReceivedRealm.objects('Message').filtered(`to != '${key}'`)
 
   let sentMessagesCopy = [];
   let receivedMessagesCopy = [];
@@ -244,19 +328,96 @@ const removeCompletedMessagesFromRealm = messages => {
   })
 }
 
+const updateMessagesWithContact = async (oldKey, newKey) => {
+  //load existing messages
+  const sentMessages = messageSentRealm.objects('Message').filtered(`to == '${oldKey}'`);
+  const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
+  const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
+
+  //decrypt, re-encrpyt with new key and write to DB
+  let newTexts = [];
+  await Promise.all(sentMessagesCopy.map(async message => {
+    const decryptedText = await Crypto.decryptString(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      parseRealmObject(message).text
+    )
+    const newEncryptedString = await Crypto.encryptStringWithKey(
+      newKey,
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      decryptedText
+    )
+    newTexts.push(newEncryptedString);
+  }))
+
+  messageSentRealm.write(() => {
+    const sentMessages = messageSentRealm.objects('Message');
+    sentMessages.map((message,index) => {
+      if(message.to == oldKey) {
+        message.to = newKey;
+        message.text = newTexts[index];
+      }
+    })
+  })
+
+  messageCopyRealm.write(() => {
+    const messages = messageCopyRealm.objects('Message');
+    messages.map(message => {
+      if(message.to == oldKey) {
+        message.to = newKey;
+      }
+    })
+  })
+  messageReceivedRealm.write(() => {
+    const receivedMessages = messageReceivedRealm.objects('Message');
+    receivedMessages.map(message => {
+      if(message.from == oldKey) {
+        message.from = newKey
+      }
+    })
+  })
+}
+
+const deleteAllMessages = () => {
+  const sentMessages = parseRealmObjects(messageSentRealm.objects('Message'));
+  const receivedMessages = parseRealmObjects(messageReceivedRealm.objects('Message'));
+
+  ServiceInterface.removeMessagesFromService([...sentMessages,...receivedMessages]);
+
+  messageSentRealm.write(() => {
+    messageSentRealm.deleteAll();
+  })
+  messageCopyRealm.write(() => {
+    messageCopyRealm.deleteAll();
+  })
+  messageReceivedRealm.write(() => {
+    messageReceivedRealm.deleteAll();
+  })
+  deletedReceivedRealm.write(() => {
+    deletedReceivedRealm.deleteAll();
+  })
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
   messageSentRealm.close();
+  deletedReceivedRealm.close();
 }
 
 export {
   getMessagesWithContact,
+  updateMessagesWithContact,
   sendMessageToContact,
   addNewReceivedMessages,
   getContactsWithChats,
   deleteChat,
   deleteAllChats,
+  deleteAllMessages,
   deleteMessages,
   getMessageQueue,
   getDeletedReceivedMessages,

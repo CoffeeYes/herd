@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
@@ -9,13 +10,17 @@ import CustomButton from './CustomButton';
 import {launchImageLibrary} from 'react-native-image-picker';
 import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
-import { createContact, getContactsByKey } from '../realm/contactRealm';
+import { createContact, getContactsByKey, getContactByName } from '../realm/contactRealm';
+
+import { addContact } from '../redux/actions/contactActions';
 
 const CreateContact = ({ navigation, route}) => {
+  const dispatch = useDispatch();
   const [username, _setUsername] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [error, setError] = useState("");
   const [contactImage, _setContactImage] = useState("");
+  const [disableButton, setDisableButton] = useState(false);
 
   const usernameRef = useRef();
   const publicKeyRef = useRef();
@@ -43,7 +48,7 @@ const CreateContact = ({ navigation, route}) => {
   },[])
 
   const createNewContact = async () => {
-    setError("");
+    setDisableButton(true);
 
     if(username.trim() === "" || publicKey.trim() === "") {
       setError("Fields Cannot be empty")
@@ -60,26 +65,37 @@ const CreateContact = ({ navigation, route}) => {
         )
       }
       catch(e) {
+        setDisableButton(false);
         return setError("Invalid Public Key")
       }
 
       //check for duplicate contacts
-      const contactExists = getContactsByKey([publicKey]);
-      if(contactExists != "") {
-        return setError("A contact with this key already exists")
+      const keyExists = getContactsByKey([publicKey.trim()]);
+      const nameExists = getContactByName(username.trim());
+      if(keyExists != "") {
+        setDisableButton(false);
+        return setError("A contact with this key already exists");
       }
+      if(nameExists) {
+        setDisableButton(false);
+        return setError("A contact with that name already exists");
+      }
+      setError("");
 
       const newContact = {
-        key : publicKey,
-        name : username,
+        key : publicKey.trim(),
+        name : username.trim(),
         image : contactImage
       }
-      createContact(newContact);
+      //create contact, add contact to state store, reset values and navigate back
+      const createdContact = createContact(newContact);
+      dispatch(addContact(createdContact));
       setUsername("");
       setPublicKey("");
       setContactImage("");
       navigation.navigate('main');
     }
+    setDisableButton(false);
   }
 
   const editImage = async () => {
@@ -165,7 +181,7 @@ const CreateContact = ({ navigation, route}) => {
         <CustomButton
         text="Import"
         onPress={createNewContact}
-        disabled={username.trim().length === 0 || publicKey.trim().length === 0}/>
+        disabled={username.trim().length === 0 || publicKey.trim().length === 0 || disableButton}/>
 
       </ScrollView>
   </>

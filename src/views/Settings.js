@@ -1,40 +1,55 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert, Dimensions } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
+import CustomModal from './CustomModal';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
-import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
+import CardButton from './CardButton';
+
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
+import { getPasswordHash, closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
-import CardButton from './CardButton';
+
+import { setChats, resetMessages, setMessageQueue } from '../redux/actions/chatActions';
+import { setContacts, resetContacts } from '../redux/actions/contactActions';
 
 import {
   getMessageQueue,
   getDeletedReceivedMessages,
   getReceivedMessagesForSelf,
+  deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 
 const Settings = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
-  const [publicKey, setPublicKey] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLocationModal, setShowLocationModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
 
+  const publicKey = useSelector(state => state.userReducer.publicKey);
+  const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
+
+  useEffect(() => {
+    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+  },[]);
+
   const copyKeyToClipboard = async () => {
-    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"))
+    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"));
+    return true;
   }
 
   const showQRCode = async () => {
-    const personalPublicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
-    await setPublicKey(personalPublicKey)
     setQRCodeVisible(true);
   }
 
@@ -50,7 +65,8 @@ const Settings = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            deleteAllChatsFromRealm()
+            deleteAllChatsFromRealm();
+            dispatch(setChats([]));
           },
         },
       ]
@@ -72,6 +88,28 @@ const Settings = ({ navigation }) => {
           onPress: async () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
+            resetContacts(dispatch);
+          },
+        },
+      ]
+    );
+  }
+
+  const deleteAllMessages = async () => {
+    Alert.alert(
+      'Discard you sure you want to delete all Messages?',
+      '',
+      [
+        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          // If the user confirmed, then we dispatch the action we blocked earlier
+          // This will continue the action that had triggered the removal of the screen
+          onPress: async () => {
+            deleteAllMessagesFromRealm();
+            dispatch(setChats([]));
+            dispatch(setMessageQueue([]));
           },
         },
       ]
@@ -80,11 +118,31 @@ const Settings = ({ navigation }) => {
 
   const toggleBackgroundTransfer = async value => {
     if(value) {
+      var locationPermissionsGranted = await Bluetooth.checkLocationPermission();
+      const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
       var btEnabled = await Bluetooth.checkBTEnabled();
       var locationEnabled = await Bluetooth.checkLocationEnabled();
 
+      if(!bluetoothScanPermissionsGranted) {
+        const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
+        if(!grantBluetoothScanPermissions) {
+          return;
+        }
+      }
+
+      if(!locationPermissionsGranted) {
+        const grantLocationPermissions = await Bluetooth.requestLocationPermissions();
+        if(!grantLocationPermissions) {
+          setShowLocationModal(true);
+          return;
+        }
+      }
+
       if(!btEnabled) {
         btEnabled = await Bluetooth.requestBTEnable();
+        if(!btEnabled) {
+          return;
+        }
       }
 
       if(!locationEnabled) {
@@ -96,13 +154,16 @@ const Settings = ({ navigation }) => {
             {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
           ]
         )
+        if(!locationEnabled) {
+          return;
+        }
       }
 
       if(btEnabled && locationEnabled) {
         setBackgroundTransfer(true);
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
-        const publicKey = await Crypto.loadKeyFromKeystore("herdPersonal");
+        const publicKey = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
         const receivedMessagesForSelf = getReceivedMessagesForSelf(publicKey);
         ServiceInterface.enableService(
           messageQueue,
@@ -114,13 +175,17 @@ const Settings = ({ navigation }) => {
     }
     else {
       setBackgroundTransfer(false);
-      ServiceInterface.disableService();
+      if(await ServiceInterface.isRunning()) {
+        ServiceInterface.disableService();
+      }
     }
   }
 
-  useEffect(() => {
-    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
-  },[])
+  const closeRealms = () => {
+    closeChatRealm();
+    closeContactRealm();
+    closePasswordRealm();
+  }
 
   return (
     <>
@@ -177,10 +242,19 @@ const Settings = ({ navigation }) => {
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
+        text="Password Protection"
+        rightIcon="lock"
+        onPress={() => userHasPassword ?
+          navigation.navigate("passwordLockScreen2",{navigationTarget : "passwordSettings"})
+          :
+          navigation.navigate("passwordSettings")}
+        />
+
+        <CardButton
         text="Delete All Chats"
         textStyle={{color : "red"}}
         iconStyle={{color : "red"}}
-        rightIcon="delete-forever"
+        rightIcon="delete"
         onPress={deleteAllChats}/>
 
         <CardButton
@@ -190,13 +264,17 @@ const Settings = ({ navigation }) => {
         rightIcon="delete-sweep"
         onPress={deleteAllContacts}/>
 
+        <CardButton
+        text="Delete All Messages"
+        textStyle={{color : "red"}}
+        iconStyle={{color : "red"}}
+        rightIcon="delete-forever"
+        onPress={deleteAllMessages}/>
+
         {__DEV__ &&
           <CustomButton
           buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
-          onPress={() => {
-            closeChatRealm();
-            closeContactRealm();
-          }}
+          onPress={closeRealms}
           text="Close Realm"/>
         }
 
@@ -205,6 +283,30 @@ const Settings = ({ navigation }) => {
         value={{key : publicKey}}
         title="My Key"
         setVisible={setQRCodeVisible}/>
+
+        {showLocationModal &&
+        <CustomModal
+        setVisible={setShowLocationModal}>
+          <View style={styles.modalContentContainer}>
+            <Icon name="location-on" size={48}/>
+            <Text>
+              In order to transfer messages in the background, herd requires
+              location permissions to be allowed all the time.
+            </Text>
+
+            <Text style={{fontWeight : "bold", marginTop : 20}}>
+            Please go into the permission settings for Herd and select "Allow all the time"
+            in order to allow Herd to function correctly.
+            </Text>
+
+            <CustomButton
+            onPress={() => {
+              setShowLocationModal(false);
+              Bluetooth.navigateToApplicationSettings();
+            }}
+            text="Go To Settings"/>
+          </View>
+        </CustomModal>}
 
       </ScrollView>
     </>
@@ -219,7 +321,21 @@ const styles = {
   },
   buttonMargin : {
     marginTop : 10
-  }
+  },
+  modalMainContainer : {
+    alignItems : "center",
+    justifyContent : "center",
+    flex : 1,
+    backgroundColor : "rgba(0,0,0,0.4)"
+  },
+  modalContentContainer : {
+    backgroundColor : "white",
+    borderRadius : 5,
+    padding : 30,
+    alignItems : "center",
+    maxWidth : Dimensions.get('window').width * 0.8,
+    maxHeight : Dimensions.get('window').height * 0.8
+  },
 }
 
 export default Settings;

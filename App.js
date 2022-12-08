@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   SafeAreaView,
   StyleSheet,
@@ -7,7 +8,8 @@ import {
   Text,
   StatusBar,
   Button,
-  NativeEventEmitter
+  NativeEventEmitter,
+  AppState
 } from 'react-native';
 
 import {
@@ -18,6 +20,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { createStackNavigator } from '@react-navigation/stack';
+import { CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import navigationRef from './src/NavigationRef.js'
@@ -37,41 +40,119 @@ import QRScanner from './src/views/QRScanner';
 import EditContact from './src/views/EditContact';
 import Customise from './src/views/Customise';
 import MessageQueue from './src/views/MessageQueue';
+import PasswordSettings from './src/views/PasswordSettings';
+import PasswordLockScreen from './src/views/PasswordLockScreen';
+import LoadingScreen from './src/views/LoadingScreen';
+import LockedScreen from './src/views/LockedScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
-} from './src/realm/chatRealm'
+} from './src/realm/chatRealm';
+import { getAllContacts } from './src/realm/contactRealm';
+import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
+
+import { getPasswordHash } from './src/realm/passwordRealm';
+
+import { setPublicKey, setPassword } from './src/redux/actions/userActions';
+import { setContacts } from './src/redux/actions/contactActions';
+import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
+import { setLocked } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator()
 
 const App = ({ }) => {
+  const dispatch = useDispatch();
+  const [initialRoute, setInitialRoute] = useState("main");
+  const [loading, setLoading] = useState(true);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
+  const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
+  const locked = useSelector(state => state.appStateReducer.locked);
+
+  const passwordSetRef = useRef();
 
   useEffect(() => {
-    loadOwnKey();
     (async () => {
+
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
         newMessages = await ServiceInterface.getReceivedMessages();
+
+        newMessages.length > 0 &&
+        await addNewReceivedMessagesToRealm(newMessages,dispatch);
       }
       else {
-        loadStoredMessages();
+        await loadStoredMessages();
       }
+      await loadInitialState();
+      setLoading(false);
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
-    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", messages => {
-      addNewReceivedMessagesToRealm(messages);
+    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
+      await addNewReceivedMessagesToRealm(messages,dispatch);
     })
 
-    return messagesListener.remove;
+    const appStateListener = AppState.addEventListener("change",async state => {
+      //switch to lock screen when backgrounded to prevent render from leaking
+      //during transition when tabbing back in
+      if(state === "background" && passwordSetRef.current) {
+        dispatch(setLocked(true))
+      }
+    })
+
+    return () => {
+      messagesListener.remove();
+      appStateListener.remove();
+    }
   },[])
 
-  const loadOwnKey = async () => {
-    const key = await Crypto.loadKeyFromKeystore("herdPersonal")
-    if(!key) {
-      navigationRef.current.navigate("splash")
+  useEffect(() => {
+    passwordSetRef.current = passwordHash.length > 0;
+  },[passwordHash])
+
+  const loadInitialState = async () => {
+    //get stored data
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    const loginPassword = getPasswordHash("loginPassword");
+    const erasurePassword = getPasswordHash("erasurePassword");
+
+    //determine the entry screen
+    if(key?.length > 0) {
+      setInitialRoute("main")
     }
+    else {
+      setInitialRoute("splash")
+    }
+
+    if(loginPassword.length > 0) {
+      dispatch(setLocked(true));
+    }
+
+    dispatch(setPublicKey(key));
+
+    //load saved contacts into store)
+    dispatch(setContacts(getAllContacts()))
+
+    //load saved chats into store
+    var contactsWithChats = (await getContactsWithChats())
+    .sort( (a,b) => a.timestamp > b.timestamp);
+    dispatch(setChats(contactsWithChats))
+
+    //load styles into store
+    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    styles &&
+    dispatch(setStyles(styles));
+
+    //load password hashes into store
+    loginPassword.length > 0 &&
+    dispatch(setPassword("login",loginPassword));
+
+    erasurePassword.length > 0 &&
+    dispatch(setPassword("erasure",erasurePassword));
+
+    const messageQueue = await getMessageQueue(true);
+    dispatch(setMessageQueue(messageQueue))
   }
 
   const loadStoredMessages = async () => {
@@ -79,9 +160,8 @@ const App = ({ }) => {
       "savedMessageQueue",
       "savedMessageQueueSizes"
     )
-
     newMessages.length > 0 &&
-    addNewReceivedMessagesToRealm(newMessages);
+    await addNewReceivedMessagesToRealm(newMessages);
 
     const messagesToRemove = await ServiceInterface.getStoredMessages(
       "messagesToRemove",
@@ -94,24 +174,38 @@ const App = ({ }) => {
 
   return (
     <>
-          <Stack.Navigator
-          initialRouteName="main"
-          screenOptions={{headerShown : false}}>
-            <Stack.Screen name="contacts" component={Contacts}/>
-            <Stack.Screen name="addContact" component={AddContact}/>
-            <Stack.Screen name="chats" component={Chats}/>
-            <Stack.Screen name="splash" component={Splash}/>
-            <Stack.Screen name="main" component={Main}/>
-            <Stack.Screen name="chat" component={Chat}/>
-            <Stack.Screen name="contact" component={Contact}/>
-            <Stack.Screen name="createcontact" component={CreateContact}/>
-            <Stack.Screen name="newChat" component={Contacts}/>
-            <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
-            <Stack.Screen name="QRScanner" component={QRScanner}/>
-            <Stack.Screen name="editContact" component={EditContact}/>
-            <Stack.Screen name="customise" component={Customise}/>
-            <Stack.Screen name="messageQueue" component={MessageQueue}/>
-          </Stack.Navigator>
+      {loading ?
+      <LoadingScreen/>
+      :
+      <Stack.Navigator
+      initialRouteName={initialRoute}
+      screenOptions={{headerShown : false}}>
+      {locked ?
+        <Stack.Screen
+        name="passwordLockScreen"
+        component={PasswordLockScreen}/>
+        :
+        <>
+          <Stack.Screen name="contacts" component={Contacts}/>
+          <Stack.Screen name="addContact" component={AddContact}/>
+          <Stack.Screen name="chats" component={Chats}/>
+          <Stack.Screen name="splash" component={Splash}/>
+          <Stack.Screen name="main" component={Main}/>
+          <Stack.Screen name="chat" component={Chat}/>
+          <Stack.Screen name="contact" component={Contact}/>
+          <Stack.Screen name="createcontact" component={CreateContact}/>
+          <Stack.Screen name="newChat" component={Contacts}/>
+          <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
+          <Stack.Screen name="QRScanner" component={QRScanner}/>
+          <Stack.Screen name="editContact" component={EditContact}/>
+          <Stack.Screen name="customise" component={Customise}/>
+          <Stack.Screen name="messageQueue" component={MessageQueue}/>
+          <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
+          <Stack.Screen
+          name="passwordLockScreen2"
+          component={PasswordLockScreen}/>
+        </>}
+      </Stack.Navigator>}
     </>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +11,10 @@ import Slider from '@react-native-community/slider';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
 
+import { setStyles } from '../redux/actions/chatActions';
+
 const Customise = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [sentBoxColor, _setSentBoxColor] = useState("");
   const [sentTextColor, _setSentTextColor] = useState("");
   const [receivedBoxColor, _setReceivedBoxColor] = useState("");
@@ -62,8 +66,8 @@ const Customise = ({ navigation }) => {
       setSentTextColor(toHsv(styles.sentTextColor));
       setReceivedBoxColor(toHsv(styles.receivedBoxColor));
       setReceivedTextColor(toHsv(styles.receivedTextColor));
-      setFontSize(styles.fontSize)
-      setOriginalStyles(styles)
+      setFontSize(styles.fontSize);
+      setOriginalStyles(styles);
     }
   }
 
@@ -76,8 +80,10 @@ const Customise = ({ navigation }) => {
       fontSize : fontSize
     }
 
-    setOriginalStyles(style)
-    return await AsyncStorage.setItem("styles",JSON.stringify(style))
+    setOriginalStyles(style);
+    await AsyncStorage.setItem("styles",JSON.stringify(style));
+    dispatch(setStyles(style));
+    return true;
   }
 
   useEffect(() => {
@@ -139,6 +145,7 @@ const Customise = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             await AsyncStorage.setItem("styles",JSON.stringify(style));
+            dispatch(setStyles(style))
             loadStyles();
           },
         },
@@ -265,10 +272,10 @@ const Customise = ({ navigation }) => {
           timeout={500}
           buttonStyle={{...styles.buttonHeight,width : 100}}
           disabled={
-            fromHsv(sentBoxColor) == originalStyles.sentBoxColor &&
-            fromHsv(sentTextColor) == originalStyles.sentTextColor &&
-            fromHsv(receivedBoxColor) == originalStyles.receivedBoxColor &&
-            fromHsv(receivedTextColor) == originalStyles.receivedTextColor &&
+            fromHsv(sentBoxColor).toLowerCase() == originalStyles.sentBoxColor.toLowerCase() &&
+            fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
+            fromHsv(receivedBoxColor).toLowerCase() == originalStyles.receivedBoxColor.toLowerCase() &&
+            fromHsv(receivedTextColor).toLowerCase() == originalStyles.receivedTextColor.toLowerCase() &&
             fontSize === originalStyles.fontSize
           }/>
 
@@ -276,10 +283,10 @@ const Customise = ({ navigation }) => {
           text={"Restore Default"}
           onPress={restoreDefault}
           disabled={
-            fromHsv(sentBoxColor) == "#c6c6c6" &&
-            fromHsv(sentTextColor) == "#f5f5f5" &&
-            fromHsv(receivedBoxColor) == "#e86252" &&
-            fromHsv(receivedTextColor) == "#f5f5f5" &&
+            fromHsv(originalStyles.sentBoxColor).toLowerCase() == "#c6c6c6" &&
+            fromHsv(originalStyles.sentTextColor).toLowerCase() == "#f5f5f5" &&
+            fromHsv(originalStyles.receivedBoxColor).toLowerCase() == "#e86252" &&
+            fromHsv(originalStyles.receivedTextColor).toLowerCase() == "#f5f5f5" &&
             fontSize === 14
           }
           buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>

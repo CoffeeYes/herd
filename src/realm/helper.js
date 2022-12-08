@@ -8,6 +8,15 @@ const parseRealmID = object => {
     }
 }
 
+const parseRealmObject = object => {
+  return ({...JSON.parse(JSON.stringify(object))})
+}
+
+const parseRealmObjects = objects => {
+  return objects.map(object => parseRealmObject(object))
+}
 export {
-  parseRealmID
+  parseRealmID,
+  parseRealmObject,
+  parseRealmObjects
 }

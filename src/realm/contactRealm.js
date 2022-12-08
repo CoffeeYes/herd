@@ -1,7 +1,8 @@
 import Realm from 'realm';
-import Schemas from '../Schemas';
-import { deleteChat } from './chatRealm';
+import Schemas from './Schemas';
+import { deleteChat, updateMessagesWithContact } from './chatRealm';
 import { cloneDeep } from 'lodash';
+import { parseRealmObject, parseRealmObjects} from './helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -9,39 +10,61 @@ const contactsRealm = new Realm({
 })
 
 const getAllContacts = () => {
-  return contactsRealm.objects('Contact');
+  const allContacts = contactsRealm.objects("Contact");
+  return allContacts.length > 0 ?
+  parseRealmObjects(allContacts)
+  :
+  []
 }
 
 const deleteContact = object => {
   deleteChat(object.key);
+  const contacts = contactsRealm.objects("Contact");
+  const contactToDelete = contacts.find(contact => contact._id == object._id);
+  contactToDelete &&
   contactsRealm.write(() => {
-    contactsRealm.delete(object);
+    contactsRealm.delete(contactToDelete);
   })
 }
 
 const createContact = object => {
+  let newContact;
   contactsRealm.write(() => {
-    contactsRealm.create('Contact',{...object,_id : Realm.BSON.ObjectId()});
+    newContact = contactsRealm.create('Contact',{...object,_id : Realm.BSON.ObjectId()});
   })
+  return parseRealmObject(newContact);
 }
 
 const getContactById = id => {
   let oid = Realm.BSON.ObjectId(id)
-  return contactsRealm.objectForPrimaryKey("Contact",oid);
+  const contact = contactsRealm.objectForPrimaryKey("Contact",oid);
+  return contact._id ? contact : {}
 }
 
 const getContactsByKey = keys => {
   if(keys.length > 0) {
     const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
-    return contactsRealm.objects('Contact').filtered(keyQuery);
+    const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
+    return contactsByKey.length > 0 ? parseRealmObjects(contactsByKey) : []
   }
   else {
     return []
   }
 }
 
-const editContact = (id, values) => {
+const getContactByName = name => {
+  const contact = contactsRealm.objects('Contact').filtered(`name =[c] '${name}'`);
+
+  return contact.length > 0 ?
+  parseRealmObject(contact[0])
+  :
+  false
+}
+
+const editContact = async (id, values) => {
   const contact = getContactById(Realm.BSON.ObjectId(id));
+  const oldKey = contact.key;
+  await updateMessagesWithContact(oldKey,values.key);
   contactsRealm.write(() => {
     contact.name = values.name;
     contact.key = values.key;
@@ -62,6 +85,7 @@ export {
   deleteContact,
   createContact,
   getContactById,
+  getContactByName,
   getContactsByKey,
   editContact,
   deleteAllContacts,

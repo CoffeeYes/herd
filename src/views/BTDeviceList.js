@@ -32,7 +32,6 @@ const BTDeviceList = () => {
     });
 
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
-      console.log(state)
       if(state === "DISCOVERY_STARTED") {
         scanningRef.current = true;
         setScanning(scanningRef.current);
@@ -109,8 +108,8 @@ const BTDeviceList = () => {
         </ScrollView>
 
         <CustomButton
-        text="Re-Scan"
-        onPress={restartScan}
+        text={scanning ? "Cancel Scan" : "Re-Scan"}
+        onPress={() => {scanning ? Bluetooth.cancelScanForDevices() : restartScan()}}
         buttonStyle={{marginTop : 10}}/>
 
         <BTExchangeModal

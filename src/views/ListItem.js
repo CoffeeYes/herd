@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, ActivityIndicator, Dimensions, Image } from 'react-native';
+import { Text, View, TouchableOpacity, Dimensions, Image } from 'react-native';
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
-                    imageContainerStyle, imageSize, rightText, subText, subTextStyle }) => {
+                    imageContainerStyle, imageSize, rightText, subText, subTextStyle,
+                    rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
+  const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
 
   return (
     <TouchableOpacity
     style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10,...containerStyle}}
     onPress={onPress}
+    onLayout={event => {setDeleteButtonHeight(event.nativeEvent.layout.height)}}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={{...styles.imageContainer,...imageContainerStyle}}>
         <ContactImage
@@ -32,11 +35,14 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
       </View>
 
       {rightText &&
-      <Text style={{marginLeft : "auto", marginRight : 10}}>{rightText}</Text>}
+      <Text style={{...styles.rightTextStyle,...rightTextStyle}}>{rightText}</Text>}
+
+      {rightIcon &&
+      <Icon name={rightIcon} size={rightIconSize || 24} style={rightIconStyle}/>}
 
       {showDelete &&
       <TouchableOpacity
-      style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto"}}
+      style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto", height : deleteButtonHeight}}
       onPress={() => {
         setShowDelete(false);
         deleteItem(name);
@@ -58,8 +64,10 @@ const styles = {
   },
   deleteButton : {
     backgroundColor : "#e05e3f",
-    padding : 13,
-    paddingVertical : 20,
+    alignItems : "center",
+    justifyContent : "center",
+    width : Dimensions.get("window").width * 0.20,
+    maxWidth :150
   },
   imageContainer : {
     borderWidth : 1,
@@ -77,10 +85,14 @@ const styles = {
     fontSize : 16,
   },
   subTextContainer : {
-    paddingRight : 10,
+    
   },
   subText : {
     color : "grey"
+  },
+  rightTextStyle : {
+    marginLeft : "auto",
+    marginRight : 10
   }
 }
 

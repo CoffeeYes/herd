@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { View, Text, Button, Platform, Dimensions } from 'react-native';
 import Crypto from '../nativeWrapper/Crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from './CustomButton';
 
+import { setPublicKey } from '../redux/actions/userActions'
+
 const Splash = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [textWidth, setTextWidth] = useState(100);
 
   const setup = async () => {
     //generate keys
     await Crypto.generateRSAKeyPair('herdPersonal');
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    dispatch(setPublicKey(key));
 
     //set default styling
     const style = {
@@ -27,11 +33,7 @@ const Splash = ({ navigation }) => {
   }
 
   return (
-    <View style={{
-      alignItems : "center",
-      justifyContent : "center",
-      backgroundColor : "#e05e3f",
-      flex : 1}}>
+    <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
       <Text style={{color : "white",marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
         Welcome to Herd, the peer-to-peer messaging app!
@@ -55,6 +57,12 @@ const Splash = ({ navigation }) => {
 }
 
 const styles = {
+  mainContainer : {
+    alignItems : "center",
+    justifyContent : "center",
+    backgroundColor : "#e05e3f",
+    flex : 1
+  },
   contentContainer : {
     width : Dimensions.get("window").width * 0.7,
     display : "flex",
