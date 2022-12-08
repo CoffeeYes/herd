@@ -177,6 +177,39 @@ class HerdCryptoModule : NSObject {
     stringToEncrypt : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(nil);
-        }
+      guard let keyAsData = Data(base64Encoded : key) else {
+          NSLog("Error converting key to data")
+          return resolve("base64 error");
+      }
+      
+      let attributes : [String : Any] = [
+              kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
+              kSecAttrKeySizeInBits as String : 2048,
+              kSecAttrKeyClass as String : kSecAttrKeyClassPublic
+      ]
+      var error : Unmanaged<CFError>?
+      guard let publicKey = SecKeyCreateWithData(keyAsData as CFData, attributes as CFDictionary,&error) else {
+        NSLog("Error creating public key from string data");
+        return resolve("Error converting string key to actual key")
+      }
+      var stringCopy = stringToEncrypt;
+      let remainder = stringCopy.count % 4;
+      if remainder > 0 {
+        stringCopy = stringCopy.padding(
+            toLength: stringCopy.count + 4 - remainder,
+            withPad: "=", startingAt: 0
+        );
+      }
+      guard let base64Data = Data(base64Encoded : stringCopy) else {
+          NSLog("Error decoding base64 string, \(stringCopy)")
+          return resolve("base64 error");
+      }
+      let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256;
+      guard let cipherData = SecKeyCreateEncryptedData(publicKey,algorithm,base64Data as CFData, &error) as Data? else {
+        NSLog("Error encrypting string");
+          return resolve(nil);
+      }
+      let cipherString = cipherData.base64EncodedString();
+      resolve(cipherString);
+    }
 }
