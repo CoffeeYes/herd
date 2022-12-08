@@ -34,15 +34,8 @@ const styles = {
   buttonText : {
     color : "white",
     fontWeight : "bold",
-<<<<<<< HEAD
     textAlign : "center",
     ...(Platform.OS === 'android' && {fontFamily : "Open-Sans"})
-=======
-    fontFamily : "Open-Sans",
-    textAlign : "center",
-    marginLeft : "auto",
-    marginRight : "auto"
->>>>>>> master
   },
 }
 
