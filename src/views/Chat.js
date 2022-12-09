@@ -41,6 +41,7 @@ const Chat = ({ route, navigation }) => {
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
+  const [characterCount, setCharacterCount] = useState(190);
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -442,19 +443,31 @@ const Chat = ({ route, navigation }) => {
         </View>
       </PanGestureHandler>}
 
-      <TextInput
-      placeholder="Send a Message"
-      style={{
-        ...styles.chatInput,
-        backgroundColor : inputDisabled ? "#c6c6c6" : "white",
-        fontSize : customStyle?.fontSize
-      }}
-      value={chatInput}
-      editable={!inputDisabled}
-      onChangeText={text => setChatInput(text.slice(0,190))}
-      multiline={true}
-      blurOnSubmit={true}
-      onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
+      <View style={{flexDirection : "row"}}>
+        <TextInput
+        placeholder="Send a Message"
+        style={{
+          ...styles.chatInput,
+          backgroundColor : inputDisabled ? "#c6c6c6" : "white",
+          fontSize : customStyle?.fontSize,
+          flex : 1
+        }}
+        value={chatInput}
+        editable={!inputDisabled}
+        onChangeText={text => {
+          const cutText = text.slice(0,190);
+          setChatInput(cutText)
+          setCharacterCount(190 - cutText.length)
+        }}
+        multiline={true}
+        blurOnSubmit={true}
+        onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
+        <View style={{backgroundColor : "white", justifyContent : "center"}}>
+          <Text style={{fontSize : 12}}>
+            {`${characterCount} / 190`}
+          </Text>
+        </View>
+      </View>
     </View>
     </>
   )
