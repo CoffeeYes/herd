@@ -209,6 +209,7 @@ const Chat = ({ route, navigation }) => {
     }));
 
     setChatInput("");
+    setCharacterCount(190);
     setInputDisabled(false);
 
     scrollToBottom();
@@ -324,7 +325,7 @@ const Chat = ({ route, navigation }) => {
       setEnableGestureHandler(true)
     }
     else {
-      setAllowScrollToLoadMessages(true)
+      !showedPopup && setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
     }
   }
@@ -344,6 +345,7 @@ const Chat = ({ route, navigation }) => {
       },1000)
       setShowedPopup(true);
       setEnableGestureHandler(false);
+      setAllowScrollToLoadMessages(false);
     }
   }
 
