@@ -16,6 +16,7 @@ import { imageValues } from '../assets/palette';
 
 import {
   addChat,
+  updateChat,
   setLastText,
   prependMessagesForContact,
   addMessage,
@@ -69,6 +70,13 @@ const Chat = ({ route, navigation }) => {
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
         scrollToBottom(false);
+        //if all messages were previously loaded into state when current chat was previously mounted,
+        //disable the ability to load more messages and prevent popup from being shown
+        if(chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
+          setShowedPopup(true);
+          setAllowScrollToLoadMessages(false);
+          setEnableGestureHandler(false);
+        }
       }
       setLoading(false);
     })()
@@ -346,6 +354,10 @@ const Chat = ({ route, navigation }) => {
       setShowedPopup(true);
       setEnableGestureHandler(false);
       setAllowScrollToLoadMessages(false);
+      dispatch(updateChat({
+        _id : contactInfo._id,
+        doneLoading : true
+      }))
     }
   }
 

@@ -74,7 +74,13 @@ const chatReducer = (state = initialState,action) => {
       if(chatToUpdate) {
         const chatIndex = state.chats.indexOf(chatToUpdate);
         let newChats = [...state.chats];
-        newChats[chatIndex] = {...chatToUpdate,name : action.payload.name,key : action.payload.key,image : action.payload.image};
+        newChats[chatIndex] = {
+          ...chatToUpdate,
+          ...(action?.payload?.name && {name : action.payload.name}),
+          ...(action?.payload?.key && {key : action.payload.key}),
+          ...(action?.payload?.image && {image : action.payload.image}),
+          ...(action?.payload?.doneLoading && {doneLoading : action.payload.doneLoading})
+        };
         return {
           ...state,
           chats : newChats,
