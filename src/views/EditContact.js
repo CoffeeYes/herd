@@ -26,6 +26,7 @@ const EditContact = ({ route, navigation }) => {
   const nameRef = useRef(originalContact.name);
   const keyRef = useRef(originalContact.key);
   const imageRef = useRef(originalContact.image);
+  const originalContactRef = useRef(originalContact);
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
@@ -40,6 +41,11 @@ const EditContact = ({ route, navigation }) => {
     imageRef.current = data;
     _setContactImage(data)
   }
+
+  useEffect(() => {
+    originalContactRef.current = originalContact
+  },[originalContact])
+
 
   const save = async () => {
     try {
@@ -98,10 +104,11 @@ const EditContact = ({ route, navigation }) => {
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
+
       const unsavedChanges = (
-        originalContact.name.trim() != nameRef.current.trim() ||
-        originalContact.key.trim() != keyRef.current.trim() ||
-        originalContact.image != imageRef.current
+        originalContactRef.current.name.trim() != nameRef.current.trim() ||
+        originalContactRef.current.key.trim() != keyRef.current.trim() ||
+        originalContactRef.current.image != imageRef.current
       )
 
       if(unsavedChanges) {
