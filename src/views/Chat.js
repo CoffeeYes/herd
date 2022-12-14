@@ -402,6 +402,18 @@ const Chat = ({ route, navigation }) => {
     )
   }
 
+  const getItemLayout = (data, index) => {
+    //multiply by 1.1 for each point increase in fontsize
+    const fontSizeFactor = (1 + ((customStyle.fontSize - 14)  * 0.1))
+    // min height at 14 fontsize ~= 80, max ~= 150, (80 + 150) / 2 = 115
+    const estimatedMessageHeight = 115 * fontSizeFactor;
+    return {
+      length : estimatedMessageHeight,
+      offset : estimatedMessageHeight * index,
+      index
+    }
+  }
+
   return (
     <>
     <Header
@@ -450,7 +462,7 @@ const Chat = ({ route, navigation }) => {
           keyExtractor={item => item._id}
           renderItem={renderItem}
           onContentSizeChange={handleContentSizeChange}
-          getItemLayout={(data, index) => ({length : 80, offset : 80 * index, index})}
+          getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
             <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
           )}/>
