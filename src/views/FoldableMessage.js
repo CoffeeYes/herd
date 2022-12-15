@@ -21,29 +21,23 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style
 
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
-      {open ?
-      <View style={styles.open}>
-        <View style={styles.closed}>
-          <Text>To: {to}</Text>
+      <View style={{width : "100%"}}>
+        <View style={styles.messageHeader}>
           <Text>From : {from}</Text>
+          <Text>To: {to}</Text>
           <Text>{timestamp}</Text>
         </View>
+        {open &&
         <View style={styles.messageText}>
           <Text>{decryptedText}</Text>
-        </View>
+        </View>}
       </View>
-      :
-      <View style={styles.closed}>
-        <Text>To: {to}</Text>
-        <Text>From : {from}</Text>
-        <Text>{timestamp}</Text>
-      </View>}
     </TouchableOpacity>
   )
 }
 
 const styles = {
-  closed : {
+  messageHeader : {
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%",
@@ -54,9 +48,6 @@ const styles = {
     width : "100%",
     backgroundColor : "#e0e0e0",
     padding : 20,
-  },
-  open : {
-    width : "100%"
   },
   container : {
     flexDirection : "row",
