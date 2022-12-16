@@ -441,11 +441,6 @@ const Chat = ({ route, navigation }) => {
         <Text style={styles.popupText}>No More messages to load</Text>
       </View>}
 
-      {loading ?
-      <ActivityIndicator
-      size="large"
-      color="#e05e3f"/>
-      :
       <PanGestureHandler
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
@@ -453,7 +448,7 @@ const Chat = ({ route, navigation }) => {
           <ActivityIndicator
           size="large"
           color="#e05e3f"
-          animating={loadingMoreMessages}/>
+          animating={loadingMoreMessages || loading}/>
 
           <SectionList
           sections={messages}
@@ -467,7 +462,7 @@ const Chat = ({ route, navigation }) => {
             <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
           )}/>
         </View>
-      </PanGestureHandler>}
+      </PanGestureHandler>
 
       <View style={{flexDirection : "row"}}>
         <TextInput
