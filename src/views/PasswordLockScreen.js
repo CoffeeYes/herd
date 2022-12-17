@@ -28,34 +28,35 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
 
-    if(isErasurePassword) {
-      deleteAllMessages();
-      deleteAllContacts();
-      await Crypto.generateRSAKeyPair('herdPersonal');
-      const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-      dispatch(setPublicKey(key));
-      eraseState(dispatch)
+    if(!isLoginPassword && !isErasurePassword) {
+      setError("Incorrect Password");
+      return;
     }
-
-    if(isErasurePassword || isLoginPassword) {
-      dispatch(setLocked(false));
+    else {
       if(route?.params?.navigationTarget === "passwordSettings") {
-        if(isLoginPassword || isErasurePassword) {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 1,
-              routes: [
-                { name: 'main', params : {initialRoute : "settings"}},
-                { name: 'passwordSettings'}
-              ]
-            })
-          )
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [
+              { name: 'main', params : {initialRoute : "settings"}},
+              { name: 'passwordSettings'}
+            ]
+          })
+        )
+      }
+      else {
+        dispatch(setLocked(false));
+        if(isErasurePassword) {
+          deleteAllMessages();
+          deleteAllContacts();
+          await Crypto.generateRSAKeyPair('herdPersonal');
+          const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+          dispatch(setPublicKey(key));
+          eraseState(dispatch)
         }
       }
     }
-    else {
-      setError("Incorrect Password")
-    }
+    
   }
 
   return (
