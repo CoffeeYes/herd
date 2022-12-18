@@ -18,6 +18,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasureHash = useSelector(state => state.userReducer.erasurePasswordHash);
+  const lastRoutes = useSelector(state => state.appStateReducer.lastRoutes);
 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -46,6 +47,17 @@ const PasswordLockScreen = ({ navigation, route }) => {
       }
       else {
         dispatch(setLocked(false));
+        
+        lastRoutes.length > 0 &&
+        lastRoutes[lastRoutes.length -1].name !== "passwordLockScreen" &&
+        lastRoutes[lastRoutes.length -1].name !== "main" &&
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: lastRoutes
+          })
+        )
+
         if(isErasurePassword) {
           deleteAllMessages();
           deleteAllContacts();
@@ -56,7 +68,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         }
       }
     }
-    
+
   }
 
   return (

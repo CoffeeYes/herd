@@ -57,9 +57,9 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
-import { setLocked } from './src/redux/actions/appStateActions';
+import { setLocked, setLastRoutes } from './src/redux/actions/appStateActions';
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 const App = ({ }) => {
   const dispatch = useDispatch();
@@ -96,8 +96,11 @@ const App = ({ }) => {
     const appStateListener = AppState.addEventListener("change",async state => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
+      const lastRoutes = navigationRef?.current?.getRootState()?.routes;
       if(state === "background" && passwordSetRef.current) {
-        dispatch(setLocked(true))
+        dispatch(setLocked(true));
+        lastRoutes &&
+        dispatch(setLastRoutes(lastRoutes));
       }
     })
 
