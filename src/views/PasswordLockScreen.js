@@ -11,7 +11,6 @@ import { deleteAllContacts } from '../realm/contactRealm';
 import Crypto from '../nativeWrapper/Crypto';
 
 import { setPublicKey } from '../redux/actions/userActions';
-import { setLocked } from '../redux/actions/appStateActions';
 import { eraseState } from '../redux/actions/combinedActions';
 
 const PasswordLockScreen = ({ navigation, route }) => {
@@ -46,15 +45,19 @@ const PasswordLockScreen = ({ navigation, route }) => {
         )
       }
       else {
-        dispatch(setLocked(false));
-        
-        lastRoutes.length > 0 &&
-        lastRoutes[lastRoutes.length -1].name !== "passwordLockScreen" &&
-        lastRoutes[lastRoutes.length -1].name !== "main" &&
+
+        let routesToResetTo = [{ name : "main"}];
+        if(lastRoutes.length > 0 && !isErasurePassword) {
+          const lastLastRoute = lastRoutes[lastRoutes.length -1].name;
+          if(lastLastRoute !== "passwordLockScreen" && lastLastRoute !== "main") {
+            routesToResetTo = lastRoutes;
+          }
+        }
+
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: lastRoutes
+            routes: routesToResetTo
           })
         )
 
@@ -75,11 +78,13 @@ const PasswordLockScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       <Text style={styles.error}>{error}</Text>
       <Text style={styles.inputTitle}>Enter Your Password : </Text>
+
       <TextInput
       secureTextEntry
       style={styles.input}
       onChangeText={setPassword}
       value={password}/>
+
       <CustomButton
       text="Submit"
       onPress={checkPassword}/>

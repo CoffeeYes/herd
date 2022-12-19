@@ -5,7 +5,6 @@ import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-nati
 import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import { setPassword } from '../redux/actions/userActions';
-import { setLocked } from '../redux/actions/appStateActions';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';

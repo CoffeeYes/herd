@@ -57,7 +57,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
-import { setLocked, setLastRoutes } from './src/redux/actions/appStateActions';
+import { setLastRoutes } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
 
@@ -98,7 +98,12 @@ const App = ({ }) => {
       //during transition when tabbing back in
       const lastRoutes = navigationRef?.current?.getRootState()?.routes;
       if(state === "background" && passwordSetRef.current) {
-        dispatch(setLocked(true));
+        navigationRef.current.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name : "passwordLockScreen"}]
+          })
+        )
         lastRoutes &&
         dispatch(setLastRoutes(lastRoutes));
       }
@@ -122,14 +127,15 @@ const App = ({ }) => {
 
     //determine the entry screen
     if(key?.length > 0) {
-      setInitialRoute("main")
+      if(loginPassword.length > 0) {
+        setInitialRoute("passwordLockScreen");
+      }
+      else {
+        setInitialRoute("main");
+      }
     }
     else {
       setInitialRoute("splash")
-    }
-
-    if(loginPassword.length > 0) {
-      dispatch(setLocked(true));
     }
 
     dispatch(setPublicKey(key));
@@ -183,12 +189,10 @@ const App = ({ }) => {
       <Stack.Navigator
       initialRouteName={initialRoute}
       screenOptions={{headerShown : false}}>
-      {locked ?
-        <Stack.Screen
-        name="passwordLockScreen"
-        component={PasswordLockScreen}/>
-        :
         <>
+          <Stack.Screen
+          name="passwordLockScreen"
+          component={PasswordLockScreen}/>
           <Stack.Screen name="contacts" component={Contacts}/>
           <Stack.Screen name="addContact" component={AddContact}/>
           <Stack.Screen name="chats" component={Chats}/>
@@ -207,7 +211,7 @@ const App = ({ }) => {
           <Stack.Screen
           name="passwordLockScreen2"
           component={PasswordLockScreen}/>
-        </>}
+        </>
       </Stack.Navigator>}
     </>
   );
