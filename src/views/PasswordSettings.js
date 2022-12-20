@@ -8,16 +8,13 @@ import { setPassword } from '../redux/actions/userActions';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import PasswordCreationBox from './PasswordCreationBox';
 
 import Crypto from '../nativeWrapper/Crypto';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
-  const [loginPassword, setLoginPassword] = useState("");
-  const [confirmLoginPassword, setConfirmLoginPassword] = useState("");
   const [loginPasswordError, setLoginPasswordError] = useState("");
-  const [erasurePassword, setErasurePassword] = useState("");
-  const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
   const [erasurePasswordError, setErasurePasswordError] = useState("");
 
   const hasErasurePassword = useSelector(state => state.userReducer.erasurePasswordHash)?.length > 0;
@@ -38,7 +35,6 @@ const PasswordSettings = () => {
   }
 
   const savePassword = async (name, password, confirmation, setError) => {
-    setError("");
     const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
       setError(validate.error);
@@ -57,8 +53,11 @@ const PasswordSettings = () => {
 
     if(!hasLoginPassword && name === "erasurePassword") {
       setErasurePasswordError("You must set up a normal password before an erasure password can be used")
-      return  false;
+      return false;
     }
+
+    //reset error after validation so that error text does not "flash" when re-submitting after error
+    setError("");
 
     if(name === "loginPassword") {
       if(loginHash) {
@@ -69,9 +68,6 @@ const PasswordSettings = () => {
       }
       //update state store
       dispatch(setPassword("login",hash));
-      //reset form
-      setLoginPassword("");
-      setConfirmLoginPassword("");
     }
     else if(name === "erasurePassword") {
       if(erasureHash) {
@@ -81,8 +77,6 @@ const PasswordSettings = () => {
         createNewPassword(name,hash);
       }
       dispatch(setPassword("erasure",hash));
-      setErasurePassword("");
-      setConfirmErasurePassword("");
     }
     return true;
   }
@@ -117,96 +111,47 @@ const PasswordSettings = () => {
 
       <ScrollView contentContainerStyle={styles.container}>
 
-        <View style={styles.card}>
-          <Text multiline>
-            You will be asked to enter this password when opening the app
-            and accessing security-critical pages such as this one.
-          </Text>
-          <Text style={styles.error}>{loginPasswordError}</Text>
-          <Text style={styles.inputTitle}>Main Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setLoginPassword}
-          value={loginPassword}/>
+        <PasswordCreationBox
+        primaryName="Main Password"
+        secondaryName="Confirm Main Password"
+        description="You will be asked to enter this password when opening the app
+        and accessing security-critical pages such as this one."
+        error={loginPasswordError}
+        primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
+          "loginPassword",
+          loginPassword,
+          confirmLoginPassword,
+          setLoginPasswordError
+        )}
+        primaryButtonText="Save"
+        primaryButtonFlashText="Saved!"
+        secondaryButtonOnPress={() => resetPassword("loginPassword")}
+        secondaryButtonDisabled={!hasLoginPassword}
+        secondaryButtonText="Reset"
+        secondaryButtonFlashText="Reset"
+        />
 
-          <Text style={styles.inputTitle}>Confirm Main Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setConfirmLoginPassword}
-          value={confirmLoginPassword}/>
-
-          <View style={{flexDirection : "row"}}>
-            <FlashTextButton
-            normalText="Save"
-            flashText="Saved!"
-            disabled={loginPassword.trim().length === 0 || confirmLoginPassword.trim().length === 0}
-            onPress={() => savePassword(
-              "loginPassword",
-              loginPassword,
-              confirmLoginPassword,
-              setLoginPasswordError
-            )}
-            timeout={500}
-            buttonStyle={styles.button}
-            textStyle={styles.buttonText}/>
-
-            <FlashTextButton
-            normalText="Reset"
-            flashText="Reset"
-            disabled={!hasLoginPassword}
-            onPress={() => resetPassword("loginPassword")}
-            timeout={0}
-            buttonStyle={{...styles.button, marginLeft : 10}}
-            textStyle={styles.buttonText}/>
-          </View>
-        </View>
-
-        <View style={{...styles.card,marginTop : 10}}>
-          <Text multiline>
-            Entering this password when opening the app will cause all data
-            to be wiped from the application. Your public key will also be changed,
-            meaning all contacts who have previously added you will need to add you again.
-          </Text>
-          <Text style={styles.error}>{erasurePasswordError}</Text>
-          <Text style={styles.inputTitle}>Erasure Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setErasurePassword}
-          value={erasurePassword}/>
-          <Text style={styles.inputTitle}>Confirm Erasure Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setConfirmErasurePassword}
-          value={confirmErasurePassword}/>
-
-          <View style={{flexDirection : "row"}}>
-            <FlashTextButton
-            normalText="Save"
-            flashText="Saved!"
-            disabled={erasurePassword.trim().length === 0 || confirmErasurePassword.trim().length === 0}
-            onPress={() => savePassword(
-              "erasurePassword",
-              erasurePassword,
-              confirmErasurePassword,
-              setErasurePasswordError
-            )}
-            timeout={500}
-            buttonStyle={styles.button}
-            textStyle={styles.buttonText}/>
-            <FlashTextButton
-            normalText="Reset"
-            flashText="Reset"
-            disabled={!hasErasurePassword}
-            onPress={() => resetPassword("erasurePassword")}
-            timeout={0}
-            buttonStyle={{...styles.button, marginLeft : 10}}
-            textStyle={styles.buttonText}/>
-          </View>
-        </View>
+        <PasswordCreationBox
+        mainContainerStyle={{marginTop : 10}}
+        primaryName="Erasure Password"
+        secondaryName="Confirm Erasure Password"
+        description="Entering this password when opening the app will cause all data
+        to be wiped from the application. Your public key will also be changed,
+        meaning all contacts who have previously added you will need to add you again."
+        error={erasurePasswordError}
+        primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
+          "erasurePassword",
+          erasurePassword,
+          confirmErasurePassword,
+          setErasurePasswordError
+        )}
+        primaryButtonText="Save"
+        primaryButtonFlashText="Saved!"
+        secondaryButtonOnPress={() => resetPassword("erasurePassword")}
+        secondaryButtonDisabled={!hasErasurePassword}
+        secondaryButtonText="Reset"
+        secondaryButtonFlashText="Reset"
+        />
 
       </ScrollView>
     </>
