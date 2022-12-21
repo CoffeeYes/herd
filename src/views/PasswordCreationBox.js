@@ -3,13 +3,24 @@ import { View, Text, TextInput, Dimensions } from 'react-native';
 
 import FlashTextButton from './FlashTextButton';
 
-const PasswordCreationBox = ({ description, submit, error, primaryName, secondaryName,
+const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
                             secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
                             primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle }) => {
 
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
+
+  const primaryInputRef = useRef();
+  const secondaryInputRef = useRef();
+
+  const submit = async () => {
+    const result = await primaryButtonOnPress(primaryInputText,secondaryInputText);
+    if(result) {
+      setPrimaryInputText("");
+      setSecondaryInputText("");
+    }
+  }
 
   return (
         <View style={{...mainContainerStyle, ...styles.card}}>
@@ -26,6 +37,8 @@ const PasswordCreationBox = ({ description, submit, error, primaryName, secondar
           secureTextEntry
           style={styles.input}
           onChangeText={setPrimaryInputText}
+          ref={primaryInputRef}
+          onSubmitEditing={() => secondaryInputRef.current.focus()}
           value={primaryInputText}/>
 
           <Text style={styles.inputTitle}>{secondaryName}</Text>
@@ -33,6 +46,8 @@ const PasswordCreationBox = ({ description, submit, error, primaryName, secondar
           secureTextEntry
           style={styles.input}
           onChangeText={setSecondaryInputText}
+          ref={secondaryInputRef}
+          onSubmitEditing={() => submit()}
           value={secondaryInputText}/>
 
           <View style={{flexDirection : "row"}}>
@@ -40,13 +55,7 @@ const PasswordCreationBox = ({ description, submit, error, primaryName, secondar
             normalText={primaryButtonText}
             flashText={primaryButtonFlashText}
             disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryButtonDisabled}
-            onPress={async () => {
-              const result = await primaryButtonOnPress(primaryInputText,secondaryInputText);
-              if(result) {
-                setPrimaryInputText("");
-                setSecondaryInputText("");
-              }
-            }}
+            onPress={() => submit()}
             timeout={500}
             buttonStyle={styles.button}
             textStyle={styles.buttonText}/>
