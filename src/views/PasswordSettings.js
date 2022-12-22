@@ -105,6 +105,13 @@ const PasswordSettings = () => {
     );
   }
 
+  const mainPasswordDescription = `You will be asked to enter this password when opening the app \
+and accessing security-critical pages such as this one.`
+
+  const erasurePasswordDescription = `Entering this password when opening the app will cause all data \
+to be wiped from the application. Your public key will also be changed, \
+meaning all contacts who have previously added you will need to add you again.`
+
   return (
     <>
       <Header title="Password Settings" allowGoBack/>
@@ -114,8 +121,7 @@ const PasswordSettings = () => {
         <PasswordCreationBox
         primaryName="Main Password"
         secondaryName="Confirm Main Password"
-        description="You will be asked to enter this password when opening the app
-        and accessing security-critical pages such as this one."
+        description={mainPasswordDescription}
         error={loginPasswordError}
         primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
           "loginPassword",
@@ -135,9 +141,7 @@ const PasswordSettings = () => {
         mainContainerStyle={{marginTop : 10}}
         primaryName="Erasure Password"
         secondaryName="Confirm Erasure Password"
-        description="Entering this password when opening the app will cause all data
-        to be wiped from the application. Your public key will also be changed,
-        meaning all contacts who have previously added you will need to add you again."
+        description={erasurePasswordDescription}
         error={erasurePasswordError}
         primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
           "erasurePassword",
@@ -162,45 +166,6 @@ const styles = {
   container : {
     padding : 20,
     alignItems : "center",
-  },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5,
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
-  },
-  input : {
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom : 10,
-    width : Dimensions.get('window').width * 0.8,
-    alignSelf : "center",
-    padding : 10,
-    backgroundColor : "white",
-    borderRadius : 5
-  },
-  inputTitle : {
-    fontWeight : "bold",
-    marginBottom : 5
-  },
-  card : {
-    backgroundColor : "white",
-    padding : 20,
-    borderRadius : 5,
-    alignItems : "center",
-    justifyContent : "center",
-    elevation : 2
-  },
-  error : {
-    color : "red",
-    fontWeight : "bold"
   }
 }
 
