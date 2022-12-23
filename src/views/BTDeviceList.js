@@ -9,8 +9,8 @@ import Header from './Header';
 import CustomButton from './CustomButton';
 
 const BTDeviceList = () => {
-  const [deviceList, setDeviceList] = useState([]);
-  const [scanning, setScanning] = useState(true);
+  const [deviceList, _setDeviceList] = useState([]);
+  const [scanning, _setScanning] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
   const [error, setError] = useState("");
@@ -18,10 +18,19 @@ const BTDeviceList = () => {
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
 
+  const setScanning = data => {
+    scanningRef.current = data;
+    _setScanning(data)
+  }
+
+  const setDeviceList = data => {
+    deviceRef.current = data;
+    _setDeviceList(data);
+  }
+
   const updateDeviceList = newDevice => {
     if(!deviceRef.current.find(existingDevice => existingDevice.macAddress === newDevice.macAddress)) {
-      deviceRef.current = [...deviceRef.current,newDevice];
-      setDeviceList(deviceRef.current);
+      setDeviceList([...deviceRef.current,newDevice]);
     }
   }
 
@@ -33,12 +42,10 @@ const BTDeviceList = () => {
 
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
       if(state === "DISCOVERY_STARTED") {
-        scanningRef.current = true;
-        setScanning(scanningRef.current);
+        setScanning(true);
       }
       else if (state === "DISCOVERY_FINISHED") {
-        scanningRef.current = false;
-        setScanning(scanningRef.current);
+        setScanning(false);
       }
     })
 
@@ -86,15 +93,14 @@ const BTDeviceList = () => {
       allowGoBack/>
 
       <View style={styles.mainContainer}>
-        {scanning &&
         <View>
-          <Text>Scanning...</Text>
-          <ActivityIndicator size="large" color="#e05e3f"/>
+          <Text>{scanning ? "Scanning..." : ""}</Text>
+          <ActivityIndicator size="large" color="#e05e3f" animating={scanning}/>
         </View>
-        }
+
         {error.length > 0 &&
-        <Text style={styles.error}>{error}</Text>
-        }
+        <Text style={styles.error}>{error}</Text>}
+
         <ScrollView contentContainerStyle={styles.BTList}>
           {deviceList.map((device,index) =>
             <TouchableOpacity
@@ -109,7 +115,7 @@ const BTDeviceList = () => {
 
         <CustomButton
         text={scanning ? "Cancel Scan" : "Re-Scan"}
-        onPress={() => {scanning ? Bluetooth.cancelScanForDevices() : restartScan()}}
+        onPress={() => scanning ? Bluetooth.cancelScanForDevices() : restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
         <BTExchangeModal
@@ -131,6 +137,7 @@ const styles = {
     backgroundColor : "#D8D8D8",
     width : Dimensions.get("window").width - 40,
     padding : 10,
+    flex : 1
   },
   deviceContainer : {
     padding : 10,
