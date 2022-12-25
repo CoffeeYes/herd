@@ -12,8 +12,11 @@ const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
       {errorText?.length > 0 &&
       <Text style={styles.error}>{errorText}</Text>}
 
-      <Icon name={icon} size={iconSize}/>
-      <Text style={{...styles.text, ...textStyle}}>{text}</Text>
+      {icon &&
+      <Icon name={icon} size={iconSize}/>}
+
+      {text &&
+      <Text style={{...styles.text, ...textStyle}}>{text}</Text>}
     </TouchableOpacity>
   )
 }

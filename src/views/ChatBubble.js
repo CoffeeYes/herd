@@ -4,35 +4,35 @@ import { fromHsv, toHsv } from 'react-native-color-picker';
 
 const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
                       onLongPress, onPress, notTouchable, highlighted }) => {
+
+  const boxStyle = {
+    ...styles.message,
+    ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
+    backgroundColor : messageFrom ? customStyle.sentBoxColor : customStyle.receivedBoxColor,
+    ...(highlighted && {...styles.highlighted})
+  }
+
+  const getTextStyle = textType => {
+    return ({
+      ...(textType === "messageText" && {...styles.messageText}),
+      ...(textType === "timestamp" && {...styles.timestamp}),
+      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
+      fontSize : customStyle.fontSize
+    })
+  }
+
   return (
     <TouchableOpacity
     disabled={notTouchable}
     onLongPress={onLongPress}
     onPress={onPress}
-    style={messageFrom ?
-      {...styles.message,
-       ...styles.messageFromYou,
-       backgroundColor : customStyle.sentBoxColor,
-       ...(highlighted && {...styles.highlighted})}
-      :
-      {...styles.message,
-       ...styles.messageFromOther,
-       backgroundColor : customStyle.receivedBoxColor,
-       ...(highlighted && {...styles.highlighted})}}>
+    style={boxStyle}>
       <Text
-      style={{
-        ...styles.messageText,
-        color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-        fontSize : customStyle.fontSize
-      }}>
+      style={getTextStyle("messageText")}>
         {text}
       </Text>
       <Text
-      style={{
-      ...styles.timestamp,
-      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-      fontSize : customStyle.fontSize
-      }}>
+      style={getTextStyle("timestamp")}>
         {timestamp}
       </Text>
     </TouchableOpacity>
@@ -64,7 +64,7 @@ const styles = {
   },
   timestamp : {
     fontWeight : "bold",
-    alignSelf : "flex-end"
+    alignSelf : "flex-end",
   },
   highlighted : {
     borderWidth : 2,

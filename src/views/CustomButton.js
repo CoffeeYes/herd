@@ -12,7 +12,8 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSiz
       {leftIcon &&
       <Icon name={leftIcon} size={leftIconSize}/>}
 
-      <Text style={{...styles.buttonText, ...textStyle}}>{text}</Text>
+      {text &&
+      <Text style={{...styles.buttonText, ...textStyle}}>{text}</Text>}
 
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize}/>}

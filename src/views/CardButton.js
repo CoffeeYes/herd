@@ -20,13 +20,18 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
     <TouchableOpacity
     style={{...styles.container,...containerStyle}}
     onPress={(flashText && timeout) ? flash : onPress}>
+    
+      {currentText &&
       <View style={styles.textContainer}>
         <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
-      </View>
+      </View>}
+
+      {rightIcon &&
       <Icon
       style={{...styles.icon, ...iconStyle}}
       name={rightIcon}
-      size={iconSize || 32}/>
+      size={iconSize || 32}/>}
+
     </TouchableOpacity>
   )
 }
