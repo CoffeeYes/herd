@@ -12,17 +12,13 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
           <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
         </TouchableOpacity>}
 
-      {onTextTouch ?
-        <TouchableOpacity onPress={onTextTouch} style={{...styles.pressContainer,...touchStyle}}>
+        <TouchableOpacity
+        disabled={!onTextTouch}
+        onPress={onTextTouch}
+        style={{...styles.pressContainer,...touchStyle}}>
           {preText}
           <Text style={{...styles.title,...textStyle}}>{title}</Text>
         </TouchableOpacity>
-        :
-        <>
-          {preText}
-          <Text style={{...styles.title,...textStyle}}>{title}</Text>
-        </>
-      }
 
 
       {rightButtonIcon && rightButtonIcon.length > 0 && rightButtonOnClick &&

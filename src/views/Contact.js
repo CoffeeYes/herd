@@ -43,8 +43,8 @@ const Contact = ({route, navigation}) => {
 
       <ScrollView contentContainerStyle={{paddingTop : 20}}>
         <View style={largeImageContainerStyle}>
-          {contact.image !== "" ?
           <TouchableOpacity
+          disabled={contact.image === ""}
           onPress={() => contact.image != "" && setShowLargeImage(true)}>
             <ContactImage
             imageURI={contact.image}
@@ -52,12 +52,6 @@ const Contact = ({route, navigation}) => {
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
           </TouchableOpacity>
-          :
-          <ContactImage
-          imageURI={contact.image}
-          iconSize={64}
-          imageWidth={Dimensions.get("window").width * 0.4}
-          imageHeight={Dimensions.get("window").height * 0.4}/>}
         </View>
 
         <View style={{alignItems : "center"}}>
