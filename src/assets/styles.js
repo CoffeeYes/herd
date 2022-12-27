@@ -15,6 +15,15 @@ const largeImageContainerStyle = {
   marginBottom : 10
 }
 
+const defaultChatStyles = {
+  sentBoxColor : "#c6c6c6",
+  sentTextColor : "#f5f5f5",
+  receivedBoxColor : "#E86252",
+  receivedTextColor : "#f5f5f5",
+  fontSize : 14
+}
+
 export {
-  largeImageContainerStyle
+  largeImageContainerStyle,
+  defaultChatStyles
 }

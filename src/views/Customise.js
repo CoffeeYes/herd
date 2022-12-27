@@ -13,6 +13,8 @@ import ChatBubble from './ChatBubble';
 
 import { setStyles } from '../redux/actions/chatActions';
 
+import { defaultChatStyles } from '../assets/styles';
+
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -60,7 +62,6 @@ const Customise = ({ navigation }) => {
 
   const loadStyles = async () => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-
     if(styles) {
       setSentBoxColor(toHsv(styles.sentBoxColor));
       setSentTextColor(toHsv(styles.sentTextColor));
@@ -92,10 +93,10 @@ const Customise = ({ navigation }) => {
       const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
       const unsavedChanges = (
-        fromHsv(sentBoxColorRef.current) != styles.sentBoxColor ||
-        fromHsv(sentTextColorRef.current) != styles.sentTextColor ||
-        fromHsv(receivedBoxColorRef.current) != styles.receivedBoxColor ||
-        fromHsv(receivedTextColorRef.current) != styles.receivedTextColor ||
+        fromHsv(sentBoxColorRef.current).toLowerCase() != styles.sentBoxColor.toLowerCase() ||
+        fromHsv(sentTextColorRef.current).toLowerCase() != styles.sentTextColor.toLowerCase() ||
+        fromHsv(receivedBoxColorRef.current).toLowerCase() != styles.receivedBoxColor.toLowerCase() ||
+        fromHsv(receivedTextColorRef.current).toLowerCase() != styles.receivedTextColor.toLowerCase() ||
         fontSizeRef.current != styles.fontSize
       )
 
@@ -124,15 +125,6 @@ const Customise = ({ navigation }) => {
   },[navigation])
 
   const restoreDefault = async () => {
-    //set default styling
-    const style = {
-      sentBoxColor : "#c6c6c6",
-      sentTextColor : "#f5f5f5",
-      receivedBoxColor : "#e86252",
-      receivedTextColor : "#f5f5f5",
-      fontSize : 14
-    }
-
     Alert.alert(
       'Discard you sure you want to restore default styles?',
       '',
@@ -144,8 +136,8 @@ const Customise = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            await AsyncStorage.setItem("styles",JSON.stringify(style));
-            dispatch(setStyles(style))
+            await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
+            dispatch(setStyles(defaultChatStyles));
             loadStyles();
           },
         },

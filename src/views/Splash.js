@@ -7,6 +7,8 @@ import CustomButton from './CustomButton';
 
 import { setPublicKey } from '../redux/actions/userActions'
 
+import { defaultChatStyles } from '../assets/styles';
+
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
   const [textWidth, setTextWidth] = useState(100);
@@ -18,15 +20,7 @@ const Splash = ({ navigation }) => {
     dispatch(setPublicKey(key));
 
     //set default styling
-    const style = {
-      sentBoxColor : "#c6c6c6",
-      sentTextColor : "#f5f5f5",
-      receivedBoxColor : "#E86252",
-      receivedTextColor : "#f5f5f5",
-      fontSize : 14
-    }
-
-    await AsyncStorage.setItem("styles",JSON.stringify(style))
+    await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
 
     navigation.navigate('main');
 
