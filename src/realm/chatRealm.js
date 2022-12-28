@@ -29,6 +29,17 @@ const deletedReceivedRealm = new Realm({
   schema : [Schemas.MessageSchema]
 })
 
+const decryptString = async text => {
+  const decrypted = await Crypto.decryptString(
+    "herdPersonal",
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    text
+  );
+  return decrypted;
+}
+
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
 
@@ -58,13 +69,7 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   if(receivedMessages.length > 0) {
     for(var message in receivedMessages) {
       const currentMessage = JSON.parse(JSON.stringify(receivedMessages[message]))
-      const decrypted = await Crypto.decryptString(
-        "herdPersonal",
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        receivedMessages[message].text
-      )
+      const decrypted = await decryptString(receivedMessages[message].text);
       initialReceivedMessages.push({...currentMessage,text : decrypted});
     }
   }
@@ -72,28 +77,32 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   var initialSentMessages = [];
   if(sentMessagesCopy.length > 0) {
     for(var message in sentMessagesCopy) {
-      const currentMessage = JSON.parse(JSON.stringify(sentMessagesCopy[message]))
-      const decrypted = await Crypto.decryptString(
-        "herdPersonal",
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        sentMessagesCopy[message].text
-      )
+      const currentMessage = JSON.parse(JSON.stringify(sentMessagesCopy[message]));
+      const decrypted = await decryptString(sentMessagesCopy[message].text);
       initialSentMessages.push({...currentMessage,text : decrypted});
     }
   }
+
+  let highestMessageIndex;
+  let lowestMessageIndex;
+
+  //calculate new indices to send to frontend based on the sizes of the received/sent message arrays
+  if(initialLoad) {
+    if(firstReceived.timestamp < firstSent.timestamp) {
+      highestMessageIndex = -initialSentMessages.length;
+      lowestMessageIndex = -initialReceivedMessages.length;
+    }
+    else {
+      highestMessageIndex = -initialReceivedMessages.length;
+      lowestMessageIndex = -initialSentMessages.length;
+    }
+  }
+
   return {
     messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
-    ...(initialLoad && {newStart : firstReceived.timestamp < firstSent.timestamp ?
-      -initialSentMessages.length
-      :
-      -initialReceivedMessages.length}
+    ...(initialLoad && {newStart : highestMessageIndex}
     ),
-    ...(initialLoad && {newEnd : firstReceived.timestamp < firstSent.timestamp ?
-      -initialReceivedMessages.length
-      :
-      -initialSentMessages.length}
+    ...(initialLoad && {newEnd : lowestMessageIndex}
     )
   }
 }
@@ -156,13 +165,8 @@ const addNewReceivedMessages = async (messages,dispatch) => {
         dispatch(addContact(contact));
       }
       if(contact && message.to.trim() === ownPublicKey.trim()) {
-        Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          message.text
-        ).then(decrypted => dispatch(addMessage(contact._id,{
+        decryptString(message.text)
+        .then(decrypted => dispatch(addMessage(contact._id,{
           ...message,
           text : decrypted
         })))
@@ -337,13 +341,7 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   //decrypt, re-encrpyt with new key and write to DB
   let newTexts = [];
   await Promise.all(sentMessagesCopy.map(async message => {
-    const decryptedText = await Crypto.decryptString(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      parseRealmObject(message).text
-    )
+    const decryptedText = await decryptString(parseRealmObject(message).text);
     const newEncryptedString = await Crypto.encryptStringWithKey(
       newKey,
       Crypto.algorithm.RSA,
