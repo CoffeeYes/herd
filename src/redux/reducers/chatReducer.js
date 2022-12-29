@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { defaultChatStyles } from '../../assets/styles'
 
 const generateMessageDays = (existingMessages = [], newMessages) => {
   let dates = [...existingMessages]
@@ -23,13 +24,7 @@ const generateMessageDays = (existingMessages = [], newMessages) => {
 
 const initialState = {
   chats : [],
-  styles : {
-    sentBoxColor : "#c6c6c6",
-    sentTextColor : "#f5f5f5",
-    receivedBoxColor : "#E86252",
-    receivedTextColor : "#f5f5f5",
-    fontSize : 14
-  },
+  styles : defaultChatStyles,
   messageQueue : [],
   messages : {}
 }
@@ -47,6 +42,19 @@ const setLastText = (state, id, message) => {
   else {
     return state.chats
   }
+}
+
+const updateChat = (originalChat, newValues) => {
+  let updatedChat = {...originalChat};
+  const updateableValues = ["name","key","image", "doneLoading"];
+
+  Object.keys(newValues).map(key => {
+    if(updateableValues.indexOf(key) != -1) {
+      updatedChat[key] = newValues[key];
+    }
+  })
+
+  return updatedChat;
 }
 
 const chatReducer = (state = initialState,action) => {
@@ -74,13 +82,7 @@ const chatReducer = (state = initialState,action) => {
       if(chatToUpdate) {
         const chatIndex = state.chats.indexOf(chatToUpdate);
         let newChats = [...state.chats];
-        newChats[chatIndex] = {
-          ...chatToUpdate,
-          ...(action?.payload?.name && {name : action.payload.name}),
-          ...(action?.payload?.key && {key : action.payload.key}),
-          ...(action?.payload?.image && {image : action.payload.image}),
-          ...(action?.payload?.doneLoading && {doneLoading : action.payload.doneLoading})
-        };
+        newChats[chatIndex] = updateChat(newChats[chatIndex],action.payload);
         return {
           ...state,
           chats : newChats,
