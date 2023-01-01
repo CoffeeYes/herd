@@ -144,6 +144,40 @@ const Customise = ({ navigation }) => {
       ]
     );
   }
+  const tabItems = [
+    {
+    	name : "sentBox",
+    	text : "Sent Box",
+      title : "Sent Box Color",
+      color : sentBoxColor,
+      originalColor : "sentBoxColor",
+      setColor : setSentBoxColor
+    },
+    {
+    	name : "sentText",
+    	text : "Sent Text",
+      title : "Sent Text Color",
+      color : sentTextColor,
+      originalColor : "sentTextColor",
+      setColor : setSentTextColor
+    },
+    {
+    	name : "receivedBox",
+    	text : "Received Box",
+      title : "Received Box Color",
+      color : receivedBoxColor,
+      originalColor : "receivedBoxColor",
+      setColor : setReceivedBoxColor
+    },
+    {
+    	name : "receivedText",
+    	text : "Received Text",
+      title : "Received Text Color",
+      color : receivedTextColor,
+      originalColor : "receivedTextColor",
+      setColor : setReceivedTextColor
+    }
+  ];
 
   return (
     <>
@@ -198,62 +232,31 @@ const Customise = ({ navigation }) => {
 
         <View style={styles.colorChoiceContainer}>
           <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
-            <TabItem
-            text="Sent Box"
-            containerStyle={{width : tabWidth}}
-            active={activeItem === "sentBox"}
-            onPress={() => setActiveItem("sentBox")}/>
-
-            <TabItem
-            text="Sent Text"
-            containerStyle={{width : tabWidth}}
-            active={activeItem === "sentText"}
-            onPress={() => setActiveItem("sentText")}/>
-
-            <TabItem
-            text="Received Box"
-            containerStyle={{width : tabWidth}}
-            active={activeItem === "receivedBox"}
-            onPress={() => setActiveItem("receivedBox")}/>
-
-            <TabItem
-            text="Received Text"
-            containerStyle={{width : tabWidth, borderRightWidth : 0}}
-            active={activeItem === "receivedText"}
-            onPress={() => setActiveItem("receivedText")}/>
+            {tabItems.map((item,index) => {
+              return (
+                <TabItem
+                text={item.text}
+                containerStyle={{
+                  width : tabWidth,
+                  ...((index === tabItems.length -1) && {borderRightWidth : 0})
+                }}
+                active={activeItem === item.name}
+                onPress={() => setActiveItem(item.name)}/>
+              )})
+            }
           </View>
 
-          {activeItem === "sentBox" &&
-          <ColorChoice
-            title={"Sent Box Color"}
-            color={toHsv(sentBoxColor)}
-            setColor={setSentBoxColor}
-            oldColor={originalStyles.sentBoxColor}
-          />}
-
-          {activeItem === "sentText" &&
-          <ColorChoice
-            title={"Sent Text Color"}
-            color={toHsv(sentTextColor)}
-            setColor={setSentTextColor}
-            oldColor={originalStyles.sentTextColor}
-          />}
-
-          {activeItem === "receivedBox" &&
-          <ColorChoice
-            title={"Received Box Color"}
-            color={toHsv(receivedBoxColor)}
-            setColor={setReceivedBoxColor}
-            oldColor={originalStyles.receivedBoxColor}
-          />}
-
-          {activeItem === "receivedText" &&
-          <ColorChoice
-            title={"Received Text Color"}
-            color={toHsv(receivedTextColor)}
-            setColor={setReceivedTextColor}
-            oldColor={originalStyles.receivedTextColor}
-          />}
+          {tabItems.map(item => {
+            return(
+              activeItem === item.name &&
+              <ColorChoice
+                title={item.title}
+                color={toHsv(item.color)}
+                setColor={item.setColor}
+                oldColor={originalStyles[item.originalColor]}
+              />
+            )})
+          }
         </View>
 
         <View style={styles.buttonRow}>
