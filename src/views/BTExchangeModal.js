@@ -99,7 +99,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
           <ActivityIndicator size="large" color="#e05e3f" animating={loading}/>
           <Text>{activityText}</Text>
           <CustomButton
-          onPress={cancel}
+          onPress={() => cancel()}
           buttonStyle={{marginTop : 10}}
           text="Cancel"/>
         </View>

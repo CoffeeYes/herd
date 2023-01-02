@@ -21,7 +21,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         </TouchableOpacity>
 
 
-      {rightButtonIcon && rightButtonIcon.length > 0 && rightButtonOnClick &&
+      {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={styles.rightButton}>
