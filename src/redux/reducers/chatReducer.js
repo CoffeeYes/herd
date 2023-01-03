@@ -81,8 +81,6 @@ const chatReducer = (state = initialState,action) => {
     case "DELETE_CHAT": {
       return {...state,
         chats : [...state.chats].filter(chat => chat._id !== action.payload._id),
-        messages : {...state.messages,[action.payload._id] : []},
-        messageQueue : [...state.messageQueue].filter(message => message.to !== action.payload.key)
       };
       break;
     }
@@ -117,8 +115,7 @@ const chatReducer = (state = initialState,action) => {
         messages : {
           ...state.messages,
           [id] : generateMessageDays(state.messages[id],[message])
-        },
-        chats : setLastText(state,id,message)
+        }
       };
       return newState;
       break;
@@ -196,7 +193,12 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "SET_MESSAGES_FOR_CONTACT": {
-      return {...state,messages : {...state.messages,[action.payload.id] : action.payload.messages}}
+      return {...state,
+        messages : {
+          ...state.messages,
+          [action.payload.id] : action.payload.messages
+        }
+      }
       break;
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {

@@ -6,9 +6,10 @@ const setChats = chats => {
 }
 
 const deleteChat = chat => {
-  return {
-    type : "DELETE_CHAT",
-    payload : chat
+  return (dispatch,getState) => {
+    dispatch({type : "DELETE_CHAT",payload : chat});
+    dispatch(filterMessageQueueByContact(chat._id));
+    dispatch(setMessagesForContact(chat._id,[]));
   }
 }
 
@@ -27,11 +28,12 @@ const updateChat = contact => {
 }
 
 const addMessage = (id, message) => {
-  return {
-    type : "ADD_MESSAGE",
-    payload : {id,message}
+  return async (dispatch,getState) => {
+    dispatch({type : "ADD_MESSAGE",payload : {id,message}});
+    dispatch(setLastText(id,message));
   }
 }
+
 const addMessageToQueue = message => {
   return {
     type : "ADD_MESSAGE_TO_QUEUE",
@@ -61,9 +63,9 @@ const filterMessageQueueByContact = id => {
 }
 
 const deleteMessages = (id, messages) => {
-  return {
-    type : "DELETE_MESSAGES",
-    payload : {id,messages}
+  return (dispatch, getState) => {
+    dispatch({type : "DELETE_MESSAGES",payload : {id,messages}});
+    dispatch(removeMessagesFromQueue(messages));
   }
 }
 

@@ -259,7 +259,6 @@ const Chat = ({ route, navigation }) => {
             setMessageStart(messageStart + messageLoadingExtension);
 
             dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
-            dispatch(removeMessagesFromQueue(highlightedMessages))
 
             //get remaining messages
             const updatedMessages = messages.map(section => ({
