@@ -80,7 +80,7 @@ const EditContact = ({ route, navigation }) => {
     setError("");
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
-    updateContactAndReferences(dispatch, {...newInfo,_id : route.params.id});
+    dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
     return true;
   }
 

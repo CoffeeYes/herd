@@ -67,7 +67,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
           await Crypto.generateRSAKeyPair('herdPersonal');
           const key = await Crypto.loadKeyFromKeystore("herdPersonal");
           dispatch(setPublicKey(key));
-          eraseState(dispatch)
+          dispatch(eraseState());
         }
       }
     }
