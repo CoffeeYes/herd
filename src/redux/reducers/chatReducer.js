@@ -62,10 +62,11 @@ const updateMessageQueue = (messageQueue, originalKey, newKey, newName) => {
     if(message.to == originalKey) {
       return {
         ...message,
-        ...(newKey && {to : newKey}),
-        ...(newName && {toContactName : newName})
+        ...(newKey.length > 0 && {to : newKey}),
+        ...(newName.length > 0 && {toContactName : newName})
       }
     }
+    else return message;
   })
   return updatedQueue;
 }
@@ -96,10 +97,7 @@ const chatReducer = (state = initialState,action) => {
         newChats[chatIndex] = updateChat(newChats[chatIndex],action.payload);
         return {
           ...state,
-          chats : newChats,
-          ...( (action?.payload?.key || action?.payload?.name) && {
-            messageQueue : updateMessageQueue(state.messageQueue,chatToUpdate.key,action.payload.key,action.payload.name)
-          })
+          chats : newChats
         }
       }
       else {
@@ -190,6 +188,19 @@ const chatReducer = (state = initialState,action) => {
     }
     case "SET_MESSAGE_QUEUE": {
       return {...state, messageQueue : action.payload}
+      break;
+    }
+    case "UPDATE_MESSAGE_QUEUE": {
+      const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
+      if(chatToUpdate) {
+        return {
+          ...state,
+          messageQueue : updateMessageQueue(state.messageQueue,{...chatToUpdate}.key,action.payload.key,action.payload.name)
+        }
+      }
+      else {
+        return state;
+      }
       break;
     }
     case "SET_MESSAGES_FOR_CONTACT": {

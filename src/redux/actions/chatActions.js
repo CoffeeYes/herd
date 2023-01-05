@@ -21,9 +21,11 @@ const addChat = chat => {
 }
 
 const updateChat = contact => {
-  return {
-    type : "UPDATE_CHAT",
-    payload : contact
+  return (dispatch,getState) => {
+    //must update queue before contact, otherwise updateQueue function has
+    //no old contact key to compare against
+    dispatch(updateMessageQueue(contact));
+    dispatch({type : "UPDATE_CHAT",payload : contact})
   }
 }
 
@@ -45,6 +47,13 @@ const addMessagesToQueue = messages => {
   return {
     type : "ADD_MESSAGES_TO_QUEUE",
     payload : messages
+  }
+}
+
+const updateMessageQueue = contact => {
+  return {
+    type : "UPDATE_MESSAGE_QUEUE",
+    payload : contact
   }
 }
 
