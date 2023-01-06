@@ -8,7 +8,7 @@ const setChats = chats => {
 const deleteChat = chat => {
   return (dispatch,getState) => {
     dispatch({type : "DELETE_CHAT",payload : chat});
-    dispatch(filterMessageQueueByContact(chat._id));
+    dispatch(filterMessageQueueByContact(chat.key));
     dispatch(setMessagesForContact(chat._id,[]));
   }
 }
@@ -64,10 +64,10 @@ const removeMessagesFromQueue = messages => {
   }
 }
 
-const filterMessageQueueByContact = id => {
+const filterMessageQueueByContact = key => {
   return {
     type : "FILTER_QUEUE_BY_CONTACT",
-    payload : id
+    payload : key
   }
 }
 

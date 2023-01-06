@@ -88,7 +88,7 @@ const Settings = ({ navigation }) => {
           onPress: async () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
-            resetContacts(dispatch);
+            dispatch(resetContacts());
           },
         },
       ]

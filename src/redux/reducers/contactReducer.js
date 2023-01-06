@@ -14,9 +14,9 @@ const contactReducer = (state = initialState,action) => {
     case "DELETE_CONTACT":
       return {...state, contacts : [...state.contacts].filter(contact => contact._id !== action.payload._id)}
       break;
-    case "UPDATE_CONTACT":
-      let contact = state.contacts.find(contact => contact._id == action.payload._id);
-      const { name, key, image } = action.payload;
+    case "UPDATE_CONTACT": {
+      const { _id, name, key, image } = action.payload;
+      let contact = state.contacts.find(contact => contact._id == _id);
       if(contact) {
   	    let contactsCopy = [...state.contacts];
     	  let newContact  = {
@@ -32,6 +32,7 @@ const contactReducer = (state = initialState,action) => {
         return state;
       }
       break;
+    }
     default:
       return state;
   }

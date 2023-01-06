@@ -1,4 +1,4 @@
-import { resetMessages } from './chatActions';
+import { resetMessages, deleteChat } from './chatActions';
 
 const addContact = contact => {
   return {
@@ -14,19 +14,11 @@ const setContacts = contacts => {
   }
 }
 
-const deleteContact = (contact,dispatch) => {
-  dispatch({
-    type : "DELETE_CONTACT",
-    payload : contact
-  })
-  dispatch({
-    type : "DELETE_CHAT",
-    payload : {_id : contact._id}
-  })
-  dispatch({
-    type : "FILTER_QUEUE_BY_CONTACT",
-    payload : contact.key
-  })
+const deleteContact = contact => {
+  return (dispatch,getState) => {
+    dispatch(deleteChat(contact))
+    dispatch({type : "DELETE_CONTACT",payload : contact})
+  }
 }
 
 const updateContact = contact => {
@@ -36,12 +28,11 @@ const updateContact = contact => {
   }
 }
 
-const resetContacts = (dispatch) => {
-  dispatch({
-    type : "SET_CONTACTS",
-    payload : []
-  });
-  dispatch(resetMessages());
+const resetContacts = () => {
+  return (dispatch,getState) => {
+    dispatch({type : "SET_CONTACTS",payload : []})
+    dispatch(resetMessages());
+  }
 }
 
 export {

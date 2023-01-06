@@ -33,7 +33,7 @@ const Contacts = ({ route, navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            deleteContact(contacts[index],dispatch)
+            dispatch(deleteContact(contacts[index]));
             // dispatch(deleteChat({_id : contacts[index]._id}))
             deleteContactFromRealm(contacts[index]);
           },
