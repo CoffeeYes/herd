@@ -284,9 +284,10 @@ const Settings = ({ navigation }) => {
         title="My Key"
         setVisible={setQRCodeVisible}/>
 
-        {showLocationModal &&
         <CustomModal
-        setVisible={setShowLocationModal}>
+        onPress={() => setShowLocationModal(false)}
+        onRequestClose={() => setShowLocationModal(false)}
+        visible={showLocationModal}>
           <View style={styles.modalContentContainer}>
             <Icon name="location-on" size={48}/>
             <Text>
@@ -306,7 +307,7 @@ const Settings = ({ navigation }) => {
             }}
             text="Go To Settings"/>
           </View>
-        </CustomModal>}
+        </CustomModal>
 
       </ScrollView>
     </>

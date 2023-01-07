@@ -7,7 +7,8 @@ const QRCodeModal = ({ visible, value, setVisible, title }) => {
   return (
     <CustomModal
     visible={visible}
-    setVisible={setVisible}>
+    onRequestClose={() => setVisible(false)}
+    onPress={() => setVisible(false)}>
       <View style={styles.modalContentContainer}>
         {title &&
         <View style={styles.header}>

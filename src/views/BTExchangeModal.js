@@ -93,8 +93,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   return (
     <CustomModal
     visible={visible}
-    setVisible={setVisible}
-    disableHideOnPress>
+    onRequestClose={() => setVisible(false)}
+    disableOnPress>
         <View style={styles.modalContentContainer}>
           <ActivityIndicator size="large" color="#e05e3f" animating={loading}/>
           <Text>{activityText}</Text>

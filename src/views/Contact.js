@@ -87,7 +87,10 @@ const Contact = ({route, navigation}) => {
       title={contact.name}
       />
 
-      <CustomModal visible={showLargeImage} setVisible={setShowLargeImage}>
+      <CustomModal
+      visible={showLargeImage}
+      onPress={() => setShowLargeImage(false)}
+      onRequestClose={() => setShowLargeImage(false)}>
         <Image
         source={{uri : contact.image}}
         style={styles.largeImage}/>
