@@ -3,12 +3,12 @@ import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
-const QRCodeModal = ({ visible, value, setVisible, title }) => {
+const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   return (
     <CustomModal
     visible={visible}
-    onRequestClose={() => setVisible(false)}
-    onPress={() => setVisible(false)}>
+    onRequestClose={onRequestClose}
+    onPress={onPress}>
       <View style={styles.modalContentContainer}>
         {title &&
         <View style={styles.header}>

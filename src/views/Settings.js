@@ -282,7 +282,8 @@ const Settings = ({ navigation }) => {
         visible={QRCodeVisible}
         value={{key : publicKey}}
         title="My Key"
-        setVisible={setQRCodeVisible}/>
+        onPress={() => setQRCodeVisible(false)}
+        onRequestClose={() => setQRCodeVisible(false)}/>
 
         <CustomModal
         onPress={() => setShowLocationModal(false)}

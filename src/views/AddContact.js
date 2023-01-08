@@ -109,7 +109,8 @@ const AddContact = ({ navigation }) => {
       </View>
       <QRCodeModal
       visible={showQRCode}
-      setVisible={setShowQRCode}
+      onPress={() => setShowQRCode(false)}
+      onRequestClose={() => setShowQRCode(false)}
       title="My Key"
       value={{key : publicKey}}/>
     </>

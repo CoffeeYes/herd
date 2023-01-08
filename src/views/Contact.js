@@ -82,7 +82,8 @@ const Contact = ({route, navigation}) => {
 
       <QRCodeModal
       visible={showQRCode}
-      setVisible={setShowQRCode}
+      onPress={() => setShowQRCode(false)}
+      onRequestClose={() => setShowQRCode(false)}
       value={{name : contact.name, key : contact.key}}
       title={contact.name}
       />
