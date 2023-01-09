@@ -220,6 +220,8 @@ const Customise = ({ navigation }) => {
         <View style={styles.sliderContainer}>
           <Slider
           style={{flex : 1}}
+          tapToSeek
+          onSlidingComplete={val => setFontSize(Math.round(val))}
           onValueChange={val => setFontSize(Math.round(val))}
           value={originalStyles.fontSize}
           minimumValue={14}
