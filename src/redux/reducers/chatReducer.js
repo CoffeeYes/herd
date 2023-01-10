@@ -62,8 +62,8 @@ const updateMessageQueue = (messageQueue, originalKey, newKey, newName) => {
     if(message.to == originalKey) {
       return {
         ...message,
-        ...(newKey.length > 0 && {to : newKey}),
-        ...(newName.length > 0 && {toContactName : newName})
+        ...(newKey?.length > 0 && {to : newKey}),
+        ...(newName?.length > 0 && {toContactName : newName})
       }
     }
     else return message;

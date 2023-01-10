@@ -24,7 +24,9 @@ const updateChat = contact => {
   return (dispatch,getState) => {
     //must update queue before contact, otherwise updateQueue function has
     //no old contact key to compare against
+    (contact?.key?.length > 0 || contact?.name?.length > 0) &&
     dispatch(updateMessageQueue(contact));
+
     dispatch({type : "UPDATE_CHAT",payload : contact})
   }
 }
