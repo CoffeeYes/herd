@@ -444,10 +444,11 @@ const Chat = ({ route, navigation }) => {
       enabled={enableGestureHandler}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
+          {(loading || loadingMoreMessages) &&
           <ActivityIndicator
           size="large"
           color="#e05e3f"
-          animating={loadingMoreMessages || loading}/>
+          animating={loadingMoreMessages || loading}/>}
 
           <SectionList
           sections={messages}

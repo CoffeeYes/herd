@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { View, ScrollView, Text, Dimensions } from 'react-native';
 import Header from './Header';
 import moment from 'moment';
@@ -9,28 +9,50 @@ import Crypto from '../nativeWrapper/Crypto';
 import FoldableMessage from './FoldableMessage';
 import CustomButton from './CustomButton';
 
-import { setMessageQueue } from '../redux/actions/chatActions';
 const MessageQueue = ({}) => {
-  const dispatch = useDispatch();
   const [openMessages, setOpenMessages] = useState([]);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
+  const [parsedQueue, setParsedQueue] = useState([]);
 
-  const parseMessageQueue = queue => {
-    queue.map(message => {
-      message.toContactName = message.to.trim() === ownPublicKey.trim() ?
-        "You"
-        :
-        contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown"
+  const parseMessageQueue = async queue => {
+    const parsedQueue = await Promise.all(queue.map( async message => {
+      let newMessage = {...message};
+      newMessage.toContactName = message.to.trim() === ownPublicKey.trim() ?
+      "You"
+      :
+      contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown"
 
-      message.fromContactName = message.from.trim() === ownPublicKey.trim() ?
-        "You"
-        :
-        contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown"
-    })
-    return queue
+      newMessage.fromContactName = message.from.trim() === ownPublicKey.trim() ?
+      "You"
+      :
+      contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown"
+
+      if(message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim()) {
+        newMessage.text = await Crypto.decryptString(
+          "herdPersonal",
+          Crypto.algorithm.RSA,
+          Crypto.blockMode.ECB,
+          Crypto.padding.OAEP_SHA256_MGF1Padding,
+          message.text
+        )
+      }
+      else {
+        newMessage.text = "Encrypted message for other user"
+        newMessage.toContactName = "N/A";
+        newMessage.fromContactName = "N/A";
+      }
+      return newMessage;
+    }))
+    return parsedQueue;
   }
+
+  useEffect(() => {
+    ( async () => {
+      setParsedQueue(await parseMessageQueue(messageQueue))
+    })()
+  },[messageQueue])
 
   const onMessagePress = index => {
     const newOpenMessages = openMessages.indexOf(index) == -1 ?
@@ -53,26 +75,15 @@ const MessageQueue = ({}) => {
       }}
       buttonStyle={{marginTop : 15}}/>
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
-        {parseMessageQueue(messageQueue).map((message,index) =>
-          message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim() ?
+        {parsedQueue.map((message,index) =>
           <FoldableMessage
           to={message.toContactName}
+          from={message.fromContactName}
           open={openMessages.indexOf(index) != -1}
           onPress={() => onMessagePress(index)}
-          from={message.fromContactName}
           key={index}
-          textEncrypted={true}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text={message.text}/>
-          :
-          <FoldableMessage
-          to="N/A"
-          from="N/A"
-          open={openMessages.indexOf(index) != -1}
-          key={index}
-          textEncrypted={false}
-          timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-          text="Encrypted Message for Other User"/>
         )}
       </ScrollView>
     </View>

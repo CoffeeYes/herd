@@ -34,7 +34,6 @@ const Contacts = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             dispatch(deleteContact(contacts[index]));
-            // dispatch(deleteChat({_id : contacts[index]._id}))
             deleteContactFromRealm(contacts[index]);
           },
         },
