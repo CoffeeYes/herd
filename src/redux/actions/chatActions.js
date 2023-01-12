@@ -38,13 +38,6 @@ const addMessage = (id, message) => {
   }
 }
 
-const addMessageToQueue = message => {
-  return {
-    type : "ADD_MESSAGE_TO_QUEUE",
-    payload : {message}
-  }
-}
-
 const addMessagesToQueue = messages => {
   return {
     type : "ADD_MESSAGES_TO_QUEUE",
@@ -127,7 +120,6 @@ export {
   updateChat,
   setChats,
   addMessage,
-  addMessageToQueue,
   addMessagesToQueue,
   removeMessagesFromQueue,
   filterMessageQueueByContact,
