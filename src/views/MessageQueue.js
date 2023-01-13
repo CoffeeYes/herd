@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, ScrollView, Text, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
 import Header from './Header';
 import moment from 'moment';
 
@@ -15,6 +15,7 @@ const MessageQueue = ({}) => {
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
   const [parsedQueue, setParsedQueue] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const parseMessageQueue = async queue => {
     const parsedQueue = await Promise.all(queue.map( async message => {
@@ -49,9 +50,11 @@ const MessageQueue = ({}) => {
   }
 
   useEffect(() => {
+    setLoading(true);
     ( async () => {
       setParsedQueue(await parseMessageQueue(messageQueue))
     })()
+    setLoading(false);
   },[messageQueue])
 
   const onMessagePress = index => {
@@ -74,6 +77,9 @@ const MessageQueue = ({}) => {
         setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
       }}
       buttonStyle={{marginTop : 15}}/>
+      {loading ?
+      <ActivityIndicator size="large" color="#e05e3f"/>
+      :
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {parsedQueue.map((message,index) =>
           <FoldableMessage
@@ -85,7 +91,7 @@ const MessageQueue = ({}) => {
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text={message.text}/>
         )}
-      </ScrollView>
+      </ScrollView>}
     </View>
   )
 }
