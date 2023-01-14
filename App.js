@@ -208,9 +208,6 @@ const App = ({ }) => {
           <Stack.Screen name="customise" component={Customise}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
-          <Stack.Screen
-          name="passwordLockScreen2"
-          component={PasswordLockScreen}/>
         </>
       </Stack.Navigator>}
     </>

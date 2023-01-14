@@ -49,10 +49,6 @@ const Settings = ({ navigation }) => {
     return true;
   }
 
-  const showQRCode = async () => {
-    setQRCodeVisible(true);
-  }
-
   const deleteAllChats = async () => {
     Alert.alert(
       'Discard you sure you want to delete all chats?',
@@ -229,7 +225,7 @@ const Settings = ({ navigation }) => {
         <CardButton
         text="Show My QR Code"
         rightIcon="qr-code-2"
-        onPress={showQRCode}/>
+        onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
         text="Customise"
@@ -245,7 +241,7 @@ const Settings = ({ navigation }) => {
         text="Password Protection"
         rightIcon="lock"
         onPress={() => userHasPassword ?
-          navigation.navigate("passwordLockScreen2",{navigationTarget : "passwordSettings"})
+          navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
           :
           navigation.navigate("passwordSettings")}
         />
