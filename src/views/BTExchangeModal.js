@@ -32,8 +32,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    var messageListener;
-    var stateChangeListener;
+    let messageListener;
+    let stateChangeListener;
 
     if(visible) {
       //listen for connected state to begin key exchange

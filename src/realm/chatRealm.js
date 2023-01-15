@@ -65,18 +65,18 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
     }
   }
 
-  var initialReceivedMessages = [];
+  let initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
-    for(var message in receivedMessages) {
+    for(let message in receivedMessages) {
       const currentMessage = JSON.parse(JSON.stringify(receivedMessages[message]))
       const decrypted = await decryptString(receivedMessages[message].text);
       initialReceivedMessages.push({...currentMessage,text : decrypted});
     }
   }
 
-  var initialSentMessages = [];
+  let initialSentMessages = [];
   if(sentMessagesCopy.length > 0) {
-    for(var message in sentMessagesCopy) {
+    for(let message in sentMessagesCopy) {
       const currentMessage = JSON.parse(JSON.stringify(sentMessagesCopy[message]));
       const decrypted = await decryptString(sentMessagesCopy[message].text);
       initialSentMessages.push({...currentMessage,text : decrypted});
@@ -181,13 +181,13 @@ const getContactsWithChats = async () => {
   //get all messages sent and received
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
-  var keys = [];
+  let keys = [];
   //get unique keys in all messages
   sentMessages.map(message => keys.indexOf(message.to.trim()) === -1 && keys.push(message.to));
   receivedMessages.map(message => keys.indexOf(message.from.trim()) === -1 && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
-    var lastMessages = [];
+    let lastMessages = [];
     for(const key of keys) {
       const messages = (await getMessagesWithContact(key,-1)).messages;
       const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
@@ -196,8 +196,8 @@ const getContactsWithChats = async () => {
     }
     //create new contacts array with last message text and timestamp
     // because realm doesnt allow mutation in place
-    var contacts = getContactsByKey(keys);
-    var contactsWithTimestamps = [];
+    let contacts = getContactsByKey(keys);
+    let contactsWithTimestamps = [];
     contacts.map(contact => {
       let currentContact = JSON.parse(JSON.stringify(contact));
       const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
