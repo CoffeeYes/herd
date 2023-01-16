@@ -6,12 +6,12 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
-import CustomModal from './CustomModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
+import LocationModal from './LocationModal';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
@@ -281,31 +281,14 @@ const Settings = ({ navigation }) => {
         onPress={() => setQRCodeVisible(false)}
         onRequestClose={() => setQRCodeVisible(false)}/>
 
-        <CustomModal
-        onPress={() => setShowLocationModal(false)}
+        <LocationModal
+        visible={showLocationModal}
+        modalOnPress={() => setShowLocationModal(false)}
         onRequestClose={() => setShowLocationModal(false)}
-        visible={showLocationModal}>
-          <View style={styles.modalContentContainer}>
-            <Icon name="location-on" size={48}/>
-            <Text>
-              In order to transfer messages in the background, herd requires
-              location permissions to be allowed all the time.
-            </Text>
-
-            <Text style={{fontWeight : "bold", marginTop : 20}}>
-            Please go into the permission settings for Herd and select "Allow all the time"
-            in order to allow Herd to function correctly.
-            </Text>
-
-            <CustomButton
-            onPress={() => {
-              setShowLocationModal(false);
-              Bluetooth.navigateToApplicationSettings();
-            }}
-            text="Go To Settings"/>
-          </View>
-        </CustomModal>
-
+        buttonOnPress={() => {
+          setShowLocationModal(false);
+          Bluetooth.navigateToApplicationSettings();
+        }}/>
       </ScrollView>
     </>
   )

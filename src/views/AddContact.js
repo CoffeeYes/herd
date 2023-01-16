@@ -5,14 +5,16 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
-import Card from './Card'
+import Card from './Card';
 
-import QRCodeModal from './QRCodeModal'
+import QRCodeModal from './QRCodeModal';
+import LocationModal from './LocationModal';
 
 const AddContact = ({ navigation }) => {
   const [BTError,setBTError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
-  const publicKey = useSelector(state => state.userReducer.publicKey)
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
 
   useEffect(() => {
     initialBTCheck();
@@ -35,8 +37,11 @@ const AddContact = ({ navigation }) => {
       await Bluetooth.requestBTEnable()
     }
     if (!locationAllowed) {
-      const locationRequest = Bluetooth.requestLocationPermissions();
-      if(!locationAllowed) { return setBTError("You must enable location permissions for Herd in settings")}
+      const locationRequest = await Bluetooth.requestLocationPermissions();
+      if(!locationRequest) {
+        setShowLocationModal(true);
+        return;
+      }
     }
     if (!locationEnabled) {
       Alert.alert(
@@ -52,11 +57,6 @@ const AddContact = ({ navigation }) => {
       await Bluetooth.requestBTMakeDiscoverable(60) &&
       navigation.navigate("BTDeviceList");
     }
-
-    // const locationAllowed = await Bluetooth.checkLocationPermission();
-    // if(!locationAllowed) {
-    //   Bluetooth.requestLocationPermissions();
-    // }
   }
 
   return (
@@ -113,6 +113,15 @@ const AddContact = ({ navigation }) => {
       onRequestClose={() => setShowQRCode(false)}
       title="My Key"
       value={{key : publicKey}}/>
+
+      <LocationModal
+      visible={showLocationModal}
+      modalOnPress={() => setShowLocationModal(false)}
+      onRequestClose={() => setShowLocationModal(false)}
+      buttonOnPress={() => {
+        setShowLocationModal(false);
+        Bluetooth.navigateToApplicationSettings();
+      }}/>
     </>
   )
 }
