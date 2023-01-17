@@ -59,6 +59,12 @@ const AddContact = ({ navigation }) => {
     }
   }
 
+  const locationModalDescription = `Herd requires location permissions in order to connect \
+with other phones using bluetooth.`;
+
+  const locationModalInstructionText = `Please navigate to Herd's app settings and select \
+'allow all the time' under location permissions in order to use bluetooth to add a contact.`;
+
   return (
     <>
       <Header allowGoBack title="Add Contact" />
@@ -121,7 +127,9 @@ const AddContact = ({ navigation }) => {
       buttonOnPress={() => {
         setShowLocationModal(false);
         Bluetooth.navigateToApplicationSettings();
-      }}/>
+      }}
+      description={locationModalDescription}
+      instructionText={locationModalInstructionText}/>
     </>
   )
 }

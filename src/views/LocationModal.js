@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 
-const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose}) => {
+const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
+                         description, instructionText}) => {
   return (
     <CustomModal
     onPress={modalOnPress}
@@ -14,13 +15,11 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose}) 
       <View style={styles.modalContentContainer}>
         <Icon name="location-on" size={48}/>
         <Text>
-          In order to transfer messages in the background, herd requires
-          location permissions to be allowed all the time.
+          {description}
         </Text>
 
-        <Text style={{fontWeight : "bold", marginTop : 20}}>
-        Please go into the permission settings for Herd and select "Allow all the time"
-        in order to allow Herd to function correctly.
+        <Text style={{fontWeight : "bold", marginVertical : 20}}>
+        {instructionText}
         </Text>
 
         <CustomButton

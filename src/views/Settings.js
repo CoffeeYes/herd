@@ -183,6 +183,12 @@ const Settings = ({ navigation }) => {
     closePasswordRealm();
   }
 
+  const locationModalDescription = `In order to transfer messages in the background, herd requires \
+location permissions to be allowed all the time.`
+
+  const locationModalInstructionText = `Please go into the permission settings for Herd and select 'Allow all the time' \
+in order to allow Herd to function correctly.`
+
   return (
     <>
       <Header title="Settings"/>
@@ -288,7 +294,9 @@ const Settings = ({ navigation }) => {
         buttonOnPress={() => {
           setShowLocationModal(false);
           Bluetooth.navigateToApplicationSettings();
-        }}/>
+        }}
+        description={locationModalDescription}
+        instructionText={locationModalInstructionText}/>
       </ScrollView>
     </>
   )
