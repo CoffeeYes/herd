@@ -237,6 +237,7 @@ const Customise = ({ navigation }) => {
             {tabItems.map((item,index) => {
               return (
                 <TabItem
+                key={index}
                 text={item.text}
                 containerStyle={{
                   width : tabWidth,
@@ -248,12 +249,13 @@ const Customise = ({ navigation }) => {
             }
           </View>
 
-          {tabItems.map(item => {
+          {tabItems.map((item,index) => {
             return(
               activeItem === item.name &&
               <ColorChoice
                 title={item.title}
                 color={toHsv(item.color)}
+                key={index}
                 setColor={item.setColor}
                 oldColor={originalStyles[item.originalColor]}
               />

@@ -271,7 +271,7 @@ const Chat = ({ route, navigation }) => {
               const lastMessage = updatedMessages[updatedMessages.length -1].data[updatedMessages[updatedMessages.length -1].data.length -1]
               dispatch(setLastText(contactInfo._id,lastMessage))
             }
-            else {
+            else if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading){
               //if all messages were deleted attempt to load more
               await loadMoreMessages(true,messageStart + messageLoadingExtension);
             }
