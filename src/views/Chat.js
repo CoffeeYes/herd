@@ -13,6 +13,7 @@ import {
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
+import _ from 'lodash'
 
 import {
   addChat,
@@ -130,7 +131,14 @@ const Chat = ({ route, navigation }) => {
       //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
       // if there are any present in the database.
       const extractedMessages = messages.map(section => section.data)[0];
-      if(JSON.stringify(extractedMessages) == JSON.stringify(newMessages)) {
+      let newMessagesToAdd = false;
+      for(const message of newMessages) {
+        const found = extractedMessages?.find(eMessage => eMessage._id == message._id) != undefined
+        if(!found) {
+          newMessagesToAdd = true;
+        }
+      }
+      if(!newMessagesToAdd) {
         showNoMoreMessagePopup();
         return;
       }
