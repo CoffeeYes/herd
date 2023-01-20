@@ -312,25 +312,27 @@ const Chat = ({ route, navigation }) => {
   }
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
-    setLoadingMoreMessages(true)
-    if(overrideLoadInitial) {
-      await loadMessages(start)
-    }
-    else {
-      await loadMessages(start,end)
-    }
-    setMessageEnd(start);
-    setMessageStart(start - messageLoadingSize);
+    if(!loadingMoreMessages) {
+      setLoadingMoreMessages(true)
+      if(overrideLoadInitial) {
+        await loadMessages(start)
+      }
+      else {
+        await loadMessages(start,end)
+      }
+      setMessageEnd(start);
+      setMessageStart(start - messageLoadingSize);
 
-    setLoadingMoreMessages(false);
+      setLoadingMoreMessages(false);
 
-    messageLengthRef.current > 0 &&
-    scrollRef.current.scrollToLocation({
-      animated : true,
-      sectionIndex : 0,
-      itemIndex : 0,
-      viewOffset : -20
-    })
+      messageLengthRef.current > 0 &&
+      scrollRef.current.scrollToLocation({
+        animated : true,
+        sectionIndex : 0,
+        itemIndex : 0,
+        viewOffset : -20
+      })
+    }
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
