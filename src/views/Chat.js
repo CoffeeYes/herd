@@ -283,6 +283,11 @@ const Chat = ({ route, navigation }) => {
               //if all messages were deleted attempt to load more
               await loadMoreMessages(true,messageStart + messageLoadingExtension);
             }
+            else {
+              //all messages were deleted and there are no more messages to load
+              //so remove chat from chats page
+              dispatch(deleteChat(contactInfo))
+            }
 
             const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));
 
