@@ -286,7 +286,7 @@ const Customise = ({ navigation }) => {
             fromHsv(originalStyles.sentTextColor).toLowerCase() == defaultChatStyles.sentTextColor.toLowerCase() &&
             fromHsv(originalStyles.receivedBoxColor).toLowerCase() == defaultChatStyles.receivedBoxColor.toLowerCase() &&
             fromHsv(originalStyles.receivedTextColor).toLowerCase() == defaultChatStyles.receivedTextColor.toLowerCase() &&
-            fontSize === 14
+            originalStyles.fontSize == defaultChatStyles.fontSize
           }
           buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
 
