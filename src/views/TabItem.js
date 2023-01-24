@@ -1,6 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
   return (
     <TouchableOpacity
@@ -9,7 +11,7 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
       <Text style={{
         ...styles.text,
         ...textStyle,
-        color : active ? "#E86252" : "black"}}>
+        color : active ? palette.primary : "black"}}>
           {text}
       </Text>
     </TouchableOpacity>

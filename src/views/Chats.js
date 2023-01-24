@@ -9,8 +9,10 @@ import { parseRealmID } from '../realm/helper';
 import moment from 'moment';
 import { toHsv } from 'react-native-color-picker';
 
+
 import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
 
+import { palette } from '../assets/palette';
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
@@ -76,7 +78,7 @@ const Chats = ({ navigation }) => {
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
         rightIconSize={18}
-        rightIconStyle={{color : "#E86252"}}
+        rightIconStyle={{color : palette.primary}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
         deleteItem={() => deleteChat(chat)}
         rightText={chat.timestamp &&

@@ -15,6 +15,8 @@ import Crypto from '../nativeWrapper/Crypto';
 import { updateContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
+import { palette } from '../assets/palette';
+
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route.params.id))
@@ -188,7 +190,7 @@ const styles = {
     alignItems : "flex-start"
   },
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     marginTop : 10,

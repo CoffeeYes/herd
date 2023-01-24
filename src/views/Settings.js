@@ -21,6 +21,8 @@ import { parseRealmID } from '../realm/helper';
 import { setChats, resetMessages, setMessageQueue } from '../redux/actions/chatActions';
 import { setContacts, resetContacts } from '../redux/actions/contactActions';
 
+import { palette } from '../assets/palette'
+
 import {
   getMessageQueue,
   getDeletedReceivedMessages,
@@ -215,9 +217,9 @@ in order to allow Herd to function correctly.`
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}
             value={backgroundTransfer}
-            trackColor={{ false: "#767577", true: "#E86252" }}
-            thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
-            ios_backgroundColor="#E86252"/>
+            trackColor={{ false: palette.grey, true: palette.primary }}
+            thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
+            ios_backgroundColor={palette.primary}/>
           </View>
         </View>
 

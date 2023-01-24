@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {Text, TouchableOpacity, Dimensions } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const FlashTextButton = ({ onPress, flashText, normalText,
                            timeout, buttonStyle, textStyle, disabled }) => {
 
@@ -28,7 +30,7 @@ const FlashTextButton = ({ onPress, flashText, normalText,
 
 const styles = {
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     borderRadius : 5,

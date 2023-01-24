@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 
+import { palette } from '../assets/palette';
+
 const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
                       onLongPress, onPress, notTouchable, highlighted }) => {
 
@@ -41,7 +43,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
 
 const styles = {
   messageFromOther : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     maxWidth: "90%",
     alignSelf : "flex-start",
     marginLeft : 5,

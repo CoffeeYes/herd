@@ -26,6 +26,7 @@ import {
   deleteChat,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
+import { palette } from '../assets/palette';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -546,7 +547,7 @@ const styles = {
     padding : 20,
     alignItems : "center",
     borderRadius : 5,
-    borderColor : "#E86252",
+    borderColor : palette.primary,
     borderWidth : 2,
     opacity : 0.8
   },

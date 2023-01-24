@@ -2,6 +2,8 @@ import React from 'react'
 import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { palette } from '../assets/palette';
+
 const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled}) => {
   return (
@@ -23,7 +25,7 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSiz
 
 const styles = {
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     borderRadius : 5,
     alignSelf : "center",

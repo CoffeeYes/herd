@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { palette } from '../assets/palette';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Chats from './Chats';
@@ -55,7 +57,7 @@ const styles = {
     padding : 20,
     flex : 1,
     alignItems : "center",
-    backgroundColor : "#E86252"
+    backgroundColor : palette.primary
   }
 }
 

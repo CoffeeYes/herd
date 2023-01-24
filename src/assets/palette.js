@@ -2,6 +2,8 @@
 const palette = {
   "primary" : "#E86252",
   "secondary" : "#EBB3A9",
+  "grey" : "#767577",
+  "lightgrey" : "#f4f3f4"
 }
 
 const imageValues = {

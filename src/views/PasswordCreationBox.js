@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Dimensions } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 import FlashTextButton from './FlashTextButton';
 
 const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
@@ -79,7 +81,7 @@ const styles = {
     alignItems : "center",
   },
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     marginTop : 10,

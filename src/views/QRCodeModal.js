@@ -3,6 +3,8 @@ import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
+import { palette } from '../assets/palette';
+
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   return (
     <CustomModal
@@ -26,7 +28,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
 
 const styles = {
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     marginTop : 10,
