@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Text, View, TouchableOpacity, Dimensions, Image } from 'react-native';
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { imageValues } from '../assets/palette';
+import { imageValues, palette } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
@@ -47,7 +47,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
         setShowDelete(false);
         deleteItem(name);
       }}>
-        <Icon name="delete" size={24} style={{color : "black"}}/>
+        <Icon name="delete" size={24} style={{color : palette.black}}/>
       </TouchableOpacity>}
 
     </TouchableOpacity>
@@ -57,12 +57,13 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
 const styles = {
   listItem : {
     flexDirection : "row",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     alignItems : "center",
     justifyContent : "flex-start",
     paddingVertical : 20
   },
   deleteButton : {
+    // backgroundColor : "#e05e3f",
     backgroundColor : "#e05e3f",
     alignItems : "center",
     justifyContent : "center",
@@ -71,7 +72,7 @@ const styles = {
   },
   imageContainer : {
     borderWidth : 1,
-    borderColor : "grey",
+    borderColor : palette.grey,
     width : Dimensions.get("window").width * imageValues.smallFactor,
     height : Dimensions.get("window").width * imageValues.smallFactor,
     marginRight : 10,
@@ -85,7 +86,7 @@ const styles = {
     fontSize : 16,
   },
   subTextContainer : {
-    
+
   },
   subText : {
     color : "grey"

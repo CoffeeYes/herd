@@ -1,13 +1,15 @@
 import React from 'react';
 import { View, Dimensions } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const CameraMarker = ({ borderWidth, borderColor }) => {
 
   const sharedStyles = {
     ...styles.border,
-    borderColor : borderColor || "white",
+    borderColor : borderColor || palette.white,
   }
-  
+
   const width = borderWidth || 5;
 
   return (

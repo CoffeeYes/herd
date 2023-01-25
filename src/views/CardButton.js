@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { palette } from '../assets/palette';
+
 const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
                       containerStyle, textStyle, flashText, timeout }) => {
   const [currentText, setCurrentText] = useState(text);
@@ -20,7 +22,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
     <TouchableOpacity
     style={{...styles.container,...containerStyle}}
     onPress={(flashText && timeout) ? flash : onPress}>
-    
+
       {currentText &&
       <View style={styles.textContainer}>
         <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
@@ -44,7 +46,7 @@ const styles = {
     width : Dimensions.get('window').width * 0.9,
     padding : 20,
     borderRadius : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     elevation : 2,
     marginVertical : 5
   },

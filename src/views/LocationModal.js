@@ -5,6 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 
+import { palette } from '../assets/palette';
+
 const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
                          description, instructionText}) => {
   return (
@@ -32,7 +34,7 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
 
 const styles = {
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 30,
     alignItems : "center",

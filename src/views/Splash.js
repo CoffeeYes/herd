@@ -9,6 +9,8 @@ import { setPublicKey } from '../redux/actions/userActions'
 
 import { defaultChatStyles } from '../assets/styles';
 
+import { palette } from '../assets/palette';
+
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
   const [textWidth, setTextWidth] = useState(100);
@@ -29,18 +31,18 @@ const Splash = ({ navigation }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
-      <Text style={{color : "white",marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
+      <Text style={{color : palette.white,marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
         Welcome to Herd, the peer-to-peer messaging app!
       </Text>
 
       <CustomButton
       text="Get Started"
       onPress={setup}
-      buttonStyle={{borderWidth : 1,borderColor : "white"}}
+      buttonStyle={{borderWidth : 1,borderColor : palette.white}}
       disabled={Platform.OS === "android" && Platform.Version < 23}/>
 
       {Platform.OS === "android" && Platform.Version < 23 &&
-        <Text style={{color : "white", marginTop : 20, fontWeight : "bold", width : textWidth}}>
+        <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold", width : textWidth}}>
           Unfortunately, your device's software is too old to utilise the security features herd requires to run.
           Please check for software updates. If there are none, herd will not function with your device.
         </Text>

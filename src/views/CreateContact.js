@@ -14,6 +14,8 @@ import { createContact, getContactsByKey, getContactByName } from '../realm/cont
 
 import { addContact } from '../redux/actions/contactActions';
 
+import { palette } from '../assets/palette';
+
 const CreateContact = ({ navigation, route}) => {
   const dispatch = useDispatch();
   const [username, _setUsername] = useState("");
@@ -190,12 +192,12 @@ const CreateContact = ({ navigation, route}) => {
 
 const styles = {
   input : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     padding : 10,
     marginBottom : 10
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold",
     alignSelf : "center",
     marginBottom : 10,
@@ -207,11 +209,11 @@ const styles = {
     height : Dimensions.get("window").width * 0.4,
     borderRadius : Dimensions.get("window").width * 0.2,
     borderWidth : 1,
-    borderColor : "grey",
+    borderColor : palette.grey,
     alignItems : "center",
     justifyContent : "center",
     overflow : "hidden",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginBottom : 20
   },
 }

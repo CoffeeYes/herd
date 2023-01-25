@@ -2,6 +2,8 @@ import React from 'react';
 import { TouchableOpacity, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { palette } from '../assets/palette';
+
 const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
                 disabled, errorText }) => {
   return (
@@ -23,7 +25,7 @@ const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
 
 const styles = {
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold",
     textAlign : "center",
     fontSize : 18
@@ -31,13 +33,13 @@ const styles = {
   card : {
     padding : 20,
     flex : 1,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     alignItems : "center",
     justifyContent : "center"
   },
   text : {
-    color : "black",
+    color : palette.black,
     marginTop : 10
   },
 }

@@ -14,6 +14,7 @@ import ChatBubble from './ChatBubble';
 import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles } from '../assets/styles';
+import { palette } from '../assets/palette';
 
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -303,7 +304,7 @@ const styles = {
     margin : 10,
   },
   colorChoiceContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginHorizontal : 10,
     borderRadius : 5
   },
@@ -311,7 +312,7 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-around",
     borderBottomWidth : 1,
-    borderBottomColor : "grey"
+    borderBottomColor : palette.grey
   },
   buttonRow : {
     flexDirection : "row",
@@ -327,7 +328,7 @@ const styles = {
     alignItems : "center",
     flexDirection : "row",
     marginHorizontal : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginBottom : 10,
     paddingVertical : 10,
     borderRadius : 5,

@@ -35,7 +35,7 @@ const styles = {
     width : Dimensions.get("window").width * 0.3
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center",

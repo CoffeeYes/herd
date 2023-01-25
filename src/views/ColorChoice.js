@@ -4,6 +4,8 @@ import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Slider from '@react-native-community/slider';
 
+import { palette } from '../assets/palette';
+
 const ColorChoice = ({ style, setColor, color, oldColor }) => {
 
   return (
@@ -33,7 +35,7 @@ const styles = {
   tab : {
     alignItems : "center",
     justifyContent : "center",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     paddingVertical : 20,
     flexDirection : "row"
   },
@@ -42,7 +44,7 @@ const styles = {
   },
   error : {
     fontWeight : "bold",
-    color : "red",
+    color : palette.red,
     marginTop : 10
   }
 }

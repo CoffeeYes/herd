@@ -88,7 +88,7 @@ const styles = {
     borderRadius : 5,
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
@@ -100,7 +100,7 @@ const styles = {
     width : Dimensions.get('window').width * 0.8,
     alignSelf : "center",
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5
   },
   inputTitle : {
@@ -108,7 +108,7 @@ const styles = {
     marginBottom : 5
   },
   card : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     padding : 20,
     borderRadius : 5,
     alignItems : "center",
@@ -116,7 +116,7 @@ const styles = {
     elevation : 2
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold"
   }
 }

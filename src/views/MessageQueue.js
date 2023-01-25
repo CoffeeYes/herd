@@ -9,6 +9,8 @@ import Crypto from '../nativeWrapper/Crypto';
 import FoldableMessage from './FoldableMessage';
 import CustomButton from './CustomButton';
 
+import { palette } from '../assets/palette';
+
 const MessageQueue = ({}) => {
   const [openMessages, setOpenMessages] = useState([]);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);

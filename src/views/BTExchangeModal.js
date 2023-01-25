@@ -6,6 +6,8 @@ import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 import navigationRef from '../NavigationRef';
 
+import { palette } from '../assets/palette';
+
 const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device");
@@ -96,7 +98,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     onRequestClose={() => setVisible(false)}
     disableOnPress>
         <View style={styles.modalContentContainer}>
-          <ActivityIndicator size="large" color="#e05e3f" animating={loading}/>
+          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
           <Text>{activityText}</Text>
           <CustomButton
           onPress={() => cancel()}
@@ -109,7 +111,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
 const styles = {
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center"

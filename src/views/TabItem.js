@@ -11,7 +11,7 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
       <Text style={{
         ...styles.text,
         ...textStyle,
-        color : active ? palette.primary : "black"}}>
+        color : active ? palette.primary : palette.black}}>
           {text}
       </Text>
     </TouchableOpacity>
@@ -27,7 +27,7 @@ const styles = {
     justifyContent : "center"
   },
   text : {
-    color : "black",
+    color : palette.black,
     fontWeight : "bold"
   },
 }

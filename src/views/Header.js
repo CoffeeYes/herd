@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'
 
+import { palette } from '../assets/palette';
+
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
                   onTextTouch, touchStyle, containerStyle, textStyle }) => {
   return (
@@ -25,7 +27,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={styles.rightButton}>
-        <Icon name={rightButtonIcon} size={20} style={{color : "white"}}/>
+        <Icon name={rightButtonIcon} size={20} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
   )
@@ -41,7 +43,7 @@ const styles = {
     height : Dimensions.get("window").height * 0.085
   },
   title : {
-    color : "white",
+    color : palette.white,
     fontSize : 18,
     marginRight : "auto"
   },

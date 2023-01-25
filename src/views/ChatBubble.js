@@ -49,7 +49,7 @@ const styles = {
     marginLeft : 5,
   },
   messageFromYou : {
-    backgroundColor : "#c6c6c6",
+    backgroundColor : palette.mediumgrey,
     alignSelf : "flex-end",
     maxWidth : "90%",
     marginRight : 5
@@ -62,7 +62,7 @@ const styles = {
     borderColor : "transparent"
   },
   messageText : {
-    color : "#f5f5f5"
+    color : palette.offwhite
   },
   timestamp : {
     fontWeight : "bold",
@@ -70,7 +70,7 @@ const styles = {
   },
   highlighted : {
     borderWidth : 2,
-    borderColor : "black",
+    borderColor : palette.black,
     borderStyle : "dotted"
   }
 }

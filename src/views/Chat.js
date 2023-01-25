@@ -485,7 +485,7 @@ const Chat = ({ route, navigation }) => {
         placeholder="Send a Message"
         style={{
           ...styles.chatInput,
-          backgroundColor : inputDisabled ? "#c6c6c6" : "white",
+          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           fontSize : customStyle?.fontSize,
           flex : 1
         }}
@@ -499,7 +499,7 @@ const Chat = ({ route, navigation }) => {
         multiline={true}
         blurOnSubmit={true}
         onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
-        <View style={{backgroundColor : "white", justifyContent : "center"}}>
+        <View style={{backgroundColor : palette.white, justifyContent : "center"}}>
           <Text style={{fontSize : 12}}>
             {`${characterCount} / 190`}
           </Text>
@@ -512,13 +512,13 @@ const Chat = ({ route, navigation }) => {
 
 const styles = {
   chatInput : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginTop : "auto",
     paddingLeft : 10
   },
   imageContainer : {
     borderWidth : 1,
-    borderColor : "grey",
+    borderColor : palette.grey,
     width : Dimensions.get("window").width * imageValues.smallFactor,
     height : Dimensions.get("window").width * imageValues.smallFactor,
     marginLeft : 10,
@@ -543,7 +543,7 @@ const styles = {
     width : Dimensions.get("window").width * 0.8,
     zIndex : 999,
     elevation : 999,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     padding : 20,
     alignItems : "center",
     borderRadius : 5,

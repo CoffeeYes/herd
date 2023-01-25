@@ -197,19 +197,19 @@ const styles = {
     borderRadius : 5,
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
   },
   input : {
-    borderColor: 'gray',
+    borderColor: palette.gray,
     borderWidth: 1,
     marginBottom : 10,
     width : Dimensions.get('window').width * 0.9,
     alignSelf : "center",
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5
   },
   inputTitle : {
@@ -217,7 +217,7 @@ const styles = {
     marginBottom : 5
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold",
     alignSelf : "center"
   }

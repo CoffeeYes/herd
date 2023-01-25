@@ -43,7 +43,7 @@ const Main = ({ navigation, route }) => {
 
 const styles = {
   navContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%"

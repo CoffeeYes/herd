@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 import Crypto from '../nativeWrapper/Crypto';
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, onPress}) => {
@@ -37,9 +39,9 @@ const styles = {
   },
   container : {
     flexDirection : "row",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     paddingVertical : 20,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     width : Dimensions.get('window').width * 0.8,
     marginVertical : 5,
     borderRadius : 10,

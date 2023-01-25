@@ -35,7 +35,7 @@ const styles = {
     borderRadius : 5
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
@@ -47,7 +47,7 @@ const styles = {
     backgroundColor : "rgba(0,0,0,0.4)"
   },
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center",

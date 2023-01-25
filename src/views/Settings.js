@@ -200,7 +200,7 @@ in order to allow Herd to function correctly.`
         <View style={{
           alignSelf : "center",
           alignItems : "center",
-          backgroundColor : "white",
+          backgroundColor : palette.white,
           elevation : 2,
           borderRadius : 10,
           padding : 20,
@@ -256,28 +256,28 @@ in order to allow Herd to function correctly.`
 
         <CardButton
         text="Delete All Chats"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
         rightIcon="delete"
         onPress={deleteAllChats}/>
 
         <CardButton
         text="Delete All Contacts"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
         rightIcon="delete-sweep"
         onPress={deleteAllContacts}/>
 
         <CardButton
         text="Delete All Messages"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
         rightIcon="delete-forever"
         onPress={deleteAllMessages}/>
 
         {__DEV__ &&
           <CustomButton
-          buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
+          buttonStyle={{backgroundColor : palette.red,...styles.buttonMargin}}
           onPress={closeRealms}
           text="Close Realm"/>
         }
@@ -306,7 +306,7 @@ in order to allow Herd to function correctly.`
 
 const styles = {
   warning : {
-    color : "red",
+    color : palette.red,
     maxWidth : 300,
     fontWeight : "bold"
   },
@@ -320,7 +320,7 @@ const styles = {
     backgroundColor : "rgba(0,0,0,0.4)"
   },
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 30,
     alignItems : "center",

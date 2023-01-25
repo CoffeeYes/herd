@@ -13,6 +13,8 @@ import Crypto from '../nativeWrapper/Crypto';
 import { setPublicKey } from '../redux/actions/userActions';
 import { eraseState } from '../redux/actions/combinedActions';
 
+import { palette } from '../assets/palette';
+
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -106,17 +108,17 @@ const styles = {
     width : Dimensions.get('window').width * 0.9,
     alignSelf : "center",
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5
   },
   inputTitle : {
     fontWeight : "bold",
     marginBottom : 5,
-    color : "white"
+    color : palette.white
   },
   error : {
     fontWeight : "bold",
-    color : "red"
+    color : palette.red
   }
 }
 

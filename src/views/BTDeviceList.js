@@ -8,6 +8,8 @@ import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
 
+import { palette } from '../assets/palette';
+
 const BTDeviceList = () => {
   const [deviceList, _setDeviceList] = useState([]);
   const [scanning, _setScanning] = useState(true);
@@ -134,19 +136,19 @@ const styles = {
     flex : 1
   },
   BTList : {
-    backgroundColor : "#D8D8D8",
+    backgroundColor : palette.mediumgrey,
     width : Dimensions.get("window").width - 40,
     padding : 10,
     flex : 1
   },
   deviceContainer : {
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginTop : 2,
-    borderBottomColor : "black"
+    borderBottomColor : palette.black
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold"
   }
 }

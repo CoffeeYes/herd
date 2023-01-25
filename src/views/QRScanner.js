@@ -6,6 +6,8 @@ import CameraMarker from './CameraMarker';
 import CustomButton from './CustomButton';
 import Orientation from "react-native-orientation-locker";
 
+import { palette } from '../assets/palette';
+
 const QRScanner = ({ navigation }) => {
 
   const scannerRef = useRef();
@@ -34,7 +36,7 @@ const QRScanner = ({ navigation }) => {
     ref={ref => {scannerRef.current = ref}}
     onRead={handleRead}
     reactivate={false}
-    customMarker={<CameraMarker borderWidth={5} borderColor="white"/>}
+    customMarker={<CameraMarker borderWidth={5} borderColor={palette.white}/>}
     cameraStyle={styles.camera}
     containerStyle={styles.container}
     bottomContent={

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Modal, TouchableOpacity, Dimensions, View } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const CustomModal = ({ children, visible, onPress, onRequestClose, disableOnPress,
                        animationType, transparent = true, containerStyle}) => {
   return (
@@ -27,7 +29,7 @@ const styles = {
     backgroundColor : "rgba(0,0,0,0.4)"
   },
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center",
