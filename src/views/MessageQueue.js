@@ -80,7 +80,7 @@ const MessageQueue = ({}) => {
       }}
       buttonStyle={{marginTop : 15}}/>
       {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      <ActivityIndicator size="large" color={palette.primary}/>
       :
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {parsedQueue.map((message,index) =>

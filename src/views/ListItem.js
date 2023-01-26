@@ -63,8 +63,8 @@ const styles = {
     paddingVertical : 20
   },
   deleteButton : {
-    // backgroundColor : "#e05e3f",
-    backgroundColor : "#e05e3f",
+    // backgroundColor : palette.primary,
+    backgroundColor : palette.primary,
     alignItems : "center",
     justifyContent : "center",
     width : Dimensions.get("window").width * 0.20,

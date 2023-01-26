@@ -186,7 +186,7 @@ const Customise = ({ navigation }) => {
     <ScrollView contentContainerStyle={{paddingBottom : 10}}>
 
       {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      <ActivityIndicator size="large" color={palette.primary}/>
       :
       <>
         <View style={styles.messagesContainer}>

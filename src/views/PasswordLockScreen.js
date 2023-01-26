@@ -98,7 +98,7 @@ const styles = {
   container : {
     alignItems : "center",
     justifyContent : "center",
-    backgroundColor : "#e05e3f",
+    backgroundColor : palette.primary,
     flex : 1
   },
   input : {

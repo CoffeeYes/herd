@@ -463,7 +463,7 @@ const Chat = ({ route, navigation }) => {
           {(loading || loadingMoreMessages) &&
           <ActivityIndicator
           size="large"
-          color="#e05e3f"
+          color={palette.primary}
           animating={loadingMoreMessages || loading}/>}
 
           <SectionList

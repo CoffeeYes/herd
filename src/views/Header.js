@@ -38,7 +38,7 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-between",
     alignItems : "center",
-    backgroundColor : "#e05e3f",
+    backgroundColor : palette.primary,
     paddingLeft : 10,
     height : Dimensions.get("window").height * 0.085
   },
@@ -48,7 +48,7 @@ const styles = {
     marginRight : "auto"
   },
   rightButton : {
-    backgroundColor : "#EBB3A9",
+    backgroundColor : palette.secondary,
     height : "100%",
     alignItems : "center",
     justifyContent : "center",

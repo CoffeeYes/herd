@@ -97,7 +97,7 @@ const BTDeviceList = () => {
       <View style={styles.mainContainer}>
         <View>
           <Text>{scanning ? "Scanning..." : ""}</Text>
-          <ActivityIndicator size="large" color="#e05e3f" animating={scanning}/>
+          <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
         </View>
 
         {error.length > 0 &&

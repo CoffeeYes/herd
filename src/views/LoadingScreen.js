@@ -5,7 +5,7 @@ const LoadingScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Herd</Text>
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      <ActivityIndicator size="large" color={palette.primary}/>
     </View>
   )
 }
