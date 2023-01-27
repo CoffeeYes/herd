@@ -6,12 +6,12 @@ import navigationRef from '../NavigationRef'
 import { palette } from '../assets/palette';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
-                  onTextTouch, touchStyle, containerStyle, textStyle }) => {
+                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize = 30, backArrowStyle }) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
         <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
-          <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
+          <Icon name="arrow-back" size={backArrowSize} style={{...styles.backArrow,...backArrowStyle}}/>
         </TouchableOpacity>}
 
         <TouchableOpacity
@@ -61,6 +61,10 @@ const styles = {
     justifyContent : "center",
     flexDirection : "row",
     alignItems : "center"
+  },
+  backArrow : {
+    color : palette.white,
+    marginRight : 10
   }
 }
 

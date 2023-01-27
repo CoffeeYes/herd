@@ -89,7 +89,7 @@ const styles = {
 
   },
   subText : {
-    color : "grey"
+    color : palette.grey
   },
   rightTextStyle : {
     marginLeft : "auto",

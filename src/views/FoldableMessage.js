@@ -34,7 +34,7 @@ const styles = {
   messageText : {
     marginTop : 10,
     width : "100%",
-    backgroundColor : "#e0e0e0",
+    backgroundColor : palette.offgrey,
     padding : 20,
   },
   container : {

@@ -140,7 +140,7 @@ const styles = {
     flex : 1
   },
   cardDisabled : {
-    backgroundColor : "grey"
+    backgroundColor : palette.grey
   },
   leftCard : {
     marginRight : 5

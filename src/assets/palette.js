@@ -3,10 +3,12 @@
 const palette = {
   // "primary" : "#E86252",
   "primary" : "#e05e3f",
+  "offprimary" : "#f46758",
   "secondary" : "#EBB3A9",
   "grey" : "#808080",
   "mediumgrey" : "#c6c6c6",
   "lightgrey" : "#f4f3f4",
+  "offgrey" : "#e0e0e0",
   "black" : "#000000",
   "white" : "#ffffff",
   "offwhite" : "#f5f5f5",

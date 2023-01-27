@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const LoadingScreen = () => {
   return (
     <View style={styles.container}>

@@ -13,6 +13,7 @@ import { toHsv } from 'react-native-color-picker';
 import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
+
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
@@ -22,7 +23,7 @@ const Chats = ({ navigation }) => {
   const checkStyleReadable = style => {
       const hsv = toHsv(style);
       if(hsv.h < 10 && hsv.s < 10 && hsv.v > 0.95) {
-        return "grey"
+        return palette.grey
       }
       else {
         return style

@@ -21,7 +21,7 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
 const styles = {
   container : {
     borderRightWidth : 1,
-    borderRightColor : "grey",
+    borderRightColor : palette.grey,
     padding : 10,
     alignItems : "center",
     justifyContent : "center"

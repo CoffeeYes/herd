@@ -433,7 +433,7 @@ const Chat = ({ route, navigation }) => {
     <>
     <Header
     title={contactInfo.name}
-    touchStyle={{backgroundColor : "#f46758"}}
+    touchStyle={{backgroundColor : palette.offprimary}}
     textStyle={{marginLeft : 10}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
     rightButtonOnClick={() => deleteMessages()}

@@ -21,7 +21,7 @@ const FlashTextButton = ({ onPress, flashText, normalText,
   return (
     <TouchableOpacity
     disabled={disabled}
-    style={disabled ? {...styles.button,...buttonStyle,backgroundColor : "grey"} : {...styles.button,...buttonStyle}}
+    style={disabled ? {...styles.button,...buttonStyle,backgroundColor : palette.grey} : {...styles.button,...buttonStyle}}
     onPress={onButtonPress}>
       <Text style={{...styles.buttonText,...textStyle}}>{buttonText + " "}</Text>
     </TouchableOpacity>

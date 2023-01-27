@@ -20,8 +20,8 @@ const Main = ({ navigation, route }) => {
       screenOptions={({ route }) => ({
         headerShown : false,
         tabBarShowLabel : false,
-        tabBarInactiveTintColor: 'black',
-        tabBarActiveTintColor: '#E86252',
+        tabBarInactiveTintColor: palette.black,
+        tabBarActiveTintColor: palette.primary,
         tabBarIcon : ({ color, size }) => {
           if(route.name === "chats") {
             return <Icon name="chat" size={size} color={color}/>
