@@ -102,7 +102,7 @@ const styles = {
     flex : 1
   },
   input : {
-    borderColor: 'gray',
+    borderColor: palette.grey,
     borderWidth: 1,
     marginBottom : 10,
     width : Dimensions.get('window').width * 0.9,

@@ -10,6 +10,8 @@ import Card from './Card';
 import QRCodeModal from './QRCodeModal';
 import LocationModal from './LocationModal';
 
+import { palette } from '../assets/palette';
+
 const AddContact = ({ navigation }) => {
   const [BTError,setBTError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
