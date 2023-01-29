@@ -36,7 +36,8 @@ const styles = {
     backgroundColor : palette.white,
     borderRadius : 5,
     alignItems : "center",
-    justifyContent : "center"
+    justifyContent : "center",
+    elevation : 2,
   },
   text : {
     color : palette.black,

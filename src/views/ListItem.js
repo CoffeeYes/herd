@@ -45,7 +45,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
       style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto", height : deleteButtonHeight}}
       onPress={() => {
         setShowDelete(false);
-        deleteItem(name);
+        deleteItem();
       }}>
         <Icon name="delete" size={24} style={{color : palette.black}}/>
       </TouchableOpacity>}
@@ -58,12 +58,13 @@ const styles = {
   listItem : {
     flexDirection : "row",
     backgroundColor : palette.white,
+    borderBottomColor : palette.mediumgrey,
+    borderBottomWidth : 1,
     alignItems : "center",
     justifyContent : "flex-start",
     paddingVertical : 20
   },
   deleteButton : {
-    // backgroundColor : palette.primary,
     backgroundColor : palette.primary,
     alignItems : "center",
     justifyContent : "center",
