@@ -69,7 +69,7 @@ const Contacts = ({ route, navigation }) => {
           navigation={navigation}
           image={contact.image}
           textStyle={{fontWeight : "bold"}}
-          containerStyle={index === chats?.length && ({borderBottomWidth : 0})}
+          containerStyle={index === (chats?.length - 1) && ({borderBottomWidth : 0})}
           onPress={() => route.params.type === "newChat" ?
             navigateToNewChat(parseRealmID(contact))
             :

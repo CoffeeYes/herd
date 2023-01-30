@@ -65,7 +65,7 @@ const Chats = ({ navigation }) => {
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold"}}
-        containerStyle={index === chats?.length -1 && ({borderBottomWidth : 0})}
+        containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         subTextStyle={{
           color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})

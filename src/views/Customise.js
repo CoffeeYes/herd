@@ -306,7 +306,8 @@ const styles = {
   colorChoiceContainer : {
     backgroundColor : palette.white,
     marginHorizontal : 10,
-    borderRadius : 5
+    borderRadius : 5,
+    elevation : 2
   },
   tabRow : {
     flexDirection : "row",
@@ -332,6 +333,7 @@ const styles = {
     marginBottom : 10,
     paddingVertical : 10,
     borderRadius : 5,
+    elevation : 2
   },
 }
 export default Customise;
