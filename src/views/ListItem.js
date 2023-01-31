@@ -9,12 +9,18 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
                     rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
+  const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
   return (
     <TouchableOpacity
     style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10,...containerStyle}}
     onPress={onPress}
-    onLayout={event => {setDeleteButtonHeight(event.nativeEvent.layout.height)}}
+    onLayout={event => {
+      if(!deleteButtonHeightAdjusted) {
+        setDeleteButtonHeight(event.nativeEvent.layout.height);
+        setDeleteButtonHeightAdjusted(true);
+      }
+    }}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={{...styles.imageContainer,...imageContainerStyle}}>
         <ContactImage
