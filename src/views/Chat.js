@@ -499,7 +499,10 @@ const Chat = ({ route, navigation }) => {
         multiline={true}
         blurOnSubmit={true}
         onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
-        <View style={{backgroundColor : palette.white, justifyContent : "center"}}>
+        <View style={{
+          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
+          justifyContent : "center"}
+        }>
           <Text style={{fontSize : 12}}>
             {`${characterCount} / 190`}
           </Text>
