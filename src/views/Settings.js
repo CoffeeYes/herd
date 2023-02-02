@@ -197,20 +197,14 @@ in order to allow Herd to function correctly.`
 
       <ScrollView contentContainerStyle={{alignItems : "center"}}>
 
-        <View style={{
-          alignSelf : "center",
-          alignItems : "center",
-          backgroundColor : palette.white,
-          elevation : 2,
-          borderRadius : 10,
-          padding : 20,
-          marginVertical : 10,
-          width : Dimensions.get('window').width * 0.9}}>
+        <View style={styles.backgroundTransferCard}>
+
           {!backgroundTransfer &&
           <Text style={styles.warning}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
+          
           <View style={{flexDirection : "row", marginVertical: 10}}>
             <Text style={{fontWeight : "bold"}}>Background Transfers</Text>
             <Switch
@@ -327,6 +321,16 @@ const styles = {
     maxWidth : Dimensions.get('window').width * 0.8,
     maxHeight : Dimensions.get('window').height * 0.8
   },
+  backgroundTransferCard : {
+    alignSelf : "center",
+    alignItems : "center",
+    backgroundColor : palette.white,
+    elevation : 2,
+    borderRadius : 10,
+    padding : 20,
+    marginVertical : 10,
+    width : Dimensions.get('window').width * 0.9
+  }
 }
 
 export default Settings;

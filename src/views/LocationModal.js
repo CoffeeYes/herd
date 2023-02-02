@@ -16,13 +16,15 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
     visible={visible}>
       <View style={styles.modalContentContainer}>
         <Icon name="location-on" size={48}/>
+        {!!description &&
         <Text>
           {description}
-        </Text>
+        </Text>}
 
+        {!!instructionText &&
         <Text style={{fontWeight : "bold", marginVertical : 20}}>
         {instructionText}
-        </Text>
+        </Text>}
 
         <CustomButton
         onPress={buttonOnPress}
