@@ -353,8 +353,8 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   }))
 
   messageSentRealm.write(() => {
-    const sentMessages = messageSentRealm.objects('Message');
     sentMessages.map((message,index) => {
+      console.log(index)
       if(message.to == oldKey) {
         message.to = newKey;
         message.text = newTexts[index];
@@ -363,15 +363,13 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   })
 
   messageCopyRealm.write(() => {
-    const messages = messageCopyRealm.objects('Message');
-    messages.map(message => {
+    sentMessagesCopy.map(message => {
       if(message.to == oldKey) {
         message.to = newKey;
       }
     })
   })
   messageReceivedRealm.write(() => {
-    const receivedMessages = messageReceivedRealm.objects('Message');
     receivedMessages.map(message => {
       if(message.from == oldKey) {
         message.from = newKey
