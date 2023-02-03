@@ -6,7 +6,8 @@ import navigationRef from '../NavigationRef'
 import { palette } from '../assets/palette';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
-                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize = 30, backArrowStyle }) => {
+                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize = 30,
+                  backArrowStyle, rightIconSize = 20 }) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
@@ -27,7 +28,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={styles.rightButton}>
-        <Icon name={rightButtonIcon} size={20} style={{color : palette.white}}/>
+        <Icon name={rightButtonIcon} size={rightIconSize} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
   )

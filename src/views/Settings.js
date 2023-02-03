@@ -204,7 +204,7 @@ in order to allow Herd to function correctly.`
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
-          
+
           <View style={{flexDirection : "row", marginVertical: 10}}>
             <Text style={{fontWeight : "bold"}}>Background Transfers</Text>
             <Switch
@@ -259,7 +259,7 @@ in order to allow Herd to function correctly.`
         text="Delete All Contacts"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
-        rightIcon="delete-sweep"
+        rightIcon="delete"
         onPress={deleteAllContacts}/>
 
         <CardButton
