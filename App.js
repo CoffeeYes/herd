@@ -49,7 +49,7 @@ import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
-import { getAllContacts } from './src/realm/contactRealm';
+import { getAllContacts, getContactsByKey } from './src/realm/contactRealm';
 import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
@@ -91,6 +91,16 @@ const App = ({ }) => {
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
+      let uniqueKeys = [];
+      for(const message of messages) {
+        if(message.to == ownPublicKey && uniqueKeys.indexOf(message.from) == -1) {
+          uniqueKeys.push(message.from);
+        }
+      }
+      const contacts = getContactsByKey(uniqueKeys);
+      for(contact of contacts) {
+        dispatch(updateChat({...contact, doneLoading : false}))
+      }
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
