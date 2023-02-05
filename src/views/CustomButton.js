@@ -9,7 +9,11 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSiz
   return (
     <TouchableOpacity
     onPress={onPress}
-    style={disabled ? {...styles.button,...buttonStyle, backgroundColor : "grey"} :{...styles.button,...buttonStyle}}
+    style={{
+      ...styles.button,
+      ...buttonStyle,
+      ...(disabled && {backgroundColor : palette.grey})
+    }}
     disabled={disabled}>
       {leftIcon &&
       <Icon name={leftIcon} size={leftIconSize}/>}
@@ -32,7 +36,9 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     flexDirection : "row",
-    width : Dimensions.get("window").width * 0.3
+    width : Dimensions.get("window").width * 0.3,
+    borderWidth : 1,
+    borderColor : palette.white
   },
   buttonText : {
     color : palette.white,

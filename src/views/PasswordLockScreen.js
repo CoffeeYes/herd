@@ -89,6 +89,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
       <CustomButton
       text="Submit"
+      buttonStyle={{backgroundColor : palette.offprimary,elevation : 2}}
+      disabled={password.length == 0}
       onPress={checkPassword}/>
     </View>
   )
