@@ -67,18 +67,18 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
 
   let initialReceivedMessages = [];
   if(receivedMessages.length > 0) {
-    for(let message in receivedMessages) {
-      const currentMessage = JSON.parse(JSON.stringify(receivedMessages[message]))
-      const decrypted = await decryptString(receivedMessages[message].text);
+    for(const message of receivedMessages) {
+      const currentMessage = parseRealmObject(message)
+      const decrypted = await decryptString(message.text);
       initialReceivedMessages.push({...currentMessage,text : decrypted});
     }
   }
 
   let initialSentMessages = [];
   if(sentMessagesCopy.length > 0) {
-    for(let message in sentMessagesCopy) {
-      const currentMessage = JSON.parse(JSON.stringify(sentMessagesCopy[message]));
-      const decrypted = await decryptString(sentMessagesCopy[message].text);
+    for(const message of sentMessagesCopy) {
+      const currentMessage = parseRealmObject(message);
+      const decrypted = await decryptString(message.text);
       initialSentMessages.push({...currentMessage,text : decrypted});
     }
   }
@@ -100,10 +100,10 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
 
   return {
     messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
-    ...(initialLoad && {newStart : highestMessageIndex}
-    ),
-    ...(initialLoad && {newEnd : lowestMessageIndex}
-    )
+    ...(initialLoad && {
+      newStart : highestMessageIndex,
+      newEnd : lowestMessageIndex
+    }),
   }
 }
 
@@ -199,7 +199,7 @@ const getContactsWithChats = async () => {
     let contacts = getContactsByKey(keys);
     let contactsWithTimestamps = [];
     contacts.map(contact => {
-      let currentContact = JSON.parse(JSON.stringify(contact));
+      let currentContact = parseRealmObject(contact);
       const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
       currentContact.timestamp = matchingMessage?.timestamp;
       currentContact.lastText = matchingMessage?.text;
@@ -253,6 +253,7 @@ const deleteMessages = messages => {
   const sentMessageCopiesToDelete = messages.map(id =>
     messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
   ).filter(message => message !== undefined);
+
   sentMessageCopiesToDelete.length > 0 &&
   messageCopyRealm.write(() => {
     messageCopyRealm.delete(sentMessageCopiesToDelete)
@@ -261,6 +262,7 @@ const deleteMessages = messages => {
   const sentMessagesToDelete = messages.map(id =>
     messageSentRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
   ).filter(message => message !== undefined);
+
   sentMessagesToDelete.length > 0 &&
   messageSentRealm.write(() => {
     messageSentRealm.delete(sentMessagesToDelete)
@@ -299,19 +301,19 @@ const getMessageQueue = async useMessageCopies => {
   let sentMessagesCopy = [];
   let receivedMessagesCopy = [];
 
-  sentMessages.map(message => sentMessagesCopy.push({...JSON.parse(JSON.stringify(message))}));
-  receivedMessages.map(message => receivedMessagesCopy.push({...JSON.parse(JSON.stringify(message))}));
+  sentMessages.map(message => sentMessagesCopy.push({...parseRealmObject(message)}));
+  receivedMessages.map(message => receivedMessagesCopy.push({...parseRealmObject(message)}));
 
   return [...sentMessagesCopy,...receivedMessagesCopy]
 }
 
 const getDeletedReceivedMessages = () => {
-  return deletedReceivedRealm.objects('Message').map(message => JSON.parse(JSON.stringify(message)));
+  return deletedReceivedRealm.objects('Message').map(message => parseRealmObject(message));
 }
 
 const getReceivedMessagesForSelf = key => {
   return messageReceivedRealm.objects('Message').filtered(`to == '${key}'`)
-  .map(message => JSON.parse(JSON.stringify(message)))
+  .map(message => parseRealmObject(message))
 }
 
 const removeCompletedMessagesFromRealm = messages => {
