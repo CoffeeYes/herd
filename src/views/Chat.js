@@ -457,7 +457,7 @@ const Chat = ({ route, navigation }) => {
       </View>}
 
       <PanGestureHandler
-      enabled={enableGestureHandler}
+      enabled={enableGestureHandler && !loadingMoreMessages}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
           {(loading || loadingMoreMessages) &&
