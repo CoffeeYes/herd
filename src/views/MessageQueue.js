@@ -78,12 +78,12 @@ const MessageQueue = ({}) => {
       onPress={() => {
         setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
       }}
-      buttonStyle={{marginTop : 15}}/>
+      buttonStyle={styles.buttonStyle}/>
       {loading ?
       <ActivityIndicator size="large" color={palette.primary}/>
       :
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
-        {parsedQueue.map((message,index) =>
+        {parsedQueue.sort((a,b) => a.timestamp < b.timestamp).map((message,index) =>
           <FoldableMessage
           to={message.toContactName}
           from={message.fromContactName}
@@ -104,6 +104,11 @@ const styles = {
   },
   messageText : {
     width : Dimensions.get('window').width * 0.7,
+  },
+  buttonStyle : {
+    marginTop : 15,
+    elevation : 2,
+    borderColor : palette.offprimary
   }
 }
 export default MessageQueue;
