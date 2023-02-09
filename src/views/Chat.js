@@ -111,8 +111,8 @@ const Chat = ({ route, navigation }) => {
   },[messages])
 
   const loadMessages = async (messageStart, messageEnd) => {
-    const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd)
-    const newMessages = messagePackage.messages
+    const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
+    const newMessages = messagePackage.messages;
 
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
@@ -132,16 +132,24 @@ const Chat = ({ route, navigation }) => {
       //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
       // if there are any present in the database.
       const extractedMessages = messages.map(section => section.data)[0];
-      let newMessagesToAdd = false;
+      let receivedMessageCount = 0;
+      let sentMessageCount = 0;
       for(const message of newMessages) {
-        const found = extractedMessages?.find(eMessage => eMessage._id == message._id) != undefined
+        const found = extractedMessages?.find(eMessage => eMessage._id == message._id) != undefined;
         if(!found) {
           newMessagesToAdd = true;
         }
+        if(message.from === ownPublicKey) {
+          sentMessageCount += 1;
+        }
+        else {
+          receivedMessageCount += 1;
+        }
       }
-      if(!newMessagesToAdd) {
+
+      const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
+      if(!newMessagesToAdd || noMoreMessagesToLoad) {
         showNoMoreMessagePopup();
-        return;
       }
     }
 
