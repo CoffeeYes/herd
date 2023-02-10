@@ -71,7 +71,7 @@ const Chat = ({ route, navigation }) => {
         const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
-        scrollToBottom(false);
+
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
         if(chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
@@ -477,6 +477,7 @@ const Chat = ({ route, navigation }) => {
           <SectionList
           sections={messages}
           ref={scrollRef}
+          initialScrollIndex={messages.reduce((accumulator,currentArray) => accumulator += currentArray.data.length,0) + 1}
           onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
           keyExtractor={item => item._id}
           renderItem={renderItem}
