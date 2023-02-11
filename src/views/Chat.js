@@ -55,6 +55,7 @@ const Chat = ({ route, navigation }) => {
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
+  const [initialScrollIndex, setInitialScrollIndex] = useState(0);
 
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
@@ -107,7 +108,11 @@ const Chat = ({ route, navigation }) => {
   //length being used for decision making in deleting chat
   const messageLengthRef = useRef();
   useEffect(() => {
-    messageLengthRef.current = getMessageLength();
+    const messageLength = getMessageLength();
+    messageLengthRef.current = messageLength;
+    if (messageLength >= messageLoadingSize * 2) {
+      setInitialScrollIndex(messageLength);
+    }
   },[messages])
 
   const loadMessages = async (messageStart, messageEnd) => {
@@ -477,7 +482,7 @@ const Chat = ({ route, navigation }) => {
           <SectionList
           sections={messages}
           ref={scrollRef}
-          initialScrollIndex={messages.reduce((accumulator,currentArray) => accumulator += currentArray.data.length,0) + 1}
+          initialScrollIndex={initialScrollIndex}
           onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
           keyExtractor={item => item._id}
           renderItem={renderItem}
