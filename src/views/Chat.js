@@ -290,7 +290,9 @@ const Chat = ({ route, navigation }) => {
             .filter(section => section.data.length > 0);
 
             if(updatedMessages.length > 0) {
-              const lastMessage = updatedMessages[updatedMessages.length -1].data[updatedMessages[updatedMessages.length -1].data.length -1]
+              const lastSection = updatedMessages[updatedMessages.length -1];
+              const lastMessageIndex = lastSection.data.length -1;
+              const lastMessage = lastSection.data[lastMessageIndex];
               dispatch(setLastText(contactInfo._id,lastMessage))
             }
             else if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading){
@@ -379,6 +381,7 @@ const Chat = ({ route, navigation }) => {
       setTimeout(() => {
         setShowPopup(false);
       },1000)
+
       setShowedPopup(true);
       setEnableGestureHandler(false);
       setAllowScrollToLoadMessages(false);
@@ -392,12 +395,15 @@ const Chat = ({ route, navigation }) => {
   const scrollRef = useRef();
 
   const scrollToBottom = (animated = true) => {
+    const lastSectionIndex = messages.length -1;
+    const lastMessageIndex = messages[lastSectionIndex].data.length -1;
+
     messages.length > 0 &&
-    messages[messages.length -1].data.length -1 > 0 &&
+    lastSectionIndex > 0 &&
     scrollRef.current.scrollToLocation({
       animated : animated,
-      sectionIndex : messages.length -1,
-      itemIndex : messages[messages.length -1].data.length -1
+      sectionIndex : lastSectionIndex,
+      itemIndex : lastMessageIndex
     });
   }
 
