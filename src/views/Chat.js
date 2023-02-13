@@ -108,9 +108,10 @@ const Chat = ({ route, navigation }) => {
   //length being used for decision making in deleting chat
   const messageLengthRef = useRef();
   useEffect(() => {
-    const messageLength = getMessageLength();
+    const [sentLength,receivedLength] = getMessageLength(true);
+    const messageLength = sentLength + receivedLength;
     messageLengthRef.current = messageLength;
-    if (messageLength >= messageLoadingSize * 2) {
+    if (sentLength > messageLoadingSize || receivedLength > messageLoadingSize) {
       setInitialScrollIndex(messageLength);
     }
   },[messages])
