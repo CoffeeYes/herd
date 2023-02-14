@@ -22,17 +22,20 @@ const MessageQueue = ({}) => {
   const parseMessageQueue = async queue => {
     const parsedQueue = await Promise.all(queue.map( async message => {
       let newMessage = {...message};
-      newMessage.toContactName = message.to.trim() === ownPublicKey.trim() ?
-      "You"
-      :
-      contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown"
+      let textToDecrypt = false;
+      const pairs = {"to" : "toContactName", "from" : "fromContactName"};
 
-      newMessage.fromContactName = message.from.trim() === ownPublicKey.trim() ?
-      "You"
-      :
-      contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown"
+      for(const [key,value] of Object.entries(pairs)) {
+        if(newMessage[key].trim() === ownPublicKey.trim()) {
+          newMessage[value] = "You";
+          textToDecrypt = true;
+        }
+        else {
+          newMessage[value] = contacts.find(contact => message[key].trim() === contact.key)?.name || "Unknown"
+        }
+      }
 
-      if(message.to.trim() === ownPublicKey.trim() || message.from.trim() === ownPublicKey.trim()) {
+      if(textToDecrypt) {
         newMessage.text = await Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
