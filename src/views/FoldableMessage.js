@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 
 import { palette } from '../assets/palette';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, onPress}) => {
+const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, onPress, loading}) => {
 
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
       <View style={{width : "100%"}}>
-        <View style={styles.messageHeader}>
-          <Text>From : {from}</Text>
-          <Text>To: {to}</Text>
-          <Text>{timestamp}</Text>
-        </View>
-        {open &&
-        <View style={styles.messageText}>
-          <Text>{text}</Text>
-        </View>}
+        {loading ?
+        <ActivityIndicator size="large" color={palette.primary}/>
+        :
+        <>
+          <View style={styles.messageHeader}>
+            <Text>From : {from}</Text>
+            <Text>To: {to}</Text>
+            <Text>{timestamp}</Text>
+          </View>
+          {open &&
+          <View style={styles.messageText}>
+            <Text>{text}</Text>
+          </View>}
+        </>}
       </View>
     </TouchableOpacity>
   )

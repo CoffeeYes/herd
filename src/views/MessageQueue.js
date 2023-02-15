@@ -16,7 +16,7 @@ const MessageQueue = ({}) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
-  const [parsedQueue, setParsedQueue] = useState([]);
+  const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
 
   const parseMessageQueue = async queue => {
@@ -81,10 +81,8 @@ const MessageQueue = ({}) => {
       onPress={() => {
         setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
       }}
+      disabled={loading}
       buttonStyle={styles.buttonStyle}/>
-      {loading ?
-      <ActivityIndicator size="large" color={palette.primary}/>
-      :
       <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
         {parsedQueue.sort((a,b) => a.timestamp < b.timestamp).map((message,index) =>
           <FoldableMessage
@@ -93,10 +91,11 @@ const MessageQueue = ({}) => {
           open={openMessages.indexOf(index) != -1}
           onPress={() => onMessagePress(index)}
           key={index}
+          loading={loading}
           timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
           text={message.text}/>
         )}
-      </ScrollView>}
+      </ScrollView>
     </View>
   )
 }
