@@ -5,14 +5,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { palette } from '../assets/palette';
 
 const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
-                        text, buttonStyle, textStyle, disabled}) => {
+                        text, buttonStyle, textStyle, disabled, disabledStyle}) => {
   return (
     <TouchableOpacity
     onPress={onPress}
     style={{
       ...styles.button,
       ...buttonStyle,
-      ...(disabled && {backgroundColor : palette.grey})
+      ...(disabled && {...styles.disabled,...disabledStyle})
     }}
     disabled={disabled}>
       {leftIcon &&
@@ -48,6 +48,10 @@ const styles = {
     marginLeft : "auto",
     marginRight : "auto"
   },
+  disabled : {
+    backgroundColor : palette.grey,
+    borderColor : palette.grey
+  }
 }
 
 export default CustomButton;

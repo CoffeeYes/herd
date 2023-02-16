@@ -4,13 +4,14 @@ import {Text, TouchableOpacity, Dimensions } from 'react-native';
 import { palette } from '../assets/palette';
 
 const FlashTextButton = ({ onPress, flashText, normalText,
-                           timeout, buttonStyle, textStyle, disabled }) => {
+                           timeout, buttonStyle, textStyle, disabled,
+                           disabledStyle }) => {
 
   const [buttonText, setButtonText] = useState(normalText)
 
   const onButtonPress = async () => {
     const success = await onPress();
-    if(success) {
+    if(success && timeout > 0) {
       setButtonText(flashText);
       setTimeout(() => {
         setButtonText(normalText);
@@ -21,7 +22,11 @@ const FlashTextButton = ({ onPress, flashText, normalText,
   return (
     <TouchableOpacity
     disabled={disabled}
-    style={disabled ? {...styles.button,...buttonStyle,backgroundColor : palette.grey} : {...styles.button,...buttonStyle}}
+    style={{
+      ...styles.button,
+      ...buttonStyle,
+      ...(disabled && {...styles.disabled,...disabledStyle})
+    }}
     onPress={onButtonPress}>
       <Text style={{...styles.buttonText,...textStyle}}>{buttonText + " "}</Text>
     </TouchableOpacity>
@@ -41,6 +46,9 @@ const styles = {
     fontWeight : "bold",
     textAlign : "center"
   },
+  disabled : {
+    backgroundColor : palette.grey
+  }
 }
 
 export default FlashTextButton;
