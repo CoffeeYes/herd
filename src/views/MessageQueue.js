@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, ScrollView, Text, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
 import Header from './Header';
 import moment from 'moment';
 
@@ -51,7 +51,7 @@ const MessageQueue = ({}) => {
       }
       return newMessage;
     }))
-    return parsedQueue;
+    return parsedQueue.sort((a,b) => a.timestamp < b.timestamp);
   }
 
   useEffect(() => {
@@ -70,6 +70,20 @@ const MessageQueue = ({}) => {
     setOpenMessages(newOpenMessages)
   }
 
+  const renderItem = ({item, index}) => {
+    return (
+      <FoldableMessage
+      to={item.toContactName}
+      from={item.fromContactName}
+      open={openMessages.indexOf(index) != -1}
+      onPress={() => onMessagePress(index)}
+      key={index}
+      loading={loading}
+      timestamp={moment(item.timestamp).format("HH:MM (DD/MM/YY)")}
+      text={item.text}/>
+    )
+  }
+
   return (
     <View style={{flex : 1}}>
       <Header
@@ -83,19 +97,12 @@ const MessageQueue = ({}) => {
       }}
       disabled={loading}
       buttonStyle={styles.buttonStyle}/>
-      <ScrollView contentContainerStyle={{alignItems : "center",paddingVertical : 10}}>
-        {parsedQueue.sort((a,b) => a.timestamp < b.timestamp).map((message,index) =>
-          <FoldableMessage
-          to={message.toContactName}
-          from={message.fromContactName}
-          open={openMessages.indexOf(index) != -1}
-          onPress={() => onMessagePress(index)}
-          key={index}
-          loading={loading}
-          timestamp={moment(message.timestamp).format("HH:MM (DD/MM/YY)")}
-          text={message.text}/>
-        )}
-      </ScrollView>
+
+      <FlatList
+      contentContainerStyle={{alignItems : "center",paddingVertical : 10}}
+      data={parsedQueue}
+      keyExtractor={item => item._id}
+      renderItem={renderItem}/>
     </View>
   )
 }
