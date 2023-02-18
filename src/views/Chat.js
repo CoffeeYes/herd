@@ -487,6 +487,7 @@ const Chat = ({ route, navigation }) => {
           animating={loadingMoreMessages || loading}/>}
 
           <SectionList
+          contentContainerStyle={{paddingBottom : 5}}
           sections={messages}
           ref={scrollRef}
           initialScrollIndex={initialScrollIndex}

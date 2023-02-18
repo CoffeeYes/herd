@@ -195,7 +195,7 @@ in order to allow Herd to function correctly.`
     <>
       <Header title="Settings"/>
 
-      <ScrollView contentContainerStyle={{alignItems : "center"}}>
+      <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
         <View style={styles.backgroundTransferCard}>
 
@@ -306,20 +306,6 @@ const styles = {
   },
   buttonMargin : {
     marginTop : 10
-  },
-  modalMainContainer : {
-    alignItems : "center",
-    justifyContent : "center",
-    flex : 1,
-    backgroundColor : "rgba(0,0,0,0.4)"
-  },
-  modalContentContainer : {
-    backgroundColor : palette.white,
-    borderRadius : 5,
-    padding : 30,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
   },
   backgroundTransferCard : {
     alignSelf : "center",

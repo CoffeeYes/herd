@@ -42,7 +42,7 @@ const Contact = ({route, navigation}) => {
       rightButtonIcon="edit"
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
-      <ScrollView contentContainerStyle={{paddingTop : 20}}>
+      <ScrollView contentContainerStyle={{paddingVertical : 20}}>
         <View style={largeImageContainerStyle}>
           <TouchableOpacity
           disabled={contact.image === ""}

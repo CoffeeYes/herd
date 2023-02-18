@@ -99,7 +99,7 @@ const MessageQueue = ({}) => {
       buttonStyle={styles.buttonStyle}/>
 
       <FlatList
-      contentContainerStyle={{alignItems : "center",paddingVertical : 10}}
+      contentContainerStyle={styles.listStyle}
       data={parsedQueue}
       keyExtractor={item => item._id}
       renderItem={renderItem}/>
@@ -115,9 +115,14 @@ const styles = {
     width : Dimensions.get('window').width * 0.7,
   },
   buttonStyle : {
-    marginTop : 15,
+    marginTop : 10,
     elevation : 2,
-    borderColor : palette.offprimary
+    borderColor : palette.offprimary,
+    marginBottom : 10
+  },
+  listStyle : {
+    alignItems : "center",
+    paddingVertical : 10,
   }
 }
 export default MessageQueue;
