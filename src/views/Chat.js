@@ -454,7 +454,7 @@ const Chat = ({ route, navigation }) => {
     <Header
     title={contactInfo.name}
     touchStyle={{backgroundColor : palette.offprimary}}
-    textStyle={{marginLeft : 10}}
+    textStyle={{marginLeft : 10, fontSize : customStyle.fontSize + 4}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
     rightButtonOnClick={() => deleteMessages()}
     allowGoBack
@@ -497,7 +497,9 @@ const Chat = ({ route, navigation }) => {
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
-            <Text style={styles.messageDay}>{day === moment().format("DD/MM") ? "Today" : day}</Text>
+            <Text style={{...styles.messageDay,fontSize : customStyle.fontSize}}>
+              {day === moment().format("DD/MM") ? "Today" : day}
+            </Text>
           )}/>
         </View>
       </PanGestureHandler>
@@ -525,7 +527,7 @@ const Chat = ({ route, navigation }) => {
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           justifyContent : "center"}
         }>
-          <Text style={{fontSize : 12}}>
+          <Text style={{fontSize : customStyle.fontSize}}>
             {`${characterCount} / 190`}
           </Text>
         </View>
@@ -559,7 +561,7 @@ const styles = {
     height : Dimensions.get("window").width * imageValues.smallFactor,
   },
   messageDay : {
-    alignSelf : "center"
+    alignSelf : "center",
   },
   popup : {
     position : "absolute",
