@@ -18,7 +18,7 @@ const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const chats = useSelector(state => state.chatReducer.chats);
-  const styles = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const checkStyleReadable = style => {
       const hsv = toHsv(style);
@@ -65,10 +65,11 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        textStyle={{fontWeight : "bold"}}
+        textStyle={{fontWeight : "bold", fontSize : customStyle.fontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         subTextStyle={{
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
+          fontSize : customStyle.fontSize / 1.2,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
@@ -76,7 +77,8 @@ const Chats = ({ navigation }) => {
           maxWidth : 150,
           marginRight : 0,
           textAlign : "center",
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
+          fontSize : customStyle.fontSize / 1.2,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}

@@ -15,6 +15,7 @@ import { deleteChat } from '../redux/actions/chatActions';
 
 const Contacts = ({ route, navigation }) => {
   const dispatch = useDispatch();
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const chats = useSelector(state => state.chatReducer.chats);
   const contacts = route.params.type === "newChat" ?
   useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
@@ -69,7 +70,7 @@ const Contacts = ({ route, navigation }) => {
           key={index}
           navigation={navigation}
           image={contact.image}
-          textStyle={{fontWeight : "bold"}}
+          textStyle={{fontWeight : "bold", fontSize : customStyle.fontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
           onPress={() => route.params.type === "newChat" ?
             navigateToNewChat(parseRealmID(contact))

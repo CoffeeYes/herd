@@ -225,7 +225,7 @@ const Customise = ({ navigation }) => {
           onSlidingComplete={val => setFontSize(Math.round(val))}
           onValueChange={val => setFontSize(Math.round(val))}
           value={originalStyles.fontSize}
-          minimumValue={14}
+          minimumValue={defaultChatStyles.fontSize}
           maximumValue={24}/>
           <View style={{alignItems : "center"}}>
             <Text style={{fontWeight : "bold"}}> Font Size </Text>

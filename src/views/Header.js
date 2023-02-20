@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'
 
@@ -8,6 +9,7 @@ import { palette } from '../assets/palette';
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
                   onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize = 30,
                   backArrowStyle, rightIconSize = 20 }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles)
   return (
     <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
@@ -20,7 +22,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         onPress={onTextTouch}
         style={{...styles.pressContainer,...touchStyle}}>
           {preText}
-          <Text style={{...styles.title,...textStyle}}>{title}</Text>
+          <Text style={{...styles.title,...textStyle, fontSize : customStyle.fontSize * 1.4}}>{title}</Text>
         </TouchableOpacity>
 
 
