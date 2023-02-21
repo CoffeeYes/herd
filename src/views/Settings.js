@@ -33,6 +33,7 @@ import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contact
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -200,13 +201,13 @@ in order to allow Herd to function correctly.`
         <View style={styles.backgroundTransferCard}>
 
           {!backgroundTransfer &&
-          <Text style={styles.warning}>
+          <Text style={{...styles.warning, fontSize : customStyle.fontSize}}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
 
           <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text style={{fontWeight : "bold"}}>Background Transfers</Text>
+            <Text style={{fontWeight : "bold", fontSize : customStyle.fontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}

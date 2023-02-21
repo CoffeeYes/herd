@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
 
-const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
+const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
                       containerStyle, textStyle, flashText, timeout }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles)
   const [currentText, setCurrentText] = useState(text);
 
   const flash = async () => {
@@ -25,14 +27,21 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
 
       {currentText &&
       <View style={styles.textContainer}>
-        <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
+        <Text style={{
+        ...styles.text,
+        fontSize : customStyle.fontSize,
+        ...textStyle}}>
+          {currentText}
+        </Text>
       </View>}
 
       {rightIcon &&
-      <Icon
-      style={{...styles.icon, ...iconStyle}}
-      name={rightIcon}
-      size={iconSize || 32}/>}
+      <View style={{...styles.iconContainer,...iconContainerStyle}}>
+        <Icon
+        style={{...styles.icon, ...iconStyle}}
+        name={rightIcon}
+        size={iconSize || 32}/>
+      </View>}
 
     </TouchableOpacity>
   )
@@ -61,9 +70,12 @@ const styles = {
     justifyContent : "flex-start",
     width : Dimensions.get('window').width * 0.4,
   },
+  iconContainer : {
+    justifyContent : "center"
+  },
   icon : {
     alignSelf : "flex-end"
-  }
+  },
 }
 
 export default CardButton
