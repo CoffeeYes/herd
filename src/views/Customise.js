@@ -75,6 +75,7 @@ const Customise = ({ navigation }) => {
 
   const saveStyles = async () => {
     const style = {
+      ...defaultChatStyles,
       sentBoxColor : fromHsv(sentBoxColor),
       sentTextColor : fromHsv(sentTextColor),
       receivedBoxColor : fromHsv(receivedBoxColor),

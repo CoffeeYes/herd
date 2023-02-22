@@ -22,7 +22,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         onPress={onTextTouch}
         style={{...styles.pressContainer,...touchStyle}}>
           {preText}
-          <Text style={{...styles.title,...textStyle, fontSize : customStyle.fontSize * 1.4}}>{title}</Text>
+          <Text style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
         </TouchableOpacity>
 
 

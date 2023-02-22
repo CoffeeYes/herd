@@ -22,6 +22,9 @@ const defaultChatStyles = {
   receivedBoxColor : palette.offprimary,
   receivedTextColor : palette.offwhite,
   fontSize : 16,
+  titleSize : 24,
+  subTextSize : 14,
+  appFontSize : 16,
 }
 
 export {

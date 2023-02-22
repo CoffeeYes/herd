@@ -68,7 +68,7 @@ const Chats = ({ navigation }) => {
         textStyle={{fontWeight : "bold", fontSize : customStyle.fontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         subTextStyle={{
-          fontSize : customStyle.fontSize / 1.2,
+          fontSize : customStyle.subTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
@@ -77,7 +77,7 @@ const Chats = ({ navigation }) => {
           maxWidth : 150,
           marginRight : 0,
           textAlign : "center",
-          fontSize : customStyle.fontSize / 1.2,
+          fontSize : customStyle.subTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
