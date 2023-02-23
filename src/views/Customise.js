@@ -7,9 +7,10 @@ import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
-import Slider from '@react-native-community/slider';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
+
+import Slider from './Slider';
 
 import { setStyles } from '../redux/actions/chatActions';
 
@@ -219,20 +220,20 @@ const Customise = ({ navigation }) => {
 
         </View>
 
-        <View style={styles.sliderContainer}>
-          <Slider
-          style={{flex : 1}}
-          tapToSeek
-          onSlidingComplete={val => setFontSize(Math.round(val))}
-          onValueChange={val => setFontSize(Math.round(val))}
-          value={originalStyles.fontSize}
-          minimumValue={defaultChatStyles.fontSize}
-          maximumValue={24}/>
-          <View style={{alignItems : "center"}}>
-            <Text style={{fontWeight : "bold"}}> Font Size </Text>
-            <Text>{fontSize}</Text>
-          </View>
-        </View>
+        <Slider
+        containerStyle={styles.sliderContainer}
+        sliderStyle={{flex : 1}}
+        tapToSeek
+        onSlidingComplete={val => setFontSize(Math.round(val))}
+        onValueChange={val => setFontSize(Math.round(val))}
+        value={originalStyles.fontSize}
+        min={defaultChatStyles.fontSize}
+        max={24}
+        rightTitle="Font Size"
+        rightText={fontSize}
+        rightTextContainerStyle={{alignItems : "center", padding : 5}}
+        rightTitleStyle={{fontWeight : "bold"}}
+        />
 
         <View style={styles.colorChoiceContainer}>
           <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
