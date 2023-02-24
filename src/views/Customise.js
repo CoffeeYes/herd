@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useDispatch } from 'react-redux';
 import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
@@ -27,14 +27,16 @@ const Customise = ({ navigation }) => {
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
-  const [fontSize, _setFontSize] = useState(14);
+  const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
+  const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
 
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
   const receivedBoxColorRef = useRef();
   const receivedTextColorRef = useRef();
-  const fontSizeRef = useRef();
+  const messageFontSizeRef = useRef();
+  const uiFontSizeRef = useRef();
 
   const setSentBoxColor = data => {
     sentBoxColorRef.current = data
@@ -53,9 +55,13 @@ const Customise = ({ navigation }) => {
     _setReceivedTextColor(data)
   }
 
-  const setFontSize = data => {
-    fontSizeRef.current = data;
-    _setFontSize(data)
+  const setMessageFontSize = data => {
+    messageFontSizeRef.current = data;
+    _setMessageFontSize(data)
+  }
+  const setUiFontSize = data => {
+    uiFontSizeRef.current = data;
+    _setUiFontSize(data)
   }
 
   useEffect(() => {
@@ -69,7 +75,8 @@ const Customise = ({ navigation }) => {
       setSentTextColor(toHsv(styles.sentTextColor));
       setReceivedBoxColor(toHsv(styles.receivedBoxColor));
       setReceivedTextColor(toHsv(styles.receivedTextColor));
-      setFontSize(styles.fontSize);
+      setMessageFontSize(styles.messageFontSize);
+      setUiFontSize(styles.uiFontSize);
       setOriginalStyles(styles);
     }
   }
@@ -81,7 +88,8 @@ const Customise = ({ navigation }) => {
       sentTextColor : fromHsv(sentTextColor),
       receivedBoxColor : fromHsv(receivedBoxColor),
       receivedTextColor : fromHsv(receivedTextColor),
-      fontSize : fontSize
+      messageFontSize : messageFontSize,
+      uiFontSize : uiFontSize
     }
 
     setOriginalStyles(style);
@@ -100,7 +108,8 @@ const Customise = ({ navigation }) => {
         fromHsv(sentTextColorRef.current).toLowerCase() != styles.sentTextColor.toLowerCase() ||
         fromHsv(receivedBoxColorRef.current).toLowerCase() != styles.receivedBoxColor.toLowerCase() ||
         fromHsv(receivedTextColorRef.current).toLowerCase() != styles.receivedTextColor.toLowerCase() ||
-        fontSizeRef.current != styles.fontSize
+        messageFontSizeRef.current != styles.messageFontSize ||
+        uiFontSizeRef.current != styles.uiFontSize
       )
 
       if(unsavedChanges) {
@@ -182,6 +191,23 @@ const Customise = ({ navigation }) => {
     }
   ];
 
+  const fontSizes = [
+    {
+      value : messageFontSize,
+      setValue : setMessageFontSize,
+      title : "Messages",
+      rightTitle : "font size",
+      rightText : messageFontSize?.toString()
+    },
+    {
+      value : uiFontSize,
+      setValue : setUiFontSize,
+      title : "User Interface",
+      rightTitle : "font size",
+      rightText : uiFontSize?.toString()
+    }
+  ]
+
   return (
     <>
     <Header title="Customise" allowGoBack/>
@@ -201,7 +227,7 @@ const Customise = ({ navigation }) => {
             receivedBoxColor : fromHsv(receivedBoxColor),
             sentTextColor : fromHsv(sentTextColor),
             receivedTextColor : fromHsv(receivedTextColor),
-            fontSize : fontSize}
+            fontSize : messageFontSize}
           }
           messageFrom={true}/>
 
@@ -214,26 +240,35 @@ const Customise = ({ navigation }) => {
             receivedBoxColor : fromHsv(receivedBoxColor),
             sentTextColor : fromHsv(sentTextColor),
             receivedTextColor : fromHsv(receivedTextColor),
-            fontSize : fontSize}
+            fontSize : messageFontSize}
           }
           messageFrom={false}/>
 
         </View>
 
-        <Slider
-        containerStyle={styles.sliderContainer}
-        sliderStyle={{flex : 1}}
-        tapToSeek
-        onSlidingComplete={val => setFontSize(Math.round(val))}
-        onValueChange={val => setFontSize(Math.round(val))}
-        value={originalStyles.fontSize}
-        min={defaultChatStyles.fontSize}
-        max={24}
-        rightTitle="Font Size"
-        rightText={fontSize}
-        rightTextContainerStyle={{alignItems : "center", padding : 5}}
-        rightTitleStyle={{fontWeight : "bold"}}
-        />
+        <View style={styles.fontSlidersContainer}>
+          {fontSizes.map((item,index) => {
+            return (
+              <Fragment key={index}>
+                <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
+                <Slider
+                containerStyle={styles.sliderContainer}
+                sliderStyle={{flex : 1}}
+                tapToSeek
+                onSlidingComplete={val => item.setValue(Math.round(val))}
+                onValueChange={val => item.setValue(Math.round(val))}
+                value={item.value}
+                min={defaultChatStyles.messageFontSize}
+                max={24}
+                rightTitle={item.rightTitle}
+                rightText={item.rightText}
+                rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
+                rightTitleStyle={{fontWeight : "bold"}}
+                />
+              </Fragment>
+            )
+          })}
+        </View>
 
         <View style={styles.colorChoiceContainer}>
           <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
@@ -278,7 +313,8 @@ const Customise = ({ navigation }) => {
             fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
             fromHsv(receivedBoxColor).toLowerCase() == originalStyles.receivedBoxColor.toLowerCase() &&
             fromHsv(receivedTextColor).toLowerCase() == originalStyles.receivedTextColor.toLowerCase() &&
-            fontSize === originalStyles.fontSize
+            messageFontSize === originalStyles.messageFontSize &&
+            uiFontSize === originalStyles.uiFontSize
           }/>
 
           <CustomButton
@@ -289,7 +325,8 @@ const Customise = ({ navigation }) => {
             fromHsv(originalStyles.sentTextColor).toLowerCase() == defaultChatStyles.sentTextColor.toLowerCase() &&
             fromHsv(originalStyles.receivedBoxColor).toLowerCase() == defaultChatStyles.receivedBoxColor.toLowerCase() &&
             fromHsv(originalStyles.receivedTextColor).toLowerCase() == defaultChatStyles.receivedTextColor.toLowerCase() &&
-            originalStyles.fontSize == defaultChatStyles.fontSize
+            originalStyles.messageFontSize == defaultChatStyles.messageFontSize &&
+            originalStyles.uiFontSize == defaultChatStyles.uiFontSize
           }
           buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
 
@@ -335,7 +372,14 @@ const styles = {
     marginBottom : 10,
     paddingVertical : 10,
     borderRadius : 5,
-    elevation : 2
   },
+  fontSlidersContainer : {
+    backgroundColor : palette.white,
+    elevation : 2,
+    marginHorizontal : 10,
+    borderRadius : 5,
+    marginBottom : 10,
+    paddingVertical : 10,
+  }
 }
 export default Customise;
