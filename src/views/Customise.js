@@ -9,6 +9,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Slider from './Slider';
 
@@ -29,6 +30,7 @@ const Customise = ({ navigation }) => {
   const [originalStyles, setOriginalStyles] = useState({});
   const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
+  const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
 
 
   const sentBoxColorRef = useRef();
@@ -208,6 +210,15 @@ const Customise = ({ navigation }) => {
     }
   ]
 
+  const changeFonts = (val,index) => {
+    if(synchroniseFontChanges) {
+      fontSizes.map(item => item.setValue(val))
+    }
+    else {
+      fontSizes[index].setValue(val);
+    }
+  }
+
   return (
     <>
     <Header title="Customise" allowGoBack/>
@@ -247,6 +258,15 @@ const Customise = ({ navigation }) => {
         </View>
 
         <View style={styles.fontSlidersContainer}>
+          <TouchableOpacity
+          style={{marginLeft : 20, marginTop : 10}}
+          onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
+            <Icon
+            size={32}
+            color={synchroniseFontChanges ? palette.primary : palette.black}
+            name={synchroniseFontChanges ? "lock" : "lock-open"}/>
+          </TouchableOpacity>
+
           {fontSizes.map((item,index) => {
             return (
               <Fragment key={index}>
@@ -255,8 +275,8 @@ const Customise = ({ navigation }) => {
                 containerStyle={styles.sliderContainer}
                 sliderStyle={{flex : 1}}
                 tapToSeek
-                onSlidingComplete={val => item.setValue(Math.round(val))}
-                onValueChange={val => item.setValue(Math.round(val))}
+                onSlidingComplete={val => changeFonts(Math.round(val),index)}
+                onValueChange={val => changeFonts(Math.round(val),index)}
                 value={item.value}
                 min={defaultChatStyles.messageFontSize}
                 max={24}
