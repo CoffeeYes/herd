@@ -29,7 +29,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
       <View style={styles.textContainer}>
         <Text style={{
         ...styles.text,
-        fontSize : customStyle.fontSize,
+        fontSize : customStyle.uiFontSize,
         ...textStyle}}>
           {currentText}
         </Text>

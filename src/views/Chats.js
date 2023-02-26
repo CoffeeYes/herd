@@ -65,7 +65,7 @@ const Chats = ({ navigation }) => {
         key={index}
         navigation={navigation}
         image={chat.image}
-        textStyle={{fontWeight : "bold", fontSize : customStyle.fontSize}}
+        textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         subTextStyle={{
           fontSize : customStyle.subTextSize,

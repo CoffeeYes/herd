@@ -91,7 +91,9 @@ const Customise = ({ navigation }) => {
       receivedBoxColor : fromHsv(receivedBoxColor),
       receivedTextColor : fromHsv(receivedTextColor),
       messageFontSize : messageFontSize,
-      uiFontSize : uiFontSize
+      uiFontSize : uiFontSize,
+      titleSize : uiFontSize * 1.5,
+      subTextSize : uiFontSize * 0.8,
     }
 
     setOriginalStyles(style);

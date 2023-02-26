@@ -24,7 +24,6 @@ const defaultChatStyles = {
   messageFontSize : 16,
   titleSize : 24,
   subTextSize : 14,
-  appFontSize : 16,
   uiFontSize : 16
 }
 
