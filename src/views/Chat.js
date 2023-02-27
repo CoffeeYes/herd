@@ -439,7 +439,7 @@ const Chat = ({ route, navigation }) => {
 
   const getItemLayout = (data, index) => {
     //multiply by 1.1 for each point increase in fontsize
-    const fontSizeFactor = (1 + ((customStyle.fontSize - 14)  * 0.1))
+    const fontSizeFactor = (1 + ((customStyle.messageFontSize - 14)  * 0.1))
     // min height at 14 fontsize ~= 80, max ~= 150, (80 + 150) / 2 = 115
     const estimatedMessageHeight = 115 * fontSizeFactor;
     return {
@@ -454,7 +454,7 @@ const Chat = ({ route, navigation }) => {
     <Header
     title={contactInfo.name}
     touchStyle={{backgroundColor : palette.offprimary}}
-    textStyle={{marginLeft : 10, fontSize : customStyle.fontSize + 4}}
+    textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
     rightButtonOnClick={() => deleteMessages()}
     allowGoBack
@@ -497,7 +497,7 @@ const Chat = ({ route, navigation }) => {
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
-            <Text style={{...styles.messageDay,fontSize : customStyle.fontSize}}>
+            <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
               {day === moment().format("DD/MM") ? "Today" : day}
             </Text>
           )}/>
@@ -510,7 +510,7 @@ const Chat = ({ route, navigation }) => {
         style={{
           ...styles.chatInput,
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
-          fontSize : customStyle?.fontSize,
+          fontSize : customStyle?.uiFontSize,
           flex : 1
         }}
         value={chatInput}
@@ -527,7 +527,7 @@ const Chat = ({ route, navigation }) => {
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           justifyContent : "center"}
         }>
-          <Text style={{fontSize : customStyle.fontSize}}>
+          <Text style={{fontSize : customStyle.uiFontSize}}>
             {`${characterCount} / 190`}
           </Text>
         </View>

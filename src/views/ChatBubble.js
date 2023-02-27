@@ -19,7 +19,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
       ...(textType === "messageText" && {...styles.messageText}),
       ...(textType === "timestamp" && {...styles.timestamp}),
       color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-      fontSize : customStyle.fontSize
+      fontSize : customStyle.messageFontSize
     })
   }
 
