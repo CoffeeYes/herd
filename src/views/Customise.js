@@ -240,7 +240,7 @@ const Customise = ({ navigation }) => {
             receivedBoxColor : fromHsv(receivedBoxColor),
             sentTextColor : fromHsv(sentTextColor),
             receivedTextColor : fromHsv(receivedTextColor),
-            fontSize : messageFontSize}
+            messageFontSize : messageFontSize}
           }
           messageFrom={true}/>
 
@@ -253,7 +253,7 @@ const Customise = ({ navigation }) => {
             receivedBoxColor : fromHsv(receivedBoxColor),
             sentTextColor : fromHsv(sentTextColor),
             receivedTextColor : fromHsv(receivedTextColor),
-            fontSize : messageFontSize}
+            messageFontSize : messageFontSize}
           }
           messageFrom={false}/>
 

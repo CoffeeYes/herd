@@ -201,13 +201,13 @@ in order to allow Herd to function correctly.`
         <View style={styles.backgroundTransferCard}>
 
           {!backgroundTransfer &&
-          <Text style={{...styles.warning, fontSize : customStyle.fontSize}}>
+          <Text style={{...styles.warning, fontSize : customStyle.uiFontSize}}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
 
           <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text style={{fontWeight : "bold", fontSize : customStyle.fontSize}}>Background Transfers</Text>
+            <Text style={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}
