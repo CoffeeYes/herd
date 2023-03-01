@@ -7,6 +7,7 @@ import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
+import CardButton from './CardButton';
 import TabItem from './TabItem';
 import ChatBubble from './ChatBubble';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -257,6 +258,12 @@ const Customise = ({ navigation }) => {
           }
           messageFrom={false}/>
 
+        </View>
+
+        <Header title="Preview" textStyle={{fontSize : uiFontSize * 1.5}}/>
+
+        <View style={{alignItems : "center"}}>
+          <CardButton text="Preview" textStyle={{fontSize : uiFontSize}} rightIcon="preview"/>
         </View>
 
         <View style={styles.fontSlidersContainer}>
