@@ -9,6 +9,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
 import TabItem from './TabItem';
+import ListItem from './ListItem';
 import ChatBubble from './ChatBubble';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -266,6 +267,15 @@ const Customise = ({ navigation }) => {
           <CardButton text="Preview" textStyle={{fontSize : uiFontSize}} rightIcon="preview"/>
         </View>
 
+        <ListItem
+        name="Preview"
+        rightText="Preview"
+        subText="Preview"
+        rightTextStyle={{fontSize : uiFontSize * 0.8}}
+        subTextStyle={{fontSize : uiFontSize * 0.8}}
+        textStyle={{fontSize : uiFontSize}}
+        />
+
         <View style={styles.fontSlidersContainer}>
           <TouchableOpacity
           style={{marginLeft : 20, marginTop : 10}}
@@ -406,8 +416,8 @@ const styles = {
     backgroundColor : palette.white,
     elevation : 2,
     marginHorizontal : 10,
+    marginVertical : 10,
     borderRadius : 5,
-    marginBottom : 10,
     paddingVertical : 10,
   }
 }
