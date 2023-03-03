@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -6,6 +7,7 @@ import { palette } from '../assets/palette';
 
 const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled, disabledStyle}) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity
     onPress={onPress}
@@ -19,7 +21,9 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSiz
       <Icon name={leftIcon} size={leftIconSize}/>}
 
       {text &&
-      <Text style={{...styles.buttonText, ...textStyle}}>{text}</Text>}
+      <Text style={{...styles.buttonText,fontSize : customStyle.uiFontSize, ...textStyle}}>
+        {text}
+      </Text>}
 
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize}/>}

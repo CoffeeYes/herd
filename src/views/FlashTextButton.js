@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import {Text, TouchableOpacity, Dimensions } from 'react-native';
 
 import { palette } from '../assets/palette';
@@ -6,7 +7,7 @@ import { palette } from '../assets/palette';
 const FlashTextButton = ({ onPress, flashText, normalText,
                            timeout, buttonStyle, textStyle, disabled,
                            disabledStyle }) => {
-
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [buttonText, setButtonText] = useState(normalText)
 
   const onButtonPress = async () => {
@@ -28,7 +29,9 @@ const FlashTextButton = ({ onPress, flashText, normalText,
       ...(disabled && {...styles.disabled,...disabledStyle})
     }}
     onPress={onButtonPress}>
-      <Text style={{...styles.buttonText,...textStyle}}>{buttonText + " "}</Text>
+      <Text style={{...styles.buttonText,fontSize : customStyle.uiFontSize,...textStyle}}>
+        {buttonText + " "}
+      </Text>
     </TouchableOpacity>
   )
 }

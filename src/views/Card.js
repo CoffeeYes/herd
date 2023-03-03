@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { TouchableOpacity, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -6,6 +7,8 @@ import { palette } from '../assets/palette';
 
 const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
                 disabled, errorText }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  
   return (
     <TouchableOpacity
     disabled={disabled}
@@ -18,7 +21,10 @@ const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
       <Icon name={icon} size={iconSize}/>}
 
       {text &&
-      <Text style={{...styles.text, ...textStyle}}>{text}</Text>}
+      <Text style={{
+        ...styles.text,
+        fontSize : customStyle.uiFontSize,
+        ...textStyle}}>{text}</Text>}
     </TouchableOpacity>
   )
 }

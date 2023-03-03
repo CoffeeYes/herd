@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
   NativeEventEmitter } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -16,6 +17,8 @@ const BTDeviceList = () => {
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
   const [error, setError] = useState("");
+
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
@@ -96,12 +99,12 @@ const BTDeviceList = () => {
 
       <View style={styles.mainContainer}>
         <View>
-          <Text>{scanning ? "Scanning..." : ""}</Text>
+          <Text style={{fontSize : customStyle.uiFontSize}}>{scanning ? "Scanning..." : ""}</Text>
           <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
         </View>
 
         {error.length > 0 &&
-        <Text style={styles.error}>{error}</Text>}
+        <Text style={{...styles.error,fontSize : customStyle.uiFontSize}}>{error}</Text>}
 
         <ScrollView contentContainerStyle={styles.BTList}>
           {deviceList.map((device,index) =>
@@ -109,8 +112,8 @@ const BTDeviceList = () => {
             key={index}
             style={styles.deviceContainer}
             onPress={ () => handleDeviceClick(device)}>
-              <Text>{device.name || "Nameless Device"}</Text>
-              <Text>{device.macAddress}</Text>
+              <Text style={{fontSize : customStyle.uiFontSize}}>{device.name || "Nameless Device"}</Text>
+              <Text style={{fontSize : customStyle.uiFontSize}}>{device.macAddress}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
