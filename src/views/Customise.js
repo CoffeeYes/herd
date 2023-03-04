@@ -346,7 +346,7 @@ const Customise = ({ navigation }) => {
           flashText="Saved!"
           onPress={saveStyles}
           timeout={500}
-          buttonStyle={{...styles.buttonHeight,width : 100}}
+          buttonStyle={{...styles.button, flexDirection : "row"}}
           disabled={
             fromHsv(sentBoxColor).toLowerCase() == originalStyles.sentBoxColor.toLowerCase() &&
             fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
@@ -367,7 +367,7 @@ const Customise = ({ navigation }) => {
             originalStyles.messageFontSize == defaultChatStyles.messageFontSize &&
             originalStyles.uiFontSize == defaultChatStyles.uiFontSize
           }
-          buttonStyle={{...styles.buttonHeight,marginLeft : 10}}/>
+          buttonStyle={{ ...styles.button, marginLeft : 10}}/>
 
         </View>
       </>}
@@ -399,10 +399,6 @@ const styles = {
     alignItems : "center",
     marginTop : 10,
   },
-  buttonHeight : {
-    height : Dimensions.get("window").height * 0.075,
-    justifyContent : "center"
-  },
   sliderContainer : {
     alignItems : "center",
     flexDirection : "row",
@@ -411,6 +407,11 @@ const styles = {
     marginBottom : 10,
     paddingVertical : 10,
     borderRadius : 5,
+  },
+  button : {
+    height : "100%",
+    justifyContent : "center",
+    alignItems : "center"
   },
   fontSlidersContainer : {
     backgroundColor : palette.white,
