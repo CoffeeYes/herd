@@ -20,6 +20,7 @@ import { palette } from '../assets/palette';
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route.params.id))
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [name, _setName] = useState(originalContact.name);
   const [publicKey, _setPublicKey] = useState(originalContact.key);
   const [contactImage, _setContactImage] = useState(originalContact.image);
@@ -152,18 +153,18 @@ const EditContact = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
 
-        <Text style={styles.error}>{error}</Text>
+        <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
 
-        <Text style={styles.inputTitle}>Name</Text>
+        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
         <TextInput
-        style={styles.input}
+        style={{...styles.input,fontSize : customStyle.uiFontSize}}
         onChangeText={text => setName(text)}
         value={name}/>
 
-        <Text style={styles.inputTitle}>Public Key</Text>
+        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
         <TextInput
         multiline={true}
-        style={styles.input}
+        style={{...styles.input,fontSize : customStyle.uiFontSize}}
         onChangeText={text => setPublicKey(text)}
         value={publicKey}/>
 

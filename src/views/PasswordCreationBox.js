@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 
 import { palette } from '../assets/palette';
 
@@ -9,7 +10,7 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
                             secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
                             primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle }) => {
-
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
 
@@ -28,25 +29,25 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
         <View style={{...mainContainerStyle, ...styles.card}}>
 
           {description &&
-          <Text multiline>
+          <Text multiline style={{fontSize : customStyle.uiFontSize}}>
             {description}
           </Text>}
 
-          <Text style={styles.error}>{error}</Text>
+          <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
 
-          <Text style={styles.inputTitle}>{primaryName}</Text>
+          <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>{primaryName}</Text>
           <TextInput
           secureTextEntry
-          style={styles.input}
+          style={{...styles.input, fontSize : customStyle.uiFontSize}}
           onChangeText={setPrimaryInputText}
           ref={primaryInputRef}
           onSubmitEditing={() => secondaryInputRef.current.focus()}
           value={primaryInputText}/>
 
-          <Text style={styles.inputTitle}>{secondaryName}</Text>
+          <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>{secondaryName}</Text>
           <TextInput
           secureTextEntry
-          style={styles.input}
+          style={{...styles.input, fontSize : customStyle.uiFontSize}}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
           onSubmitEditing={() => submit()}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { View, Text, TextInput, TouchableOpacity, Dimensions, Image, Alert, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Crypto from '../nativeWrapper/Crypto';
@@ -18,6 +18,7 @@ import { palette } from '../assets/palette';
 
 const CreateContact = ({ navigation, route}) => {
   const dispatch = useDispatch();
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [username, _setUsername] = useState("");
   const [publicKey, _setPublicKey] = useState("");
   const [error, setError] = useState("");
@@ -155,7 +156,7 @@ const CreateContact = ({ navigation, route}) => {
       <Header title="Create Contact" allowGoBack/>
 
       <ScrollView contentContainerStyle={{padding : 20}}>
-        <Text style={styles.error}>{error}</Text>
+        <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
@@ -171,12 +172,12 @@ const CreateContact = ({ navigation, route}) => {
         placeholder="Name"
         onChangeText={name => setUsername(name)}
         value={username}
-        style={styles.input}/>
+        style={{...styles.input, fontSize : customStyle.uiFontSize}}/>
 
         <TextInput
         placeholder="Public Key"
         onChangeText={key => setPublicKey(key)}
-        style={styles.input}
+        style={{...styles.input, fontSize : customStyle.uiFontSize}}
         editable={!route?.params?.publicKey}
         value={publicKey}/>
 

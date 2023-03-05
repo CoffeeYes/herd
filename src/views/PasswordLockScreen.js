@@ -20,6 +20,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasureHash = useSelector(state => state.userReducer.erasurePasswordHash);
   const lastRoutes = useSelector(state => state.appStateReducer.lastRoutes);
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -78,12 +79,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.error}>{error}</Text>
-      <Text style={styles.inputTitle}>Enter Your Password : </Text>
+      <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+      <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>Enter Your Password : </Text>
 
       <TextInput
       secureTextEntry
-      style={styles.input}
+      style={{...styles.input, fontSize : customStyle.uiFontSize}}
       onChangeText={setPassword}
       value={password}/>
 
