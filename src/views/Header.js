@@ -7,14 +7,14 @@ import navigationRef from '../NavigationRef'
 import { palette } from '../assets/palette';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
-                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize = 30,
-                  backArrowStyle, rightIconSize = 20 }) => {
+                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
+                  backArrowStyle, rightIconSize }) => {
   const customStyle = useSelector(state => state.chatReducer.styles)
   return (
     <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
         <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
-          <Icon name="arrow-back" size={backArrowSize} style={{...styles.backArrow,...backArrowStyle}}/>
+          <Icon name="arrow-back" size={backArrowSize || customStyle.uiFontSize + 16} style={{...styles.backArrow,...backArrowStyle}}/>
         </TouchableOpacity>}
 
         <TouchableOpacity
@@ -30,7 +30,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={styles.rightButton}>
-        <Icon name={rightButtonIcon} size={rightIconSize} style={{color : palette.white}}/>
+        <Icon name={rightButtonIcon} size={rightIconSize || customStyle.uiFontSize + 16} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
   )

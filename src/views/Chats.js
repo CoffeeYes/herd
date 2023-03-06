@@ -56,7 +56,6 @@ const Chats = ({ navigation }) => {
       <Header
       title="Chats"
       rightButtonIcon="add"
-      rightIconSize={26}
       rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
       <ScrollView>
       {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
