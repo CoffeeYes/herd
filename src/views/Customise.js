@@ -264,7 +264,11 @@ const Customise = ({ navigation }) => {
         <Header title="Preview" textStyle={{fontSize : uiFontSize * 1.5}}/>
 
         <View style={{alignItems : "center"}}>
-          <CardButton text="Preview" textStyle={{fontSize : uiFontSize}} rightIcon="preview"/>
+          <CardButton
+          disableTouch
+          text="Preview"
+          textStyle={{fontSize : uiFontSize}}
+          rightIcon="preview" iconSize={uiFontSize + 16}/>
         </View>
 
         <ListItem
@@ -274,6 +278,7 @@ const Customise = ({ navigation }) => {
         rightTextStyle={{fontSize : uiFontSize * 0.8}}
         subTextStyle={{fontSize : uiFontSize * 0.8}}
         textStyle={{fontSize : uiFontSize}}
+        disableTouch
         />
 
         <View style={styles.fontSlidersContainer}>

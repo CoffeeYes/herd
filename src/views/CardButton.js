@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { palette } from '../assets/palette';
 
 const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
-                      containerStyle, textStyle, flashText, timeout }) => {
+                      containerStyle, textStyle, flashText, timeout, disableTouch }) => {
   const customStyle = useSelector(state => state.chatReducer.styles)
   const [currentText, setCurrentText] = useState(text);
 
@@ -22,6 +22,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
 
   return (
     <TouchableOpacity
+    disabled={disableTouch}
     style={{...styles.container,...containerStyle}}
     onPress={(flashText && timeout) ? flash : onPress}>
 

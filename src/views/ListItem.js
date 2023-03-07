@@ -6,7 +6,7 @@ import { imageValues, palette } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
-                    rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
+                    disableTouch, rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
   const [showDelete, setShowDelete ] = useState(false);
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
@@ -21,6 +21,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
         setDeleteButtonHeightAdjusted(true);
       }
     }}
+    disabled={disableTouch}
     onLongPress={() => setShowDelete(!showDelete)}>
       <View style={{...styles.imageContainer,...imageContainerStyle}}>
         <ContactImage
