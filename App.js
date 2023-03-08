@@ -68,6 +68,7 @@ const App = ({ }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const locked = useSelector(state => state.appStateReducer.locked);
+  const lockable = useSelector(state => state.appStateReducer.lockable);
 
   const passwordSetRef = useRef();
 
@@ -107,7 +108,7 @@ const App = ({ }) => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
       const lastRoutes = navigationRef?.current?.getRootState()?.routes;
-      if(state === "background" && passwordSetRef.current) {
+      if(state === "background" && passwordSetRef.current && lockable) {
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 1,
