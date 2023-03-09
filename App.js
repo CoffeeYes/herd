@@ -71,6 +71,7 @@ const App = ({ }) => {
   const lockable = useSelector(state => state.appStateReducer.lockable);
 
   const passwordSetRef = useRef();
+  const lockableRef = useRef();
 
   useEffect(() => {
     (async () => {
@@ -108,7 +109,7 @@ const App = ({ }) => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
       const lastRoutes = navigationRef?.current?.getRootState()?.routes;
-      if(state === "background" && passwordSetRef.current && lockable) {
+      if(state === "background" && passwordSetRef.current && lockableRef.current) {
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 1,
@@ -129,6 +130,10 @@ const App = ({ }) => {
   useEffect(() => {
     passwordSetRef.current = passwordHash.length > 0;
   },[passwordHash])
+
+  useEffect(() => {
+    lockableRef.current = lockable;
+  },[lockable])
 
   const loadInitialState = async () => {
     //get stored data

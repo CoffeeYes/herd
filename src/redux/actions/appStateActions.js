@@ -29,5 +29,6 @@ const setLastRoutes = routes => {
 export {
   setInitialRoute,
   setLocked,
+  setLockable,
   setLastRoutes
 }

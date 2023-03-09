@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TouchableOpacity, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -12,7 +12,10 @@ import LocationModal from './LocationModal';
 
 import { palette } from '../assets/palette';
 
+import { setLockable } from '../redux/actions/appStateActions';
+
 const AddContact = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [BTError,setBTError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
@@ -35,6 +38,7 @@ const AddContact = ({ navigation }) => {
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationAllowed = await Bluetooth.checkLocationPermission();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
+    dispatch(setLockable(false));
     if(!btEnabled) {
       await Bluetooth.requestBTEnable()
     }
@@ -42,6 +46,7 @@ const AddContact = ({ navigation }) => {
       const locationRequest = await Bluetooth.requestLocationPermissions();
       if(!locationRequest) {
         setShowLocationModal(true);
+        dispatch(setLockable(true));
         return;
       }
     }
@@ -59,6 +64,7 @@ const AddContact = ({ navigation }) => {
       await Bluetooth.requestBTMakeDiscoverable(60) &&
       navigation.navigate("BTDeviceList");
     }
+    dispatch(setLockable(true));
   }
 
   const locationModalDescription = `Herd requires location permissions in order to connect \
