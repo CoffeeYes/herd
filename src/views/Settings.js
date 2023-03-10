@@ -20,8 +20,9 @@ import { parseRealmID } from '../realm/helper';
 
 import { setChats, resetMessages, setMessageQueue } from '../redux/actions/chatActions';
 import { setContacts, resetContacts } from '../redux/actions/contactActions';
+import { setLockable } from '../redux/actions/appStateActions';
 
-import { palette } from '../assets/palette'
+import { palette } from '../assets/palette';
 
 import {
   getMessageQueue,
@@ -117,6 +118,7 @@ const Settings = ({ navigation }) => {
 
   const toggleBackgroundTransfer = async value => {
     if(value) {
+      dispatch(setLockable(false));
       let locationPermissionsGranted = await Bluetooth.checkLocationPermission();
       const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
       let btEnabled = await Bluetooth.checkBTEnabled();
@@ -125,6 +127,7 @@ const Settings = ({ navigation }) => {
       if(!bluetoothScanPermissionsGranted) {
         const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
         if(!grantBluetoothScanPermissions) {
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -133,6 +136,7 @@ const Settings = ({ navigation }) => {
         const grantLocationPermissions = await Bluetooth.requestLocationPermissions();
         if(!grantLocationPermissions) {
           setShowLocationModal(true);
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -140,6 +144,7 @@ const Settings = ({ navigation }) => {
       if(!btEnabled) {
         btEnabled = await Bluetooth.requestBTEnable();
         if(!btEnabled) {
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -154,6 +159,7 @@ const Settings = ({ navigation }) => {
           ]
         )
         if(!locationEnabled) {
+          dispatch(setLockable(true));
           return;
         }
       }
