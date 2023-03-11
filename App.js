@@ -57,7 +57,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
-import { setLastRoutes } from './src/redux/actions/appStateActions';
+import { setLastRoutes, setLockable } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
 
@@ -118,6 +118,9 @@ const App = ({ }) => {
         )
         lastRoutes &&
         dispatch(setLastRoutes(lastRoutes));
+      }
+      else if (state === "active") {
+        dispatch(setLockable(true));
       }
     })
 

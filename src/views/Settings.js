@@ -46,6 +46,7 @@ const Settings = ({ navigation }) => {
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+    console.log("mount")
   },[]);
 
   const copyKeyToClipboard = async () => {
@@ -296,6 +297,7 @@ in order to allow Herd to function correctly.`
         onRequestClose={() => setShowLocationModal(false)}
         buttonOnPress={() => {
           setShowLocationModal(false);
+          dispatch(setLockable(false));
           Bluetooth.navigateToApplicationSettings();
         }}
         description={locationModalDescription}
