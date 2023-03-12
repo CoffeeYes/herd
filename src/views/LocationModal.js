@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import CustomModal from './CustomModal';
@@ -9,6 +10,7 @@ import { palette } from '../assets/palette';
 
 const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
                          description, instructionText}) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <CustomModal
     onPress={modalOnPress}
@@ -17,12 +19,12 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
       <View style={styles.modalContentContainer}>
         <Icon name="location-on" size={48}/>
         {!!description &&
-        <Text>
+        <Text style={{fontSize : customStyle.uiFontSize}}>
           {description}
         </Text>}
 
         {!!instructionText &&
-        <Text style={{fontWeight : "bold", marginVertical : 20}}>
+        <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.uiFontSize}}>
         {instructionText}
         </Text>}
 

@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
 import { palette } from '../assets/palette';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <CustomModal
     visible={visible}
@@ -14,7 +16,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
       <View style={styles.modalContentContainer}>
         {title &&
         <View style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={{...styles.title,fontSize : customStyle.uiFontSize}}>{title}</Text>
         </View>}
         <View style={styles.QRContainer}>
           <QRCode
