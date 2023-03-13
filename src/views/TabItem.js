@@ -8,7 +8,11 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity
-    style={{...styles.container,...containerStyle}}
+    style={{
+      ...styles.container,
+      ...containerStyle,
+      ...(active && styles.activeContainer)
+    }}
     onPress={onPress}>
       <Text style={{
         ...styles.text,
@@ -23,11 +27,13 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
 
 const styles = {
   container : {
-    borderRightWidth : 1,
-    borderRightColor : palette.grey,
     padding : 10,
     alignItems : "center",
     justifyContent : "center"
+  },
+  activeContainer : {
+    borderBottomWidth : 1,
+    borderBottomColor : palette.primary,
   },
   text : {
     color : palette.black,

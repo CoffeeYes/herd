@@ -26,7 +26,7 @@ const Customise = ({ navigation }) => {
   const [sentTextColor, _setSentTextColor] = useState("");
   const [receivedBoxColor, _setReceivedBoxColor] = useState("");
   const [receivedTextColor, _setReceivedTextColor] = useState("");
-  const [activeItem, setActiveItem] = useState("sentBox");
+  const [activeItem, setActiveItem] = useState(0);
   const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
@@ -325,24 +325,19 @@ const Customise = ({ navigation }) => {
                   width : tabWidth,
                   ...((index === tabItems.length -1) && {borderRightWidth : 0})
                 }}
-                active={activeItem === item.name}
-                onPress={() => setActiveItem(item.name)}/>
+                active={activeItem === index}
+                onPress={() => setActiveItem(index)}/>
               )})
             }
           </View>
 
-          {tabItems.map((item,index) => {
-            return(
-              activeItem === item.name &&
-              <ColorChoice
-                title={item.title}
-                color={toHsv(item.color)}
-                key={index}
-                setColor={item.setColor}
-                oldColor={originalStyles[item.originalColor]}
-              />
-            )})
-          }
+
+          <ColorChoice
+            title={tabItems[activeItem].name}
+            color={toHsv(tabItems[activeItem].color)}
+            setColor={tabItems[activeItem].setColor}
+            oldColor={originalStyles[tabItems[activeItem].originalColor]}
+          />
         </View>
 
         <View style={styles.buttonRow}>
@@ -396,7 +391,7 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-around",
     borderBottomWidth : 1,
-    borderBottomColor : palette.grey
+    borderBottomColor : palette.offgrey
   },
   buttonRow : {
     flexDirection : "row",
