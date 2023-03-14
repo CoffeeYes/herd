@@ -321,10 +321,7 @@ const Customise = ({ navigation }) => {
                 <TabItem
                 key={index}
                 text={item.text}
-                containerStyle={{
-                  width : tabWidth,
-                  ...((index === tabItems.length -1) && {borderRightWidth : 0})
-                }}
+                containerStyle={{width : tabWidth}}
                 active={activeItem === index}
                 onPress={() => setActiveItem(index)}/>
               )})

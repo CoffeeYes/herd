@@ -46,7 +46,6 @@ const Settings = ({ navigation }) => {
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
-    console.log("mount")
   },[]);
 
   const copyKeyToClipboard = async () => {

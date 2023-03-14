@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 
 import { palette } from '../assets/palette';
@@ -6,7 +7,7 @@ import { palette } from '../assets/palette';
 import Crypto from '../nativeWrapper/Crypto';
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, onPress, loading}) => {
-
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
       <View style={{width : "100%"}}>
@@ -21,7 +22,7 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style
           </View>
           {open &&
           <View style={styles.messageText}>
-            <Text>{text}</Text>
+            <Text style={{fontSize : customStyle.uiFontSize}}>{text}</Text>
           </View>}
         </>}
       </View>

@@ -396,11 +396,12 @@ const Chat = ({ route, navigation }) => {
   const scrollRef = useRef();
 
   const scrollToBottom = (animated = true) => {
-    const lastSectionIndex = messages.length -1;
-    const lastMessageIndex = messages[lastSectionIndex].data.length -1;
+    const lastSectionIndex = messages?.length -1;
+    const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
 
     messages.length > 0 &&
-    lastSectionIndex > 0 &&
+    lastSectionIndex >= 0 &&
+    lastMessageIndex >= 0 &&
     scrollRef.current.scrollToLocation({
       animated : animated,
       sectionIndex : lastSectionIndex,
