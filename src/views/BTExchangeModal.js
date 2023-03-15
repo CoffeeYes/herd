@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
@@ -14,6 +15,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [otherKey, _setOtherKey] = useState("");
   const [keyReceived, _setKeyReceived] = useState(false);
   const [keySent, _setKeySent] = useState(false);
+
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const otherKeyRef = useRef();
   const keyReceivedRef = useRef();
@@ -99,7 +102,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     disableOnPress>
         <View style={styles.modalContentContainer}>
           <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
-          <Text>{activityText}</Text>
+          <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
           <CustomButton
           onPress={() => cancel()}
           buttonStyle={{marginTop : 10}}

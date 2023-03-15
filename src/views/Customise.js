@@ -283,7 +283,7 @@ const Customise = ({ navigation }) => {
 
         <View style={styles.fontSlidersContainer}>
           <TouchableOpacity
-          style={{marginLeft : 20, marginTop : 10}}
+          style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
           onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
             <Icon
             size={32}
