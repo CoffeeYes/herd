@@ -321,7 +321,7 @@ const Customise = ({ navigation }) => {
                 <TabItem
                 key={index}
                 text={item.text}
-                containerStyle={{width : tabWidth}}
+                containerStyle={{width : tabWidth,borderBottomWidth : 1, borderBottomColor : "rgba(255,255,255,0)"}}
                 active={activeItem === index}
                 onPress={() => setActiveItem(index)}/>
               )})
@@ -389,6 +389,10 @@ const styles = {
     justifyContent : "space-around",
     borderBottomWidth : 1,
     borderBottomColor : palette.offgrey
+  },
+  tabItem : {
+    borderBottomWidth : 1,
+    borderbottomColor : "rgba(255,255,255,0)"
   },
   buttonRow : {
     flexDirection : "row",
