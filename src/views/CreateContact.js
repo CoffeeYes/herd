@@ -21,7 +21,7 @@ const CreateContact = ({ navigation, route}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [username, _setUsername] = useState("");
   const [publicKey, _setPublicKey] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState([]);
   const [contactImage, _setContactImage] = useState("");
   const [disableButton, setDisableButton] = useState(false);
 
@@ -54,7 +54,7 @@ const CreateContact = ({ navigation, route}) => {
     setDisableButton(true);
 
     if(username.trim() === "" || publicKey.trim() === "") {
-      setError("Fields Cannot be empty")
+      setError(["Fields Cannot be empty"])
     }
     else {
       //test public key
@@ -69,21 +69,24 @@ const CreateContact = ({ navigation, route}) => {
       }
       catch(e) {
         setDisableButton(false);
-        return setError("Invalid Public Key")
+        return setError(["Invalid Public Key"])
       }
 
       //check for duplicate contacts
       const keyExists = getContactsByKey([publicKey.trim()]);
       const nameExists = getContactByName(username.trim());
+      let errors = [];
       if(keyExists != "") {
-        setDisableButton(false);
-        return setError("A contact with this key already exists");
+        errors.push("A contact with this key already exists");
       }
       if(nameExists) {
-        setDisableButton(false);
-        return setError("A contact with that name already exists");
+        errors.push("A contact with that name already exists");
       }
-      setError("");
+      if(errors.length > 0) {
+        setDisableButton(false);
+        return setError(errors);
+      }
+      setError([]);
 
       const newContact = {
         key : publicKey.trim(),
@@ -102,14 +105,14 @@ const CreateContact = ({ navigation, route}) => {
   }
 
   const editImage = async () => {
-    setError("");
+    setError([]);
     const options = {
       mediaType : 'photo',
       includeBase64 : true
     }
     launchImageLibrary(options,response => {
       if(response.errorCode) {
-        setError(response.errorMessage)
+        setError([response.errorMessage])
       }
       else if(!response.didCancel) {
         setContactImage("data:" + response.type + ";base64," + response.base64);
@@ -156,7 +159,11 @@ const CreateContact = ({ navigation, route}) => {
       <Header title="Create Contact" allowGoBack/>
 
       <ScrollView contentContainerStyle={{padding : 20}}>
-        <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+        {error.map((text,index) => {
+          return (
+            <Text key={index} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{text}</Text>
+          )
+        })}
 
         <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
           <View style={styles.imageContainer}>
