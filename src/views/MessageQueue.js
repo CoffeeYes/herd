@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { View, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
 import Header from './Header';
-import moment from 'moment';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -10,6 +9,8 @@ import FoldableMessage from './FoldableMessage';
 import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
+
+import { timestampToText } from '../helper.js';
 
 const MessageQueue = ({}) => {
   const [openMessages, setOpenMessages] = useState([]);
@@ -71,6 +72,8 @@ const MessageQueue = ({}) => {
   }
 
   const renderItem = ({item, index}) => {
+    const date = timestampToText(item.timestamp, "HH:MM (DD/MM/YY)");
+
     return (
       <FoldableMessage
       to={item.toContactName}
@@ -79,7 +82,7 @@ const MessageQueue = ({}) => {
       onPress={() => onMessagePress(index)}
       key={index}
       loading={loading}
-      timestamp={moment(item.timestamp).format("HH:MM (DD/MM/YY)")}
+      timestamp={date}
       text={item.text}/>
     )
   }
