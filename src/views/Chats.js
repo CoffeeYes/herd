@@ -6,13 +6,13 @@ import Header from './Header';
 import ListItem from './ListItem';
 import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
-import moment from 'moment';
 import { toHsv } from 'react-native-color-picker';
-
 
 import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
+
+import { timestampToText } from '../helper';
 
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -85,12 +85,7 @@ const Chats = ({ navigation }) => {
         rightIconStyle={{color : palette.primary}}
         onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
         deleteItem={() => deleteChat(chat)}
-        rightText={chat.timestamp &&
-          (moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
-            "Today"
-            :
-            moment(chat.timestamp).format("DD/MM"))
-        }
+        rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText}/>
       )}
       </ScrollView>

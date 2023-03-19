@@ -1,11 +1,11 @@
-import moment from 'moment';
 import { defaultChatStyles } from '../../assets/styles'
+import { timestampToText } from '../../helper';
 
 const generateMessageDays = (existingMessages = [], newMessages) => {
   let dates = [...existingMessages]
   for(let message of newMessages) {
     if(message) {
-      let messageDate = moment(message.timestamp).format("DD/MM");
+      let messageDate = timestampToText(message.timestamp, "DD/MM");
       const existingDate = dates.find(item => item.day === messageDate)
       if(existingDate) {
         existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
