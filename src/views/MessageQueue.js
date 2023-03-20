@@ -56,11 +56,11 @@ const MessageQueue = ({}) => {
   }
 
   useEffect(() => {
-    setLoading(true);
     ( async () => {
+      setLoading(true);
       setParsedQueue(await parseMessageQueue(messageQueue))
+      setLoading(false);
     })()
-    setLoading(false);
   },[messageQueue])
 
   const onMessagePress = index => {
