@@ -12,6 +12,8 @@ import { palette } from '../assets/palette';
 
 import { timestampToText } from '../helper.js';
 
+import moment from 'moment';
+
 const MessageQueue = ({}) => {
   const [openMessages, setOpenMessages] = useState([]);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
@@ -72,7 +74,8 @@ const MessageQueue = ({}) => {
   }
 
   const renderItem = ({item, index}) => {
-    const date = timestampToText(item.timestamp, "HH:MM (DD/MM/YY)");
+    const date = timestampToText(item.timestamp, "DD/MM/YY");
+    const hours = moment(item.timestamp).format("HH:MM");
 
     return (
       <FoldableMessage
@@ -82,7 +85,8 @@ const MessageQueue = ({}) => {
       onPress={() => onMessagePress(index)}
       key={index}
       loading={loading}
-      timestamp={date}
+      closedTimestamp={date}
+      openTimestamp={hours}
       text={item.text}/>
     )
   }

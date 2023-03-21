@@ -6,7 +6,8 @@ import { palette } from '../assets/palette';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, onPress, loading}) => {
+const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, style, onPress, loading,
+                          openTimestamp}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
@@ -18,11 +19,12 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style
           <View style={styles.messageHeader}>
             <Text>From : {from}</Text>
             <Text>To: {to}</Text>
-            <Text>{timestamp}</Text>
+            <Text>{closedTimestamp}</Text>
           </View>
           {open &&
           <View style={styles.messageText}>
             <Text style={{fontSize : customStyle.uiFontSize}}>{text}</Text>
+            <Text style={{alignSelf : "flex-end"}}>{openTimestamp}</Text>
           </View>}
         </>}
       </View>

@@ -82,8 +82,8 @@ with other phones using bluetooth.`;
 
           <Card
           onPress={requestBTPermissions}
-          disabled={!!BTError}
-          cardStyle={!!BTError ?
+          disabled={BTError.length > 0}
+          cardStyle={BTError.length > 0 ?
             styles.cardDisabled
             :
             styles.leftCard
