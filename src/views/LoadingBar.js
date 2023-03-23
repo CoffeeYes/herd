@@ -3,7 +3,7 @@ import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const LoadingBar = (containerStyle, loadingBarStyle) => {
+const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [barWidth, setBarWidth] = useState(0);
@@ -24,6 +24,7 @@ const LoadingBar = (containerStyle, loadingBarStyle) => {
       useNativeDriver : false
     }).start(moveToEnd)
   }
+
   useEffect(() => {
     if (containerWidth > 0 && barWidth > 0 && !animationStarted && loadingViewPosition) {
       setAnimationStarted(true);
@@ -32,9 +33,19 @@ const LoadingBar = (containerStyle, loadingBarStyle) => {
   },[containerWidth,barWidth,loadingViewPosition])
 
   return (
-    <View style={{...styles.loadingContainerView,...containerStyle}} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
+    <View style={{
+      ...styles.loadingContainerView,
+      ...containerStyle,
+      ...(barColor && {backgroundColor : barColor})
+    }}
+    onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
-      style={{...styles.loadingView,...loadingBarStyle, marginLeft : loadingViewPosition}}
+      style={{
+        ...styles.loadingView,
+        ...loadingBarStyle,
+        marginLeft : loadingViewPosition,
+        ...(sliderColor && {backgroundColor : sliderColor})
+      }}
       onLayout={e => setBarWidth(e.nativeEvent.layout.width)}/>
     </View>
   )

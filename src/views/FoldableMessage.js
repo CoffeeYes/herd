@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 
 import { palette } from '../assets/palette';
 
@@ -11,44 +11,12 @@ import LoadingBar from './LoadingBar';
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, style, onPress, loading,
                           openTimestamp}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const loadingViewPosition = useRef(new Animated.Value(0)).current;
 
-  const moveToEnd = () => {
-    return Animated.timing(loadingViewPosition, {
-      toValue: 300,
-      duration: 1000,
-      useNativeDriver : false
-    }).start(moveToBeginning)
-  }
-
-  const moveToBeginning = () => {
-    Animated.timing(loadingViewPosition, {
-      toValue: 0,
-      duration: 1000,
-      useNativeDriver : false
-    }).start(moveToEnd)
-  }
-  useEffect(() => {
-    Animated.loop(
-      moveToEnd()
-      // Animated.timing(loadingViewPosition, {
-      //   toValue: 300,
-      //   duration: 1000,
-      //   useNativeDriver : false
-      // }).start(() => {
-      //   Animated.timing(loadingViewPosition, {
-      //     toValue: 0,
-      //     duration: 1000,
-      //     useNativeDriver : false
-      //   }).start();
-      // })
-    );
-  },[loadingViewPosition])
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
       <View style={{width : "100%"}}>
         {loading ?
-        <LoadingBar/>
+        <LoadingBar barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
         :
         <>
           <View style={styles.messageHeader}>
