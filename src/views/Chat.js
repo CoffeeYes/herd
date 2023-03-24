@@ -72,7 +72,7 @@ const Chat = ({ route, navigation }) => {
         const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
-
+        scrollToBottom();
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
         if(chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
