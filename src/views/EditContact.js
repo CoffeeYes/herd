@@ -24,7 +24,7 @@ const EditContact = ({ route, navigation }) => {
   const [name, _setName] = useState(originalContact.name);
   const [publicKey, _setPublicKey] = useState(originalContact.key);
   const [contactImage, _setContactImage] = useState(originalContact.image);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState([]);
 
   const nameRef = useRef(originalContact.name);
   const keyRef = useRef(originalContact.key);
@@ -51,6 +51,7 @@ const EditContact = ({ route, navigation }) => {
 
 
   const save = async () => {
+    let errorSaving = []
     try {
       const encryptedTest = await Crypto.encryptStringWithKey(
         publicKey.trim(),
@@ -61,26 +62,29 @@ const EditContact = ({ route, navigation }) => {
       )
     }
     catch(e) {
-      setError("Invalid Public Key")
-      console.log(e)
-      return false;
+      errorSaving.push("Invalid Public Key")
     }
+
     if(name.trim().length === 0) {
-      setError("Username can not be empty");
-      return false;
+      errorSaving.push("Username can not be empty");
     }
+
     const keyExists = getContactsByKey([publicKey.trim()]);
     const nameExists = getContactByName(name.trim());
 
     if(keyExists != "" && keyExists[0].key != originalContact.key) {
-      setError("A user with this key already exists");
-      return false;
+      errorSaving.push("A user with this key already exists");
     }
     if(nameExists && nameExists.name != originalContact.name) {
-      setError("A user with this name already exists");
+      errorSaving.push("A user with this name already exists");
+    }
+
+    if(errorSaving.length > 0) {
+      setErrors(errorSaving);
       return false;
     }
-    setError("");
+
+    setErrors([]);
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
     editContact(route.params.id, newInfo);
     dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
@@ -88,14 +92,14 @@ const EditContact = ({ route, navigation }) => {
   }
 
   const editImage = async () => {
-    setError("");
+    setErrors([]);
     const options = {
       mediaType : 'photo',
       includeBase64 : true
     }
     launchImageLibrary(options,response => {
       if(response.errorCode) {
-        setError(response.errorMessage)
+        setErrors([response.errorMessage])
       }
       else if(!response.didCancel) {
         setContactImage("data:" + response.type + ";base64," + response.base64);
@@ -153,7 +157,11 @@ const EditContact = ({ route, navigation }) => {
           </View>
         </TouchableOpacity>
 
-        <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+        {errors.map((error,index) => {
+          return (
+            <Text key={index} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+          )
+        })}
 
         <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
         <TextInput
