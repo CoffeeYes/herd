@@ -165,14 +165,14 @@ const CreateContact = ({ navigation, route}) => {
           )
         })}
 
-        <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
-          <View style={styles.imageContainer}>
+        <TouchableOpacity
+        style={styles.imageContainer}
+        onPress={editImage}>
             <ContactImage
             imageURI={contactImage}
             iconSize={64}
             imageWidth={Dimensions.get("window").width * 0.4}
             imageHeight={Dimensions.get("window").height * 0.4}/>
-          </View>
         </TouchableOpacity>
 
         <TextInput

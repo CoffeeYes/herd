@@ -147,14 +147,14 @@ const EditContact = ({ route, navigation }) => {
       <Header title="Edit Contact" allowGoBack/>
       <ScrollView contentContainerStyle={styles.container}>
 
-        <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
-          <View style={largeImageContainerStyle}>
-            <ContactImage
-            imageURI={contactImage}
-            iconSize={64}
-            imageWidth={Dimensions.get("window").width * 0.4}
-            imageHeight={Dimensions.get("window").height * 0.4}/>
-          </View>
+        <TouchableOpacity
+        style={largeImageContainerStyle}
+        onPress={editImage}>
+          <ContactImage
+          imageURI={contactImage}
+          iconSize={64}
+          imageWidth={Dimensions.get("window").width * 0.4}
+          imageHeight={Dimensions.get("window").height * 0.4}/>
         </TouchableOpacity>
 
         {errors.map((error,index) => {

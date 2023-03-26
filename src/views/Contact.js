@@ -42,17 +42,16 @@ const Contact = ({route, navigation}) => {
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
       <ScrollView contentContainerStyle={{paddingVertical : 20}}>
-        <View style={largeImageContainerStyle}>
-          <TouchableOpacity
-          disabled={contact.image === ""}
-          onPress={() => contact.image != "" && setShowLargeImage(true)}>
-            <ContactImage
-            imageURI={contact.image}
-            iconSize={64}
-            imageWidth={Dimensions.get("window").width * 0.4}
-            imageHeight={Dimensions.get("window").height * 0.4}/>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+        style={largeImageContainerStyle}
+        disabled={contact?.image?.trim()?.length === 0}
+        onPress={() => setShowLargeImage(true)}>
+          <ContactImage
+          imageURI={contact.image}
+          iconSize={64}
+          imageWidth={Dimensions.get("window").width * 0.4}
+          imageHeight={Dimensions.get("window").height * 0.4}/>
+        </TouchableOpacity>
 
         <View style={{alignItems : "center"}}>
           <CardButton
