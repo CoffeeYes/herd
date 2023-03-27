@@ -28,6 +28,7 @@ const Splash = ({ navigation }) => {
 
   }
 
+  const badVersion = Platform.OS === "android" && Platform.Version < 23;
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
@@ -39,9 +40,9 @@ const Splash = ({ navigation }) => {
       text="Get Started"
       onPress={setup}
       buttonStyle={{borderWidth : 1,borderColor : palette.white}}
-      disabled={Platform.OS === "android" && Platform.Version < 23}/>
+      disabled={badVersion}/>
 
-      {Platform.OS === "android" && Platform.Version < 23 &&
+      { badVersion &&
         <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold", width : textWidth}}>
           Unfortunately, your device's software is too old to utilise the security features herd requires to run.
           Please check for software updates. If there are none, herd will not function with your device.

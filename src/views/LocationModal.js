@@ -18,14 +18,14 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
     visible={visible}>
       <View style={styles.modalContentContainer}>
         <Icon name="location-on" size={48}/>
-        {!!description &&
+        {description?.length > 0 &&
         <Text style={{fontSize : customStyle.uiFontSize}}>
           {description}
         </Text>}
 
-        {!!instructionText &&
+        {instructionText?.length > 0 &&
         <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.uiFontSize}}>
-        {instructionText}
+          {instructionText}
         </Text>}
 
         <CustomButton
