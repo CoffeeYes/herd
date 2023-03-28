@@ -12,7 +12,7 @@ const FlashTextButton = ({ onPress, flashText, normalText,
 
   const onButtonPress = async () => {
     const success = await onPress();
-    if(success && timeout > 0) {
+    if(success && flashText?.length > 0 && timeout > 0) {
       setButtonText(flashText);
       setTimeout(() => {
         setButtonText(normalText);

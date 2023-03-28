@@ -12,7 +12,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
 
   const flash = async () => {
     const success = await onPress();
-    if(success) {
+    if(success && flashText?.length > 0 && timeout > 0) {
       setCurrentText(flashText);
       setTimeout(() => {
         setCurrentText(text);
@@ -24,7 +24,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
     <TouchableOpacity
     disabled={disableTouch}
     style={{...styles.container,...containerStyle}}
-    onPress={(flashText && timeout) ? flash : onPress}>
+    onPress={flash}>
 
       {currentText &&
       <View style={styles.textContainer}>
