@@ -8,7 +8,7 @@ import { palette } from '../assets/palette';
 const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
                 disabled, errorText }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  
+
   return (
     <TouchableOpacity
     disabled={disabled}
@@ -20,7 +20,7 @@ const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
       {icon &&
       <Icon name={icon} size={iconSize}/>}
 
-      {text &&
+      {text?.length > 0 &&
       <Text style={{
         ...styles.text,
         fontSize : customStyle.uiFontSize,

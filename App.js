@@ -208,7 +208,6 @@ const App = ({ }) => {
       <Stack.Navigator
       initialRouteName={initialRoute}
       screenOptions={{headerShown : false}}>
-        <>
           <Stack.Screen
           name="passwordLockScreen"
           component={PasswordLockScreen}/>
@@ -227,7 +226,6 @@ const App = ({ }) => {
           <Stack.Screen name="customise" component={Customise}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
-        </>
       </Stack.Navigator>}
     </>
   );

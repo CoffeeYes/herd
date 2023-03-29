@@ -26,7 +26,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
     style={{...styles.container,...containerStyle}}
     onPress={flash}>
 
-      {currentText &&
+      {currentText?.length > 0 &&
       <View style={styles.textContainer}>
         <Text style={{
         ...styles.text,
