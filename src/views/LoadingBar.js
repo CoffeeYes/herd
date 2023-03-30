@@ -3,7 +3,7 @@ import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor}) => {
+const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor, animationDuration = 500}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [barWidth, setBarWidth] = useState(0);
@@ -12,7 +12,7 @@ const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor}) =>
   const moveToEnd = () => {
     return Animated.timing(loadingViewPosition, {
       toValue: containerWidth - barWidth,
-      duration: 500,
+      duration: animationDuration,
       useNativeDriver : false
     }).start(moveToBeginning)
   }
@@ -20,7 +20,7 @@ const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor}) =>
   const moveToBeginning = () => {
     Animated.timing(loadingViewPosition, {
       toValue: 0,
-      duration: 500,
+      duration: animationDuration,
       useNativeDriver : false
     }).start(moveToEnd)
   }
@@ -55,6 +55,7 @@ export default LoadingBar
 
 const styles = {
   loadingContainerView : {
+    flex : 1,
     width : "90%",
     alignSelf : "center",
     height : 10,
