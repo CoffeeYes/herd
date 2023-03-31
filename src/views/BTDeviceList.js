@@ -109,7 +109,7 @@ const BTDeviceList = () => {
         <ScrollView contentContainerStyle={styles.BTList}>
           {deviceList.map((device,index) =>
             <TouchableOpacity
-            key={index}
+            key={device.macAddress}
             style={styles.deviceContainer}
             onPress={ () => handleDeviceClick(device)}>
               <Text style={{fontSize : customStyle.uiFontSize}}>{device.name || "Nameless Device"}</Text>

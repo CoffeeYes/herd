@@ -66,7 +66,7 @@ const Contacts = ({ route, navigation }) => {
         {contacts?.map( (contact, index) =>
           <ListItem
           name={contact.name}
-          key={index}
+          key={contact._id}
           navigation={navigation}
           image={contact.image}
           textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}

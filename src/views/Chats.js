@@ -61,7 +61,7 @@ const Chats = ({ navigation }) => {
       {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
         <ListItem
         name={chat.name}
-        key={index}
+        key={chat._id}
         navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
