@@ -199,6 +199,7 @@ const Customise = ({ navigation }) => {
 
   const fontSizes = [
     {
+      tag : "message_size",
       value : messageFontSize,
       setValue : setMessageFontSize,
       title : "Messages",
@@ -206,6 +207,7 @@ const Customise = ({ navigation }) => {
       rightText : messageFontSize?.toString()
     },
     {
+      tag : "ui_size",
       value : uiFontSize,
       setValue : setUiFontSize,
       title : "User Interface",
@@ -291,9 +293,9 @@ const Customise = ({ navigation }) => {
             name={synchroniseFontChanges ? "lock" : "lock-open"}/>
           </TouchableOpacity>
 
-          {fontSizes.map((item,index) => {
+          {fontSizes.map(item=> {
             return (
-              <Fragment key={index}>
+              <Fragment key={item.tag}>
                 <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
                 <Slider
                 containerStyle={styles.sliderContainer}

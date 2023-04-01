@@ -62,21 +62,33 @@ const EditContact = ({ route, navigation }) => {
       )
     }
     catch(e) {
-      errorSaving.push("Invalid Public Key")
+      errorSaving.push({
+        type : "invalid_key",
+        message : "Invalid Public Key"
+      })
     }
 
     if(name.trim().length === 0) {
-      errorSaving.push("Username can not be empty");
+      errorSaving.push({
+        type : "empty_fields",
+        message : "Username can not be empty"
+      });
     }
 
     const keyExists = getContactsByKey([publicKey.trim()]);
     const nameExists = getContactByName(name.trim());
 
     if(keyExists != "" && keyExists[0].key != originalContact.key) {
-      errorSaving.push("A user with this key already exists");
+      errorSaving.push({
+        type : "key_exists",
+        message : "A user with this key already exists"
+      });
     }
     if(nameExists && nameExists.name != originalContact.name) {
-      errorSaving.push("A user with this name already exists");
+      errorSaving.push({
+        type : "name_exists",
+        message : "A user with this name already exists"
+      });
     }
 
     if(errorSaving.length > 0) {
@@ -99,7 +111,10 @@ const EditContact = ({ route, navigation }) => {
     }
     launchImageLibrary(options,response => {
       if(response.errorCode) {
-        setErrors([response.errorMessage])
+        setErrors([{
+          type : "image_error",
+          message : response.errorMessage
+        }])
       }
       else if(!response.didCancel) {
         setContactImage("data:" + response.type + ";base64," + response.base64);
@@ -157,9 +172,9 @@ const EditContact = ({ route, navigation }) => {
           imageHeight={Dimensions.get("window").height * 0.4}/>
         </TouchableOpacity>
 
-        {errors.map((error,index) => {
+        {errors.map(error => {
           return (
-            <Text key={index} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+            <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
           )
         })}
 

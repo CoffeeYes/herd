@@ -54,7 +54,10 @@ const CreateContact = ({ navigation, route}) => {
     setDisableButton(true);
 
     if(username.trim() === "" || publicKey.trim() === "") {
-      setError(["Fields Cannot be empty"])
+      setError([{
+        type : "empty_fields",
+        message : "Fields Cannot be empty"
+      }])
     }
     else {
       //test public key
@@ -69,7 +72,10 @@ const CreateContact = ({ navigation, route}) => {
       }
       catch(e) {
         setDisableButton(false);
-        return setError(["Invalid Public Key"])
+        return setError([{
+          type : "invalid_key",
+          message : "Invalid Public Key"}
+        ])
       }
 
       //check for duplicate contacts
@@ -77,10 +83,16 @@ const CreateContact = ({ navigation, route}) => {
       const nameExists = getContactByName(username.trim());
       let errors = [];
       if(keyExists != "") {
-        errors.push("A contact with this key already exists");
+        errors.push({
+          type : "key_exists",
+          message : "A contact with this key already exists"
+        });
       }
       if(nameExists) {
-        errors.push("A contact with that name already exists");
+        errors.push({
+          type : "name_exists",
+          message : "A contact with that name already exists"
+        });
       }
       if(errors.length > 0) {
         setDisableButton(false);
@@ -112,7 +124,10 @@ const CreateContact = ({ navigation, route}) => {
     }
     launchImageLibrary(options,response => {
       if(response.errorCode) {
-        setError([response.errorMessage])
+        setError([{
+          type : "image_error",
+          message : response.errorMessage
+        }])
       }
       else if(!response.didCancel) {
         setContactImage("data:" + response.type + ";base64," + response.base64);
@@ -159,9 +174,9 @@ const CreateContact = ({ navigation, route}) => {
       <Header title="Create Contact" allowGoBack/>
 
       <ScrollView contentContainerStyle={{padding : 20}}>
-        {error.map((text,index) => {
+        {error.map(error => {
           return (
-            <Text key={index} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{text}</Text>
+            <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
           )
         })}
 
