@@ -14,7 +14,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
   return (
     <TouchableOpacity
     style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10,...containerStyle}}
-    onPress={onPress}
+    onPress={showDelete ? () => setShowDelete(false) : onPress}
     onLayout={event => {
       if(!deleteButtonHeightAdjusted) {
         setDeleteButtonHeight(event.nativeEvent.layout.height);
