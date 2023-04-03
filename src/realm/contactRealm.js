@@ -17,13 +17,14 @@ const getAllContacts = () => {
   []
 }
 
-const deleteContact = object => {
-  deleteChat(object.key);
-  const contacts = contactsRealm.objects("Contact");
-  const contactToDelete = contacts.find(contact => contact._id == object._id);
-  contactToDelete &&
+const deleteContacts = contacts => {
+  const realmContacts = contactsRealm.objects("Contact");
+  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => item._id != contact._id) === undefined)
+  for(contact of contactsToDelete) {
+    deleteChat(contact.key);
+  }
   contactsRealm.write(() => {
-    contactsRealm.delete(contactToDelete);
+    contactsRealm.delete(contactsToDelete);
   })
 }
 
@@ -82,7 +83,7 @@ const closeContactRealm = () => {
 
 export {
   getAllContacts,
-  deleteContact,
+  deleteContacts,
   createContact,
   getContactById,
   getContactByName,

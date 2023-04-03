@@ -4,7 +4,7 @@ import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, Scr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getAllContacts, deleteContact as deleteContactFromRealm } from '../realm/contactRealm';
+import { getAllContacts, deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
 import { getContactsWithChats } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
@@ -35,7 +35,7 @@ const Contacts = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             dispatch(deleteContact(contacts[index]));
-            deleteContactFromRealm(contacts[index]);
+            deleteContactsFromRealm([contacts[index]]);
           },
         },
       ]
