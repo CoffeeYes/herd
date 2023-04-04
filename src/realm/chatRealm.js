@@ -213,10 +213,10 @@ const getContactsWithChats = async () => {
   }
 }
 
-const deleteChat = key => {
-  const sentMessagesToDelete = messageSentRealm.objects('Message').filtered("to = " + "'" + key + "'");
-  const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filtered("to = " + "'" + key + "'");
-  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered("from = " + "'" + key + "'");
+const deleteChat = keys => {
+  const sentMessagesToDelete = messageSentRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
+  const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filter(message => keys.indexOf(message.from) != -1);
 
   ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
 

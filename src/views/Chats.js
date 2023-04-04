@@ -43,7 +43,7 @@ const Chats = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             dispatch(deleteChatFromState(chat))
-            deleteChatFromRealm(chat.key)
+            deleteChatFromRealm([chat.key])
           },
         },
       ]
