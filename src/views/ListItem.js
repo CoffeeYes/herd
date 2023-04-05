@@ -4,17 +4,18 @@ import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues, palette } from '../assets/palette';
 
-const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
+const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
-                    disableTouch, rightTextStyle, rightIcon, rightIconSize, rightIconStyle }) => {
-  const [showDelete, setShowDelete ] = useState(false);
+                    disableTouch, rightTextStyle, rightIcon, rightIconSize, rightIconStyle,
+                    highlighted }) => {
+
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
   return (
     <TouchableOpacity
-    style={{...styles.listItem,paddingVertical : showDelete ? 0 : 10, paddingLeft : 10,...containerStyle}}
-    onPress={showDelete ? () => setShowDelete(false) : onPress}
+    style={{...styles.listItem,paddingVertical : highlighted ? 0 : 10, paddingLeft : 10,...containerStyle}}
+    onPress={onPress}
     onLayout={event => {
       if(!deleteButtonHeightAdjusted) {
         setDeleteButtonHeight(event.nativeEvent.layout.height);
@@ -22,7 +23,7 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
       }
     }}
     disabled={disableTouch}
-    onLongPress={() => setShowDelete(!showDelete)}>
+    onLongPress={onLongPress}>
       <View style={{...styles.imageContainer,...imageContainerStyle}}>
         <ContactImage
         imageURI={image}
@@ -47,13 +48,10 @@ const ListItem = ({ name, image, deleteItem, onPress, containerStyle, textStyle,
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize || 24} style={rightIconStyle}/>}
 
-      {showDelete &&
+      {highlighted &&
       <TouchableOpacity
       style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto", height : deleteButtonHeight}}
-      onPress={() => {
-        setShowDelete(false);
-        deleteItem();
-      }}>
+      onPress={() => deleteItem()}>
         <Icon name="delete" size={24} style={{color : palette.black}}/>
       </TouchableOpacity>}
 

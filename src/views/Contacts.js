@@ -21,6 +21,7 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
   :
   useSelector(state => state.contactReducer.contacts);
+  const [highlightedContacts, setHighlightedContacts ] = useState([]);
 
   const onPressDelete = async index => {
     Alert.alert(
@@ -54,6 +55,30 @@ const Contacts = ({ route, navigation }) => {
     );
   }
 
+  const handleLongPress = contact => {
+    if(highlightedContacts.indexOf(contact) == -1) {
+      setHighlightedContacts([...highlightedContacts,contact]);
+    }
+  }
+
+  const handlePress = contact => {
+    if(highlightedContacts.length > 0) {
+      const contactIndex = highlightedContacts.indexOf(contact);
+      if(contactIndex === -1) {
+        setHighlightedContacts([...highlightedContacts,contact]);
+      }
+      else {
+        setHighlightedContacts([...highlightedContacts].filter(highlightedContact => highlightedContact !== contact));
+      }
+    }
+    else {
+      route.params.type === "newChat" ?
+      navigateToNewChat(parseRealmID(contact))
+      :
+      navigation.navigate("contact", {id : parseRealmID(contact)})
+    }
+  }
+
   return (
     <>
       <Header
@@ -71,11 +96,9 @@ const Contacts = ({ route, navigation }) => {
           image={contact.image}
           textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
-          onPress={() => route.params.type === "newChat" ?
-            navigateToNewChat(parseRealmID(contact))
-            :
-            navigation.navigate("contact", {id : parseRealmID(contact)})
-          }
+          onPress={() => handlePress(contact)}
+          onLongPress={() => handleLongPress(contact)}
+          highlighted={highlightedContacts.indexOf(contact) !== -1}
           deleteItem={() => onPressDelete(index)}
           />
         )}

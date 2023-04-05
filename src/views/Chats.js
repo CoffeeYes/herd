@@ -19,6 +19,7 @@ const Chats = ({ navigation }) => {
 
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const [highlightedChats, setHighlightedChats ] = useState([]);
 
   const checkStyleReadable = style => {
       const hsv = toHsv(style);
@@ -48,7 +49,27 @@ const Chats = ({ navigation }) => {
         },
       ]
     );
+  }
 
+  const handleLongPress = chat => {
+    if(highlightedChats.indexOf(chat) == -1) {
+      setHighlightedChats([...highlightedChats,chat]);
+    }
+  }
+
+  const handlePress = chat => {
+    if(highlightedChats.length > 0) {
+      const chatIndex = highlightedChats.indexOf(chat);
+      if(chatIndex === -1) {
+        setHighlightedChats([...highlightedChats,chat]);
+      }
+      else {
+        setHighlightedChats([...highlightedChats].filter(highlightedChat => highlightedChat !== chat));
+      }
+    }
+    else {
+      navigation.navigate("chat", {contactID : parseRealmID(chat)})
+    }
   }
 
   return (
@@ -83,7 +104,9 @@ const Chats = ({ navigation }) => {
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
         rightIconSize={18}
         rightIconStyle={{color : palette.primary}}
-        onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
+        onPress={() => handlePress(chat)}
+        onLongPress={() => handleLongPress(chat)}
+        highlighted={highlightedChats.indexOf(chat) !== -1}
         deleteItem={() => deleteChat(chat)}
         rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText}/>
