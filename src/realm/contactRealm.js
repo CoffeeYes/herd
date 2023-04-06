@@ -2,7 +2,7 @@ import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChat, updateMessagesWithContact } from './chatRealm';
 import { cloneDeep } from 'lodash';
-import { parseRealmObject, parseRealmObjects} from './helper'
+import { parseRealmObject, parseRealmObjects, parseRealmID} from './helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -19,8 +19,8 @@ const getAllContacts = () => {
 
 const deleteContacts = contacts => {
   const realmContacts = contactsRealm.objects("Contact");
-  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => item._id != contact._id) === undefined)
-  for(contact of contactsToDelete) {
+  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => parseRealmID(item) == parseRealmID(contact)) !== undefined);
+  for(const contact of contactsToDelete) {
     deleteChat(contact.key);
   }
   contactsRealm.write(() => {

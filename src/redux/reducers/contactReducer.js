@@ -1,4 +1,3 @@
-
 const initialState = {
   contacts : []
 }
@@ -11,8 +10,14 @@ const contactReducer = (state = initialState,action) => {
     case "ADD_CONTACT":
       return {...state, contacts : [...state.contacts,action.payload]};
       break;
-    case "DELETE_CONTACT":
-      return {...state, contacts : [...state.contacts].filter(contact => contact._id !== action.payload._id)}
+    case "DELETE_CONTACTS":
+      return {
+        ...state,
+        contacts : [...state.contacts].filter(
+          contact => action.payload.find(
+            contactToDelete => contactToDelete._id == contact._id) === undefined
+          )
+        }
       break;
     case "UPDATE_CONTACT": {
       const { _id, name, key, image } = action.payload;

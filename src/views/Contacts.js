@@ -9,7 +9,7 @@ import { getContactsWithChats } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
-import { deleteContact } from '../redux/actions/contactActions';
+import { deleteContacts } from '../redux/actions/contactActions';
 import { deleteChat } from '../redux/actions/chatActions';
 
 
@@ -28,15 +28,16 @@ const Contacts = ({ route, navigation }) => {
       'Are you sure ?',
       '',
       [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        { text: "Cancel", style: 'cancel', onPress: () => setHighlightedContacts([]) },
         {
           text: 'Delete',
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            dispatch(deleteContact(contacts[index]));
-            deleteContactsFromRealm([contacts[index]]);
+            dispatch(deleteContacts(highlightedContacts));
+            deleteContactsFromRealm(highlightedContacts);
+            setHighlightedContacts([]);
           },
         },
       ]

@@ -14,10 +14,12 @@ const setContacts = contacts => {
   }
 }
 
-const deleteContact = contact => {
+const deleteContacts = contacts => {
   return (dispatch,getState) => {
-    dispatch(deleteChat(contact))
-    dispatch({type : "DELETE_CONTACT",payload : contact})
+    for (const contact of contacts) {
+      dispatch(deleteChat(contact))
+    }
+    dispatch({type : "DELETE_CONTACTS",payload : contacts})
   }
 }
 
@@ -37,7 +39,7 @@ const resetContacts = () => {
 
 export {
   addContact,
-  deleteContact,
+  deleteContacts,
   updateContact,
   setContacts,
   resetContacts
