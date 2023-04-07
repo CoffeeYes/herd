@@ -4,11 +4,11 @@ import { Text, View, TouchableOpacity, Dimensions, Image, ScrollView, Alert } fr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
+import { getContactsWithChats, deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { toHsv } from 'react-native-color-picker';
 
-import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
+import { deleteChats as deleteChatsFromState } from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
 
@@ -43,8 +43,8 @@ const Chats = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            dispatch(deleteChatFromState(chat))
-            deleteChatFromRealm([chat.key])
+            dispatch(deleteChatsFromState(highlightedChats))
+            deleteChatsFromRealm(highlightedChats.map(chat => chat.key))
           },
         },
       ]

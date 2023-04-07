@@ -79,9 +79,12 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     }
-    case "DELETE_CHAT": {
+    case "DELETE_CHATS": {
       return {...state,
-        chats : [...state.chats].filter(chat => chat._id !== action.payload._id),
+        chats : [...state.chats].filter(
+          chat => action.payload.find(
+          chatToDelete => chatToDelete._id == chat._id) === undefined
+        )
       };
       break;
     }

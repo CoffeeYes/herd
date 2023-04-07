@@ -5,11 +5,13 @@ const setChats = chats => {
   }
 }
 
-const deleteChat = chat => {
+const deleteChats = chats => {
   return (dispatch,getState) => {
-    dispatch({type : "DELETE_CHAT",payload : chat});
-    dispatch(filterMessageQueueByContact(chat.key));
-    dispatch(setMessagesForContact(chat._id,[]));
+    dispatch({type : "DELETE_CHATS",payload : chats});
+    for(const chat of chats) {
+      dispatch(filterMessageQueueByContact(chat.key));
+      dispatch(setMessagesForContact(chat._id,[]));
+    }
   }
 }
 
@@ -115,7 +117,7 @@ const prependMessagesForContact = (id, messages) => {
 }
 
 export {
-  deleteChat,
+  deleteChats,
   addChat,
   updateChat,
   setChats,
