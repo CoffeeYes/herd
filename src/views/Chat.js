@@ -23,7 +23,7 @@ import {
   addMessage,
   addMessagesToQueue,
   removeMessagesFromQueue,
-  deleteChat,
+  deleteChats,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
@@ -122,7 +122,7 @@ const Chat = ({ route, navigation }) => {
 
     if(newMessages.length === 0) {
       if(messageLengthRef.current === 0) {
-        dispatch(deleteChat(contactInfo))
+        dispatch(deleteChats([contactInfo]))
       }
       else {
         //show popup that no more messages can be loaded, but only do so when
@@ -303,7 +303,7 @@ const Chat = ({ route, navigation }) => {
             else {
               //all messages were deleted and there are no more messages to load
               //so remove chat from chats page
-              dispatch(deleteChat(contactInfo))
+              dispatch(deleteChats([contactInfo]))
             }
 
             const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));

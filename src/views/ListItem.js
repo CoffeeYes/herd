@@ -7,14 +7,19 @@ import { imageValues, palette } from '../assets/palette';
 const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
                     disableTouch, rightTextStyle, rightIcon, rightIconSize, rightIconStyle,
-                    highlighted }) => {
+                    highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
 
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
   return (
     <TouchableOpacity
-    style={{...styles.listItem,paddingVertical : highlighted ? 0 : 10, paddingLeft : 10,...containerStyle}}
+    style={{
+      ...styles.listItem,
+      paddingVertical : highlighted && useSingularDeleteButton ? 0 : 10,
+      paddingLeft : 10,
+      ...(highlighted ? highlightedStyle : containerStyle)
+    }}
     onPress={onPress}
     onLayout={event => {
       if(!deleteButtonHeightAdjusted) {
@@ -48,7 +53,7 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize || 24} style={rightIconStyle}/>}
 
-      {highlighted &&
+      {highlighted && useSingularDeleteButton &&
       <TouchableOpacity
       style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto", height : deleteButtonHeight}}
       onPress={() => deleteItem()}>

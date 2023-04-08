@@ -31,7 +31,7 @@ const Chats = ({ navigation }) => {
       }
   }
 
-  const deleteChat = chat => {
+  const deleteChats = () => {
     Alert.alert(
       'Are you sure ?',
       '',
@@ -45,6 +45,7 @@ const Chats = ({ navigation }) => {
           onPress: () => {
             dispatch(deleteChatsFromState(highlightedChats))
             deleteChatsFromRealm(highlightedChats.map(chat => chat.key))
+            setHighlightedChats([]);
           },
         },
       ]
@@ -76,8 +77,13 @@ const Chats = ({ navigation }) => {
     <>
       <Header
       title="Chats"
-      rightButtonIcon="add"
-      rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
+      rightButtonIcon={highlightedChats.length > 0 ? "delete" : "add"}
+      rightButtonOnClick={() => {
+        highlightedChats.length > 0 ?
+        deleteChats()
+        :
+        navigation.navigate("newChat",{type : "newChat", disableAddNew : true})
+      }}/>
       <ScrollView>
       {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
         <ListItem
@@ -87,6 +93,10 @@ const Chats = ({ navigation }) => {
         image={chat.image}
         textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
+        highlightedStyle={{
+          backgroundColor : "rgba(0,0,0,0.1)",
+          borderStyle : "dotted"
+        }}
         subTextStyle={{
           fontSize : customStyle.subTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
@@ -107,7 +117,6 @@ const Chats = ({ navigation }) => {
         onPress={() => handlePress(chat)}
         onLongPress={() => handleLongPress(chat)}
         highlighted={highlightedChats.indexOf(chat) !== -1}
-        deleteItem={() => deleteChat(chat)}
         rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText}/>
       )}
