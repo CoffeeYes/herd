@@ -84,8 +84,8 @@ const Contacts = ({ route, navigation }) => {
     <>
       <Header
       title={route.params.type === "newChat" ? "Start a new Chat" : "Contacts"}
-      {...(!route.params.disableAddNew && {rightButtonIcon : "add"})}
-      rightButtonOnClick={() => navigation.navigate("addContact")}
+      {...(!route.params.disableAddNew && {rightButtonIcon : highlightedContacts.length > 0 ? "delete" : "add"})}
+      rightButtonOnClick={() => highlightedContacts.length > 0 ? onPressDelete() : navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>
 
       <ScrollView>
@@ -100,7 +100,7 @@ const Contacts = ({ route, navigation }) => {
           onPress={() => handlePress(contact)}
           onLongPress={() => handleLongPress(contact)}
           highlighted={highlightedContacts.indexOf(contact) !== -1}
-          deleteItem={() => onPressDelete(index)}
+          highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
           />
         )}
       </ScrollView>

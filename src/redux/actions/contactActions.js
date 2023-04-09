@@ -1,4 +1,4 @@
-import { resetMessages, deleteChat } from './chatActions';
+import { resetMessages, deleteChats } from './chatActions';
 
 const addContact = contact => {
   return {
@@ -16,9 +16,7 @@ const setContacts = contacts => {
 
 const deleteContacts = contacts => {
   return (dispatch,getState) => {
-    for (const contact of contacts) {
-      dispatch(deleteChat(contact))
-    }
+    dispatch(deleteChats(contacts));
     dispatch({type : "DELETE_CONTACTS",payload : contacts})
   }
 }
