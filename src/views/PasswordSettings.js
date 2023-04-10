@@ -44,9 +44,27 @@ const PasswordSettings = () => {
     const loginHash = getPasswordHash("loginPassword");
     const erasureHash = getPasswordHash("erasurePassword");
 
-    if(loginHash.length > 0 && erasureHash.length > 0  &&
-     name === "loginPassword" && await Crypto.compareHashes(hash,erasureHash) ||
-     name === "erasurePassword" && await Crypto.compareHashes(hash,loginHash)) {
+    let originalHash = "";
+    let oppositeHash = "";
+    let shortName = "";
+    if (name === "loginPassword") {
+      originalHash = loginHash;
+      oppositeHash = erasureHash
+      shortName = "login";
+    }
+    else if(name === "erasurePassword") {
+      originalHash = erasureHash;
+      oppositeHash = loginHash;
+      shortName = "erasure"
+    }
+    else {
+      throw new error("invalid password name used when attempting to save password");
+      return;
+    }
+
+    const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);
+
+    if(loginAndErasureAreIdentical) {
       setError("Login and Erasure password cannot be the same");
       return false;
     }
@@ -59,25 +77,14 @@ const PasswordSettings = () => {
     //reset error after validation so that error text does not "flash" when re-submitting after error
     setError("");
 
-    if(name === "loginPassword") {
-      if(loginHash) {
-        updatePassword(name,hash);
-      }
-      else {
-        createNewPassword(name,hash);
-      }
-      //update state store
-      dispatch(setPassword("login",hash));
+    if(originalHash.length > 0) {
+      updatePassword(name,hash);
     }
-    else if(name === "erasurePassword") {
-      if(erasureHash) {
-        updatePassword(name,hash);
-      }
-      else {
-        createNewPassword(name,hash);
-      }
-      dispatch(setPassword("erasure",hash));
+    else {
+      createNewPassword(name,hash);
     }
+    dispatch(setPassword(shortName,hash));
+    
     return true;
   }
 

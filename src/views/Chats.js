@@ -93,10 +93,7 @@ const Chats = ({ navigation }) => {
         image={chat.image}
         textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
-        highlightedStyle={{
-          backgroundColor : "rgba(0,0,0,0.1)",
-          borderStyle : "dotted"
-        }}
+        highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
         subTextStyle={{
           fontSize : customStyle.subTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
