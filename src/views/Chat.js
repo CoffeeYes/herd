@@ -140,6 +140,7 @@ const Chat = ({ route, navigation }) => {
       const extractedMessages = messages.map(section => section.data)[0];
       let receivedMessageCount = 0;
       let sentMessageCount = 0;
+      let newMessagesToAdd = false;
       for(const message of newMessages) {
         const found = extractedMessages?.find(eMessage => eMessage._id == message._id) != undefined;
         if(!found) {
