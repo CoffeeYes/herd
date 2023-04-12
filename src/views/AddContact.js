@@ -94,7 +94,7 @@ with other phones using bluetooth.`;
           text="Start Bluetooth Scan"/>
 
           <Card
-          onPress={() => navigation.navigate("createcontact")}
+          onPress={() => navigation.navigate("editContact")}
           cardStyle={styles.rightCard}
           icon="import-export"
           iconSize={120}

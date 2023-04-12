@@ -8,47 +8,60 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 
-import { getContactById, editContact, getContactByName, getContactsByKey } from '../realm/contactRealm';
+import { getContactById, editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
-import { updateContact } from '../redux/actions/contactActions';
+import { updateContact, addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route.params.id))
+  const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [name, _setName] = useState(originalContact.name);
-  const [publicKey, _setPublicKey] = useState(originalContact.key);
-  const [contactImage, _setContactImage] = useState(originalContact.image);
+  const [name, _setName] = useState(originalContact?.name || "");
+  const [publicKey, _setPublicKey] = useState(originalContact?.key || "");
+  const [contactImage, _setContactImage] = useState(originalContact?.image || "");
+  const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
   const [errors, setErrors] = useState([]);
 
-  const nameRef = useRef(originalContact.name);
-  const keyRef = useRef(originalContact.key);
-  const imageRef = useRef(originalContact.image);
-  const originalContactRef = useRef(originalContact);
+  const nameRef = useRef(originalContact?.name || "");
+  const keyRef = useRef(originalContact?.key || "");
+  const imageRef = useRef(originalContact?.image || "");
+  const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
+  const originalContactRef = useRef(originalContact || {});
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
     keyRef.current = data;
-    _setPublicKey(data)
+    _setPublicKey(data);
   }
   const setName = data => {
     nameRef.current = data;
-    _setName(data)
+    _setName(data);
   }
   const setContactImage = data => {
     imageRef.current = data;
-    _setContactImage(data)
+    _setContactImage(data);
+  }
+  const setEditingExistingContact = data => {
+    editingExistingContactRef.current = data;
+    _setEditingExistingContact(data);
   }
 
   useEffect(() => {
     originalContactRef.current = originalContact
   },[originalContact])
 
+  useEffect(() => {
+    if(!editingExistingContact) {
+      setContactImage("")
+      setPublicKey(route?.params?.publicKey || "");
+      setName(route?.params?.name || "");
+    }
+  },[])
 
   const save = async () => {
     let errorSaving = []
@@ -78,13 +91,13 @@ const EditContact = ({ route, navigation }) => {
     const keyExists = getContactsByKey([publicKey.trim()]);
     const nameExists = getContactByName(name.trim());
 
-    if(keyExists != "" && keyExists[0].key != originalContact.key) {
+    if(keyExists != "" && keyExists[0].key != originalContact?.key) {
       errorSaving.push({
         type : "key_exists",
         message : "A user with this key already exists"
       });
     }
-    if(nameExists && nameExists.name != originalContact.name) {
+    if(nameExists && nameExists.name != originalContact?.name) {
       errorSaving.push({
         type : "name_exists",
         message : "A user with this name already exists"
@@ -98,8 +111,15 @@ const EditContact = ({ route, navigation }) => {
 
     setErrors([]);
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
-    editContact(route.params.id, newInfo);
-    dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
+    if(editingExistingContact) {
+      editContact(route.params.id, newInfo);
+      dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
+    }
+    else {
+      const createdContact = createContact(newInfo);
+      dispatch(addContact(createdContact));
+      navigation.navigate('main');
+    }
     return true;
   }
 
@@ -128,12 +148,12 @@ const EditContact = ({ route, navigation }) => {
       e.preventDefault();
 
       const unsavedChanges = (
-        originalContactRef.current.name.trim() != nameRef.current.trim() ||
-        originalContactRef.current.key.trim() != keyRef.current.trim() ||
-        originalContactRef.current.image != imageRef.current
+        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
+        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
+        originalContactRef?.current?.image != imageRef?.current
       )
 
-      if(unsavedChanges) {
+      if(unsavedChanges && editingExistingContactRef.current) {
         Alert.alert(
           'Discard changes?',
           'You have unsaved changes. Are you sure to discard them and leave the screen?',
@@ -186,7 +206,7 @@ const EditContact = ({ route, navigation }) => {
 
         <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
         <TextInput
-        multiline={true}
+        multiline={editingExistingContact}
         style={{...styles.input,fontSize : customStyle.uiFontSize}}
         onChangeText={text => setPublicKey(text)}
         value={publicKey}/>
@@ -197,9 +217,9 @@ const EditContact = ({ route, navigation }) => {
         onPress={save}
         timeout={500}
         disabled={
-          name.trim() === originalContact.name.trim() &&
-          publicKey.trim() === originalContact.key.trim() &&
-          contactImage === originalContact.image
+          name.trim() === originalContact?.name?.trim() &&
+          publicKey.trim() === originalContact?.key?.trim() &&
+          contactImage === originalContact?.image
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
