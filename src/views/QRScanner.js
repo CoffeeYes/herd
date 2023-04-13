@@ -14,7 +14,7 @@ const QRScanner = ({ navigation }) => {
 
   const handleRead = scanResult => {
     const result = JSON.parse(scanResult?.data)
-    navigation.navigate("createcontact", {
+    navigation.navigate("editContact", {
       ...(result.key && {publicKey : result.key}),
       ...(result.name && {name : result.name})
       }

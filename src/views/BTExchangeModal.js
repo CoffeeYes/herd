@@ -83,7 +83,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
-      navigationRef.current.navigate("createcontact",{publicKey : otherKeyRef.current});
+      navigationRef.current.navigate("editContact",{publicKey : otherKeyRef.current});
       setVisible(false);
     }
   },[keySentRef.current,keyReceivedRef.current])
