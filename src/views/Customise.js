@@ -293,7 +293,7 @@ const Customise = ({ navigation }) => {
             name={synchroniseFontChanges ? "lock" : "lock-open"}/>
           </TouchableOpacity>
 
-          {fontSizes.map(item=> {
+          {fontSizes.map((item,index)=> {
             return (
               <Fragment key={item.tag}>
                 <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
