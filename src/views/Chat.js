@@ -224,9 +224,15 @@ const Chat = ({ route, navigation }) => {
         lastMessageSentBySelf : true,
         lastText : message,
         name : contactInfo.name,
-        timestamp : timestamp
+        timestamp : timestamp,
+        doneLoading : true
       }
       dispatch(addChat(newChat));
+      
+      //don't allow loading new messages because this is a brand new chat
+      setShowedPopup(true);
+      setAllowScrollToLoadMessages(false);
+      setEnableGestureHandler(false);
     }
     dispatch(addMessage(contactInfo._id,newMessage));
 
