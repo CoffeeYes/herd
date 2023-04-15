@@ -32,7 +32,6 @@ import Chat from './src/views/Chat';
 import Contacts from './src/views/Contacts';
 import Contact from './src/views/Contact';
 import AddContact from './src/views/AddContact';
-import CreateContact from './src/views/CreateContact';
 import Splash from './src/views/Splash';
 import Main from './src/views/Main';
 import BTDeviceList from './src/views/BTDeviceList';
@@ -211,18 +210,17 @@ const App = ({ }) => {
           <Stack.Screen
           name="passwordLockScreen"
           component={PasswordLockScreen}/>
-          <Stack.Screen name="contacts" component={Contacts}/>
-          <Stack.Screen name="addContact" component={AddContact}/>
-          <Stack.Screen name="chats" component={Chats}/>
           <Stack.Screen name="splash" component={Splash}/>
           <Stack.Screen name="main" component={Main}/>
-          <Stack.Screen name="chat" component={Chat}/>
+          <Stack.Screen name="contacts" component={Contacts}/>
           <Stack.Screen name="contact" component={Contact}/>
-          <Stack.Screen name="createcontact" component={CreateContact}/>
+          <Stack.Screen name="addContact" component={AddContact}/>
+          <Stack.Screen name="editContact" component={EditContact}/>
+          <Stack.Screen name="chats" component={Chats}/>
+          <Stack.Screen name="chat" component={Chat}/>
           <Stack.Screen name="newChat" component={Contacts}/>
           <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
           <Stack.Screen name="QRScanner" component={QRScanner}/>
-          <Stack.Screen name="editContact" component={EditContact}/>
           <Stack.Screen name="customise" component={Customise}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
