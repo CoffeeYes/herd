@@ -13,7 +13,7 @@ const parseRealmObject = object => {
 }
 
 const parseRealmObjects = objects => {
-  return objects.map(object => parseRealmObject(object))
+  return objects?.map(object => parseRealmObject(object)) || []
 }
 export {
   parseRealmID,

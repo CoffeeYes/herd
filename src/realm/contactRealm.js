@@ -1,7 +1,6 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChats, updateMessagesWithContact } from './chatRealm';
-import { cloneDeep } from 'lodash';
 import { parseRealmObject, parseRealmObjects, parseRealmID} from './helper'
 
 const contactsRealm = new Realm({
@@ -42,9 +41,9 @@ const getContactById = id => {
 
 const getContactsByKey = keys => {
   if(keys.length > 0) {
-    const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
+    const keyQuery = keys.map(key => `key = '${key}'`).join(' OR ');
     const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
-    return contactsByKey.length > 0 ? parseRealmObjects(contactsByKey) : []
+    return parseRealmObjects(contactsByKey)
   }
   else {
     return []
