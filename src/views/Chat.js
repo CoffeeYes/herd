@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Dimensions, ScrollView, TouchableOpacity, Alert, SectionList } from 'react-native';
+         Dimensions, ScrollView, TouchableOpacity, Alert, SectionList,
+         KeyboardAvoidingView, Keyboard} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
@@ -56,6 +57,7 @@ const Chat = ({ route, navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
   const [initialScrollIndex, setInitialScrollIndex] = useState(0);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
@@ -83,6 +85,24 @@ const Chat = ({ route, navigation }) => {
       }
       setLoading(false);
     })()
+
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true); // or some other action
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false); // or some other action
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+      keyboardDidShowListener.remove();
+    };
   },[]);
 
   //calculate actual number of messages by extracting them from sections
@@ -228,7 +248,7 @@ const Chat = ({ route, navigation }) => {
         doneLoading : true
       }
       dispatch(addChat(newChat));
-      
+
       //don't allow loading new messages because this is a brand new chat
       setShowedPopup(true);
       setAllowScrollToLoadMessages(false);
@@ -477,7 +497,8 @@ const Chat = ({ route, navigation }) => {
         imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
     }/>
-    <View style={{flex : 1}}>
+    <KeyboardAvoidingView
+    style={{flex : 1}}>
 
       {showPopup &&
       <View style={styles.popup}>
@@ -485,7 +506,7 @@ const Chat = ({ route, navigation }) => {
       </View>}
 
       <PanGestureHandler
-      enabled={enableGestureHandler && !loadingMoreMessages}
+      enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
           {(loading || loadingMoreMessages) &&
@@ -540,7 +561,7 @@ const Chat = ({ route, navigation }) => {
           </Text>
         </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
     </>
   )
 }
