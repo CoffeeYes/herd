@@ -78,7 +78,7 @@ class HerdCryptoModule : NSObject {
       let privateKey = storedKey as! SecKey
       return privateKey
     }
-  
+
     func loadRSAPublicKey(_ alias : String) -> SecKey? {
         let privateKey = loadRSAPrivateKey(alias)
         if(privateKey != nil) {
@@ -93,11 +93,16 @@ class HerdCryptoModule : NSObject {
     @objc
     func loadKeyFromKeystore(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
         let publicKey = loadRSAPublicKey(alias);
-        let publicKeyData = SecKeyCopyExternalRepresentation(publicKey!,nil)
-        let finalPublicKeyData = publicKeyData! as Data;
-        resolve(finalPublicKeyData.base64EncodedString());
+        if(publicKey != nil) {
+          let publicKeyData = SecKeyCopyExternalRepresentation(publicKey!,nil)
+          let finalPublicKeyData = publicKeyData! as Data;
+          resolve(finalPublicKeyData.base64EncodedString());
+        }
+        else {
+          resolve(nil);
+        }
     }
-    
+
     @objc
     func encryptString(_ alias : String,
     algorithm : String,
@@ -170,7 +175,7 @@ class HerdCryptoModule : NSObject {
     }
 
     @objc
-    func encryptStringWithKey(_ key : String,        
+    func encryptStringWithKey(_ key : String,
     algorithm : String,
     blockmode : String,
     padding : String,
@@ -181,7 +186,7 @@ class HerdCryptoModule : NSObject {
           NSLog("Error converting key to data")
           return resolve("base64 error");
       }
-      
+
       let attributes : [String : Any] = [
               kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
               kSecAttrKeySizeInBits as String : 2048,
