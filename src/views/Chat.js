@@ -68,13 +68,14 @@ const Chat = ({ route, navigation }) => {
       if(messages.length === 0) {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
+        setLoading(false);
       }
       else {
         const messageLengths = getMessageLength(true);
         const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
-        scrollToBottom();
+        scrollToBottom(false);
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
         if(chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
@@ -83,7 +84,6 @@ const Chat = ({ route, navigation }) => {
           setEnableGestureHandler(false);
         }
       }
-      setLoading(false);
     })()
 
     const keyboardDidShowListener = Keyboard.addListener(
