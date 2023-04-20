@@ -4,10 +4,10 @@ import { Modal, TouchableOpacity, Dimensions, View } from 'react-native';
 import { palette } from '../assets/palette';
 
 const CustomModal = ({ children, visible, onPress, onRequestClose, disableOnPress,
-                       animationType, transparent = true, containerStyle}) => {
+                       animationType = "fade", transparent = true, containerStyle}) => {
   return (
     <Modal
-    animationType={animationType || "fade"}
+    animationType={animationType}
     transparent={transparent}
     onRequestClose={onRequestClose}
     visible={visible}>
