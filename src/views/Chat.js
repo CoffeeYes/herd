@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
          Dimensions, ScrollView, TouchableOpacity, Alert, SectionList,
@@ -466,6 +466,10 @@ const Chat = ({ route, navigation }) => {
     )
   }
 
+  const optimizedRenderItem = useCallback( ({item}) => {
+    return renderItem({item})
+  },[messages])
+
   const getItemLayout = (data, index) => {
     //multiply by 1.1 for each point increase in fontsize
     const fontSizeFactor = (1 + ((customStyle.messageFontSize - 14)  * 0.1))
@@ -517,13 +521,14 @@ const Chat = ({ route, navigation }) => {
           animating={loadingMoreMessages || loading}/>}
 
           <SectionList
+          removeClippedSubviews
           contentContainerStyle={{paddingBottom : 5}}
           sections={messages}
           ref={scrollRef}
           initialScrollIndex={initialScrollIndex}
           onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={renderItem}
+          renderItem={optimizedRenderItem}
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
