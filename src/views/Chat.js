@@ -409,15 +409,15 @@ const Chat = ({ route, navigation }) => {
       setShowPopup(true)
       setTimeout(() => {
         setShowPopup(false);
+        setShowedPopup(true);
+        dispatch(updateChat({
+          _id : contactInfo._id,
+          doneLoading : true
+        }))
       },1000)
 
-      setShowedPopup(true);
       setEnableGestureHandler(false);
       setAllowScrollToLoadMessages(false);
-      dispatch(updateChat({
-        _id : contactInfo._id,
-        doneLoading : true
-      }))
     }
   }
 
