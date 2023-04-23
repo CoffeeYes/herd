@@ -468,7 +468,7 @@ const Chat = ({ route, navigation }) => {
 
   const optimizedRenderItem = useCallback( ({item}) => {
     return renderItem({item})
-  },[messages])
+  },[messages,highlightedMessages])
 
   const getItemLayout = (data, index) => {
     //multiply by 1.1 for each point increase in fontsize
