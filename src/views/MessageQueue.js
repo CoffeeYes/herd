@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { View, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
 import Header from './Header';
@@ -73,6 +73,10 @@ const MessageQueue = ({}) => {
     setOpenMessages(newOpenMessages)
   }
 
+  const renderItemCallback = useCallback( ({item, index}) => {
+    return renderItem({item,index})
+  },[parsedQueue,loading,openMessages])
+
   const renderItem = ({item, index}) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
@@ -109,7 +113,7 @@ const MessageQueue = ({}) => {
       contentContainerStyle={styles.listStyle}
       data={parsedQueue}
       keyExtractor={item => item._id}
-      renderItem={renderItem}/>
+      renderItem={renderItemCallback}/>
     </View>
   )
 }
