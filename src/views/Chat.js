@@ -194,7 +194,11 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
-    if(message.trim() === "") return;
+    if(message.trim() === "") {
+      setChatInput("");
+      setCharacterCount(190);
+      return;
+    }
     setInputDisabled(true);
 
     const timestamp = Date.now();
@@ -466,7 +470,7 @@ const Chat = ({ route, navigation }) => {
     )
   }
 
-  const optimizedRenderItem = useCallback( ({item}) => {
+  const renderItemCallback = useCallback( ({item}) => {
     return renderItem({item})
   },[messages,highlightedMessages])
 
@@ -528,7 +532,7 @@ const Chat = ({ route, navigation }) => {
           initialScrollIndex={initialScrollIndex}
           onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={optimizedRenderItem}
+          renderItem={renderItemCallback}
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
