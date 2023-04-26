@@ -409,6 +409,8 @@ const Chat = ({ route, navigation }) => {
   }
 
   const showNoMoreMessagePopup = () => {
+    setEnableGestureHandler(false);
+    setAllowScrollToLoadMessages(false);
     if(!showedPopup) {
       setShowPopup(true)
       setTimeout(() => {
@@ -419,9 +421,6 @@ const Chat = ({ route, navigation }) => {
           doneLoading : true
         }))
       },1000)
-
-      setEnableGestureHandler(false);
-      setAllowScrollToLoadMessages(false);
     }
   }
 
