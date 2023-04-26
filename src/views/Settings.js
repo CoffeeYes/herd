@@ -169,7 +169,7 @@ const Settings = ({ navigation }) => {
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
         const publicKey = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
-        const receivedMessagesForSelf = getReceivedMessagesForSelf(publicKey);
+        const receivedMessagesForSelf = await getReceivedMessagesForSelf();
         ServiceInterface.enableService(
           messageQueue,
           receivedMessagesForSelf,

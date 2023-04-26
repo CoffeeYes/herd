@@ -217,7 +217,7 @@ const deleteChats = keys => {
   const sentMessagesToDelete = messageSentRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
   const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filter(message => keys.indexOf(message.from) != -1);
-  
+
   ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
 
   messageSentRealm.write(() => {
@@ -311,8 +311,9 @@ const getDeletedReceivedMessages = () => {
   return deletedReceivedRealm.objects('Message').map(message => parseRealmObject(message));
 }
 
-const getReceivedMessagesForSelf = key => {
-  return messageReceivedRealm.objects('Message').filtered(`to == '${key}'`)
+const getReceivedMessagesForSelf = async () => {
+  const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
+  return messageReceivedRealm.objects('Message').filtered(`to == '${ownKey}'`)
   .map(message => parseRealmObject(message))
 }
 
