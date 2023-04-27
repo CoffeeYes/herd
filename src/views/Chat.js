@@ -517,7 +517,7 @@ const Chat = ({ route, navigation }) => {
       enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
-          {(loading || loadingMoreMessages) &&
+          {((loading || loadingMoreMessages) && !showPopup) &&
           <ActivityIndicator
           size="large"
           color={palette.primary}
