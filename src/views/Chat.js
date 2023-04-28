@@ -409,17 +409,17 @@ const Chat = ({ route, navigation }) => {
   }
 
   const showNoMoreMessagePopup = () => {
-    setEnableGestureHandler(false);
-    setAllowScrollToLoadMessages(false);
     if(!showedPopup) {
+      setEnableGestureHandler(false);
+      setAllowScrollToLoadMessages(false);
+      dispatch(updateChat({
+        _id : contactInfo._id,
+        doneLoading : true
+      }))
       setShowPopup(true)
       setTimeout(() => {
         setShowPopup(false);
         setShowedPopup(true);
-        dispatch(updateChat({
-          _id : contactInfo._id,
-          doneLoading : true
-        }))
       },1000)
     }
   }
@@ -520,8 +520,7 @@ const Chat = ({ route, navigation }) => {
           {((loading || loadingMoreMessages) && !showPopup) &&
           <ActivityIndicator
           size="large"
-          color={palette.primary}
-          animating={loadingMoreMessages || loading}/>}
+          color={palette.primary}/>}
 
           <SectionList
           removeClippedSubviews
@@ -529,7 +528,7 @@ const Chat = ({ route, navigation }) => {
           sections={messages}
           ref={scrollRef}
           initialScrollIndex={initialScrollIndex}
-          onScroll={(e) => allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0 && handleScroll()}
+          onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
           renderItem={renderItemCallback}
           onContentSizeChange={handleContentSizeChange}
