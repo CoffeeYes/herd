@@ -180,7 +180,7 @@ const EditContact = ({ route, navigation }) => {
   return (
     <>
       <Header title="Edit Contact" allowGoBack/>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
 
         <TouchableOpacity
         style={largeImageContainerStyle}
