@@ -65,7 +65,10 @@ const Chat = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      if(messages.length === 0) {
+      const existingChat = chats.find(chat => chat._id == contactInfo._id);
+      const chatStarted = existingChat !== undefined;
+      const doneLoading = existingChat?.doneLoading;
+      if(messages.length === 0 && existingChat) {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
         setLoading(false);
@@ -78,7 +81,7 @@ const Chat = ({ route, navigation }) => {
         scrollToBottom(false);
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
-        if(chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
+        if(doneLoading) {
           setShowedPopup(true);
           setAllowScrollToLoadMessages(false);
           setEnableGestureHandler(false);
