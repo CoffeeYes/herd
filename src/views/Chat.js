@@ -555,10 +555,10 @@ const Chat = ({ route, navigation }) => {
         }}
         value={chatInput}
         editable={!inputDisabled}
+        maxLength={190}
         onChangeText={text => {
-          const cutText = text.slice(0,190);
-          setChatInput(cutText)
-          setCharacterCount(190 - cutText.length)
+          setChatInput(text)
+          setCharacterCount(190 - text.length)
         }}
         multiline={true}
         blurOnSubmit={true}
