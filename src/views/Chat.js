@@ -278,6 +278,7 @@ const Chat = ({ route, navigation }) => {
     setCharacterCount(190);
     setInputDisabled(false);
 
+    !enableGestureHandler &&
     scrollToBottom();
 
     setMessageStart(messageStart - 1)
@@ -562,7 +563,7 @@ const Chat = ({ route, navigation }) => {
         }}
         multiline={true}
         blurOnSubmit={true}
-        onSubmitEditing={event => sendMessage(event.nativeEvent.text)}/>
+        onSubmitEditing={event => sendMessage(event.nativeEvent.text.trim())}/>
         <View style={{
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           justifyContent : "center"}
