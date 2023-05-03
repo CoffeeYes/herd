@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 
 import { palette } from '../assets/palette';
 
-const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
+const ChatBubble = memo(({ text, timestamp, messageFrom, customStyle,
                       onLongPress, onPress, disableTouch = false, highlighted }) => {
-
   const boxStyle = {
     ...styles.message,
     ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
@@ -39,7 +38,13 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
       </Text>
     </TouchableOpacity>
   )
-}
+},(props, nextProps) => {
+  return (
+    props.text === nextProps.text &&
+    props.timestamp === nextProps.timestamp &&
+    props.highlighted === nextProps.highlighted
+  )
+})
 
 const styles = {
   messageFromOther : {
