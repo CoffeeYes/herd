@@ -19,6 +19,7 @@ const MessageQueue = ({}) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
 
@@ -91,6 +92,7 @@ const MessageQueue = ({}) => {
       loading={loading}
       closedTimestamp={date}
       openTimestamp={hours}
+      textFontSize={customStyle.uiFontSize}
       text={item.text}/>
     )
   }

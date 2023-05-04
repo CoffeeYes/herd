@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useSelector } from 'react-redux';
 import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
 
@@ -8,10 +8,17 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import LoadingBar from './LoadingBar';
 
-const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, style, onPress, loading,
-                          openTimestamp}) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+const componentShouldUpdate = (props, nextProps) => {
+  return (
+    props.text === nextProps.text &&
+    props.textFontSize === nextProps.textFontSize &&
+    props.open === nextProps.open &&
+    props.loading === nextProps.loading
+  )
+}
 
+const FoldableMessage = memo(({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
+                          openTimestamp}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
       <View style={{width : "100%"}}>
@@ -26,14 +33,14 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
           </View>
           {open &&
           <View style={styles.messageText}>
-            <Text style={{fontSize : customStyle.uiFontSize}}>{text}</Text>
+            <Text style={{fontSize : textFontSize}}>{text}</Text>
             <Text style={{alignSelf : "flex-end"}}>{openTimestamp}</Text>
           </View>}
         </>}
       </View>
     </TouchableOpacity>
   )
-}
+},componentShouldUpdate)
 
 const styles = {
   messageHeader : {
