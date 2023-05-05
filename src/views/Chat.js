@@ -444,17 +444,17 @@ const Chat = ({ route, navigation }) => {
     });
   }
 
-  const longPressMessage = item => {
-    setHighlightedMessages([...highlightedMessages,item]);
+  const longPressMessage = id => {
+    setHighlightedMessages([...highlightedMessages,id]);
   }
 
-  const shortPressMessage = item => {
+  const shortPressMessage = id => {
     if(highlightedMessages.length > 0) {
       setHighlightedMessages(
-        highlightedMessages.indexOf(item) == -1 ?
-        [...highlightedMessages,item]
+        highlightedMessages.includes(id) ?
+        highlightedMessages.filter(message => message !== id)
         :
-        highlightedMessages.filter(message => message !== item)
+        [...highlightedMessages,id]
       );
     }
   }
@@ -463,9 +463,9 @@ const Chat = ({ route, navigation }) => {
     return (
       <ChatBubble
       text={item.text}
-      onLongPress={() => longPressMessage(item)}
-      onPress={() => shortPressMessage(item)}
-      highlighted={highlightedMessages.indexOf(item) !== -1}
+      onLongPress={() => longPressMessage(item._id)}
+      onPress={() => shortPressMessage(item._id)}
+      highlighted={highlightedMessages.indexOf(item._id) !== -1}
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
       customStyle={customStyle}
