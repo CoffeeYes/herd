@@ -66,13 +66,12 @@ const MessageQueue = ({}) => {
     })()
   },[messageQueue])
 
-  const onMessagePress = index => {
-    const newOpenMessages = openMessages.indexOf(index) == -1 ?
-      [...openMessages,index]
-      :
-      openMessages.filter(item => item != index)
-    setOpenMessages(newOpenMessages)
-  }
+  const onMessagePress = useCallback(id => {
+    setOpenMessages(oldOpenMessages => oldOpenMessages.includes(id) ?
+    oldOpenMessages.filter(item => item != id)
+    :
+    [...oldOpenMessages,id])
+  },[openMessages])
 
   const renderItemCallback = useCallback( ({item, index}) => {
     return renderItem({item,index})
@@ -86,8 +85,8 @@ const MessageQueue = ({}) => {
       <FoldableMessage
       to={item.toContactName}
       from={item.fromContactName}
-      open={openMessages.indexOf(index) != -1}
-      onPress={() => onMessagePress(index)}
+      open={openMessages.includes(item._id)}
+      onPress={() => onMessagePress(item._id)}
       key={item._id}
       loading={loading}
       closedTimestamp={date}
@@ -106,7 +105,7 @@ const MessageQueue = ({}) => {
       <CustomButton
       text={openMessages.length > 0 ? "Close All" : "Open All"}
       onPress={() => {
-        setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map((message,index) => index))
+        setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
       }}
       disabled={loading}
       buttonStyle={styles.buttonStyle}/>
