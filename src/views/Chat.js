@@ -445,18 +445,21 @@ const Chat = ({ route, navigation }) => {
   }
 
   const longPressMessage = id => {
-    setHighlightedMessages([...highlightedMessages,id]);
+    setHighlightedMessages(highlightedMessages => [...highlightedMessages,id]);
   }
 
   const shortPressMessage = id => {
-    if(highlightedMessages.length > 0) {
-      setHighlightedMessages(
-        highlightedMessages.includes(id) ?
+    setHighlightedMessages(highlightedMessages => {
+      if(highlightedMessages.length > 0) {
+        return highlightedMessages.includes(id) ?
         highlightedMessages.filter(message => message !== id)
         :
         [...highlightedMessages,id]
-      );
-    }
+      }
+      else {
+        return [];
+      }
+    });
   }
 
   const renderItem = ({item}) => {
