@@ -4,16 +4,7 @@ import { fromHsv, toHsv } from 'react-native-color-picker';
 
 import { palette } from '../assets/palette';
 
-const shouldComponentUpdate = (props, nextProps) => {
-  //return true if component should not update
-  return (
-    props.text === nextProps.text &&
-    props.timestamp === nextProps.timestamp &&
-    props.highlighted === nextProps.highlighted
-  )
-}
-
-const ChatBubble = memo(({ text, timestamp, messageFrom, customStyle,
+const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
                       onLongPress, onPress, disableTouch = false, highlighted }) => {
                         
   const boxStyle = {
@@ -48,7 +39,7 @@ const ChatBubble = memo(({ text, timestamp, messageFrom, customStyle,
       </Text>
     </TouchableOpacity>
   )
-},shouldComponentUpdate)
+}
 
 const styles = {
   messageFromOther : {
@@ -84,4 +75,4 @@ const styles = {
   }
 }
 
-export default ChatBubble
+export default memo(ChatBubble)

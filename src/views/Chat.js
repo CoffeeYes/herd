@@ -466,8 +466,8 @@ const Chat = ({ route, navigation }) => {
     return (
       <ChatBubble
       text={item.text}
-      onLongPress={() => longPressMessage(item._id)}
-      onPress={() => shortPressMessage(item._id)}
+      onLongPress={useCallback(() => longPressMessage(item._id),[])}
+      onPress={useCallback(() => shortPressMessage(item._id),[])}
       highlighted={highlightedMessages.indexOf(item._id) !== -1}
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
