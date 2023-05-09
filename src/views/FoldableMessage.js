@@ -17,7 +17,7 @@ const componentShouldUpdate = (props, nextProps) => {
   )
 }
 
-const FoldableMessage = memo(({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
+const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
                           openTimestamp}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
@@ -40,7 +40,7 @@ const FoldableMessage = memo(({open, to = "N/A", from = "N/A", closedTimestamp, 
       </View>
     </TouchableOpacity>
   )
-},componentShouldUpdate)
+}
 
 const styles = {
   messageHeader : {
@@ -81,4 +81,4 @@ const styles = {
   }
 }
 
-export default FoldableMessage;
+export default memo(FoldableMessage,componentShouldUpdate);

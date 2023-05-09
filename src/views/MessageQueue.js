@@ -71,13 +71,13 @@ const MessageQueue = ({}) => {
     oldOpenMessages.filter(item => item != id)
     :
     [...oldOpenMessages,id])
-  },[openMessages])
+  },[])
 
-  const renderItemCallback = useCallback( ({item, index}) => {
-    return renderItem({item,index})
+  const renderItemCallback = useCallback( ({ item }) => {
+    return renderItem({ item })
   },[parsedQueue,loading,openMessages])
 
-  const renderItem = ({item, index}) => {
+  const renderItem = ({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
