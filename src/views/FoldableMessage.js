@@ -9,12 +9,12 @@ import Crypto from '../nativeWrapper/Crypto';
 import LoadingBar from './LoadingBar';
 
 const componentShouldUpdate = (props, nextProps) => {
-  for(const key of props) {
-    if(key != "onPress" && props[key] !== nextProps[key]) {
+  for(const key of Object.keys(props)) {
+    if(key !== "onPress" && props[key] !== nextProps[key]) {
       return false;
     }
-    return true;
   }
+  return true;
 }
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
