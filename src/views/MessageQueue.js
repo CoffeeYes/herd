@@ -87,7 +87,6 @@ const MessageQueue = ({}) => {
       from={item.fromContactName}
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
-      key={item._id}
       loading={loading}
       closedTimestamp={date}
       openTimestamp={hours}

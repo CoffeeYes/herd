@@ -10,7 +10,7 @@ import LoadingBar from './LoadingBar';
 
 const componentShouldUpdate = (props, nextProps) => {
   for(const key of Object.keys(props)) {
-    if(key !== "onPress" && props[key] !== nextProps[key]) {
+    if(typeof props[key] !== "function" && props[key] !== nextProps[key]) {
       return false;
     }
   }
