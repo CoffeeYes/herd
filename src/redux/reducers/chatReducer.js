@@ -156,10 +156,10 @@ const chatReducer = (state = initialState,action) => {
 
       const newSections = state.messages[id].map(section => ({
         ...section,
-        data : [...section.data].filter(message => messages.indexOf(message) === -1 )}
+        data : [...section.data].filter(message => messages.find(id => id === message._id) === undefined )}
       ))
       .filter(section => section.data.length !== 0)
-
+      
       const newState = {
         ...state,
         messages : {

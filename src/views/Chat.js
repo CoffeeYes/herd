@@ -300,7 +300,7 @@ const Chat = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             setInputDisabled(true);
-            deleteMessagesFromRealm(highlightedMessages.map(message => parseRealmID(message)));
+            deleteMessagesFromRealm(highlightedMessages);
 
             let sentLength = 0;
             let receivedLength = 0;
