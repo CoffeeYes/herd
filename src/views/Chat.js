@@ -302,9 +302,12 @@ const Chat = ({ route, navigation }) => {
             setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
 
+            const fullHighlightedMessages = messages.map(section => section.data).flat(1)
+            .filter(message => highlightedMessages.includes(message._id));
+
             let sentLength = 0;
             let receivedLength = 0;
-            for(let message of highlightedMessages) {
+            for(let message of fullHighlightedMessages) {
               if(message.from === ownPublicKey) {
                 sentLength += 1;
               }
