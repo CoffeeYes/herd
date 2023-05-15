@@ -325,7 +325,7 @@ const Chat = ({ route, navigation }) => {
             //get remaining messages
             const updatedMessages = messages.map(section => ({
               ...section,
-              data : section.data.filter(message => highlightedMessages.indexOf(message) === -1)
+              data : section.data.filter(message => fullHighlightedMessages.indexOf(message) === -1)
             }))
             .filter(section => section.data.length > 0);
 
