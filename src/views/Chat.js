@@ -113,18 +113,20 @@ const Chat = ({ route, navigation }) => {
   const getMessageLength = (splitBySender = false, customMessages = messages) => {
     let sentMessageLength = 0;
     let receivedMessageLength = 0;
-    let totalMessageLength = 0;
-    splitBySender ?
-    customMessages.map(section => section.data.map(message => {
+    const flattenedMessages = customMessages.map(section => section.data).flat(1);
+
+    if (splitBySender) {
+      flattenedMessages.map(message => {
         message.from === ownPublicKey ?
         sentMessageLength += 1
         :
         receivedMessageLength += 1
       })
-    )
-    :
-    customMessages.map(section => totalMessageLength += section.data.length)
-    return splitBySender ? [sentMessageLength,receivedMessageLength] : totalMessageLength;
+      return [sentMessageLength,receivedMessageLength]
+    }
+    else {
+      return flattenedMessages.length
+    }
   }
 
   //use a ref for messages length because when calling loadMoreMessages
