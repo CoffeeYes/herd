@@ -74,8 +74,8 @@ const Chat = ({ route, navigation }) => {
         setLoading(false);
       }
       else {
-        const messageLengths = getMessageLength(true);
-        const longest = messageLengths[0] > messageLengths[1] ? messageLengths[0] : messageLengths[1];
+        const [sentLength,receivedLength] = getMessageLength(true);
+        const longest = sentLength > receivedLength ? sentLength : receivedLength;
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
         scrollToBottom(false);
@@ -113,7 +113,18 @@ const Chat = ({ route, navigation }) => {
   const getMessageLength = (splitBySender = false, customMessages = messages) => {
     let sentMessageLength = 0;
     let receivedMessageLength = 0;
-    const flattenedMessages = customMessages.map(section => section.data).flat(1);
+    let flattenedMessages = [];
+    if(customMessages?.length > 0) {
+      if(customMessages?.[0]?.data) {
+        flattenedMessages = customMessages.map(section => section.data).flat(1);
+      }
+      else if (customMessages?.[0]?._id?.length > 0) {
+        flattenedMessages = customMessages
+      }
+      else {
+        throw new Error("Invalid array format passed to function getMessageLength")
+      }
+    }
 
     if (splitBySender) {
       flattenedMessages.map(message => {
@@ -163,20 +174,15 @@ const Chat = ({ route, navigation }) => {
       //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
       //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
       // if there are any present in the database.
-      const extractedMessages = messages.map(section => section.data)[0];
-      let receivedMessageCount = 0;
-      let sentMessageCount = 0;
+      const extractedMessageIDs = messages.map(section => section.data).flat(1).map(message => message._id)
+
       let newMessagesToAdd = false;
+      const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
+
       for(const message of newMessages) {
-        const found = extractedMessages?.find(eMessage => eMessage._id == message._id) != undefined;
+        const found = extractedMessageIDs?.includes(message._id);
         if(!found) {
           newMessagesToAdd = true;
-        }
-        if(message.from === ownPublicKey) {
-          sentMessageCount += 1;
-        }
-        else {
-          receivedMessageCount += 1;
         }
       }
 
@@ -307,16 +313,7 @@ const Chat = ({ route, navigation }) => {
             const fullHighlightedMessages = messages.map(section => section.data).flat(1)
             .filter(message => highlightedMessages.includes(message._id));
 
-            let sentLength = 0;
-            let receivedLength = 0;
-            for(let message of fullHighlightedMessages) {
-              if(message.from === ownPublicKey) {
-                sentLength += 1;
-              }
-              else {
-                receivedLength += 1;
-              }
-            }
+            const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
 
             //set new loading index
             const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
