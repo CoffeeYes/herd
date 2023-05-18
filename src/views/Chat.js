@@ -468,6 +468,7 @@ const Chat = ({ route, navigation }) => {
     return (
       <ChatBubble
       text={item.text}
+      activeOpacity={highlightedMessages.length === 0 && 0.8}
       onLongPress={useCallback(() => longPressMessage(item._id),[])}
       onPress={useCallback(() => shortPressMessage(item._id),[])}
       highlighted={highlightedMessages.indexOf(item._id) !== -1}

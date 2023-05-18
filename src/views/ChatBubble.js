@@ -4,9 +4,9 @@ import { fromHsv, toHsv } from 'react-native-color-picker';
 
 import { palette } from '../assets/palette';
 
-const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
+const ChatBubble = ({ text, timestamp, messageFrom, customStyle, activeOpacity,
                       onLongPress, onPress, disableTouch = false, highlighted }) => {
-                        
+
   const boxStyle = {
     ...styles.message,
     ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
@@ -26,6 +26,7 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle,
   return (
     <TouchableOpacity
     disabled={disableTouch}
+    activeOpacity={activeOpacity}
     onLongPress={onLongPress}
     onPress={onPress}
     style={boxStyle}>
