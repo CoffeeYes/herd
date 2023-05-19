@@ -205,21 +205,26 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
+    setChatInput("");
+    setCharacterCount(190);
     if(message.trim() === "") {
-      setChatInput("");
-      setCharacterCount(190);
       return;
     }
     setInputDisabled(true);
 
     const timestamp = Date.now();
 
-    //plaintext copy of the message to immediatly append to chat state
-    const plainText = {
+    //create a message object with relevant metadata
+    const metaData = {
       to : contactInfo.key,
       from : ownPublicKey,
-      text : message,
       timestamp : timestamp
+    }
+
+    //plaintext copy of the message to immediatly append to chat state
+    const plainText = {
+      ...metaData,
+      text : message
     }
 
     //encrypt the message to be sent using the other users public key
@@ -240,16 +245,10 @@ const Chat = ({ route, navigation }) => {
       message
     )
 
-    //create a message object with relevant metadata
-    const metaData = {
-      to : contactInfo.key,
-      from : ownPublicKey,
-      timestamp : timestamp
-    }
-
     //add message to UI
-    let messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
+    const messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
     const newMessage = {...plainText,_id : messageID};
+    const selfEncryptedCopy = {...metaData,_id : messageID, text : newMessageEncryptedCopy};
 
     //add new chat to chats state in redux store if it isnt in chats state
     if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
@@ -273,26 +272,20 @@ const Chat = ({ route, navigation }) => {
     dispatch(addMessage(contactInfo._id,newMessage));
 
     dispatch(addMessagesToQueue([{
-      _id : messageID,
+      ...selfEncryptedCopy,
       fromContactName : "You",
       toContactName : contactInfo.name,
-      to : contactInfo.key,
-      from : ownPublicKey,
-      timestamp : timestamp,
-      text : newMessageEncryptedCopy
     }]));
 
-    setChatInput("");
-    setCharacterCount(190);
     setInputDisabled(false);
 
     !enableGestureHandler &&
     scrollToBottom();
 
-    setMessageStart(messageStart - 1)
+    setMessageStart(messageStart - 1);
 
     await ServiceInterface.isRunning() &&
-    ServiceInterface.addMessageToService({...metaData,text : newMessageEncrypted,_id : messageID});
+    ServiceInterface.addMessageToService(selfEncryptedCopy);
   }
 
   const deleteMessages = () => {
