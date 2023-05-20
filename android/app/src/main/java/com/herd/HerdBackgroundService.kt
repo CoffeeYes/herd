@@ -587,7 +587,7 @@ class HerdBackgroundService : Service() {
               //update message pointer to point to next message with boundary check
               messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
               //create new byteArray for next message to be sent
-              createCurrentMessageBytes(messageQueue?.get(messagePointer));
+              currentMessageBytes = createBytesFromMessage(messageQueue?.get(messagePointer));
               Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
             }
           }
@@ -921,7 +921,7 @@ class HerdBackgroundService : Service() {
       Log.i(TAG,"Added message to Queue, new length : ${messageQueue?.size}");
       //if Queue was empty initialise bytes to be sent
       if((messageQueue?.size as Int) == 1) {
-        createCurrentMessageBytes(messageQueue?.get(0));
+        currentMessageBytes = createBytesFromMessage(messageQueue?.get(0));
       }
     } else {
       Log.i(TAG,"Failed to add message to Queue");
@@ -959,13 +959,6 @@ class HerdBackgroundService : Service() {
     return deleted;
   }
 
-  private fun createCurrentMessageBytes(message : HerdMessage?) {
-    val messageParcel : Parcel = Parcel.obtain();
-    message?.writeToParcel(messageParcel,0);
-    val parcelBytes = messageParcel.marshall();
-    currentMessageBytes = parcelBytes;
-  }
-
   private fun createBytesFromMessage(message : HerdMessage?) : ByteArray {
     val messageParcel : Parcel = Parcel.obtain();
     message?.writeToParcel(messageParcel,0);
@@ -1001,7 +994,7 @@ class HerdBackgroundService : Service() {
       publicKey = bundle?.getString("publicKey");
       //initialise byte array for sending message
       if((messageQueue?.size as Int) > 0) {
-        createCurrentMessageBytes(messageQueue?.get(0))
+        currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
       }
       /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
       startGATTService();
