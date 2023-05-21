@@ -358,7 +358,10 @@ class HerdBackgroundService : Service() {
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
-               addMessage(message);
+               val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
+               if((messageQueue?.size as Int) == 1 && added) {
+                 currentMessageBytes = createBytesFromMessage(messageQueue?.get(0));
+               }
              }
            }
            //add custom parcelable to received array
@@ -915,29 +918,32 @@ class HerdBackgroundService : Service() {
     }
   }
 
-  fun addMessage(message : HerdMessage) : Boolean {
-    val added : Boolean = messageQueue?.add(message) as Boolean;
-    if(added) {
-      Log.i(TAG,"Added message to Queue, new length : ${messageQueue?.size}");
-      //if Queue was empty initialise bytes to be sent
-      if((messageQueue?.size as Int) == 1) {
-        currentMessageBytes = createBytesFromMessage(messageQueue?.get(0));
-      }
-    } else {
-      Log.i(TAG,"Failed to add message to Queue");
-    }
+  fun addMessagesToList(message : HerdMessage, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
+    val added : Boolean = listToAddTo.add(message) as Boolean;
+    logSuccessfullyAddedToList(added,listName,1,listToAddTo.size);
     return added;
   }
 
-  public fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
-    val added : Boolean = deletedMessages?.addAll(messages) as Boolean;
-    if(added) {
-      Log.i(TAG,"Successfully added messages to deleted list");
-    }
-    else {
-      Log.i(TAG,"Failed to add messages to deleted list")
-    }
+  fun addMessagesToList(messages : ArrayList<HerdMessage>, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
+    val added : Boolean = listToAddTo.addAll(messages) as Boolean;
+    logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
     return added;
+  }
+
+  fun logSuccessfullyAddedToList(added : Boolean, listName : String, numAdded : Int, newSize : Int) {
+    if(added) {
+      Log.i(TAG,"Added ${numAdded} messages to ${listName}, new length : ${newSize}");
+    } else {
+      Log.i(TAG,"Failed to add messages to ${listName}");
+    }
+  }
+
+  public fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
+    return addMessagesToList(messages,deletedMessages as ArrayList<HerdMessage>, "deletedMessages")
+  }
+
+  public fun addMessageToQueue(message : HerdMessage) : Boolean {
+    return addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
   }
 
   public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
