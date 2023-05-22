@@ -13,6 +13,7 @@ import java.security.PublicKey
 import java.security.PrivateKey
 import java.security.KeyStore
 import android.util.Base64
+import android.util.Log
 import android.security.keystore.KeyProperties
 import java.security.KeyFactory
 import java.security.spec.X509EncodedKeySpec
@@ -25,6 +26,7 @@ import java.security.spec.MGF1ParameterSpec
 import javax.crypto.spec.PSource
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+  private final val TAG = "HerdCryptoModule";
 
   override fun getName(): String {
       return "CryptoModule"
@@ -73,6 +75,36 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return constants
   }
 
+  private fun loadKeyStore(storeName : String) : KeyStore {
+    val keyStore = KeyStore.getInstance(storeName);
+    keyStore.load(null);
+    return keyStore;
+  }
+
+  private fun loadPublicKey(alias : String, keyStore : String) : PublicKey? {
+    try {
+      val keyStore = loadKeyStore(keyStore)
+      val publicKey = keyStore.getCertificate(alias)?.publicKey;
+      return publicKey;
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"error loading public key from keystore",e);
+    }
+    return null;
+  }
+
+  private fun loadPrivateKey(alias : String, keyStore : String) : PrivateKey? {
+    try {
+      val keyStore = loadKeyStore(keyStore);
+      val privateKey = keyStore.getKey(alias, null) as PrivateKey?;
+      return privateKey;
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"error loading private key from keystore",e);
+    }
+    return null;
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -97,8 +129,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   @ReactMethod
   fun deleteKeyPair(alias : String, promise : Promise) {
-    val keyStore = KeyStore.getInstance("AndroidKeyStore")
-    keyStore.load(null)
+    val keyStore = loadKeyStore("AndroidKeyStore");
     try {
       keyStore.deleteEntry(alias)
     }
@@ -110,10 +141,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   @ReactMethod
   fun loadKeyFromKeystore(alias : String, promise : Promise) {
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    //val privateKey : PrivateKey = keyStore.getKey(alias, null) as PrivateKey;
-    val publicKey = keyStore.getCertificate(alias)?.publicKey;
+    val publicKey = loadPublicKey(alias,"AndroidKeyStore");
     if(publicKey === null) {
       return promise.resolve(null)
     }
@@ -134,9 +162,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    val publicKey : PublicKey? = keyStore.getCertificate(alias)?.getPublicKey();
+    val publicKey : PublicKey? = loadPublicKey(alias,"AndroidKeyStore");
     if(publicKey === null) {
       return promise.resolve("Public Key does not exist")
     }
@@ -213,9 +239,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    val privateKey = keyStore.getKey(alias, null) as PrivateKey?;
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
 
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
