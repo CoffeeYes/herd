@@ -105,6 +105,35 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return null;
   }
 
+  private fun getCipherSpec() : OAEPParameterSpec {
+    val cipherSpec = OAEPParameterSpec(
+      "SHA-256",
+      "MGF1",
+      MGF1ParameterSpec.SHA1,
+      PSource.PSpecified.DEFAULT
+    );
+    return cipherSpec;
+  }
+
+  private fun initialiseCipher(encryptionType : String, cipherMode : Int, publicKey : PublicKey) : Cipher {
+    val cipher : Cipher = Cipher.getInstance(encryptionType);
+    val cipherSpec = getCipherSpec();
+    cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+    return cipher;
+  }
+
+  private fun initialiseCipher(encryptionType : String, cipherMode : Int, privateKey : PrivateKey) : Cipher {
+    val cipher : Cipher = Cipher.getInstance(encryptionType);
+    val cipherSpec = getCipherSpec();
+    if(encryptionType === "RSA/ECB/OAEPWithSHA-256AndMGF1Padding") {
+      cipher.init(Cipher.DECRYPT_MODE, privateKey,cipherSpec);
+    }
+    else {
+      cipher.init(Cipher.DECRYPT_MODE, privateKey);
+    }
+    return cipher;
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -168,14 +197,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = Cipher.getInstance(encryptionType);
-    val cipherSpec = OAEPParameterSpec(
-      "SHA-256",
-      "MGF1",
-      MGF1ParameterSpec.SHA1,
-      PSource.PSpecified.DEFAULT
-    )
-    cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+    val cipher = initialiseCipher(encryptionType, Cipher.ENCRYPT_MODE, publicKey);
 
     //cast string to bytes
     val stringAsBytes : ByteArray = stringToEncrypt.toByteArray();
@@ -208,14 +230,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       val publicBytes = Base64.decode(key,Base64.DEFAULT);
       val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
       //init encryption cipher
-      val cipher : Cipher = Cipher.getInstance(encryptionType);
-      val cipherSpec = OAEPParameterSpec(
-        "SHA-256",
-        "MGF1",
-        MGF1ParameterSpec.SHA1,
-        PSource.PSpecified.DEFAULT
-      )
-      cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+      val cipher : Cipher = initialiseCipher(encryptionType,Cipher.ENCRYPT_MODE,publicKey);
       //convert message to encrypt to bytes
       val stringAsBytes = stringToEncrypt.toByteArray();
       //encrypt message bytes
@@ -246,20 +261,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = Cipher.getInstance(encryptionType);
-    val cipherSpec = OAEPParameterSpec(
-      "SHA-256",
-      "MGF1",
-      MGF1ParameterSpec.SHA1,
-      PSource.PSpecified.DEFAULT
-    )
-
-    if(encryptionType === "RSA/ECB/OAEPWithSHA-256AndMGF1Padding") {
-      cipher.init(Cipher.DECRYPT_MODE, privateKey,cipherSpec);
-    }
-    else {
-      cipher.init(Cipher.DECRYPT_MODE,privateKey)
-    }
+    val cipher : Cipher = initialiseCipher(encryptionType,Cipher.DECRYPT_MODE,privateKey);
 
     //decode base64 string passed in from javscript
     val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
