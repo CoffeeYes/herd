@@ -275,15 +275,15 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
   }
 
-  private fun generateMessageDigest(message : String) : ByteArray {
+  private fun generateMessageDigest(message : String, algorithm : String) : ByteArray {
     val messageBytes : ByteArray = message.toByteArray();
-    val messageDigest = MessageDigest.getInstance("SHA-512");
+    val messageDigest = MessageDigest.getInstance(algorithm);
     return messageDigest.digest(messageBytes);
   }
 
   @ReactMethod
   fun createHash(message : String, promise : Promise) {
-    val hash = Base64.encodeToString(generateMessageDigest(message),Base64.DEFAULT);
+    val hash = Base64.encodeToString(generateMessageDigest(message,"SHA-512"),Base64.DEFAULT);
     promise.resolve(hash);
   }
 
