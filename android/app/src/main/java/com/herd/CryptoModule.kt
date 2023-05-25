@@ -81,9 +81,9 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return keyStore;
   }
 
-  private fun loadPublicKey(alias : String, keyStore : String) : PublicKey? {
+  private fun loadPublicKey(alias : String, keyStoreName : String) : PublicKey? {
     try {
-      val keyStore = loadKeyStore(keyStore)
+      val keyStore = loadKeyStore(keyStoreName)
       val publicKey = keyStore.getCertificate(alias)?.publicKey;
       return publicKey;
     }
@@ -93,9 +93,9 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return null;
   }
 
-  private fun loadPrivateKey(alias : String, keyStore : String) : PrivateKey? {
+  private fun loadPrivateKey(alias : String, keyStoreName : String) : PrivateKey? {
     try {
-      val keyStore = loadKeyStore(keyStore);
+      val keyStore = loadKeyStore(keyStoreName);
       val privateKey = keyStore.getKey(alias, null) as PrivateKey?;
       return privateKey;
     }
@@ -115,14 +115,14 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return cipherSpec;
   }
 
-  private fun initialiseCipher(encryptionType : String, cipherMode : Int, publicKey : PublicKey) : Cipher {
+  private fun initialiseCipher(encryptionType : String, publicKey : PublicKey) : Cipher {
     val cipher : Cipher = Cipher.getInstance(encryptionType);
     val cipherSpec = getCipherSpec();
     cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
     return cipher;
   }
 
-  private fun initialiseCipher(encryptionType : String, cipherMode : Int, privateKey : PrivateKey) : Cipher {
+  private fun initialiseCipher(encryptionType : String, privateKey : PrivateKey) : Cipher {
     val cipher : Cipher = Cipher.getInstance(encryptionType);
     val cipherSpec = getCipherSpec();
     if(encryptionType === "RSA/ECB/OAEPWithSHA-256AndMGF1Padding") {
@@ -152,7 +152,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       .build()
     )
 
-    val keyPair : KeyPair = keyPairGenerator.generateKeyPair();
+    keyPairGenerator.generateKeyPair();
     promise.resolve(null);
   }
 
@@ -197,14 +197,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher = initialiseCipher(encryptionType, Cipher.ENCRYPT_MODE, publicKey);
+    val cipher = initialiseCipher(encryptionType, publicKey);
 
     //cast string to bytes
     val stringAsBytes : ByteArray = stringToEncrypt.toByteArray();
-    val encryptedBytes : ByteArray
     try {
-      //encrypt string
-      encryptedBytes = cipher.doFinal(stringAsBytes);
+      //encrypt bytes
+      val encryptedBytes = cipher.doFinal(stringAsBytes);
       //encode encrypted string to base64 for javascript and pass upwards
       val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
       return promise.resolve(encryptedStringBASE64);
@@ -230,7 +229,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       val publicBytes = Base64.decode(key,Base64.DEFAULT);
       val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
       //init encryption cipher
-      val cipher : Cipher = initialiseCipher(encryptionType,Cipher.ENCRYPT_MODE,publicKey);
+      val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
       //convert message to encrypt to bytes
       val stringAsBytes = stringToEncrypt.toByteArray();
       //encrypt message bytes
@@ -261,7 +260,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = initialiseCipher(encryptionType,Cipher.DECRYPT_MODE,privateKey);
+    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
 
     //decode base64 string passed in from javscript
     val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
