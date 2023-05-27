@@ -58,6 +58,7 @@ const Chat = ({ route, navigation }) => {
   const [showedPopup, setShowedPopup] = useState(false);
   const [initialScrollIndex, setInitialScrollIndex] = useState(0);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [chatWindowSize, setChatWindowSize] = useState(1);
 
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
@@ -509,6 +510,7 @@ const Chat = ({ route, navigation }) => {
       </View>
     }/>
     <KeyboardAvoidingView
+    onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}
     style={{flex : 1}}>
 
       {showPopup &&
@@ -528,6 +530,7 @@ const Chat = ({ route, navigation }) => {
           <SectionList
           removeClippedSubviews
           contentContainerStyle={{paddingBottom : 5}}
+          windowSize={chatWindowSize}
           sections={messages}
           ref={scrollRef}
           initialScrollIndex={initialScrollIndex}
