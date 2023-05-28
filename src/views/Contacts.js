@@ -18,7 +18,8 @@ const Contacts = ({ route, navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const chats = useSelector(state => state.chatReducer.chats);
   const contacts = route.params.type === "newChat" ?
-  useSelector(state => state.contactReducer.contacts).filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
+  useSelector(state => state.contactReducer.contacts)
+  .filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
   :
   useSelector(state => state.contactReducer.contacts);
   const [highlightedContacts, setHighlightedContacts ] = useState([]);

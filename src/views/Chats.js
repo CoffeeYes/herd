@@ -21,6 +21,10 @@ const Chats = ({ navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [highlightedChats, setHighlightedChats ] = useState([]);
 
+  const canStartNewChat = useSelector(state => state.contactReducer.contacts)
+  .filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
+  .length > 0;
+
   const checkStyleReadable = style => {
       const hsv = toHsv(style);
       if(hsv.h < 10 && hsv.s < 10 && hsv.v > 0.95) {
@@ -73,11 +77,20 @@ const Chats = ({ navigation }) => {
     }
   }
 
+  const getRightIcon = () => {
+    if (highlightedChats.length > 0) {
+      return "delete"
+    }
+    else if (canStartNewChat) {
+      return "add";
+    }
+  }
+
   return (
     <>
       <Header
       title="Chats"
-      rightButtonIcon={highlightedChats.length > 0 ? "delete" : "add"}
+      rightButtonIcon={getRightIcon()}
       rightButtonOnClick={() => {
         highlightedChats.length > 0 ?
         deleteChats()
