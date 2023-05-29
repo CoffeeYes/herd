@@ -11,6 +11,7 @@ import CardButton from './CardButton';
 import TabItem from './TabItem';
 import ListItem from './ListItem';
 import ChatBubble from './ChatBubble';
+import Dropdown from './Dropdown';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Slider from './Slider';
@@ -317,19 +318,13 @@ const Customise = ({ navigation }) => {
         </View>
 
         <View style={styles.colorChoiceContainer}>
-          <View style={styles.tabRow} onLayout={e => setTabWidth(e.nativeEvent.layout.width / 4)}>
-            {tabItems.map((item,index) => {
-              return (
-                <TabItem
-                key={index}
-                text={item.text}
-                containerStyle={{width : tabWidth,borderBottomWidth : 1, borderBottomColor : "rgba(255,255,255,0)"}}
-                active={activeItem === index}
-                onPress={() => setActiveItem(index)}/>
-              )})
-            }
-          </View>
-
+          <Dropdown
+          onChangeOption={index => setActiveItem(index)}
+          choices={tabItems}
+          textStyle={{fontSize : originalStyles.uiFontSize}}
+          chosenStyle={{color : palette.primary}}
+          containerStyle={{borderRadius : 5}}
+          />
 
           <ColorChoice
             title={tabItems[activeItem].name}
