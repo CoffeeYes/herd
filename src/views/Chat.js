@@ -515,7 +515,7 @@ const Chat = ({ route, navigation }) => {
 
       {showPopup &&
       <View style={styles.popup}>
-        <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No More messages to load</Text>
+        <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
       </View>}
 
       <PanGestureHandler

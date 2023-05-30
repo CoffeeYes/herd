@@ -4,7 +4,7 @@ import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
-                    itemStyle, textStyle, chosenStyle }) => {
+                    itemStyle, textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
   const [open, setOpen] = useState(false);
   const [chosenIndex, setChosenIndex] = useState(defaultIndex);
 
@@ -17,7 +17,7 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
   }
   return (
     <View style={{...styles.container, ...containerStyle}}>
-      <TouchableOpacity style={styles.box} onPress={() => setOpen(!open)}>
+      <TouchableOpacity style={{...styles.choice, borderBottomWidth : 2}} onPress={() => setOpen(!open)}>
         <Text style={{...styles.text,...textStyle}}>{choices[chosenIndex].text}</Text>
         <Icon
         size={24}
@@ -25,12 +25,17 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
         name="arrow-downward"/>
       </TouchableOpacity>
       {open &&
-      <View style={styles.choiceContainer}>
+      <View style={{...styles.choiceContainer, ...choiceContainerStyle}}>
         {choices.map((choice,index) => {
           return (
             <TouchableOpacity
             activeOpacity={1}
-            style={{...styles.box}}
+            style={{
+              ...styles.choice,
+              borderBottomColor : palette.grey,
+              ...(index === choices.length -1 && {borderBottomWidth : 0}),
+              ...choiceStyle
+            }}
             key={choice.name}
             onPress={() => handleChoicePress(index)}>
               <Text style={{
@@ -57,14 +62,16 @@ const styles = {
     position : "absolute",
     zIndex : 999,
     width : "100%",
-    top : "100%"
+    top : "100%",
+    elevation : 10,
+    borderWidth : 0.1,
   },
-  box : {
+  choice : {
     backgroundColor : palette.white,
     width : "100%",
     padding : 20,
     borderBottomWidth : 1,
-    borderColor : "black",
+    borderColor : palette.black,
     flexDirection : "row",
     alignItems : "center"
   },
