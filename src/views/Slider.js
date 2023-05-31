@@ -5,10 +5,14 @@ import Slider from '@react-native-community/slider';
 const CustomSlider = ({ value, onValueChange, onSlidingComplete, min, max,
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
-                        tapToSeek }) => {
+                        tapToSeek, minimumTrackTintColor, maximumTrackTintColor,
+                        thumbTintColor }) => {
   return (
     <View style={containerStyle}>
       <Slider
+      minimumTrackTintColor={minimumTrackTintColor}
+      maximumTrackTintColor={maximumTrackTintColor}
+      thumbTintColor={thumbTintColor}
       style={sliderStyle}
       tapToSeek={tapToSeek}
       onSlidingComplete={onSlidingComplete}

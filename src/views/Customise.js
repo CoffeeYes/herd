@@ -301,6 +301,9 @@ const Customise = ({ navigation }) => {
                 <Slider
                 containerStyle={styles.sliderContainer}
                 sliderStyle={{flex : 1}}
+                minimumTrackTintColor={palette.secondary}
+                maximumTrackTintColor={palette.primary}
+                thumbTintColor={palette.primary}
                 tapToSeek
                 onSlidingComplete={val => changeFonts(Math.round(val),index)}
                 onValueChange={val => changeFonts(Math.round(val),index)}
