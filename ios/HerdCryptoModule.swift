@@ -217,4 +217,19 @@ class HerdCryptoModule : NSObject {
       let cipherString = cipherData.base64EncodedString();
       resolve(cipherString);
     }
+
+    @objc
+    func generateHash(_ value : String,
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        
+    }
+    
+    @objc
+    func compareHashes(_ firstHash : String,
+    secondHash : String,
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        
+    }
 }

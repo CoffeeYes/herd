@@ -40,4 +40,13 @@ stringToDecrypt : (NSString*) stringToDecrypt
 resolve : (RCTPromiseResolveBlock)resolve
 reject : (RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(generateHash : (NSString*) value
+resolve : (RCTPromiseResolveBlock)resolve
+reject : (RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(compareHashes : (NSString*) firstHash
+(NSString*) secondHash
+resolve : (RCTPromiseResolveBlock)resolve
+reject : (RCTPromiseRejectBlock)reject)
+
 @end
