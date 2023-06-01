@@ -1,4 +1,4 @@
-import React,{ useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -8,13 +8,25 @@ import { palette } from '../assets/palette';
 
 const ColorChoice = ({ style, setColor, color, oldColor }) => {
 
+  //useCallback necessary because passing just the custom slider
+  //causes the slider to stutter and not function correctly
+  const CustomSlider = useCallback(props => {
+    return (
+      <Slider
+      minimumTrackTintColor={palette.secondary}
+      maximumTrackTintColor={palette.primary}
+      thumbTintColor={palette.primary}
+      {...props}/>
+    )
+  },[])
+
   return (
     <View style={styles.colorPickerContainer}>
       <ColorPicker
         color={color}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
-        sliderComponent={Slider}
+        sliderComponent={CustomSlider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
       />
     </View>
