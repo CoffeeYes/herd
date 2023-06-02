@@ -1,4 +1,6 @@
 import Foundation
+import CommonCrypto
+import CryptoKit
 
 @objc(HerdCryptoModule)
 class HerdCryptoModule : NSObject {
@@ -219,10 +221,24 @@ class HerdCryptoModule : NSObject {
     }
 
     @objc
-    func generateHash(_ value : String,
+    func createHash(_ value : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        
+      
+      guard let stringData : Data = value.data(using: .utf8) else {
+        NSLog("Error converting string to data")
+        return resolve("string conversion error");
+      }
+      
+      var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH));
+      CC_SHA256((stringData as NSData).bytes,CC_LONG(stringData.count),&hash)
+      
+      var hashString = "";
+      for byte in hash {
+        hashString += String(format : "%02x", UInt8(byte))
+      }
+      
+      resolve(hashString);
     }
     
     @objc
