@@ -23,8 +23,8 @@ const CustomSlider = ({ value, onValueChange, onSlidingComplete, min, max,
       <View style={rightTextContainerStyle}>
         {rightTitle?.length > 0 &&
         <Text style={rightTitleStyle}>{rightTitle}</Text>}
-        {rightText?.length > 0 &&
-        <Text style={rightTextStyle}>{rightText}</Text>}
+        {rightText?.toString()?.length > 0 &&
+        <Text style={rightTextStyle}>{rightText.toString()}</Text>}
       </View>
     </View>
   )

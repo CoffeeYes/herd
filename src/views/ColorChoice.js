@@ -2,21 +2,23 @@ import React, { useEffect, useCallback } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Slider from '@react-native-community/slider';
+import CustomSlider from './Slider'
 
 import { palette } from '../assets/palette';
 
 const ColorChoice = ({ style, setColor, color, oldColor }) => {
 
-  //useCallback necessary because passing just the custom slider
-  //causes the slider to stutter and not function correctly
-  const CustomSlider = useCallback(props => {
+  const Slider = useCallback(props => {
     return (
-      <Slider
+      <CustomSlider
       minimumTrackTintColor={palette.secondary}
       maximumTrackTintColor={palette.primary}
       thumbTintColor={palette.primary}
-      {...props}/>
+      rightText={props.value.toFixed(2)}
+      value={props.value}
+      sliderStyle={styles.slider}
+      containerStyle={styles.sliderContainer}
+      onValueChange={props.onValueChange}/>
     )
   },[])
 
@@ -26,7 +28,7 @@ const ColorChoice = ({ style, setColor, color, oldColor }) => {
         color={color}
         oldColor={oldColor}
         style={{...styles.colorPicker,...style}}
-        sliderComponent={CustomSlider}
+        sliderComponent={Slider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
       />
     </View>
@@ -58,5 +60,15 @@ const styles = {
     fontWeight : "bold",
     color : palette.red,
     marginTop : 10
+  },
+  slider : {
+      flex : 1,
+  },
+  sliderContainer : {
+    alignItems : "center",
+    flexDirection : "row",
+    marginHorizontal : 10,
+    backgroundColor : palette.white,
+    marginVertical : 10,
   }
 }
