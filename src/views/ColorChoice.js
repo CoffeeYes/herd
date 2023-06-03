@@ -11,6 +11,8 @@ const ColorChoice = ({ style, setColor, color, oldColor }) => {
   const Slider = useCallback(props => {
     return (
       <CustomSlider
+      tapToSeek
+      onSlidingComplete={val => props.onValueChange(val)}
       minimumTrackTintColor={palette.secondary}
       maximumTrackTintColor={palette.primary}
       thumbTintColor={palette.primary}

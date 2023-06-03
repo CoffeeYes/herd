@@ -179,7 +179,7 @@ const EditContact = ({ route, navigation }) => {
 
   return (
     <>
-      <Header title="Edit Contact" allowGoBack/>
+      <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
 
         <TouchableOpacity

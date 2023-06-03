@@ -62,6 +62,11 @@ const Contact = ({route, navigation}) => {
           onPress={copyKeyToClipboard}/>
 
           <CardButton
+          onPress={() => setShowQRCode(true)}
+          rightIcon="qr-code"
+          text="Show Contact's QR Code"/>
+
+          <CardButton
           onPress={shareContact}
           rightIcon="share"
           text="Share Contact"/>
@@ -70,11 +75,6 @@ const Contact = ({route, navigation}) => {
           onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
           rightIcon="chat"
           text="Go To Chat"/>
-
-          <CardButton
-          onPress={() => setShowQRCode(true)}
-          rightIcon="qr-code"
-          text="Show Contact's QR Code"/>
 
         </View>
       </ScrollView>
