@@ -39,8 +39,8 @@ const styles = {
   buttonText : {
     color : palette.white,
     fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
+    textAlign : "center",
+    ...(Platform.OS === 'android' && {fontFamily : "Open-Sans"})
   },
   modalMainContainer : {
     alignItems : "center",
