@@ -4,6 +4,7 @@ import com.facebook.react.ReactActivity;
 
 import android.view.WindowManager;
 import android.os.Bundle;
+import android.os.Build;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
@@ -53,17 +54,22 @@ public class MainActivity extends ReactActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceBundle) {
-    int bluetoothConnectPermission = ActivityCompat.checkSelfPermission(
+    if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+      int bluetoothConnectPermission = ActivityCompat.checkSelfPermission(
       getApplicationContext(),
       Manifest.permission.BLUETOOTH_CONNECT
-    );
-    if (bluetoothConnectPermission != PackageManager.PERMISSION_GRANTED) {
-      instanceBundle = savedInstanceBundle;
-      ActivityCompat.requestPermissions(
+      );
+      if (bluetoothConnectPermission != PackageManager.PERMISSION_GRANTED) {
+        instanceBundle = savedInstanceBundle;
+        ActivityCompat.requestPermissions(
         this,
         new String[] { Manifest.permission.BLUETOOTH_CONNECT },
         BLUETOOTH_CONNECT_PERMISSION_REQUEST_CODE
-      );
+        );
+      }
+      else {
+        startApp(savedInstanceBundle);
+      }
     }
     else {
       startApp(savedInstanceBundle);
