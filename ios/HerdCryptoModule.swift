@@ -246,6 +246,8 @@ class HerdCryptoModule : NSObject {
     secondHash : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        
+        let firstHashBytes = firstHash.data(using: .utf8);
+        let secondHashBytes = secondHash.data(using: .utf8);
+        resolve(firstHashBytes == secondHashBytes);
     }
 }

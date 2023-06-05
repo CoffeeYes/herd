@@ -45,7 +45,7 @@ resolve : (RCTPromiseResolveBlock)resolve
 reject : (RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(compareHashes : (NSString*) firstHash
-(NSString*) secondHash
+secondHash : (NSString*) secondHash
 resolve : (RCTPromiseResolveBlock)resolve
 reject : (RCTPromiseRejectBlock)reject)
 
