@@ -12,7 +12,23 @@ const setLocked = locked => {
   }
 }
 
+const setLockable = lockable => {
+  return {
+    type : "SET_LOCKABLE",
+    payload : lockable
+  }
+}
+
+const setLastRoutes = routes => {
+  return {
+    type : "SET_LAST_ROUTES",
+    payload : routes
+  }
+}
+
 export {
   setInitialRoute,
-  setLocked
+  setLocked,
+  setLockable,
+  setLastRoutes
 }

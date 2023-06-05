@@ -1,23 +1,22 @@
 import React from 'react';
 import { Modal, TouchableOpacity, Dimensions, View } from 'react-native';
 
-const CustomModal = ({ children, visible, setVisible, disableHideOnPress }) => {
+import { palette } from '../assets/palette';
+
+const CustomModal = ({ children, visible, onPress, onRequestClose, disableOnPress,
+                       animationType = "fade", transparent = true, containerStyle}) => {
   return (
     <Modal
-    animationType="fade"
-    transparent={true}
-    onRequestClose={() => setVisible(false)}
+    animationType={animationType}
+    transparent={transparent}
+    onRequestClose={onRequestClose}
     visible={visible}>
-      {disableHideOnPress ?
-      <View style={styles.modalMainContainer}>
-        {children}
-      </View>
-      :
       <TouchableOpacity
-      style={styles.modalMainContainer}
-      onPress={() => setVisible(false)}>
+      disabled={disableOnPress}
+      style={{...styles.modalMainContainer,...containerStyle}}
+      onPress={onPress}>
         {children}
-      </TouchableOpacity>}
+      </TouchableOpacity>
     </Modal>
   )
 }
@@ -30,7 +29,7 @@ const styles = {
     backgroundColor : "rgba(0,0,0,0.4)"
   },
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center",

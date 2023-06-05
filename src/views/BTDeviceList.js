@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
   NativeEventEmitter } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -8,20 +9,33 @@ import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
 
+import { palette } from '../assets/palette';
+
 const BTDeviceList = () => {
-  const [deviceList, setDeviceList] = useState([]);
-  const [scanning, setScanning] = useState(true);
+  const [deviceList, _setDeviceList] = useState([]);
+  const [scanning, _setScanning] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
   const [error, setError] = useState("");
 
+  const customStyle = useSelector(state => state.chatReducer.styles);
+
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
 
+  const setScanning = data => {
+    scanningRef.current = data;
+    _setScanning(data)
+  }
+
+  const setDeviceList = data => {
+    deviceRef.current = data;
+    _setDeviceList(data);
+  }
+
   const updateDeviceList = newDevice => {
     if(!deviceRef.current.find(existingDevice => existingDevice.macAddress === newDevice.macAddress)) {
-      deviceRef.current = [...deviceRef.current,newDevice];
-      setDeviceList(deviceRef.current);
+      setDeviceList([...deviceRef.current,newDevice]);
     }
   }
 
@@ -33,12 +47,10 @@ const BTDeviceList = () => {
 
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
       if(state === "DISCOVERY_STARTED") {
-        scanningRef.current = true;
-        setScanning(scanningRef.current);
+        setScanning(true);
       }
       else if (state === "DISCOVERY_FINISHED") {
-        scanningRef.current = false;
-        setScanning(scanningRef.current);
+        setScanning(false);
       }
     })
 
@@ -86,30 +98,29 @@ const BTDeviceList = () => {
       allowGoBack/>
 
       <View style={styles.mainContainer}>
-        {scanning &&
         <View>
-          <Text>Scanning...</Text>
-          <ActivityIndicator size="large" color="#e05e3f"/>
+          <Text style={{fontSize : customStyle.uiFontSize}}>{scanning ? "Scanning..." : ""}</Text>
+          <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
         </View>
-        }
+
         {error.length > 0 &&
-        <Text style={styles.error}>{error}</Text>
-        }
+        <Text style={{...styles.error,fontSize : customStyle.uiFontSize}}>{error}</Text>}
+
         <ScrollView contentContainerStyle={styles.BTList}>
           {deviceList.map((device,index) =>
             <TouchableOpacity
-            key={index}
+            key={device.macAddress}
             style={styles.deviceContainer}
             onPress={ () => handleDeviceClick(device)}>
-              <Text>{device.name || "Nameless Device"}</Text>
-              <Text>{device.macAddress}</Text>
+              <Text style={{fontSize : customStyle.uiFontSize}}>{device.name || "Nameless Device"}</Text>
+              <Text style={{fontSize : customStyle.uiFontSize}}>{device.macAddress}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
 
         <CustomButton
         text={scanning ? "Cancel Scan" : "Re-Scan"}
-        onPress={() => {scanning ? Bluetooth.cancelScanForDevices() : restartScan()}}
+        onPress={() => scanning ? Bluetooth.cancelScanForDevices() : restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
         <BTExchangeModal
@@ -128,18 +139,19 @@ const styles = {
     flex : 1
   },
   BTList : {
-    backgroundColor : "#D8D8D8",
+    backgroundColor : palette.mediumgrey,
     width : Dimensions.get("window").width - 40,
     padding : 10,
+    flex : 1
   },
   deviceContainer : {
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     marginTop : 2,
-    borderBottomColor : "black"
+    borderBottomColor : palette.black
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold"
   }
 }

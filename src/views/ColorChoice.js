@@ -1,10 +1,28 @@
-import React,{ useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Slider from '@react-native-community/slider';
+import CustomSlider from './Slider'
 
-const ColorChoice = ({ title, style, setColor, color, oldColor }) => {
+import { palette } from '../assets/palette';
+
+const ColorChoice = ({ style, setColor, color, oldColor }) => {
+
+  const Slider = useCallback(props => {
+    return (
+      <CustomSlider
+      tapToSeek
+      onSlidingComplete={val => props.onValueChange(val)}
+      minimumTrackTintColor={palette.secondary}
+      maximumTrackTintColor={palette.primary}
+      thumbTintColor={palette.primary}
+      rightText={props.value.toFixed(2)}
+      value={props.value}
+      sliderStyle={styles.slider}
+      containerStyle={styles.sliderContainer}
+      onValueChange={props.onValueChange}/>
+    )
+  },[])
 
   return (
     <View style={styles.colorPickerContainer}>
@@ -33,20 +51,26 @@ const styles = {
   tab : {
     alignItems : "center",
     justifyContent : "center",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     paddingVertical : 20,
     flexDirection : "row"
-  },
-  title : {
-    marginLeft : "auto",
-    marginRight : "auto"
   },
   icon : {
     marginRight : 10
   },
   error : {
     fontWeight : "bold",
-    color : "red",
+    color : palette.red,
     marginTop : 10
+  },
+  slider : {
+      flex : 1,
+  },
+  sliderContainer : {
+    alignItems : "center",
+    flexDirection : "row",
+    marginHorizontal : 10,
+    backgroundColor : palette.white,
+    marginVertical : 10,
   }
 }

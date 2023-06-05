@@ -1,14 +1,74 @@
+import { defaultChatStyles } from '../../assets/styles'
+import { timestampToText } from '../../helper';
+
+const generateMessageDays = (existingMessages = [], newMessages) => {
+  let dates = [...existingMessages]
+  for(let message of newMessages) {
+    if(message) {
+      let messageDate = timestampToText(message.timestamp, "DD/MM");
+      const existingDate = dates.find(item => item.day === messageDate)
+      if(existingDate) {
+        existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
+        existingDate.data.push(message)
+      }
+      else {
+        dates.push({day : messageDate, data : [message]})
+      }
+    }
+  }
+  for (date of dates) {
+    date.data = date.data.sort((a,b) => a.timestamp > b.timestamp)
+  }
+  return dates.sort((a,b) => a.data[a.data.length -1].timestamp > b.data[b.data.length -1].timestamp)
+}
+
 const initialState = {
   chats : [],
-  styles : {
-    sentBoxColor : "#c6c6c6",
-    sentTextColor : "#f5f5f5",
-    receivedBoxColor : "#E86252",
-    receivedTextColor : "#f5f5f5",
-    fontSize : 14
-  },
+  styles : defaultChatStyles,
   messageQueue : [],
   messages : {}
+}
+
+const setLastText = (state, id, message) => {
+  let chat = state.chats.find(chat => chat._id == id);
+  if(chat) {
+    let chats = [...state.chats];
+    const chatIndex = chats.indexOf(chat);
+    chat.lastText = message.text;
+    chat.timestamp = message.timestamp;
+    chats[chatIndex] = chat;
+    return chats;
+  }
+  else {
+    return state.chats
+  }
+}
+
+const updateChat = (originalChat, newValues) => {
+  let updatedChat = {...originalChat};
+  const updateableValues = ["name","key","image", "doneLoading"];
+
+  Object.keys(newValues).map(key => {
+    if(updateableValues.indexOf(key) != -1) {
+      updatedChat[key] = newValues[key];
+    }
+  })
+
+  return updatedChat;
+}
+
+const updateMessageQueue = (messageQueue, originalKey, newKey, newName) => {
+  const updatedQueue = messageQueue.map(message => {
+    if(message.to == originalKey) {
+      return {
+        ...message,
+        ...(newKey?.length > 0 && {to : newKey}),
+        ...(newName?.length > 0 && {toContactName : newName})
+      }
+    }
+    else return message;
+  })
+  return updatedQueue;
 }
 
 const chatReducer = (state = initialState,action) => {
@@ -19,11 +79,12 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     }
-    case "DELETE_CHAT": {
+    case "DELETE_CHATS": {
       return {...state,
-        chats : [...state.chats].filter(chat => chat._id !== action.payload._id),
-        messages : {...state.messages,[action.payload._id] : []},
-        messageQueue : [...state.messageQueue].filter(message => message.to !== action.payload.key)
+        chats : [...state.chats].filter(
+          chat => action.payload.find(
+          chatToDelete => chatToDelete._id == chat._id) === undefined
+        )
       };
       break;
     }
@@ -36,19 +97,10 @@ const chatReducer = (state = initialState,action) => {
       if(chatToUpdate) {
         const chatIndex = state.chats.indexOf(chatToUpdate);
         let newChats = [...state.chats];
-        newChats[chatIndex] = {...chatToUpdate,name : action.payload.name,key : action.payload.key,image : action.payload.image};
+        newChats[chatIndex] = updateChat(newChats[chatIndex],action.payload);
         return {
           ...state,
-          chats : newChats,
-          messageQueue : [...state.messageQueue].map(message => {
-            if(message.to == chatToUpdate.key) {
-              return {
-                ...message,
-                to : action.payload.key,
-                toContactName : action.payload.name
-              }
-            }
-          })
+          chats : newChats
         }
       }
       else {
@@ -58,16 +110,15 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "ADD_MESSAGE": {
-      return {
+      const { message, id } = action.payload
+      const newState = {
         ...state,
         messages : {
           ...state.messages,
-          [action.payload.id] : state.messages?.[action.payload.id] ?
-            [...state.messages[action.payload.id],action.payload.message].sort((a,b) => a.timestamp > b.timestamp)
-            :
-            [action.payload.message]
+          [id] : generateMessageDays(state.messages[id],[message])
         }
-      }
+      };
+      return newState;
       break;
     }
     case "ADD_MESSAGE_TO_QUEUE": {
@@ -88,7 +139,7 @@ const chatReducer = (state = initialState,action) => {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => action.payload.find(id => id == message._id) === undefined)
+        (message => action.payload.find(item => item._id == message._id) === undefined)
       }
       break;
     }
@@ -101,30 +152,22 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "DELETE_MESSAGES": {
-      const chatWithMessagesRemoved = [...state.messages[action.payload.id]].filter
-      (message => action.payload.messages.find(messageID => messageID == message._id) === undefined);
+      const { id, messages } = action.payload;
 
-      const chatEmpty = chatWithMessagesRemoved.length === 0;
-
-      let chatToUpdate = [...state.chats].find(chat => chat._id === action.payload.id);
-      let newChats = [...state.chats];
-
-      if(!chatEmpty) {
-        const last = chatWithMessagesRemoved.length -1
-        const updateIndex = state.chats.indexOf(chatToUpdate);
-        chatToUpdate.lastText = chatWithMessagesRemoved[last].text;
-        chatToUpdate.timestamp = chatWithMessagesRemoved[last].timestamp;
-        if(updateIndex) {
-          newChats[updateIndex] = chatToUpdate;
-        }
-      }
-      return {...state,
+      const newSections = state.messages[id].map(section => ({
+        ...section,
+        data : [...section.data].filter(message => messages.find(id => id === message._id) === undefined )}
+      ))
+      .filter(section => section.data.length !== 0)
+      
+      const newState = {
+        ...state,
         messages : {
           ...state.messages,
-           [action.payload.id] : chatWithMessagesRemoved
-         },
-         chats : newChats
-       }
+          [id] : newSections
+        }
+      }
+      return newState;
       break;
     }
     case "RESET_MESSAGES": {
@@ -135,16 +178,11 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "SET_LAST_TEXT": {
-      let chat = state.chats.find(chat => chat._id == action.payload._id);
-      if(chat) {
-        let chats = [...state.chats];
-        const chatIndex = chats.indexOf(chat);
-        chat.lastText = action.payload.lastText;
-        chat.timestamp = action.payload.timestamp;
-        chats[chatIndex] = chat;
-        return {...state,chats : chats};
+      const {id, message} = action.payload;
+      return {
+        ...state,
+        chats : setLastText(state,id,message)
       }
-      return state;
       break;
     }
     case "SET_STYLES": {
@@ -155,28 +193,38 @@ const chatReducer = (state = initialState,action) => {
       return {...state, messageQueue : action.payload}
       break;
     }
+    case "UPDATE_MESSAGE_QUEUE": {
+      const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
+      if(chatToUpdate) {
+        return {
+          ...state,
+          messageQueue : updateMessageQueue(state.messageQueue,{...chatToUpdate}.key,action.payload.key,action.payload.name)
+        }
+      }
+      else {
+        return state;
+      }
+      break;
+    }
     case "SET_MESSAGES_FOR_CONTACT": {
-      return {...state,messages : {...state.messages,[action.payload.id] : action.payload.messages}}
+      return {...state,
+        messages : {
+          ...state.messages,
+          [action.payload.id] : action.payload.messages
+        }
+      }
       break;
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {
-      let newState = {...state}
-      if(!state.messages[action.payload.id]) {
-        newState.messages[action.payload.id] = []
+      const {id, messages} = action.payload
+      const newState = {
+        ...state,
+        messages : {
+          ...state.messages,
+          [id] : generateMessageDays(state.messages[id],messages)
+        }
       }
-
-      const newMessages = [...action.payload.messages]
-      .filter(message => newState.messages[action.payload.id].find(
-        existingMessage => existingMessage._id == message._id) == undefined
-      );
-
-      return {...newState, messages : {
-        ...newState.messages,
-        [action.payload.id] : [
-          ...newMessages,
-          ...newState.messages[action.payload.id]
-        ].sort((a,b) => a.timestamp > b.timestamp)
-      }}
+      return newState;
       break;
     }
     default:

@@ -1,35 +1,36 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'
 
+import { palette } from '../assets/palette';
+
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
-                  onTextTouch, touchStyle, containerStyle, textStyle }) => {
+                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
+                  backArrowStyle, rightIconSize }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles)
   return (
     <View style={{...styles.container,...containerStyle}}>
       {allowGoBack &&
         <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
-          <Icon name="arrow-back" size={30} style={{color : "#EEEBD0", marginRight : 10}}/>
+          <Icon name="arrow-back" size={backArrowSize || customStyle.uiFontSize + 16} style={{...styles.backArrow,...backArrowStyle}}/>
         </TouchableOpacity>}
 
-      {onTextTouch ?
-        <TouchableOpacity onPress={onTextTouch} style={{...styles.pressContainer,...touchStyle}}>
+        <TouchableOpacity
+        disabled={!onTextTouch}
+        onPress={onTextTouch}
+        style={{...styles.pressContainer,...touchStyle}}>
           {preText}
-          <Text style={{...styles.title,...textStyle}}>{title}</Text>
+          <Text style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
         </TouchableOpacity>
-        :
-        <>
-          {preText}
-          <Text style={{...styles.title,...textStyle}}>{title}</Text>
-        </>
-      }
 
 
-      {rightButtonIcon && rightButtonIcon.length > 0 && rightButtonOnClick &&
+      {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={styles.rightButton}>
-        <Icon name={rightButtonIcon} size={20} style={{color : "white"}}/>
+        <Icon name={rightButtonIcon} size={rightIconSize || customStyle.uiFontSize + 16} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
   )
@@ -40,17 +41,17 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-between",
     alignItems : "center",
-    backgroundColor : "#e05e3f",
+    backgroundColor : palette.primary,
     paddingLeft : 10,
     height : Dimensions.get("window").height * 0.085
   },
   title : {
-    color : "white",
+    color : palette.white,
     fontSize : 18,
     marginRight : "auto"
   },
   rightButton : {
-    backgroundColor : "#EBB3A9",
+    backgroundColor : palette.secondary,
     height : "100%",
     alignItems : "center",
     justifyContent : "center",
@@ -63,6 +64,10 @@ const styles = {
     justifyContent : "center",
     flexDirection : "row",
     alignItems : "center"
+  },
+  backArrow : {
+    color : palette.white,
+    marginRight : 10
   }
 }
 

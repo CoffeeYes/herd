@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 
+import { palette } from '../assets/palette';
+
 const LoadingScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Herd</Text>
-      <ActivityIndicator size="large" color="#e05e3f"/>
+      <ActivityIndicator size="large" color={palette.primary}/>
     </View>
   )
 }

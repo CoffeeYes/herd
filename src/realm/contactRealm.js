@@ -1,8 +1,7 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
-import { deleteChat, updateMessagesWithContact } from './chatRealm';
-import { cloneDeep } from 'lodash';
-import { parseRealmObject, parseRealmObjects} from './helper'
+import { deleteChats, updateMessagesWithContact } from './chatRealm';
+import { parseRealmObject, parseRealmObjects, parseRealmID} from './helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -17,13 +16,12 @@ const getAllContacts = () => {
   []
 }
 
-const deleteContact = object => {
-  deleteChat(object.key);
-  const contacts = contactsRealm.objects("Contact");
-  const contactToDelete = contacts.find(contact => contact._id == object._id);
-  contactToDelete &&
+const deleteContacts = contacts => {
+  const realmContacts = contactsRealm.objects("Contact");
+  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => parseRealmID(item) == parseRealmID(contact)) !== undefined);
+  deleteChats(contacts.map(contact => contact.key))
   contactsRealm.write(() => {
-    contactsRealm.delete(contactToDelete);
+    contactsRealm.delete(contactsToDelete);
   })
 }
 
@@ -43,9 +41,9 @@ const getContactById = id => {
 
 const getContactsByKey = keys => {
   if(keys.length > 0) {
-    const keyQuery = keys.map(key => "key = " + "'" + key + "'").join(' OR ');
+    const keyQuery = keys.map(key => `key = '${key}'`).join(' OR ');
     const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
-    return contactsByKey.length > 0 ? parseRealmObjects(contactsByKey) : []
+    return parseRealmObjects(contactsByKey)
   }
   else {
     return []
@@ -82,7 +80,7 @@ const closeContactRealm = () => {
 
 export {
   getAllContacts,
-  deleteContact,
+  deleteContacts,
   createContact,
   getContactById,
   getContactByName,

@@ -7,6 +7,10 @@ import CustomButton from './CustomButton';
 
 import { setPublicKey } from '../redux/actions/userActions'
 
+import { defaultChatStyles } from '../assets/styles';
+
+import { palette } from '../assets/palette';
+
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
   const [textWidth, setTextWidth] = useState(100);
@@ -18,35 +22,28 @@ const Splash = ({ navigation }) => {
     dispatch(setPublicKey(key));
 
     //set default styling
-    const style = {
-      sentBoxColor : "#c6c6c6",
-      sentTextColor : "#f5f5f5",
-      receivedBoxColor : "#E86252",
-      receivedTextColor : "#f5f5f5",
-      fontSize : 14
-    }
-
-    await AsyncStorage.setItem("styles",JSON.stringify(style))
+    await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
 
     navigation.navigate('main');
 
   }
 
+  const badVersion = Platform.OS === "android" && Platform.Version < 23;
   return (
     <View style={styles.mainContainer}>
       <View style={styles.contentContainer}>
-      <Text style={{color : "white",marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
+      <Text style={{color : palette.white,marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
         Welcome to Herd, the peer-to-peer messaging app!
       </Text>
 
       <CustomButton
       text="Get Started"
       onPress={setup}
-      buttonStyle={{borderWidth : 1,borderColor : "white"}}
-      disabled={Platform.OS === "android" && Platform.Version < 23}/>
+      buttonStyle={{borderWidth : 1,borderColor : palette.white}}
+      disabled={badVersion}/>
 
-      {Platform.OS === "android" && Platform.Version < 23 &&
-        <Text style={{color : "white", marginTop : 20, fontWeight : "bold", width : textWidth}}>
+      { badVersion &&
+        <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold", width : textWidth}}>
           Unfortunately, your device's software is too old to utilise the security features herd requires to run.
           Please check for software updates. If there are none, herd will not function with your device.
         </Text>
@@ -60,7 +57,7 @@ const styles = {
   mainContainer : {
     alignItems : "center",
     justifyContent : "center",
-    backgroundColor : "#e05e3f",
+    backgroundColor : palette.primary,
     flex : 1
   },
   contentContainer : {

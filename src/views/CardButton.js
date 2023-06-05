@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
-                      containerStyle, textStyle, flashText, timeout }) => {
+import { palette } from '../assets/palette';
+
+const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
+                      containerStyle, textStyle, flashText, timeout, disableTouch }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles)
   const [currentText, setCurrentText] = useState(text);
 
   const flash = async () => {
     const success = await onPress();
-    if(success) {
+    if(success && flashText?.length > 0 && timeout > 0) {
       setCurrentText(flashText);
       setTimeout(() => {
         setCurrentText(text);
@@ -18,15 +22,28 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle,
 
   return (
     <TouchableOpacity
+    disabled={disableTouch}
     style={{...styles.container,...containerStyle}}
-    onPress={(flashText && timeout) ? flash : onPress}>
+    onPress={flash}>
+
+      {currentText?.length > 0 &&
       <View style={styles.textContainer}>
-        <Text style={{...styles.text,...textStyle}}>{currentText}</Text>
-      </View>
-      <Icon
-      style={{...styles.icon, ...iconStyle}}
-      name={rightIcon}
-      size={iconSize || 32}/>
+        <Text style={{
+        ...styles.text,
+        fontSize : customStyle.uiFontSize,
+        ...textStyle}}>
+          {currentText}
+        </Text>
+      </View>}
+
+      {rightIcon &&
+      <View style={{...styles.iconContainer,...iconContainerStyle}}>
+        <Icon
+        style={{...styles.icon, ...iconStyle}}
+        name={rightIcon}
+        size={iconSize || customStyle.uiFontSize + 16}/>
+      </View>}
+
     </TouchableOpacity>
   )
 }
@@ -39,7 +56,7 @@ const styles = {
     width : Dimensions.get('window').width * 0.9,
     padding : 20,
     borderRadius : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     elevation : 2,
     marginVertical : 5
   },
@@ -54,9 +71,12 @@ const styles = {
     justifyContent : "flex-start",
     width : Dimensions.get('window').width * 0.4,
   },
+  iconContainer : {
+    justifyContent : "center"
+  },
   icon : {
     alignSelf : "flex-end"
-  }
+  },
 }
 
 export default CardButton

@@ -1,63 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 
-const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
-                      highlightedMessages, setHighlightedMessages, notTouchable }) => {
-  const [highlighted, setHighlighted] = useState(false);
+import { palette } from '../assets/palette';
 
-  const invertColor = color => {
-    var temp = toHsv(color);
-    temp.h = 0.3 + (0.1* temp.h);
-    temp.s = 0.3 + (0.1* temp.s);
-    temp.v = 0.3 + (0.1* temp.v);
-    temp.a = 0.3 + (0.1* temp.a);
-    temp = fromHsv(temp);
-    return temp;
+const ChatBubble = ({ text, timestamp, messageFrom, customStyle, activeOpacity,
+                      onLongPress, onPress, disableTouch = false, highlighted }) => {
+
+  const boxStyle = {
+    ...styles.message,
+    ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
+    backgroundColor : messageFrom ? customStyle.sentBoxColor : customStyle.receivedBoxColor,
+    ...(highlighted && {...styles.highlighted})
   }
 
-  const highlight = () => {
-    setHighlighted(true);
-    highlightedMessages.indexOf(identifier) === -1 &&
-    setHighlightedMessages([...highlightedMessages,identifier])
-  }
-
-  const unhighlight = () => {
-    if(highlighted) {
-      setHighlighted(false)
-      setHighlightedMessages([...highlightedMessages].filter(item => item !== identifier))
-    }
+  const getTextStyle = textType => {
+    return ({
+      ...(textType === "messageText" && {...styles.messageText}),
+      ...(textType === "timestamp" && {...styles.timestamp}),
+      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
+      fontSize : customStyle.messageFontSize
+    })
   }
 
   return (
     <TouchableOpacity
-    disabled={notTouchable}
-    onLongPress={highlight}
-    onPress={() => highlighted ? unhighlight() : highlightedMessages.length > 0 && highlight()}
-    style={messageFrom ?
-      {...styles.message,
-       ...styles.messageFromYou,
-       backgroundColor : customStyle.sentBoxColor,
-       ...(highlighted && {...styles.highlighted})}
-      :
-      {...styles.message,
-       ...styles.messageFromOther,
-       backgroundColor : customStyle.receivedBoxColor,
-       ...(highlighted && {...styles.highlighted})}}>
+    disabled={disableTouch}
+    activeOpacity={activeOpacity}
+    onLongPress={onLongPress}
+    onPress={onPress}
+    style={boxStyle}>
       <Text
-      style={{
-        ...styles.messageText,
-        color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-        fontSize : customStyle.fontSize
-      }}>
+      style={getTextStyle("messageText")}>
         {text}
       </Text>
       <Text
-      style={{
-      ...styles.timestamp,
-      color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
-      fontSize : customStyle.fontSize
-      }}>
+      style={getTextStyle("timestamp")}>
         {timestamp}
       </Text>
     </TouchableOpacity>
@@ -66,13 +44,13 @@ const ChatBubble = ({ text, timestamp, messageFrom, customStyle, identifier,
 
 const styles = {
   messageFromOther : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     maxWidth: "90%",
     alignSelf : "flex-start",
     marginLeft : 5,
   },
   messageFromYou : {
-    backgroundColor : "#c6c6c6",
+    backgroundColor : palette.mediumgrey,
     alignSelf : "flex-end",
     maxWidth : "90%",
     marginRight : 5
@@ -85,17 +63,17 @@ const styles = {
     borderColor : "transparent"
   },
   messageText : {
-    color : "#f5f5f5"
+    color : palette.offwhite
   },
   timestamp : {
     fontWeight : "bold",
-    alignSelf : "flex-end"
+    alignSelf : "flex-end",
   },
   highlighted : {
     borderWidth : 2,
-    borderColor : "black",
+    borderColor : palette.black,
     borderStyle : "dotted"
   }
 }
 
-export default ChatBubble
+export default memo(ChatBubble)

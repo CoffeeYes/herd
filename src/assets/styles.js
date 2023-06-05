@@ -1,4 +1,5 @@
 import { Dimensions } from 'react-native';
+import { palette } from './palette';
 
 const largeImageContainerStyle = {
   alignSelf : "center",
@@ -6,15 +7,27 @@ const largeImageContainerStyle = {
   height : Dimensions.get("window").width * 0.4,
   borderRadius : Dimensions.get("window").width * 0.2,
   borderWidth : 1,
-  borderColor : "grey",
+  borderColor : palette.grey,
   alignItems : "center",
   justifyContent : "center",
   overflow : "hidden",
-  backgroundColor : "white",
+  backgroundColor : palette.white,
   elevation : 2,
   marginBottom : 10
 }
 
+const defaultChatStyles = {
+  sentBoxColor : palette.mediumgrey,
+  sentTextColor : palette.offwhite,
+  receivedBoxColor : palette.offprimary,
+  receivedTextColor : palette.offwhite,
+  messageFontSize : 16,
+  titleSize : 24,
+  subTextSize : 14,
+  uiFontSize : 16
+}
+
 export {
-  largeImageContainerStyle
+  largeImageContainerStyle,
+  defaultChatStyles
 }

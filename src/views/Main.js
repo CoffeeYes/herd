@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
+import { palette } from '../assets/palette';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Chats from './Chats';
@@ -18,8 +20,8 @@ const Main = ({ navigation, route }) => {
       screenOptions={({ route }) => ({
         headerShown : false,
         tabBarShowLabel : false,
-        tabBarInactiveTintColor: 'black',
-        tabBarActiveTintColor: '#E86252',
+        tabBarInactiveTintColor: palette.black,
+        tabBarActiveTintColor: palette.primary,
         tabBarIcon : ({ color, size }) => {
           if(route.name === "chats") {
             return <Icon name="chat" size={size} color={color}/>
@@ -41,7 +43,7 @@ const Main = ({ navigation, route }) => {
 
 const styles = {
   navContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%"
@@ -55,7 +57,7 @@ const styles = {
     padding : 20,
     flex : 1,
     alignItems : "center",
-    backgroundColor : "#E86252"
+    backgroundColor : palette.primary
   }
 }
 

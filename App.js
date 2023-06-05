@@ -32,7 +32,6 @@ import Chat from './src/views/Chat';
 import Contacts from './src/views/Contacts';
 import Contact from './src/views/Contact';
 import AddContact from './src/views/AddContact';
-import CreateContact from './src/views/CreateContact';
 import Splash from './src/views/Splash';
 import Main from './src/views/Main';
 import BTDeviceList from './src/views/BTDeviceList';
@@ -49,7 +48,7 @@ import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
-import { getAllContacts } from './src/realm/contactRealm';
+import { getAllContacts, getContactsByKey } from './src/realm/contactRealm';
 import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
@@ -57,9 +56,9 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
-import { setLocked } from './src/redux/actions/appStateActions';
+import { setLastRoutes, setLockable } from './src/redux/actions/appStateActions';
 
-const Stack = createStackNavigator()
+const Stack = createStackNavigator();
 
 const App = ({ }) => {
   const dispatch = useDispatch();
@@ -68,8 +67,10 @@ const App = ({ }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const locked = useSelector(state => state.appStateReducer.locked);
+  const lockable = useSelector(state => state.appStateReducer.lockable);
 
   const passwordSetRef = useRef();
+  const lockableRef = useRef();
 
   useEffect(() => {
     (async () => {
@@ -91,13 +92,34 @@ const App = ({ }) => {
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
+      let uniqueKeys = [];
+      for(const message of messages) {
+        if(message.to == ownPublicKey && uniqueKeys.indexOf(message.from) == -1) {
+          uniqueKeys.push(message.from);
+        }
+      }
+      const contacts = getContactsByKey(uniqueKeys);
+      for(contact of contacts) {
+        dispatch(updateChat({...contact, doneLoading : false}))
+      }
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
-      if(state === "background" && passwordSetRef.current) {
-        dispatch(setLocked(true))
+      const lastRoutes = navigationRef?.current?.getRootState()?.routes;
+      if(state === "background" && passwordSetRef.current && lockableRef.current) {
+        navigationRef.current.dispatch(
+          CommonActions.reset({
+            index: 1,
+            routes: [{name : "passwordLockScreen"}]
+          })
+        )
+        lastRoutes &&
+        dispatch(setLastRoutes(lastRoutes));
+      }
+      else if (state === "active") {
+        dispatch(setLockable(true));
       }
     })
 
@@ -111,6 +133,10 @@ const App = ({ }) => {
     passwordSetRef.current = passwordHash.length > 0;
   },[passwordHash])
 
+  useEffect(() => {
+    lockableRef.current = lockable;
+  },[lockable])
+
   const loadInitialState = async () => {
     //get stored data
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
@@ -119,14 +145,15 @@ const App = ({ }) => {
 
     //determine the entry screen
     if(key?.length > 0) {
-      setInitialRoute("main")
+      if(loginPassword.length > 0) {
+        setInitialRoute("passwordLockScreen");
+      }
+      else {
+        setInitialRoute("main");
+      }
     }
     else {
       setInitialRoute("splash")
-    }
-
-    if(loginPassword.length > 0) {
-      dispatch(setLocked(true));
     }
 
     dispatch(setPublicKey(key));
@@ -135,7 +162,7 @@ const App = ({ }) => {
     dispatch(setContacts(getAllContacts()))
 
     //load saved chats into store
-    var contactsWithChats = (await getContactsWithChats())
+    let contactsWithChats = (await getContactsWithChats())
     .sort( (a,b) => a.timestamp > b.timestamp);
     dispatch(setChats(contactsWithChats))
 
@@ -180,31 +207,23 @@ const App = ({ }) => {
       <Stack.Navigator
       initialRouteName={initialRoute}
       screenOptions={{headerShown : false}}>
-      {locked ?
-        <Stack.Screen
-        name="passwordLockScreen"
-        component={PasswordLockScreen}/>
-        :
-        <>
-          <Stack.Screen name="contacts" component={Contacts}/>
-          <Stack.Screen name="addContact" component={AddContact}/>
-          <Stack.Screen name="chats" component={Chats}/>
+          <Stack.Screen
+          name="passwordLockScreen"
+          component={PasswordLockScreen}/>
           <Stack.Screen name="splash" component={Splash}/>
           <Stack.Screen name="main" component={Main}/>
-          <Stack.Screen name="chat" component={Chat}/>
+          <Stack.Screen name="contacts" component={Contacts}/>
           <Stack.Screen name="contact" component={Contact}/>
-          <Stack.Screen name="createcontact" component={CreateContact}/>
+          <Stack.Screen name="addContact" component={AddContact}/>
+          <Stack.Screen name="editContact" component={EditContact}/>
+          <Stack.Screen name="chats" component={Chats}/>
+          <Stack.Screen name="chat" component={Chat}/>
           <Stack.Screen name="newChat" component={Contacts}/>
           <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
           <Stack.Screen name="QRScanner" component={QRScanner}/>
-          <Stack.Screen name="editContact" component={EditContact}/>
           <Stack.Screen name="customise" component={Customise}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
-          <Stack.Screen
-          name="passwordLockScreen2"
-          component={PasswordLockScreen}/>
-        </>}
       </Stack.Navigator>}
     </>
   );

@@ -5,10 +5,13 @@ const setChats = chats => {
   }
 }
 
-const deleteChat = chat => {
-  return {
-    type : "DELETE_CHAT",
-    payload : chat
+const deleteChats = chats => {
+  return (dispatch,getState) => {
+    dispatch({type : "DELETE_CHATS",payload : chats});
+    for(const chat of chats) {
+      dispatch(filterMessageQueueByContact(chat.key));
+      dispatch(setMessagesForContact(chat._id,[]));
+    }
   }
 }
 
@@ -20,22 +23,20 @@ const addChat = chat => {
 }
 
 const updateChat = contact => {
-  return {
-    type : "UPDATE_CHAT",
-    payload : contact
+  return (dispatch,getState) => {
+    //must update queue before contact, otherwise updateQueue function has
+    //no old contact key to compare against
+    (contact?.key?.length > 0 || contact?.name?.length > 0) &&
+    dispatch(updateMessageQueue(contact));
+
+    dispatch({type : "UPDATE_CHAT",payload : contact})
   }
 }
 
 const addMessage = (id, message) => {
-  return {
-    type : "ADD_MESSAGE",
-    payload : {id,message}
-  }
-}
-const addMessageToQueue = message => {
-  return {
-    type : "ADD_MESSAGE_TO_QUEUE",
-    payload : {message}
+  return async (dispatch,getState) => {
+    dispatch({type : "ADD_MESSAGE",payload : {id,message}});
+    dispatch(setLastText(id,message));
   }
 }
 
@@ -46,6 +47,13 @@ const addMessagesToQueue = messages => {
   }
 }
 
+const updateMessageQueue = contact => {
+  return {
+    type : "UPDATE_MESSAGE_QUEUE",
+    payload : contact
+  }
+}
+
 const removeMessagesFromQueue = messages => {
   return {
     type : "REMOVE_MESSAGES_FROM_QUEUE",
@@ -53,17 +61,17 @@ const removeMessagesFromQueue = messages => {
   }
 }
 
-const filterMessageQueueByContact = id => {
+const filterMessageQueueByContact = key => {
   return {
     type : "FILTER_QUEUE_BY_CONTACT",
-    payload : id
+    payload : key
   }
 }
 
 const deleteMessages = (id, messages) => {
-  return {
-    type : "DELETE_MESSAGES",
-    payload : {id,messages}
+  return (dispatch, getState) => {
+    dispatch({type : "DELETE_MESSAGES",payload : {id,messages}});
+    dispatch(removeMessagesFromQueue(messages));
   }
 }
 
@@ -73,10 +81,10 @@ const resetMessages = () => {
   }
 }
 
-const setLastText = newText => {
+const setLastText = (id, message) => {
   return {
     type : "SET_LAST_TEXT",
-    payload : newText
+    payload : {id,message}
   }
 }
 
@@ -109,12 +117,11 @@ const prependMessagesForContact = (id, messages) => {
 }
 
 export {
-  deleteChat,
+  deleteChats,
   addChat,
   updateChat,
   setChats,
   addMessage,
-  addMessageToQueue,
   addMessagesToQueue,
   removeMessagesFromQueue,
   filterMessageQueueByContact,

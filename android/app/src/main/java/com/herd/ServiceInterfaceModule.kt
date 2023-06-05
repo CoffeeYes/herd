@@ -189,7 +189,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun addMessageToService(message : ReadableMap,promise : Promise) {
     if(bound) {
       val msgParcel : HerdMessage = createMessageFromObject(message);
-      promise.resolve(service.addMessage(msgParcel))
+      promise.resolve(service.addMessageToQueue(msgParcel))
     }
     else {
       promise.resolve(false);

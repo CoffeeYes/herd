@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
@@ -6,12 +7,16 @@ import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 import navigationRef from '../NavigationRef';
 
+import { palette } from '../assets/palette';
+
 const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device");
   const [otherKey, _setOtherKey] = useState("");
   const [keyReceived, _setKeyReceived] = useState(false);
   const [keySent, _setKeySent] = useState(false);
+
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const otherKeyRef = useRef();
   const keyReceivedRef = useRef();
@@ -32,8 +37,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    var messageListener;
-    var stateChangeListener;
+    let messageListener;
+    let stateChangeListener;
 
     if(visible) {
       //listen for connected state to begin key exchange
@@ -78,7 +83,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
-      navigationRef.current.navigate("createcontact",{publicKey : otherKeyRef.current});
+      navigationRef.current.navigate("editContact",{publicKey : otherKeyRef.current});
       setVisible(false);
     }
   },[keySentRef.current,keyReceivedRef.current])
@@ -93,13 +98,13 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   return (
     <CustomModal
     visible={visible}
-    setVisible={setVisible}
-    disableHideOnPress>
+    onRequestClose={() => setVisible(false)}
+    disableOnPress>
         <View style={styles.modalContentContainer}>
-          <ActivityIndicator size="large" color="#e05e3f" animating={loading}/>
-          <Text>{activityText}</Text>
+          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
+          <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
           <CustomButton
-          onPress={cancel}
+          onPress={() => cancel()}
           buttonStyle={{marginTop : 10}}
           text="Cancel"/>
         </View>
@@ -109,7 +114,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
 const styles = {
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center"

@@ -6,12 +6,12 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
-import CustomModal from './CustomModal';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
+import LocationModal from './LocationModal';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
@@ -20,6 +20,9 @@ import { parseRealmID } from '../realm/helper';
 
 import { setChats, resetMessages, setMessageQueue } from '../redux/actions/chatActions';
 import { setContacts, resetContacts } from '../redux/actions/contactActions';
+import { setLockable } from '../redux/actions/appStateActions';
+
+import { palette } from '../assets/palette';
 
 import {
   getMessageQueue,
@@ -31,6 +34,7 @@ import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contact
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
+  const customStyle = useSelector(state => state.chatReducer.styles);
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -47,10 +51,6 @@ const Settings = ({ navigation }) => {
   const copyKeyToClipboard = async () => {
     setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"));
     return true;
-  }
-
-  const showQRCode = async () => {
-    setQRCodeVisible(true);
   }
 
   const deleteAllChats = async () => {
@@ -88,7 +88,7 @@ const Settings = ({ navigation }) => {
           onPress: async () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
-            resetContacts(dispatch);
+            dispatch(resetContacts());
           },
         },
       ]
@@ -118,14 +118,16 @@ const Settings = ({ navigation }) => {
 
   const toggleBackgroundTransfer = async value => {
     if(value) {
-      var locationPermissionsGranted = await Bluetooth.checkLocationPermission();
+      dispatch(setLockable(false));
+      let locationPermissionsGranted = await Bluetooth.checkLocationPermission();
       const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
-      var btEnabled = await Bluetooth.checkBTEnabled();
-      var locationEnabled = await Bluetooth.checkLocationEnabled();
+      let btEnabled = await Bluetooth.checkBTEnabled();
+      let locationEnabled = await Bluetooth.checkLocationEnabled();
 
       if(!bluetoothScanPermissionsGranted) {
         const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
         if(!grantBluetoothScanPermissions) {
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -134,6 +136,7 @@ const Settings = ({ navigation }) => {
         const grantLocationPermissions = await Bluetooth.requestLocationPermissions();
         if(!grantLocationPermissions) {
           setShowLocationModal(true);
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -141,6 +144,7 @@ const Settings = ({ navigation }) => {
       if(!btEnabled) {
         btEnabled = await Bluetooth.requestBTEnable();
         if(!btEnabled) {
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -155,6 +159,7 @@ const Settings = ({ navigation }) => {
           ]
         )
         if(!locationEnabled) {
+          dispatch(setLockable(true));
           return;
         }
       }
@@ -164,7 +169,7 @@ const Settings = ({ navigation }) => {
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
         const publicKey = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
-        const receivedMessagesForSelf = getReceivedMessagesForSelf(publicKey);
+        const receivedMessagesForSelf = await getReceivedMessagesForSelf();
         ServiceInterface.enableService(
           messageQueue,
           receivedMessagesForSelf,
@@ -187,35 +192,35 @@ const Settings = ({ navigation }) => {
     closePasswordRealm();
   }
 
+  const locationModalDescription = `In order to transfer messages in the background, herd requires \
+location permissions to be allowed all the time.`
+
+  const locationModalInstructionText = `Please go into the permission settings for Herd and select 'Allow all the time' \
+in order to allow Herd to function correctly.`
+
   return (
     <>
       <Header title="Settings"/>
 
-      <ScrollView contentContainerStyle={{alignItems : "center"}}>
+      <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={{
-          alignSelf : "center",
-          alignItems : "center",
-          backgroundColor : "white",
-          elevation : 2,
-          borderRadius : 10,
-          padding : 20,
-          marginVertical : 10,
-          width : Dimensions.get('window').width * 0.9}}>
+        <View style={styles.backgroundTransferCard}>
+
           {!backgroundTransfer &&
-          <Text style={styles.warning}>
+          <Text style={{...styles.warning, fontSize : customStyle.uiFontSize}}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
+
           <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text style={{fontWeight : "bold"}}>Background Transfers</Text>
+            <Text style={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}
             value={backgroundTransfer}
-            trackColor={{ false: "#767577", true: "#E86252" }}
-            thumbColor={backgroundTransfer ? "#EBB3A9" : "#f4f3f4"}
-            ios_backgroundColor="#E86252"/>
+            trackColor={{ false: palette.grey, true: palette.primary }}
+            thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
+            ios_backgroundColor={palette.primary}/>
           </View>
         </View>
 
@@ -229,7 +234,7 @@ const Settings = ({ navigation }) => {
         <CardButton
         text="Show My QR Code"
         rightIcon="qr-code-2"
-        onPress={showQRCode}/>
+        onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
         text="Customise"
@@ -245,35 +250,35 @@ const Settings = ({ navigation }) => {
         text="Password Protection"
         rightIcon="lock"
         onPress={() => userHasPassword ?
-          navigation.navigate("passwordLockScreen2",{navigationTarget : "passwordSettings"})
+          navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
           :
           navigation.navigate("passwordSettings")}
         />
 
         <CardButton
         text="Delete All Chats"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
         rightIcon="delete"
         onPress={deleteAllChats}/>
 
         <CardButton
         text="Delete All Contacts"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
-        rightIcon="delete-sweep"
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
+        rightIcon="delete"
         onPress={deleteAllContacts}/>
 
         <CardButton
         text="Delete All Messages"
-        textStyle={{color : "red"}}
-        iconStyle={{color : "red"}}
+        textStyle={{color : palette.red}}
+        iconStyle={{color : palette.red}}
         rightIcon="delete-forever"
         onPress={deleteAllMessages}/>
 
         {__DEV__ &&
           <CustomButton
-          buttonStyle={{backgroundColor : "red",...styles.buttonMargin}}
+          buttonStyle={{backgroundColor : palette.red,...styles.buttonMargin}}
           onPress={closeRealms}
           text="Close Realm"/>
         }
@@ -282,32 +287,20 @@ const Settings = ({ navigation }) => {
         visible={QRCodeVisible}
         value={{key : publicKey}}
         title="My Key"
-        setVisible={setQRCodeVisible}/>
+        onPress={() => setQRCodeVisible(false)}
+        onRequestClose={() => setQRCodeVisible(false)}/>
 
-        {showLocationModal &&
-        <CustomModal
-        setVisible={setShowLocationModal}>
-          <View style={styles.modalContentContainer}>
-            <Icon name="location-on" size={48}/>
-            <Text>
-              In order to transfer messages in the background, herd requires
-              location permissions to be allowed all the time.
-            </Text>
-
-            <Text style={{fontWeight : "bold", marginTop : 20}}>
-            Please go into the permission settings for Herd and select "Allow all the time"
-            in order to allow Herd to function correctly.
-            </Text>
-
-            <CustomButton
-            onPress={() => {
-              setShowLocationModal(false);
-              Bluetooth.navigateToApplicationSettings();
-            }}
-            text="Go To Settings"/>
-          </View>
-        </CustomModal>}
-
+        <LocationModal
+        visible={showLocationModal}
+        modalOnPress={() => setShowLocationModal(false)}
+        onRequestClose={() => setShowLocationModal(false)}
+        buttonOnPress={() => {
+          setShowLocationModal(false);
+          dispatch(setLockable(false));
+          Bluetooth.navigateToApplicationSettings();
+        }}
+        description={locationModalDescription}
+        instructionText={locationModalInstructionText}/>
       </ScrollView>
     </>
   )
@@ -315,27 +308,23 @@ const Settings = ({ navigation }) => {
 
 const styles = {
   warning : {
-    color : "red",
+    color : palette.red,
     maxWidth : 300,
     fontWeight : "bold"
   },
   buttonMargin : {
     marginTop : 10
   },
-  modalMainContainer : {
+  backgroundTransferCard : {
+    alignSelf : "center",
     alignItems : "center",
-    justifyContent : "center",
-    flex : 1,
-    backgroundColor : "rgba(0,0,0,0.4)"
-  },
-  modalContentContainer : {
-    backgroundColor : "white",
-    borderRadius : 5,
-    padding : 30,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
-  },
+    backgroundColor : palette.white,
+    elevation : 2,
+    borderRadius : 10,
+    padding : 20,
+    marginVertical : 10,
+    width : Dimensions.get('window').width * 0.9
+  }
 }
 
 export default Settings;

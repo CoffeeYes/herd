@@ -1,64 +1,70 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
          ActivityIndicator, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 
-import { getContactById, editContact, getContactByName, getContactsByKey } from '../realm/contactRealm';
+import { getContactById, editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
-import { updateContact } from '../redux/actions/contactActions';
+import { updateContact, addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
+
+import { palette } from '../assets/palette';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const [name, _setName] = useState("");
-  const [publicKey, _setPublicKey] = useState("");
-  const [savedContacts,setSavedContacts] = useState([]);
-  const [originalContact, setOriginalContact] = useState({});
-  const [contactImage, _setContactImage] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  const [name, _setName] = useState(originalContact?.name || "");
+  const [publicKey, _setPublicKey] = useState(originalContact?.key || "");
+  const [contactImage, _setContactImage] = useState(originalContact?.image || "");
+  const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
+  const [errors, setErrors] = useState([]);
 
-  const nameRef = useRef();
-  const keyRef = useRef();
-  const imageRef = useRef();
+  const nameRef = useRef(originalContact?.name || "");
+  const keyRef = useRef(originalContact?.key || "");
+  const imageRef = useRef(originalContact?.image || "");
+  const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
+  const originalContactRef = useRef(originalContact || {});
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
     keyRef.current = data;
-    _setPublicKey(data)
+    _setPublicKey(data);
   }
   const setName = data => {
     nameRef.current = data;
-    _setName(data)
+    _setName(data);
   }
   const setContactImage = data => {
     imageRef.current = data;
-    _setContactImage(data)
+    _setContactImage(data);
+  }
+  const setEditingExistingContact = data => {
+    editingExistingContactRef.current = data;
+    _setEditingExistingContact(data);
   }
 
   useEffect(() => {
-    loadContactInfo().then(() => setLoading(false));
+    originalContactRef.current = originalContact
+  },[originalContact])
+
+  useEffect(() => {
+    if(!editingExistingContact) {
+      setContactImage("")
+      setPublicKey(route?.params?.publicKey || "");
+      setName(route?.params?.name || "");
+    }
   },[])
 
-  const loadContactInfo = async () => {
-    const contact = getContactById(route.params.id)
-    setOriginalContact(contact);
-    if(contact) {
-      setName(contact.name)
-      setPublicKey(contact.key);
-      setContactImage(contact.image);
-    }
-  }
-
   const save = async () => {
+    let errorSaving = []
     try {
       const encryptedTest = await Crypto.encryptStringWithKey(
         publicKey.trim(),
@@ -69,42 +75,66 @@ const EditContact = ({ route, navigation }) => {
       )
     }
     catch(e) {
-      setError("Invalid Public Key")
-      console.log(e)
-      return false;
+      errorSaving.push({
+        type : "invalid_key",
+        message : "Invalid Public Key"
+      })
     }
+
     if(name.trim().length === 0) {
-      setError("Username can not be empty");
-      return false;
+      errorSaving.push({
+        type : "empty_fields",
+        message : "Username can not be empty"
+      });
     }
+
     const keyExists = getContactsByKey([publicKey.trim()]);
     const nameExists = getContactByName(name.trim());
 
-    if(keyExists != "" && keyExists[0].key != originalContact.key) {
-      setError("A user with this key already exists");
+    if(keyExists != "" && keyExists[0].key != originalContact?.key) {
+      errorSaving.push({
+        type : "key_exists",
+        message : "A user with this key already exists"
+      });
+    }
+    if(nameExists && nameExists.name != originalContact?.name) {
+      errorSaving.push({
+        type : "name_exists",
+        message : "A user with this name already exists"
+      });
+    }
+
+    if(errorSaving.length > 0) {
+      setErrors(errorSaving);
       return false;
     }
-    if(nameExists && nameExists.name != originalContact.name) {
-      setError("A user with this name already exists");
-      return false;
-    }
-    setError("");
+
+    setErrors([]);
     const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
-    editContact(route.params.id, newInfo);
-    updateContactAndReferences(dispatch, {...newInfo,_id : route.params.id});
-    setOriginalContact(newInfo);
+    if(editingExistingContact) {
+      editContact(route.params.id, newInfo);
+      dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
+    }
+    else {
+      const createdContact = createContact(newInfo);
+      dispatch(addContact(createdContact));
+      navigation.navigate('main');
+    }
     return true;
   }
 
   const editImage = async () => {
-    setError("");
+    setErrors([]);
     const options = {
       mediaType : 'photo',
       includeBase64 : true
     }
     launchImageLibrary(options,response => {
       if(response.errorCode) {
-        setError(response.errorMessage)
+        setErrors([{
+          type : "image_error",
+          message : response.errorMessage
+        }])
       }
       else if(!response.didCancel) {
         setContactImage("data:" + response.type + ";base64," + response.base64);
@@ -116,34 +146,31 @@ const EditContact = ({ route, navigation }) => {
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
-      const contact = getContactById(route.params.id);
 
-      if(contact) {
-        const unsavedChanges = (
-          contact.name.trim() != nameRef.current.trim() ||
-          contact.key.trim() != keyRef.current.trim() ||
-          contact.image != imageRef.current
-        )
+      const unsavedChanges = (
+        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
+        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
+        originalContactRef?.current?.image != imageRef?.current
+      )
 
-        if(unsavedChanges) {
-          Alert.alert(
-            'Discard changes?',
-            'You have unsaved changes. Are you sure to discard them and leave the screen?',
-            [
-              {
-                text: 'Discard',
-                style: 'destructive',
-                // If the user confirmed, then we dispatch the action we blocked earlier
-                // This will continue the action that had triggered the removal of the screen
-                onPress: () => navigation.dispatch(e.data.action),
-              },
-              { text: "Stay", style: 'cancel', onPress: () => {} },
-            ]
-          );
-        }
-        else {
-          navigation.dispatch(e.data.action);
-        }
+      if(unsavedChanges && editingExistingContactRef.current) {
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure to discard them and leave the screen?',
+          [
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+            { text: "Stay", style: 'cancel', onPress: () => {} },
+          ]
+        );
+      }
+      else {
+        navigation.dispatch(e.data.action);
       }
     })
 
@@ -152,34 +179,35 @@ const EditContact = ({ route, navigation }) => {
 
   return (
     <>
-      <Header title="Edit Contact" allowGoBack/>
-      {loading ?
-      <ActivityIndicator size="large" color="#e05e3f"/>
-      :
-      <ScrollView contentContainerStyle={styles.container}>
+      <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
 
-        <TouchableOpacity style={{alignSelf : "center"}} onPress={editImage}>
-          <View style={largeImageContainerStyle}>
-            <ContactImage
-            imageURI={contactImage}
-            iconSize={64}
-            imageWidth={Dimensions.get("window").width * 0.4}
-            imageHeight={Dimensions.get("window").height * 0.4}/>
-          </View>
+        <TouchableOpacity
+        style={largeImageContainerStyle}
+        onPress={editImage}>
+          <ContactImage
+          imageURI={contactImage}
+          iconSize={64}
+          imageWidth={Dimensions.get("window").width * 0.4}
+          imageHeight={Dimensions.get("window").height * 0.4}/>
         </TouchableOpacity>
 
-        <Text style={styles.error}>{error}</Text>
+        {errors.map(error => {
+          return (
+            <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
+          )
+        })}
 
-        <Text style={styles.inputTitle}>Name</Text>
+        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
         <TextInput
-        style={styles.input}
+        style={{...styles.input,fontSize : customStyle.uiFontSize}}
         onChangeText={text => setName(text)}
         value={name}/>
 
-        <Text style={styles.inputTitle}>Public Key</Text>
+        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
         <TextInput
-        multiline={true}
-        style={styles.input}
+        multiline={editingExistingContact}
+        style={{...styles.input,fontSize : customStyle.uiFontSize}}
         onChangeText={text => setPublicKey(text)}
         value={publicKey}/>
 
@@ -187,15 +215,16 @@ const EditContact = ({ route, navigation }) => {
         normalText="Save"
         flashText="Saved!"
         onPress={save}
-        timeout={500}
+        timeout={editingExistingContact ? 500 : 0}
         disabled={
-          (name.trim() === originalContact.name.trim() || name === originalContact.name) &&
-          (publicKey.trim() === originalContact.key.trim() || publicKey === originalContact.key) &&
-          contactImage === originalContact.image
+          (name.trim().length === 0 || publicKey.trim().length === 0) ||
+          (name.trim() === originalContact?.name?.trim() &&
+          publicKey.trim() === originalContact?.key?.trim() &&
+          contactImage === originalContact?.image)
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
-      </ScrollView>}
+      </ScrollView>
     </>
   )
 }
@@ -206,26 +235,26 @@ const styles = {
     alignItems : "flex-start"
   },
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     marginTop : 10,
     borderRadius : 5,
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
   },
   input : {
-    borderColor: 'gray',
+    borderColor: palette.gray,
     borderWidth: 1,
     marginBottom : 10,
     width : Dimensions.get('window').width * 0.9,
     alignSelf : "center",
     padding : 10,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5
   },
   inputTitle : {
@@ -233,7 +262,7 @@ const styles = {
     marginBottom : 5
   },
   error : {
-    color : "red",
+    color : palette.red,
     fontWeight : "bold",
     alignSelf : "center"
   }

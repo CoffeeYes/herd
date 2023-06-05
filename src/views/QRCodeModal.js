@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
-const QRCodeModal = ({ visible, value, setVisible, title }) => {
+import { palette } from '../assets/palette';
+
+const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <CustomModal
     visible={visible}
-    setVisible={setVisible}>
+    onRequestClose={onRequestClose}
+    onPress={onPress}>
       <View style={styles.modalContentContainer}>
         {title &&
         <View style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={{...styles.title,fontSize : customStyle.uiFontSize}}>{title}</Text>
         </View>}
         <View style={styles.QRContainer}>
           <QRCode
@@ -25,14 +30,14 @@ const QRCodeModal = ({ visible, value, setVisible, title }) => {
 
 const styles = {
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
     marginTop : 10,
     borderRadius : 5
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
@@ -44,7 +49,7 @@ const styles = {
     backgroundColor : "rgba(0,0,0,0.4)"
   },
   modalContentContainer : {
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
     alignItems : "center",

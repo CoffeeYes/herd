@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -6,13 +6,15 @@ import CameraMarker from './CameraMarker';
 import CustomButton from './CustomButton';
 import Orientation from "react-native-orientation-locker";
 
+import { palette } from '../assets/palette';
+
 const QRScanner = ({ navigation }) => {
-  const [active, setActive] = useState(true);
+
+  const scannerRef = useRef();
 
   const handleRead = scanResult => {
     const result = JSON.parse(scanResult?.data)
-    setActive(false);
-    navigation.navigate("createcontact", {
+    navigation.navigate("editContact", {
       ...(result.key && {publicKey : result.key}),
       ...(result.name && {name : result.name})
       }
@@ -20,7 +22,7 @@ const QRScanner = ({ navigation }) => {
   }
 
   useFocusEffect(() => {
-    setActive(true)
+    scannerRef.current.reactivate();
   })
 
   useEffect(() => {
@@ -29,13 +31,12 @@ const QRScanner = ({ navigation }) => {
   },[])
 
   return (
-    <>
-    {active &&
     <QRCodeScanner
     showMarker
+    ref={ref => {scannerRef.current = ref}}
     onRead={handleRead}
-    reactivate={true}
-    customMarker={<CameraMarker borderWidth={5} borderColor="white"/>}
+    reactivate={false}
+    customMarker={<CameraMarker borderWidth={5} borderColor={palette.white}/>}
     cameraStyle={styles.camera}
     containerStyle={styles.container}
     bottomContent={
@@ -43,8 +44,7 @@ const QRScanner = ({ navigation }) => {
       text="Cancel"
       onPress={() => navigation.goBack()}
       buttonStyle={{marginTop : 30}}/>
-    }/>}
-    </>
+    }/>
   )
 }
 

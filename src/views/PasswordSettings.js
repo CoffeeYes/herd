@@ -5,20 +5,16 @@ import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-nati
 import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import { setPassword } from '../redux/actions/userActions';
-import { setLocked } from '../redux/actions/appStateActions';
 
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
+import PasswordCreationBox from './PasswordCreationBox';
 
 import Crypto from '../nativeWrapper/Crypto';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
-  const [loginPassword, setLoginPassword] = useState("");
-  const [confirmLoginPassword, setConfirmLoginPassword] = useState("");
   const [loginPasswordError, setLoginPasswordError] = useState("");
-  const [erasurePassword, setErasurePassword] = useState("");
-  const [confirmErasurePassword, setConfirmErasurePassword] = useState("");
   const [erasurePasswordError, setErasurePasswordError] = useState("");
 
   const hasErasurePassword = useSelector(state => state.userReducer.erasurePasswordHash)?.length > 0;
@@ -39,7 +35,6 @@ const PasswordSettings = () => {
   }
 
   const savePassword = async (name, password, confirmation, setError) => {
-    setError("");
     const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
       setError(validate.error);
@@ -49,42 +44,47 @@ const PasswordSettings = () => {
     const loginHash = getPasswordHash("loginPassword");
     const erasureHash = getPasswordHash("erasurePassword");
 
-    if(loginHash.length > 0 && erasureHash.length > 0  &&
-     name === "loginPassword" && await Crypto.compareHashes(hash,erasureHash) ||
-     name === "erasurePassword" && await Crypto.compareHashes(hash,loginHash)) {
+    let originalHash = "";
+    let oppositeHash = "";
+    let shortName = "";
+    if (name === "loginPassword") {
+      originalHash = loginHash;
+      oppositeHash = erasureHash
+      shortName = "login";
+    }
+    else if(name === "erasurePassword") {
+      originalHash = erasureHash;
+      oppositeHash = loginHash;
+      shortName = "erasure"
+    }
+    else {
+      throw new error("invalid password name used when attempting to save password");
+      return;
+    }
+
+    const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);
+
+    if(loginAndErasureAreIdentical) {
       setError("Login and Erasure password cannot be the same");
       return false;
     }
 
     if(!hasLoginPassword && name === "erasurePassword") {
       setErasurePasswordError("You must set up a normal password before an erasure password can be used")
-      return  false;
+      return false;
     }
 
-    if(name === "loginPassword") {
-      if(loginHash) {
-        updatePassword(name,hash);
-      }
-      else {
-        createNewPassword(name,hash);
-      }
-      //update state store
-      dispatch(setPassword("login",hash));
-      //reset form
-      setLoginPassword("");
-      setConfirmLoginPassword("");
+    //reset error after validation so that error text does not "flash" when re-submitting after error
+    setError("");
+
+    if(originalHash.length > 0) {
+      updatePassword(name,hash);
     }
-    else if(name === "erasurePassword") {
-      if(erasureHash) {
-        updatePassword(name,hash);
-      }
-      else {
-        createNewPassword(name,hash);
-      }
-      dispatch(setPassword("erasure",hash));
-      setErasurePassword("");
-      setConfirmErasurePassword("");
+    else {
+      createNewPassword(name,hash);
     }
+    dispatch(setPassword(shortName,hash));
+    
     return true;
   }
 
@@ -112,102 +112,57 @@ const PasswordSettings = () => {
     );
   }
 
+  const mainPasswordDescription = `You will be asked to enter this password when opening the app \
+and accessing security-critical pages such as this one.`
+
+  const erasurePasswordDescription = `Entering this password when opening the app will cause all data \
+to be wiped from the application. Your public key will also be changed, \
+meaning all contacts who have previously added you will need to add you again.`
+
   return (
     <>
       <Header title="Password Settings" allowGoBack/>
 
       <ScrollView contentContainerStyle={styles.container}>
 
-        <View style={styles.card}>
-          <Text multiline>
-            You will be asked to enter this password when opening the app
-            and accessing security-critical pages such as this one.
-          </Text>
-          <Text style={styles.error}>{loginPasswordError}</Text>
-          <Text style={styles.inputTitle}>Main Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setLoginPassword}
-          value={loginPassword}/>
+        <PasswordCreationBox
+        primaryName="Main Password"
+        secondaryName="Confirm Main Password"
+        description={mainPasswordDescription}
+        error={loginPasswordError}
+        primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
+          "loginPassword",
+          loginPassword,
+          confirmLoginPassword,
+          setLoginPasswordError
+        )}
+        primaryButtonText="Save"
+        primaryButtonFlashText="Saved!"
+        secondaryButtonOnPress={() => resetPassword("loginPassword")}
+        secondaryButtonDisabled={!hasLoginPassword}
+        secondaryButtonText="Reset"
+        secondaryButtonFlashText="Reset"
+        />
 
-          <Text style={styles.inputTitle}>Confirm Main Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setConfirmLoginPassword}
-          value={confirmLoginPassword}/>
-
-          <View style={{flexDirection : "row"}}>
-            <FlashTextButton
-            normalText="Save"
-            flashText="Saved!"
-            disabled={loginPassword.trim().length === 0 || confirmLoginPassword.trim().length === 0}
-            onPress={() => savePassword(
-              "loginPassword",
-              loginPassword,
-              confirmLoginPassword,
-              setLoginPasswordError
-            )}
-            timeout={500}
-            buttonStyle={styles.button}
-            textStyle={styles.buttonText}/>
-
-            <FlashTextButton
-            normalText="Reset"
-            flashText="Reset"
-            disabled={!hasLoginPassword}
-            onPress={() => resetPassword("loginPassword")}
-            timeout={0}
-            buttonStyle={{...styles.button, marginLeft : 10}}
-            textStyle={styles.buttonText}/>
-          </View>
-        </View>
-
-        <View style={{...styles.card,marginTop : 10}}>
-          <Text multiline>
-            Entering this password when opening the app will cause all data
-            to be wiped from the application. Your public key will also be changed,
-            meaning all contacts who have previously added you will need to add you again.
-          </Text>
-          <Text style={styles.error}>{erasurePasswordError}</Text>
-          <Text style={styles.inputTitle}>Erasure Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setErasurePassword}
-          value={erasurePassword}/>
-          <Text style={styles.inputTitle}>Confirm Erasure Password</Text>
-          <TextInput
-          secureTextEntry
-          style={styles.input}
-          onChangeText={setConfirmErasurePassword}
-          value={confirmErasurePassword}/>
-
-          <View style={{flexDirection : "row"}}>
-            <FlashTextButton
-            normalText="Save"
-            flashText="Saved!"
-            disabled={erasurePassword.trim().length === 0 || confirmErasurePassword.trim().length === 0}
-            onPress={() => savePassword(
-              "erasurePassword",
-              erasurePassword,
-              confirmErasurePassword,
-              setErasurePasswordError
-            )}
-            timeout={500}
-            buttonStyle={styles.button}
-            textStyle={styles.buttonText}/>
-            <FlashTextButton
-            normalText="Reset"
-            flashText="Reset"
-            disabled={!hasErasurePassword}
-            onPress={() => resetPassword("erasurePassword")}
-            timeout={0}
-            buttonStyle={{...styles.button, marginLeft : 10}}
-            textStyle={styles.buttonText}/>
-          </View>
-        </View>
+        <PasswordCreationBox
+        mainContainerStyle={{marginTop : 10}}
+        primaryName="Erasure Password"
+        secondaryName="Confirm Erasure Password"
+        description={erasurePasswordDescription}
+        error={erasurePasswordError}
+        primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
+          "erasurePassword",
+          erasurePassword,
+          confirmErasurePassword,
+          setErasurePasswordError
+        )}
+        primaryButtonText="Save"
+        primaryButtonFlashText="Saved!"
+        secondaryButtonOnPress={() => resetPassword("erasurePassword")}
+        secondaryButtonDisabled={!hasErasurePassword}
+        secondaryButtonText="Reset"
+        secondaryButtonFlashText="Reset"
+        />
 
       </ScrollView>
     </>
@@ -218,45 +173,6 @@ const styles = {
   container : {
     padding : 20,
     alignItems : "center",
-  },
-  button : {
-    backgroundColor : "#E86252",
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5,
-  },
-  buttonText : {
-    color : "white",
-    fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
-  },
-  input : {
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom : 10,
-    width : Dimensions.get('window').width * 0.8,
-    alignSelf : "center",
-    padding : 10,
-    backgroundColor : "white",
-    borderRadius : 5
-  },
-  inputTitle : {
-    fontWeight : "bold",
-    marginBottom : 5
-  },
-  card : {
-    backgroundColor : "white",
-    padding : 20,
-    borderRadius : 5,
-    alignItems : "center",
-    justifyContent : "center",
-    elevation : 2
-  },
-  error : {
-    color : "red",
-    fontWeight : "bold"
   }
 }
 

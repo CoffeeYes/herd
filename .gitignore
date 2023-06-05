@@ -63,3 +63,7 @@ keystore.properties
 
 #ignore folder with generated docs
 docs/
+
+#ignore temporary emacs files
+\#*\#
+*.\#*

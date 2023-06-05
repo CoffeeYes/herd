@@ -1,62 +1,66 @@
 import React from 'react';
 import { View, Dimensions } from 'react-native';
 
-const CameraMarker = ({ borderWidth, borderColor }) => {
+import { palette } from '../assets/palette';
+
+const CameraMarker = ({ borderWidth = 5, borderColor = palette.white }) => {
+
+  const sharedStyles = {
+    ...styles.border,
+    borderColor : borderColor
+  }
+
+  const width = borderWidth;
+
   return (
     <View style={{
     justifyContent : "space-between",
     width : Dimensions.get("window").width * 0.8,
     height : Dimensions.get("window").height * 0.4}}>
 
-      <View style={{
-      flexDirection : "row",
-      justifyContent : "space-between"}}>
-
+      <View style={styles.row}>
         <View style={{
-          borderTopWidth : borderWidth,
-          borderLeftWidth : borderWidth,
-          borderTopColor : borderColor,
-          borderLeftColor : borderColor,
-          width : Dimensions.get("window").width * 0.2,
-          height : Dimensions.get("window").width * 0.2}}
+          ...sharedStyles,
+          borderTopWidth : width,
+          borderLeftWidth : width}}
         />
 
         <View style={{
-          borderTopWidth : borderWidth,
-          borderRightWidth : borderWidth,
-          borderTopColor : borderColor,
-          borderRightColor : borderColor,
-          alignSelf : "flex-end",
-          width : Dimensions.get("window").width * 0.2,
-          height : Dimensions.get("window").width * 0.2}}
+          ...sharedStyles,
+          borderTopWidth : width,
+          borderRightWidth : width,
+          alignSelf : "flex-end"}}
         />
       </View>
 
-      <View style={{
-      flexDirection : "row",
-      justifyContent : "space-between"}}>
-
+      <View style={styles.row}>
         <View style={{
-          borderBottomWidth : borderWidth,
-          borderLeftWidth : borderWidth,
-          borderBottomColor : borderColor,
-          borderLeftColor : borderColor,
-          width : Dimensions.get("window").width * 0.2,
-          height : Dimensions.get("window").width * 0.2}}
+          ...sharedStyles,
+          borderBottomWidth : width,
+          borderLeftWidth : width}}
         />
 
         <View style={{
-          borderBottomWidth : borderWidth,
-          borderRightWidth : borderWidth,
-          borderBottomColor : borderColor,
-          borderRightColor : borderColor,
-          alignSelf : "flex-end",
-          width : Dimensions.get("window").width * 0.2,
-          height : Dimensions.get("window").width * 0.2}}
+          ...sharedStyles,
+          borderBottomWidth : width,
+          borderRightWidth : width,
+          alignSelf : "flex-end"}}
         />
       </View>
+
     </View>
   )
+}
+
+const styles = {
+  border : {
+    width : Dimensions.get("window").width * 0.2,
+    height : Dimensions.get("window").width * 0.2,
+  },
+  row : {
+    flexDirection : "row",
+    justifyContent : "space-between"
+  }
 }
 
 export default CameraMarker

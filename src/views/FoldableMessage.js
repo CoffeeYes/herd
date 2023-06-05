@@ -1,49 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useEffect, memo } from 'react';
+import { useSelector } from 'react-redux';
+import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+
+import { palette } from '../assets/palette';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-const FoldableMessage = ({open, to = "N/A", from = "N/A", timestamp, text, style, textEncrypted, onPress}) => {
-  const [decryptedText, setDecryptedText] = useState("");
+import LoadingBar from './LoadingBar';
 
-  useEffect(() => {
-    textEncrypted ?
-    Crypto.decryptString(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      text
-    ).then(result => setDecryptedText(result))
-    :
-    setDecryptedText(text)
-  },[])
+const componentShouldUpdate = (props, nextProps) => {
+  for(const key of Object.keys(props)) {
+    if(typeof props[key] !== "function" && props[key] !== nextProps[key]) {
+      return false;
+    }
+  }
+  return true;
+}
 
+const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
+                          openTimestamp}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
-      {open ?
-      <View style={styles.open}>
-        <View style={styles.closed}>
-          <Text>To: {to}</Text>
-          <Text>From : {from}</Text>
-          <Text>{timestamp}</Text>
-        </View>
-        <View style={styles.messageText}>
-          <Text>{decryptedText}</Text>
-        </View>
+      <View style={{width : "100%"}}>
+        {loading ?
+        <LoadingBar barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
+        :
+        <>
+          <View style={styles.messageHeader}>
+            <Text>From : {from}</Text>
+            <Text>To: {to}</Text>
+            <Text>{closedTimestamp}</Text>
+          </View>
+          {open &&
+          <View style={styles.messageText}>
+            <Text style={{fontSize : textFontSize}}>{text}</Text>
+            <Text style={{alignSelf : "flex-end"}}>{openTimestamp}</Text>
+          </View>}
+        </>}
       </View>
-      :
-      <View style={styles.closed}>
-        <Text>To: {to}</Text>
-        <Text>From : {from}</Text>
-        <Text>{timestamp}</Text>
-      </View>}
     </TouchableOpacity>
   )
 }
 
 const styles = {
-  closed : {
+  messageHeader : {
     flexDirection : "row",
     justifyContent : "space-between",
     width : "100%",
@@ -52,22 +52,33 @@ const styles = {
   messageText : {
     marginTop : 10,
     width : "100%",
-    backgroundColor : "#e0e0e0",
+    backgroundColor : palette.offgrey,
     padding : 20,
-  },
-  open : {
-    width : "100%"
   },
   container : {
     flexDirection : "row",
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     paddingVertical : 20,
-    backgroundColor : "white",
+    backgroundColor : palette.white,
     width : Dimensions.get('window').width * 0.8,
     marginVertical : 5,
     borderRadius : 10,
     elevation : 2
   },
+  loadingContainerView : {
+    width : "90%",
+    alignSelf : "center",
+    height : 10,
+    borderRadius : 5,
+    backgroundColor : palette.grey,
+    overflow : "hidden"
+  },
+  loadingView : {
+    width : "20%",
+    height : "100%",
+    backgroundColor : palette.black,
+    borderRadius : 5
+  }
 }
 
-export default FoldableMessage;
+export default memo(FoldableMessage,componentShouldUpdate);

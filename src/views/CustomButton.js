@@ -1,18 +1,29 @@
-import React from 'react'
-import { TouchableOpacity, Text, Dimensions, Platform } from 'react-native';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { TouchableOpacity, Text, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { palette } from '../assets/palette';
+
 const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
-                        text, buttonStyle, textStyle, disabled}) => {
+                        text, buttonStyle, textStyle, disabled, disabledStyle}) => {
+  const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity
     onPress={onPress}
-    style={disabled ? {...styles.button,...buttonStyle, backgroundColor : "grey"} :{...styles.button,...buttonStyle}}
+    style={{
+      ...styles.button,
+      ...buttonStyle,
+      ...(disabled && {...styles.disabled,...disabledStyle})
+    }}
     disabled={disabled}>
       {leftIcon &&
       <Icon name={leftIcon} size={leftIconSize}/>}
 
-      <Text style={{...styles.buttonText, ...textStyle}}>{text}</Text>
+      {text &&
+      <Text style={{...styles.buttonText,fontSize : customStyle.uiFontSize, ...textStyle}}>
+        {text}
+      </Text>}
 
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize}/>}
@@ -22,21 +33,27 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSiz
 
 const styles = {
   button : {
-    backgroundColor : "#E86252",
+    backgroundColor : palette.primary,
     padding : 10,
     borderRadius : 5,
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center",
     flexDirection : "row",
-    width : Dimensions.get("window").width * 0.3
+    width : Dimensions.get("window").width * 0.3,
+    borderWidth : 1,
+    borderColor : palette.white
   },
   buttonText : {
-    color : "white",
+    color : palette.white,
     fontWeight : "bold",
     textAlign : "center",
     ...(Platform.OS === 'android' && {fontFamily : "Open-Sans"})
   },
+  disabled : {
+    backgroundColor : palette.grey,
+    borderColor : palette.grey
+  }
 }
 
 export default CustomButton;

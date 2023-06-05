@@ -13,6 +13,7 @@ import java.security.PublicKey
 import java.security.PrivateKey
 import java.security.KeyStore
 import android.util.Base64
+import android.util.Log
 import android.security.keystore.KeyProperties
 import java.security.KeyFactory
 import java.security.spec.X509EncodedKeySpec
@@ -25,6 +26,7 @@ import java.security.spec.MGF1ParameterSpec
 import javax.crypto.spec.PSource
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+  private final val TAG = "HerdCryptoModule";
 
   override fun getName(): String {
       return "CryptoModule"
@@ -73,6 +75,65 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return constants
   }
 
+  private fun loadKeyStore(storeName : String) : KeyStore {
+    val keyStore = KeyStore.getInstance(storeName);
+    keyStore.load(null);
+    return keyStore;
+  }
+
+  private fun loadPublicKey(alias : String, keyStoreName : String) : PublicKey? {
+    try {
+      val keyStore = loadKeyStore(keyStoreName)
+      val publicKey = keyStore.getCertificate(alias)?.publicKey;
+      return publicKey;
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"error loading public key from keystore",e);
+    }
+    return null;
+  }
+
+  private fun loadPrivateKey(alias : String, keyStoreName : String) : PrivateKey? {
+    try {
+      val keyStore = loadKeyStore(keyStoreName);
+      val privateKey = keyStore.getKey(alias, null) as PrivateKey?;
+      return privateKey;
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"error loading private key from keystore",e);
+    }
+    return null;
+  }
+
+  private fun getCipherSpec() : OAEPParameterSpec {
+    val cipherSpec = OAEPParameterSpec(
+      "SHA-256",
+      "MGF1",
+      MGF1ParameterSpec.SHA1,
+      PSource.PSpecified.DEFAULT
+    );
+    return cipherSpec;
+  }
+
+  private fun initialiseCipher(encryptionType : String, publicKey : PublicKey) : Cipher {
+    val cipher : Cipher = Cipher.getInstance(encryptionType);
+    val cipherSpec = getCipherSpec();
+    cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+    return cipher;
+  }
+
+  private fun initialiseCipher(encryptionType : String, privateKey : PrivateKey) : Cipher {
+    val cipher : Cipher = Cipher.getInstance(encryptionType);
+    val cipherSpec = getCipherSpec();
+    if(encryptionType === "RSA/ECB/OAEPWithSHA-256AndMGF1Padding") {
+      cipher.init(Cipher.DECRYPT_MODE, privateKey,cipherSpec);
+    }
+    else {
+      cipher.init(Cipher.DECRYPT_MODE, privateKey);
+    }
+    return cipher;
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -91,14 +152,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       .build()
     )
 
-    val keyPair : KeyPair = keyPairGenerator.generateKeyPair();
+    keyPairGenerator.generateKeyPair();
     promise.resolve(null);
   }
 
   @ReactMethod
   fun deleteKeyPair(alias : String, promise : Promise) {
-    val keyStore = KeyStore.getInstance("AndroidKeyStore")
-    keyStore.load(null)
+    val keyStore = loadKeyStore("AndroidKeyStore");
     try {
       keyStore.deleteEntry(alias)
     }
@@ -110,10 +170,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   @ReactMethod
   fun loadKeyFromKeystore(alias : String, promise : Promise) {
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    //val privateKey : PrivateKey = keyStore.getKey(alias, null) as PrivateKey;
-    val publicKey = keyStore.getCertificate(alias)?.publicKey;
+    val publicKey = loadPublicKey(alias,"AndroidKeyStore");
     if(publicKey === null) {
       return promise.resolve(null)
     }
@@ -134,29 +191,19 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    val publicKey : PublicKey? = keyStore.getCertificate(alias)?.getPublicKey();
+    val publicKey : PublicKey? = loadPublicKey(alias,"AndroidKeyStore");
     if(publicKey === null) {
       return promise.resolve("Public Key does not exist")
     }
 
     //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = Cipher.getInstance(encryptionType);
-    val cipherSpec = OAEPParameterSpec(
-      "SHA-256",
-      "MGF1",
-      MGF1ParameterSpec.SHA1,
-      PSource.PSpecified.DEFAULT
-    )
-    cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+    val cipher = initialiseCipher(encryptionType, publicKey);
 
     //cast string to bytes
     val stringAsBytes : ByteArray = stringToEncrypt.toByteArray();
-    val encryptedBytes : ByteArray
     try {
-      //encrypt string
-      encryptedBytes = cipher.doFinal(stringAsBytes);
+      //encrypt bytes
+      val encryptedBytes = cipher.doFinal(stringAsBytes);
       //encode encrypted string to base64 for javascript and pass upwards
       val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
       return promise.resolve(encryptedStringBASE64);
@@ -182,14 +229,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       val publicBytes = Base64.decode(key,Base64.DEFAULT);
       val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
       //init encryption cipher
-      val cipher : Cipher = Cipher.getInstance(encryptionType);
-      val cipherSpec = OAEPParameterSpec(
-        "SHA-256",
-        "MGF1",
-        MGF1ParameterSpec.SHA1,
-        PSource.PSpecified.DEFAULT
-      )
-      cipher.init(Cipher.ENCRYPT_MODE, publicKey, cipherSpec);
+      val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
       //convert message to encrypt to bytes
       val stringAsBytes = stringToEncrypt.toByteArray();
       //encrypt message bytes
@@ -213,29 +253,14 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
-    val keyStore : KeyStore = KeyStore.getInstance("AndroidKeyStore");
-    keyStore.load(null);
-    val privateKey = keyStore.getKey(alias, null) as PrivateKey?;
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
 
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
     }
 
     //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = Cipher.getInstance(encryptionType);
-    val cipherSpec = OAEPParameterSpec(
-      "SHA-256",
-      "MGF1",
-      MGF1ParameterSpec.SHA1,
-      PSource.PSpecified.DEFAULT
-    )
-
-    if(encryptionType === "RSA/ECB/OAEPWithSHA-256AndMGF1Padding") {
-      cipher.init(Cipher.DECRYPT_MODE, privateKey,cipherSpec);
-    }
-    else {
-      cipher.init(Cipher.DECRYPT_MODE,privateKey)
-    }
+    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
 
     //decode base64 string passed in from javscript
     val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
@@ -249,15 +274,15 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
   }
 
-  private fun generateMessageDigest(message : String) : ByteArray {
+  private fun generateMessageDigest(message : String, algorithm : String) : ByteArray {
     val messageBytes : ByteArray = message.toByteArray();
-    val messageDigest = MessageDigest.getInstance("SHA-512");
+    val messageDigest = MessageDigest.getInstance(algorithm);
     return messageDigest.digest(messageBytes);
   }
 
   @ReactMethod
   fun createHash(message : String, promise : Promise) {
-    val hash = Base64.encodeToString(generateMessageDigest(message),Base64.DEFAULT);
+    val hash = Base64.encodeToString(generateMessageDigest(message,"SHA-512"),Base64.DEFAULT);
     promise.resolve(hash);
   }
 

@@ -7,7 +7,7 @@ const ContactImage = ({ iconSize, imageWidth, imageHeight, imageURI }) => {
 
   return (
     <>
-      {imageURI ?
+      {imageURI?.length > 0 ?
       <Image
       source={{uri : imageURI}}
       style={{width : imageWidth, height : imageHeight}}/>

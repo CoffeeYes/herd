@@ -4,30 +4,38 @@ import { Text, View, TouchableOpacity, Dimensions, Image, ScrollView, Alert } fr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getContactsWithChats, deleteChat as deleteChatFromRealm } from '../realm/chatRealm';
+import { getContactsWithChats, deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
-import moment from 'moment';
 import { toHsv } from 'react-native-color-picker';
 
-import { deleteChat as deleteChatFromState } from '../redux/actions/chatActions';
+import { deleteChats as deleteChatsFromState } from '../redux/actions/chatActions';
+
+import { palette } from '../assets/palette';
+
+import { timestampToText } from '../helper';
 
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const chats = useSelector(state => state.chatReducer.chats);
-  const styles = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  const [highlightedChats, setHighlightedChats ] = useState([]);
+
+  const canStartNewChat = useSelector(state => state.contactReducer.contacts)
+  .filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
+  .length > 0;
 
   const checkStyleReadable = style => {
       const hsv = toHsv(style);
       if(hsv.h < 10 && hsv.s < 10 && hsv.v > 0.95) {
-        return "grey"
+        return palette.grey
       }
       else {
         return style
       }
   }
 
-  const deleteChat = chat => {
+  const deleteChats = () => {
     Alert.alert(
       'Are you sure ?',
       '',
@@ -39,52 +47,84 @@ const Chats = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            dispatch(deleteChatFromState(chat))
-            deleteChatFromRealm(chat.key)
+            dispatch(deleteChatsFromState(highlightedChats))
+            deleteChatsFromRealm(highlightedChats.map(chat => chat.key))
+            setHighlightedChats([]);
           },
         },
       ]
     );
+  }
 
+  const handleLongPress = chat => {
+    if(highlightedChats.indexOf(chat) == -1) {
+      setHighlightedChats([...highlightedChats,chat]);
+    }
+  }
+
+  const handlePress = chat => {
+    if(highlightedChats.length > 0) {
+      const chatIndex = highlightedChats.indexOf(chat);
+      if(chatIndex === -1) {
+        setHighlightedChats([...highlightedChats,chat]);
+      }
+      else {
+        setHighlightedChats([...highlightedChats].filter(highlightedChat => highlightedChat !== chat));
+      }
+    }
+    else {
+      navigation.navigate("chat", {contactID : parseRealmID(chat)})
+    }
+  }
+
+  const getRightIcon = () => {
+    if (highlightedChats.length > 0) {
+      return "delete"
+    }
+    else if (canStartNewChat) {
+      return "add";
+    }
   }
 
   return (
     <>
       <Header
       title="Chats"
-      rightButtonIcon="add"
-      rightButtonOnClick={() => navigation.navigate("newChat",{type : "newChat", disableAddNew : true})}/>
+      rightButtonIcon={getRightIcon()}
+      rightButtonOnClick={() => {
+        highlightedChats.length > 0 ?
+        deleteChats()
+        :
+        navigation.navigate("newChat",{type : "newChat", disableAddNew : true})
+      }}/>
       <ScrollView>
       {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
         <ListItem
         name={chat.name}
-        key={index}
+        key={chat._id}
         navigation={navigation}
         image={chat.image}
-        textStyle={{fontWeight : "bold"}}
+        textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
+        containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
+        highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
         subTextStyle={{
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
+          fontSize : customStyle.subTextSize,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
-          width: Dimensions.get('window').width * 0.20,
-          maxWidth : 150,
-          marginRight : 0,
-          textAlign : "center",
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(styles.sentTextColor) : checkStyleReadable(styles.receivedTextColor),
+          marginRight : 10,
+          fontSize : customStyle.subTextSize,
+          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
         rightIconSize={18}
-        rightIconStyle={{color : "#E86252"}}
-        onPress={() => navigation.navigate("chat", {contactID : parseRealmID(chat)})}
-        deleteItem={() => deleteChat(chat)}
-        rightText={chat.timestamp &&
-          (moment(chat.timestamp).format("DD/MM") === moment().format("DD/MM") ?
-            "Today"
-            :
-            moment(chat.timestamp).format("DD/MM"))
-        }
+        rightIconStyle={{color : palette.primary}}
+        onPress={() => handlePress(chat)}
+        onLongPress={() => handleLongPress(chat)}
+        highlighted={highlightedChats.indexOf(chat) !== -1}
+        rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText}/>
       )}
       </ScrollView>
