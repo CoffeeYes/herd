@@ -147,13 +147,23 @@ const EditContact = ({ route, navigation }) => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
 
-      const unsavedChanges = (
-        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
-        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
-        originalContactRef?.current?.image != imageRef?.current
-      )
+      let unsavedChanges;
+      if(editingExistingContactRef.current) {
+        unsavedChanges = (
+          originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
+          originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
+          originalContactRef?.current?.image != imageRef?.current
+        )
+      }
+      else {
+        unsavedChanges = (
+          nameRef?.current?.trim()?.length > 0 ||
+          keyRef?.current?.trim()?.length > 0 ||
+          imageRef?.current?.trim()?.length > 0
+        )
+      }
 
-      if(unsavedChanges && editingExistingContactRef.current) {
+      if(unsavedChanges) {
         Alert.alert(
           'Discard changes?',
           'You have unsaved changes. Are you sure to discard them and leave the screen?',
