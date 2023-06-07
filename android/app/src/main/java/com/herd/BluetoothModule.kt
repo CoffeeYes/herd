@@ -58,8 +58,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 6;
     private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
 
-    private lateinit var originalAdapterName : String;
-
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
@@ -188,7 +186,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter);
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter);
-      originalAdapterName = BluetoothAdapter.getDefaultAdapter().getName();
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
@@ -251,6 +248,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           if(adapter.isDiscovering()) {
             adapter.cancelDiscovery();
           }
+          val originalAdapterName = BluetoothAdapter.getDefaultAdapter().getName();
           adapter?.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
