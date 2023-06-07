@@ -115,7 +115,7 @@ class HerdCryptoModule : NSObject {
     reject : RCTPromiseRejectBlock) {
         let publicKey: SecKey? = loadRSAPublicKey(alias);
         let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256
-        guard let base64Data = Data(base64Encoded : stringToEncrypt) else {
+        guard let base64Data = stringToEncrypt.data(using : .utf8) else {
             NSLog("Error converting string to base64")
             return resolve("base64 error");
         }
@@ -140,6 +140,7 @@ class HerdCryptoModule : NSObject {
         let cipherString = cipherData.base64EncodedString()
         resolve(cipherString);
     }
+
     @objc
     func decryptString(_ alias : String,
     algorithm : String,
@@ -168,8 +169,8 @@ class HerdCryptoModule : NSObject {
                 NSLog("Error decrypting string")
                 return resolve(nil);
             }
-            let plainTextString = plainTextData.base64EncodedString();
-            resolve(plainTextString);
+            let plainTextString = String(decoding: plainTextData, as: UTF8.self)
+            resolve(plainTextString);	
         }
         else {
             resolve("no private key");
@@ -199,16 +200,9 @@ class HerdCryptoModule : NSObject {
         NSLog("Error creating public key from string data");
         return resolve("Error converting string key to actual key")
       }
-      var stringCopy = stringToEncrypt;
-      let remainder = stringCopy.count % 4;
-      if remainder > 0 {
-        stringCopy = stringCopy.padding(
-            toLength: stringCopy.count + 4 - remainder,
-            withPad: "=", startingAt: 0
-        );
-      }
-      guard let base64Data = Data(base64Encoded : stringCopy) else {
-          NSLog("Error decoding base64 string, \(stringCopy)")
+
+      guard let base64Data = stringToEncrypt.data(using : .utf8) else {
+          NSLog("Error decoding base64 string")
           return resolve("base64 error");
       }
       let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256;
