@@ -9,7 +9,7 @@ import CustomButton from './CustomButton';
 import { palette } from '../assets/palette';
 
 const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
-                         description, instructionText}) => {
+                         description, instructionText, icon, iconSize = 48}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <CustomModal
@@ -17,7 +17,9 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
     onRequestClose={onRequestClose}
     visible={visible}>
       <View style={styles.modalContentContainer}>
-        <Icon name="location-on" size={48}/>
+        {icon &&
+        <Icon name={icon} size={iconSize}/>}
+
         {description?.length > 0 &&
         <Text style={{fontSize : customStyle.uiFontSize}}>
           {description}

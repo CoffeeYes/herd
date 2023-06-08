@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
-import LocationModal from './LocationModal';
+import PermissionModal from './PermissionModal';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
@@ -290,7 +290,8 @@ in order to allow Herd to function correctly.`
         onPress={() => setQRCodeVisible(false)}
         onRequestClose={() => setQRCodeVisible(false)}/>
 
-        <LocationModal
+        <PermissionModal
+        icon="location-on"
         visible={showLocationModal}
         modalOnPress={() => setShowLocationModal(false)}
         onRequestClose={() => setShowLocationModal(false)}

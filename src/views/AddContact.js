@@ -8,7 +8,7 @@ import Header from './Header';
 import Card from './Card';
 
 import QRCodeModal from './QRCodeModal';
-import LocationModal from './LocationModal';
+import PermissionModal from './PermissionModal';
 
 import { palette } from '../assets/palette';
 
@@ -35,6 +35,11 @@ const AddContact = ({ navigation }) => {
 
   const requestBTPermissions = async () => {
     setBTError("");
+    const btPermissionsGranted = await Bluetooth.requestBTPermissions();
+    if(!btPermissionsGranted) {
+      setShowBluetoothModal(true);
+      return;
+    }
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationAllowed = await Bluetooth.checkLocationPermission();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
@@ -128,7 +133,8 @@ with other phones using bluetooth.`;
       title="My Key"
       value={{key : publicKey}}/>
 
-      <LocationModal
+      <PermissionModal
+      icon="location-on"
       visible={showLocationModal}
       modalOnPress={() => setShowLocationModal(false)}
       onRequestClose={() => setShowLocationModal(false)}
@@ -160,6 +166,9 @@ const styles = {
     flexDirection : "row",
     marginTop : 10,
     flex : 1
+  },
+  modalContent : {
+    backgroundColor : palette.white
   }
 }
 
