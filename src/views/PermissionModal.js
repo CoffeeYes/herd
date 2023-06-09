@@ -9,7 +9,7 @@ import CustomButton from './CustomButton';
 import { palette } from '../assets/palette';
 
 const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
-                         description, instructionText, icon, iconSize = 48}) => {
+                         description, instructionText, icon, iconSize = 48, permissions}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <CustomModal
@@ -30,7 +30,14 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
           {instructionText}
         </Text>}
 
+        {permissions?.map(permission => {
+          return(
+            <Text key={permission} style={{fontWeight : "bold"}}>{permission}</Text>
+          )
+        })}
+
         <CustomButton
+        buttonStyle={{marginTop : 20}}
         onPress={buttonOnPress}
         text="Go To Settings"/>
       </View>

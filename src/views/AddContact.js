@@ -18,7 +18,8 @@ const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
   const [BTError,setBTError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [requestedPermissions, setRequestedPermissions] = useState([]);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   useEffect(() => {
@@ -35,26 +36,35 @@ const AddContact = ({ navigation }) => {
 
   const requestBTPermissions = async () => {
     setBTError("");
+    setRequestedPermissions([]);
+    let currentRequestedPermissions = [];
+    const locationAllowed = await Bluetooth.checkLocationPermission();
+    if(!locationAllowed) {
+      const locationRequest = await Bluetooth.requestLocationPermissions();
+      if(!locationRequest) {
+        currentRequestedPermissions.push("Location")
+      }
+    }
+
     const btPermissionsGranted = await Bluetooth.requestBTPermissions();
-    if(!btPermissionsGranted) {
-      setShowBluetoothModal(true);
+    if (!btPermissionsGranted) {
+      currentRequestedPermissions.push("Nearby-devices")
+    }
+
+    if(currentRequestedPermissions.length > 0) {
+      setRequestedPermissions(currentRequestedPermissions);
+      setShowPermissionModal(true);
+      dispatch(setLockable(true));
       return;
     }
+
     const btEnabled = await Bluetooth.checkBTEnabled();
-    const locationAllowed = await Bluetooth.checkLocationPermission();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
     dispatch(setLockable(false));
     if(!btEnabled) {
       await Bluetooth.requestBTEnable()
     }
-    if (!locationAllowed) {
-      const locationRequest = await Bluetooth.requestLocationPermissions();
-      if(!locationRequest) {
-        setShowLocationModal(true);
-        dispatch(setLockable(true));
-        return;
-      }
-    }
+
     if (!locationEnabled) {
       Alert.alert(
         "Location",
@@ -72,11 +82,11 @@ const AddContact = ({ navigation }) => {
     dispatch(setLockable(true));
   }
 
-  const locationModalDescription = `Herd requires location permissions in order to connect \
+  const permissionModalDescription = `Herd requires permissions in order to connect \
 with other phones using bluetooth.`;
 
-  const locationModalInstructionText = `Please navigate to Herd's app settings and select \
-'allow all the time' under location permissions in order to use bluetooth to add a contact.`;
+  const permissionModalInstructionText = `Please navigate to Herd's app settings and select \
+'allow all the time' under for the following permissions in order to use bluetooth to add a contact.`;
 
   return (
     <>
@@ -135,15 +145,16 @@ with other phones using bluetooth.`;
 
       <PermissionModal
       icon="location-on"
-      visible={showLocationModal}
-      modalOnPress={() => setShowLocationModal(false)}
-      onRequestClose={() => setShowLocationModal(false)}
+      visible={showPermissionModal}
+      modalOnPress={() => setShowPermissionModal(false)}
+      onRequestClose={() => setShowPermissionModal(false)}
       buttonOnPress={() => {
-        setShowLocationModal(false);
+        setShowPermissionModal(false);
         Bluetooth.navigateToApplicationSettings();
       }}
-      description={locationModalDescription}
-      instructionText={locationModalInstructionText}/>
+      permissions={requestedPermissions}
+      description={permissionModalDescription}
+      instructionText={permissionModalInstructionText}/>
     </>
   )
 }
