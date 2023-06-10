@@ -38,8 +38,9 @@ const Settings = ({ navigation }) => {
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
+  const [requestedPermissions, setRequestedPermissions] = useState([]);
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
@@ -119,27 +120,38 @@ const Settings = ({ navigation }) => {
   const toggleBackgroundTransfer = async value => {
     if(value) {
       dispatch(setLockable(false));
+
+      setRequestedPermissions([]);
+      let currentRequestedPermissions = [];
+
       let locationPermissionsGranted = await Bluetooth.checkLocationPermission();
+      if(!locationPermissionsGranted) {
+        const locationRequest = await Bluetooth.requestLocationPermissions();
+        if(!locationRequest) {
+          currentRequestedPermissions.push("Location")
+        }
+      }
+
       const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
-      let btEnabled = await Bluetooth.checkBTEnabled();
-      let locationEnabled = await Bluetooth.checkLocationEnabled();
 
       if(!bluetoothScanPermissionsGranted) {
         const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
         if(!grantBluetoothScanPermissions) {
+          currentRequestedPermissions.push("Nearby-devices");
           dispatch(setLockable(true));
           return;
         }
       }
 
-      if(!locationPermissionsGranted) {
-        const grantLocationPermissions = await Bluetooth.requestLocationPermissions();
-        if(!grantLocationPermissions) {
-          setShowLocationModal(true);
-          dispatch(setLockable(true));
-          return;
-        }
+      if(currentRequestedPermissions.length > 0) {
+        setRequestedPermissions(currentRequestedPermissions);
+        setShowPermissionModal(true);
+        dispatch(setLockable(true));
+        return;
       }
+
+      let btEnabled = await Bluetooth.checkBTEnabled();
+      let locationEnabled = await Bluetooth.checkLocationEnabled();
 
       if(!btEnabled) {
         btEnabled = await Bluetooth.requestBTEnable();
@@ -193,10 +205,10 @@ const Settings = ({ navigation }) => {
   }
 
   const locationModalDescription = `In order to transfer messages in the background, herd requires \
-location permissions to be allowed all the time.`
+certain permissions to be allowed all the time.`
 
   const locationModalInstructionText = `Please go into the permission settings for Herd and select 'Allow all the time' \
-in order to allow Herd to function correctly.`
+for the following permissions in order to allow Herd to function correctly.`
 
   return (
     <>
@@ -292,11 +304,12 @@ in order to allow Herd to function correctly.`
 
         <PermissionModal
         icon="location-on"
-        visible={showLocationModal}
-        modalOnPress={() => setShowLocationModal(false)}
-        onRequestClose={() => setShowLocationModal(false)}
+        visible={showPermissionModal}
+        permissions={requestedPermissions}
+        modalOnPress={() => setShowPermissionModal(false)}
+        onRequestClose={() => setShowPermissionModal(false)}
         buttonOnPress={() => {
-          setShowLocationModal(false);
+          setShowPermissionModal(false);
           dispatch(setLockable(false));
           Bluetooth.navigateToApplicationSettings();
         }}
