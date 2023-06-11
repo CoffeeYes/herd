@@ -235,36 +235,11 @@ const Customise = ({ navigation }) => {
       <ActivityIndicator size="large" color={palette.primary}/>
       :
       <>
-        <View style={styles.messagesContainer}>
-          <ChatBubble
-          disableTouch
-          text="This is a sample sent message"
-          timestamp="12 : 20"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
-          messageFrom={true}/>
 
-          <ChatBubble
-          disableTouch
-          text="This is a sample response message"
-          timestamp="12 : 21"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
-          messageFrom={false}/>
-
-        </View>
-
-        <Header title="Preview" textStyle={{fontSize : uiFontSize * 1.5}}/>
+        <Header
+        title="Preview"
+        textStyle={{fontSize : uiFontSize * 1.5}}
+        containerStyle={{marginTop : 10}}/>
 
         <View style={{alignItems : "center"}}>
           <CardButton
@@ -318,6 +293,34 @@ const Customise = ({ navigation }) => {
               </Fragment>
             )
           })}
+        </View>
+
+        <View style={styles.messagesContainer}>
+          <ChatBubble
+          disableTouch
+          text="This is a sample sent message"
+          timestamp="12 : 20"
+          customStyle={{
+            sentBoxColor : fromHsv(sentBoxColor),
+            receivedBoxColor : fromHsv(receivedBoxColor),
+            sentTextColor : fromHsv(sentTextColor),
+            receivedTextColor : fromHsv(receivedTextColor),
+            messageFontSize : messageFontSize}
+          }
+          messageFrom={true}/>
+
+          <ChatBubble
+          disableTouch
+          text="This is a sample response message"
+          timestamp="12 : 21"
+          customStyle={{
+            sentBoxColor : fromHsv(sentBoxColor),
+            receivedBoxColor : fromHsv(receivedBoxColor),
+            sentTextColor : fromHsv(sentTextColor),
+            receivedTextColor : fromHsv(receivedTextColor),
+            messageFontSize : messageFontSize}
+          }
+          messageFrom={false}/>
         </View>
 
         <View style={styles.colorChoiceContainer}>

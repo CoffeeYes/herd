@@ -17,13 +17,15 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
   }
   return (
     <View style={{...styles.container, ...containerStyle}}>
+
       <TouchableOpacity style={{...styles.choice, borderBottomWidth : 2}} onPress={() => setOpen(!open)}>
         <Text style={{...styles.text,...textStyle}}>{choices[chosenIndex].text}</Text>
         <Icon
         size={24}
         style={{marginLeft : "auto"}}
-        name="arrow-downward"/>
+        name={open ? "arrow-back" : "arrow-downward"}/>
       </TouchableOpacity>
+
       {open &&
       <View style={{...styles.choiceContainer, ...choiceContainerStyle}}>
         {choices.map((choice,index) => {
