@@ -3,19 +3,15 @@ import CoreBluetooth
 
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
-  
+    
+    var currentManagerState : CBManagerState?;
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
       print("CBCentralManager initialized");
       
-      switch(central.state) {
-        case CBManagerState.poweredOff:
-            print("CBCentralManager State is : poweredOff");
-        case CBManagerState.poweredOn:
-            print("CBCentralManager State is : poweredOn");
-        default:
-            break;
-      }
+      currentManagerState = central.state;
+      print("CBCentralManager State is : \(central.state)")
     }
+  
     var manager : CBCentralManager?
     override init() {
         super.init()
@@ -32,11 +28,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func checkBTEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+        resolve(currentManagerState == CBManagerState.poweredOn)
     }
+
     @objc
     func checkBTPermissions(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
@@ -47,11 +45,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+  
     @objc
     func checkForBTAdapter(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      resolve(currentManagerState == CBManagerState.poweredOn || currentManagerState ==  CBManagerState.poweredOff)
     }
+  
     @objc
     func requestBTEnable(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
