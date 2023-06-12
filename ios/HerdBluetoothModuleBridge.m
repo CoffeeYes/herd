@@ -12,6 +12,12 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(checkBTEnabled : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
+RCT_EXTERN_METHOD(checkBTPermissions : (RCTPromiseResolveBlock) resolve
+reject:(RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(requestBTPermissions : (RCTPromiseResolveBlock) resolve
+reject:(RCTPromiseRejectBlock) reject)
+
 RCT_EXTERN_METHOD(checkForBTAdapter : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 

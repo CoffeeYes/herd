@@ -38,6 +38,16 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
         resolve(false)
     }
     @objc
+    func checkBTPermissions(_ resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(false)
+    }
+    @objc
+    func requestBTPermissions(_ resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(false)
+    }
+    @objc
     func checkForBTAdapter(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
