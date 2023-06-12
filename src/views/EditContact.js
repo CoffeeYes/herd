@@ -51,6 +51,8 @@ const EditContact = ({ route, navigation }) => {
     _setEditingExistingContact(data);
   }
 
+  const scrollViewRef = useRef();
+
   useEffect(() => {
     originalContactRef.current = originalContact
   },[originalContact])
@@ -106,6 +108,10 @@ const EditContact = ({ route, navigation }) => {
 
     if(errorSaving.length > 0) {
       setErrors(errorSaving);
+      scrollViewRef.current.scrollTo({
+        y: 0,
+        animated: true,
+      });
       return false;
     }
 
@@ -190,7 +196,10 @@ const EditContact = ({ route, navigation }) => {
   return (
     <>
       <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
+      <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps='handled'>
 
         <TouchableOpacity
         style={largeImageContainerStyle}
