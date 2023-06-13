@@ -26,12 +26,14 @@ const EditContact = ({ route, navigation }) => {
   const [contactImage, _setContactImage] = useState(originalContact?.image || "");
   const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
   const [errors, setErrors] = useState([]);
+  const [haveSavedContact, _setHaveSavedContact] = useState(false);
 
   const nameRef = useRef(originalContact?.name || "");
   const keyRef = useRef(originalContact?.key || "");
   const imageRef = useRef(originalContact?.image || "");
   const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
   const originalContactRef = useRef(originalContact || {});
+  const haveSavedContactRef = useRef(false);
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
@@ -49,6 +51,11 @@ const EditContact = ({ route, navigation }) => {
   const setEditingExistingContact = data => {
     editingExistingContactRef.current = data;
     _setEditingExistingContact(data);
+  }
+
+  const setHaveSavedContact = data => {
+    haveSavedContactRef.current = data;
+    _setHaveSavedContact(data);
   }
 
   const scrollViewRef = useRef();
@@ -122,6 +129,7 @@ const EditContact = ({ route, navigation }) => {
       dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
     }
     else {
+      setHaveSavedContact(true);
       const createdContact = createContact(newInfo);
       dispatch(addContact(createdContact));
       navigation.navigate('main');
@@ -163,9 +171,10 @@ const EditContact = ({ route, navigation }) => {
       }
       else {
         unsavedChanges = (
-          nameRef?.current?.trim()?.length > 0 ||
+          (nameRef?.current?.trim()?.length > 0 ||
           keyRef?.current?.trim()?.length > 0 ||
-          imageRef?.current?.trim()?.length > 0
+          imageRef?.current?.trim()?.length > 0) &&
+          !haveSavedContactRef.current
         )
       }
 
