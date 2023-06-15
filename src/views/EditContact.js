@@ -27,6 +27,7 @@ const EditContact = ({ route, navigation }) => {
   const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
   const [errors, setErrors] = useState([]);
   const [haveSavedContact, _setHaveSavedContact] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const nameRef = useRef(originalContact?.name || "");
   const keyRef = useRef(originalContact?.key || "");
@@ -73,6 +74,7 @@ const EditContact = ({ route, navigation }) => {
   },[])
 
   const save = async () => {
+    setSaving(true);
     let errorSaving = []
     try {
       const encryptedTest = await Crypto.encryptStringWithKey(
@@ -119,6 +121,7 @@ const EditContact = ({ route, navigation }) => {
         y: 0,
         animated: true,
       });
+      setSaving(false);
       return false;
     }
 
@@ -134,6 +137,7 @@ const EditContact = ({ route, navigation }) => {
       dispatch(addContact(createdContact));
       navigation.navigate('main');
     }
+    setSaving(false);
     return true;
   }
 
@@ -243,6 +247,7 @@ const EditContact = ({ route, navigation }) => {
         normalText="Save"
         flashText="Saved!"
         onPress={save}
+        loading={saving}
         timeout={editingExistingContact ? 500 : 0}
         disabled={
           (name.trim().length === 0 || publicKey.trim().length === 0) ||
