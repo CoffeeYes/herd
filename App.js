@@ -64,7 +64,7 @@ const App = ({ }) => {
   const dispatch = useDispatch();
   const [initialRoute, setInitialRoute] = useState("main");
   const [loading, setLoading] = useState(true);
-  const publicKey = useSelector(state => state.userReducer.publicKey);
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const locked = useSelector(state => state.appStateReducer.locked);
   const lockable = useSelector(state => state.appStateReducer.lockable);
@@ -94,7 +94,7 @@ const App = ({ }) => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
       let uniqueKeys = [];
       for(const message of messages) {
-        if(message.to == ownPublicKey && uniqueKeys.indexOf(message.from) == -1) {
+        if(message.to == ownPublicKey && !uniqueKeys.includes(message.from)) {
           uniqueKeys.push(message.from);
         }
       }
