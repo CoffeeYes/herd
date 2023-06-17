@@ -101,7 +101,11 @@ class HerdBackgroundService : Service() {
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action
       if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-        if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
+        val state = intent.getIntExtra(
+          BluetoothAdapter.EXTRA_STATE,
+          BluetoothAdapter.ERROR
+        );
+        if (state == BluetoothAdapter.STATE_OFF) {
           Log.i(TAG,"Bluetooth Turned off, stopping service");
           //let the user know the service is stopping
           sendNotification(
@@ -637,14 +641,15 @@ class HerdBackgroundService : Service() {
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
+        val messageQueueSize = messageQueue?.size as Int;
         if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
           gattServer?.sendResponse(
             device,
             requestId,BluetoothGatt.GATT_SUCCESS,
             0,
-            byteArrayOf((messageQueue?.size as Int).toByte())
+            byteArrayOf(messageQueueSize.toByte())
           );
-          if((messageQueue?.size as Int) == 0) {
+          if(messageQueueSize == 0) {
             remoteHasReadMessages = true;
             if(!writebackComplete) {
               Log.i(TAG,"writeback not complete, connecting as client")
@@ -919,13 +924,13 @@ class HerdBackgroundService : Service() {
   }
 
   fun addMessagesToList(message : HerdMessage, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.add(message) as Boolean;
+    val added : Boolean = listToAddTo.add(message);
     logSuccessfullyAddedToList(added,listName,1,listToAddTo.size);
     return added;
   }
 
   fun addMessagesToList(messages : ArrayList<HerdMessage>, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.addAll(messages) as Boolean;
+    val added : Boolean = listToAddTo.addAll(messages);
     logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
     return added;
   }
