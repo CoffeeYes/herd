@@ -67,7 +67,9 @@ const editContact = async (id, values) => {
     await updateMessagesWithContact(oldKey,values.key);
   }
 
-  const validKeys = ["name","key","image"]
+  const validKeys = Object.keys(Schemas.ContactSchema.properties)
+  .filter(key => key !== "_id");
+
   contactsRealm.write(() => {
     for(const key of  Object.keys(values)) {
       if (validKeys.includes(key)) {

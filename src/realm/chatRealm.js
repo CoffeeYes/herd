@@ -341,9 +341,7 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
 
-  //decrypt, re-encrpyt with new key and write to DB
-  let newTexts = [];
-  await Promise.all(sentMessagesCopy.map(async message => {
+  const newTexts = await Promise.all(sentMessagesCopy.map(async message => {
     const decryptedText = await decryptString(parseRealmObject(message).text);
     const newEncryptedString = await Crypto.encryptStringWithKey(
       newKey,
@@ -352,31 +350,32 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
       Crypto.padding.OAEP_SHA256_MGF1Padding,
       decryptedText
     )
-    newTexts.push(newEncryptedString);
-  }))
+    return newEncryptedString;
+  }));
 
   messageSentRealm.write(() => {
-    parseRealmObjects(sentMessages).map((message,index) => {
+    for(const [index,message] of sentMessages.entries()) {
       if(message.to == oldKey) {
         message.to = newKey;
         message.text = newTexts[index];
       }
-    })
+    }
   })
 
   messageCopyRealm.write(() => {
-    parseRealmObjects(sentMessagesCopy).map(message => {
+    for (const message of sentMessagesCopy) {
       if(message.to == oldKey) {
         message.to = newKey;
       }
-    })
+    }
   })
+
   messageReceivedRealm.write(() => {
-    parseRealmObjects(receivedMessages).map(message => {
+    for (const message of receivedMessages) {
       if(message.from == oldKey) {
         message.from = newKey
       }
-    })
+    }
   })
 }
 
