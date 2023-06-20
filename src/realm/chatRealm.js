@@ -40,6 +40,13 @@ const decryptString = async text => {
   return decrypted;
 }
 
+const decryptMessage = async message => {
+  let parsedMessage = parseRealmObject(message);
+  const decryptedText = await decryptString(message.text);
+  parsedMessage.text = decryptedText;
+  return parsedMessage;
+}
+
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
 
@@ -65,23 +72,13 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
     }
   }
 
-  let initialReceivedMessages = [];
-  if(receivedMessages.length > 0) {
-    for(const message of receivedMessages) {
-      const currentMessage = parseRealmObject(message)
-      const decrypted = await decryptString(message.text);
-      initialReceivedMessages.push({...currentMessage,text : decrypted});
-    }
-  }
+  const initialReceivedMessages = await Promise.all(
+    receivedMessages.map(message => decryptMessage(message))
+  )
 
-  let initialSentMessages = [];
-  if(sentMessagesCopy.length > 0) {
-    for(const message of sentMessagesCopy) {
-      const currentMessage = parseRealmObject(message);
-      const decrypted = await decryptString(message.text);
-      initialSentMessages.push({...currentMessage,text : decrypted});
-    }
-  }
+  const initialSentMessages = await Promise.all(
+    sentMessagesCopy.map(message => decryptMessage(message))
+  )
 
   let highestMessageIndex;
   let lowestMessageIndex;

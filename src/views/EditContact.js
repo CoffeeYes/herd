@@ -253,7 +253,8 @@ const EditContact = ({ route, navigation }) => {
           (name.trim().length === 0 || publicKey.trim().length === 0) ||
           (name.trim() === originalContact?.name?.trim() &&
           publicKey.trim() === originalContact?.key?.trim() &&
-          contactImage === originalContact?.image)
+          contactImage === originalContact?.image) ||
+          saving
         }
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
