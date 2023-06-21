@@ -180,8 +180,8 @@ const getContactsWithChats = async () => {
   const receivedMessages = messageReceivedRealm.objects('Message');
   let keys = [];
   //get unique keys in all messages
-  sentMessages.map(message => keys.indexOf(message.to.trim()) === -1 && keys.push(message.to));
-  receivedMessages.map(message => keys.indexOf(message.from.trim()) === -1 && keys.push(message.from));
+  sentMessages.map(message => !keys.includes(message.to.trim()) && keys.push(message.to));
+  receivedMessages.map(message => !keys.includes(message.from.trim()) && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
     let lastMessages = [];
@@ -211,9 +211,9 @@ const getContactsWithChats = async () => {
 }
 
 const deleteChats = keys => {
-  const sentMessagesToDelete = messageSentRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
-  const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filter(message => keys.indexOf(message.to) != -1);
-  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filter(message => keys.indexOf(message.from) != -1);
+  const sentMessagesToDelete = messageSentRealm.objects('Message').filter(message => keys.includes(message.to));
+  const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filter(message => keys.includes(message.to));
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filter(message => keys.includes(message.from));
 
   ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
 
@@ -352,26 +352,20 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
 
   messageSentRealm.write(() => {
     for(const [index,message] of sentMessages.entries()) {
-      if(message.to == oldKey) {
-        message.to = newKey;
-        message.text = newTexts[index];
-      }
+      message.to = newKey;
+      message.text = newTexts[index];
     }
   })
 
   messageCopyRealm.write(() => {
     for (const message of sentMessagesCopy) {
-      if(message.to == oldKey) {
-        message.to = newKey;
-      }
+      message.to = newKey;
     }
   })
 
   messageReceivedRealm.write(() => {
     for (const message of receivedMessages) {
-      if(message.from == oldKey) {
-        message.from = newKey
-      }
+      message.from = newKey
     }
   })
 }

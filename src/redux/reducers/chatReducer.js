@@ -49,7 +49,7 @@ const updateChat = (originalChat, newValues) => {
   const updateableValues = ["name","key","image", "doneLoading"];
 
   Object.keys(newValues).map(key => {
-    if(updateableValues.indexOf(key) != -1) {
+    if(updateableValues.includes(key)) {
       updatedChat[key] = newValues[key];
     }
   })
@@ -159,7 +159,7 @@ const chatReducer = (state = initialState,action) => {
         data : [...section.data].filter(message => messages.find(id => id === message._id) === undefined )}
       ))
       .filter(section => section.data.length !== 0)
-      
+
       const newState = {
         ...state,
         messages : {
