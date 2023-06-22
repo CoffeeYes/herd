@@ -108,18 +108,21 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 
   const messageID = Realm.BSON.ObjectId();
 
+  const messageData = {
+    ...metaData,
+    _id : messageID
+  }
+
   messageCopyRealm.write(() => {
     messageCopyRealm.create("Message",{
-      ...metaData,
-      _id : messageID,
+      ...messageData,
       text : selfEncryptedCopy,
     })
   });
 
   messageSentRealm.write(() => {
     messageSentRealm.create("Message",{
-      ...metaData,
-      _id : messageID,
+      ...messageData,
       text : encrypted,
     })
   });

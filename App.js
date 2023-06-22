@@ -116,6 +116,7 @@ const App = ({ }) => {
           })
         )
         lastRoutes &&
+        lastRoutes[lastRoutes.length -1].name !== "passwordLockScreen" &&
         dispatch(setLastRoutes(lastRoutes));
       }
       else if (state === "active") {
