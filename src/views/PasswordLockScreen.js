@@ -52,7 +52,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         let routesToResetTo = [{ name : "main"}];
         if(lastRoutes.length > 0 && !isErasurePassword) {
           const lastLastRoute = lastRoutes[lastRoutes.length -1].name;
-          if(lastLastRoute !== "passwordLockScreen" && lastLastRoute !== "main") {
+          if(lastLastRoute !== "passwordLockScreen") {
             routesToResetTo = lastRoutes;
           }
         }
