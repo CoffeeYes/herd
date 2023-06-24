@@ -73,13 +73,13 @@ const Chat = ({ route, navigation }) => {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
         setLoading(false);
+        scrollToBottom(false);
       }
       else {
         const [sentLength,receivedLength] = getMessageLength(true);
         const longest = sentLength > receivedLength ? sentLength : receivedLength;
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
-        scrollToBottom(false);
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
         if(doneLoading) {
@@ -144,15 +144,22 @@ const Chat = ({ route, navigation }) => {
   //use a ref for messages length because when calling loadMoreMessages
   //during deleteMessages process messages state is outdated, leading to wrong
   //length being used for decision making in deleting chat
-  const messageLengthRef = useRef();
+  const messageLengthRef = useRef(0);
   useEffect(() => {
     const [sentLength,receivedLength] = getMessageLength(true);
     const messageLength = sentLength + receivedLength;
-    messageLengthRef.current = messageLength;
     if (sentLength > messageLoadingSize || receivedLength > messageLoadingSize) {
       setInitialScrollIndex(messageLength);
     }
-  },[messages])
+    // wait for loading to be done and messages to be rendered before calling
+    // scrollToBottom so that it actually executes
+    if(!loading) {
+      if(messageLengthRef.current === 0 && messages.length > 0) {
+        scrollToBottom(false);
+      }
+      messageLengthRef.current = messageLength;
+    }
+  },[messages,loading])
 
   const loadMessages = async (messageStart, messageEnd) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
@@ -194,8 +201,8 @@ const Chat = ({ route, navigation }) => {
     }
 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
-    //if this is the first load, more messages can be returned that expected
-    //in order to ensure correct message order. As such, adjust the message
+    //if this is the first load, more messages can be returned than expected
+    //As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
@@ -429,7 +436,7 @@ const Chat = ({ route, navigation }) => {
   const scrollToBottom = (animated = true) => {
     const lastSectionIndex = messages?.length -1;
     const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-
+    
     messages.length > 0 &&
     lastSectionIndex >= 0 &&
     lastMessageIndex >= 0 &&
