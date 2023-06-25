@@ -56,7 +56,6 @@ const Chat = ({ route, navigation }) => {
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
-  const [initialScrollIndex, setInitialScrollIndex] = useState(0);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [chatWindowSize, setChatWindowSize] = useState(1);
 
@@ -148,9 +147,6 @@ const Chat = ({ route, navigation }) => {
   useEffect(() => {
     const [sentLength,receivedLength] = getMessageLength(true);
     const messageLength = sentLength + receivedLength;
-    if (sentLength > messageLoadingSize || receivedLength > messageLoadingSize) {
-      setInitialScrollIndex(messageLength);
-    }
     // wait for loading to be done and messages to be rendered before calling
     // scrollToBottom so that it actually executes
     if(!loading) {
@@ -436,7 +432,7 @@ const Chat = ({ route, navigation }) => {
   const scrollToBottom = (animated = true) => {
     const lastSectionIndex = messages?.length -1;
     const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-    
+
     messages.length > 0 &&
     lastSectionIndex >= 0 &&
     lastMessageIndex >= 0 &&
@@ -540,7 +536,6 @@ const Chat = ({ route, navigation }) => {
           windowSize={chatWindowSize}
           sections={messages}
           ref={scrollRef}
-          initialScrollIndex={initialScrollIndex}
           onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
           renderItem={renderItemCallback}
