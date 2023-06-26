@@ -8,8 +8,8 @@ const setChats = chats => {
 const deleteChats = chats => {
   return (dispatch,getState) => {
     dispatch({type : "DELETE_CHATS",payload : chats});
+    dispatch(filterMessageQueueByKeys(chats.map(chat => chat.key)));
     for(const chat of chats) {
-      dispatch(filterMessageQueueByContact(chat.key));
       dispatch(setMessagesForContact(chat._id,[]));
     }
   }
@@ -61,10 +61,10 @@ const removeMessagesFromQueue = messages => {
   }
 }
 
-const filterMessageQueueByContact = key => {
+const filterMessageQueueByKeys = keys => {
   return {
-    type : "FILTER_QUEUE_BY_CONTACT",
-    payload : key
+    type : "FILTER_QUEUE_BY_KEYS",
+    payload : keys
   }
 }
 
@@ -124,7 +124,7 @@ export {
   addMessage,
   addMessagesToQueue,
   removeMessagesFromQueue,
-  filterMessageQueueByContact,
+  filterMessageQueueByKeys,
   deleteMessages,
   resetMessages,
   setStyles,

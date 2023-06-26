@@ -143,11 +143,11 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     }
-    case "FILTER_QUEUE_BY_CONTACT": {
+    case "FILTER_QUEUE_BY_KEYS": {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => message.to !== action.payload)
+        (message => !action.payload.includes(message.to))
       }
       break;
     }
