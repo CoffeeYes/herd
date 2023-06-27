@@ -9,9 +9,9 @@ const deleteChats = chats => {
   return (dispatch,getState) => {
     dispatch({type : "DELETE_CHATS",payload : chats});
     dispatch(filterMessageQueueByKeys(chats.map(chat => chat.key)));
-    for(const chat of chats) {
-      dispatch(setMessagesForContact(chat._id,[]));
-    }
+    dispatch(setMessagesForContacts(
+      chats.map(chat => ({id : chat._id,messages : []})
+    )))
   }
 }
 
@@ -102,10 +102,11 @@ const setMessageQueue = queue => {
   }
 }
 
-const setMessagesForContact = (id, messages) => {
+const setMessagesForContacts = contactsArray => {
+  //expects array in format [{id : <contactID>,messages : <contactMessages>}, ...]
   return {
-    type : "SET_MESSAGES_FOR_CONTACT",
-    payload : {id : id, messages : messages}
+    type : "SET_MESSAGES_FOR_CONTACTS",
+    payload : contactsArray
   }
 }
 
@@ -130,6 +131,6 @@ export {
   setStyles,
   setLastText,
   setMessageQueue,
-  setMessagesForContact,
+  setMessagesForContacts,
   prependMessagesForContact
 }

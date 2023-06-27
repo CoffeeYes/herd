@@ -206,12 +206,13 @@ const chatReducer = (state = initialState,action) => {
       }
       break;
     }
-    case "SET_MESSAGES_FOR_CONTACT": {
+    case "SET_MESSAGES_FOR_CONTACTS": {
+      let messagesCopy = {...state.messages};
+      for(const item of action.payload) {
+        messagesCopy[item.id] = item.messages;
+      }
       return {...state,
-        messages : {
-          ...state.messages,
-          [action.payload.id] : action.payload.messages
-        }
+        messages : messagesCopy
       }
       break;
     }
