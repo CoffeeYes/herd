@@ -54,10 +54,10 @@ const updateMessageQueue = contact => {
   }
 }
 
-const removeMessagesFromQueue = messages => {
+const removeMessagesFromQueue = messageIDs => {
   return {
     type : "REMOVE_MESSAGES_FROM_QUEUE",
-    payload : messages
+    payload : messageIDs
   }
 }
 
@@ -68,10 +68,10 @@ const filterMessageQueueByKeys = keys => {
   }
 }
 
-const deleteMessages = (id, messages) => {
+const deleteMessages = (id, messageIDs) => {
   return (dispatch, getState) => {
-    dispatch({type : "DELETE_MESSAGES",payload : {id,messages}});
-    dispatch(removeMessagesFromQueue(messages));
+    dispatch({type : "DELETE_MESSAGES",payload : {id,messageIDs}});
+    dispatch(removeMessagesFromQueue(messageIDs));
   }
 }
 
