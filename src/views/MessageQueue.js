@@ -23,21 +23,29 @@ const MessageQueue = ({}) => {
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
 
+  const assignParticipantsToMessage = message => {
+    const pairs = {"to" : "toContactName", "from" : "fromContactName"};
+    let textToDecrypt = false;
+
+    for(const [key,value] of Object.entries(pairs)) {
+      //if sender or receiver is oneself, replace name with "You" and mark the message as needing to be decrypted
+      if(message[key].trim() === ownPublicKey.trim()) {
+        message[value] = "You";
+        textToDecrypt = true;
+      }
+      //find the matching contacts name, if no contact for that message is saved mark it as unknown
+      else {
+        message[value] = contacts.find(contact => message[key].trim() === contact.key)?.name || "Unknown"
+      }
+    }
+
+    return [message,textToDecrypt];
+  }
+
   const parseMessageQueue = async queue => {
     const parsedQueue = await Promise.all(queue.map( async message => {
-      let newMessage = {...message};
-      let textToDecrypt = false;
-      const pairs = {"to" : "toContactName", "from" : "fromContactName"};
 
-      for(const [key,value] of Object.entries(pairs)) {
-        if(newMessage[key].trim() === ownPublicKey.trim()) {
-          newMessage[value] = "You";
-          textToDecrypt = true;
-        }
-        else {
-          newMessage[value] = contacts.find(contact => message[key].trim() === contact.key)?.name || "Unknown"
-        }
-      }
+      let [newMessage, textToDecrypt] = assignParticipantsToMessage({...message})
 
       if(textToDecrypt) {
         newMessage.text = await Crypto.decryptString(

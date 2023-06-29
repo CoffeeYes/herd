@@ -4,20 +4,20 @@ import { timestampToText } from '../../helper';
 const generateMessageDays = (existingMessages = [], newMessages) => {
   let dates = [...existingMessages]
   for(let message of newMessages) {
-    if(message) {
-      let messageDate = timestampToText(message.timestamp, "DD/MM");
-      const existingDate = dates.find(item => item.day === messageDate)
-      if(existingDate) {
-        existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
-        existingDate.data.push(message)
-      }
-      else {
-        dates.push({day : messageDate, data : [message]})
-      }
+    let messageDate = timestampToText(message.timestamp, "DD/MM");
+    const existingDate = dates.find(item => item.day === messageDate)
+    //append message to existing date entry if it is a new message
+    if(existingDate) {
+      existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
+      existingDate.data.push(message)
+    }
+    //first message with this date, initialise message array for this date
+    else {
+      dates.push({day : messageDate, data : [message]})
     }
   }
   for (date of dates) {
-    date.data = date.data.sort((a,b) => a.timestamp > b.timestamp)
+    date.data.sort((a,b) => a.timestamp > b.timestamp)
   }
   return dates.sort((a,b) => a.data[a.data.length -1].timestamp > b.data[b.data.length -1].timestamp)
 }
