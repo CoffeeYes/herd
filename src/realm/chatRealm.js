@@ -196,15 +196,14 @@ const getContactsWithChats = async () => {
     }
     //create new contacts array with last message text and timestamp
     // because realm doesnt allow mutation in place
-    let contacts = getContactsByKey(keys);
+    let contacts = parseRealmObjects(getContactsByKey(keys));
     let contactsWithTimestamps = [];
     contacts.map(contact => {
-      let currentContact = parseRealmObject(contact);
       const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
-      currentContact.timestamp = matchingMessage?.timestamp;
-      currentContact.lastText = matchingMessage?.text;
-      currentContact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
-      contactsWithTimestamps.push(currentContact);
+      contact.timestamp = matchingMessage?.timestamp;
+      contact.lastText = matchingMessage?.text;
+      contact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
+      contactsWithTimestamps.push(contact);
     })
     return contactsWithTimestamps;
   }
@@ -298,23 +297,19 @@ const getMessageQueue = async useMessageCopies => {
   }
   const receivedMessages= messageReceivedRealm.objects('Message').filtered(`to != '${key}'`)
 
-  let sentMessagesCopy = [];
-  let receivedMessagesCopy = [];
-
-  sentMessages.map(message => sentMessagesCopy.push({...parseRealmObject(message)}));
-  receivedMessages.map(message => receivedMessagesCopy.push({...parseRealmObject(message)}));
+  let sentMessagesCopy = parseRealmObjects(sentMessages);
+  let receivedMessagesCopy = parseRealmObjects(receivedMessages);
 
   return [...sentMessagesCopy,...receivedMessagesCopy]
 }
 
 const getDeletedReceivedMessages = () => {
-  return deletedReceivedRealm.objects('Message').map(message => parseRealmObject(message));
+  return parseRealmObjects(deletedReceivedRealm.objects('Message'));
 }
 
 const getReceivedMessagesForSelf = async () => {
   const ownKey = await Crypto.loadKeyFromKeystore('herdPersonal');
-  return messageReceivedRealm.objects('Message').filtered(`to == '${ownKey}'`)
-  .map(message => parseRealmObject(message))
+  return parseRealmObjects(messageReceivedRealm.objects('Message').filtered(`to == '${ownKey}'`))
 }
 
 const removeCompletedMessagesFromRealm = messages => {
