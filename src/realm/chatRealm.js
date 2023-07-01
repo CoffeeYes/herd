@@ -80,11 +80,13 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
     sentMessagesCopy.map(message => decryptMessage(message))
   )
 
-  let highestMessageIndex;
-  let lowestMessageIndex;
+  let payload = {
+    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
+  }
 
   //calculate new indices to send to frontend based on the sizes of the received/sent message arrays
   if(initialLoad) {
+    let highestMessageIndex, lowestMessageIndex;
     if(firstReceived.timestamp < firstSent.timestamp) {
       highestMessageIndex = -initialSentMessages.length;
       lowestMessageIndex = -initialReceivedMessages.length;
@@ -93,15 +95,15 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
       highestMessageIndex = -initialReceivedMessages.length;
       lowestMessageIndex = -initialSentMessages.length;
     }
-  }
 
-  return {
-    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp),
-    ...(initialLoad && {
+    payload = {
+      ...payload,
       newStart : highestMessageIndex,
       newEnd : lowestMessageIndex
-    }),
+    }
   }
+
+  return payload;
 }
 
 const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
@@ -187,23 +189,26 @@ const getContactsWithChats = async () => {
   receivedMessages.map(message => !keys.includes(message.from.trim()) && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
-    let lastMessages = [];
+    let lastMessages = {};
     for(const key of keys) {
       const messages = (await getMessagesWithContact(key,-1)).messages;
       const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
-      currentLastMessage &&
-      lastMessages.push({key : key, message : currentLastMessage});
+      if(currentLastMessage) {
+        lastMessages[key] = currentLastMessage;
+      }
     }
     //create new contacts array with last message text and timestamp
     // because realm doesnt allow mutation in place
     let contacts = parseRealmObjects(getContactsByKey(keys));
     let contactsWithTimestamps = [];
     contacts.map(contact => {
-      const matchingMessage = lastMessages.find(message => message.key == contact.key)?.message
-      contact.timestamp = matchingMessage?.timestamp;
-      contact.lastText = matchingMessage?.text;
-      contact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
-      contactsWithTimestamps.push(contact);
+      const matchingMessage = lastMessages[contact.key];
+      if(matchingMessage) {
+        contact.timestamp = matchingMessage?.timestamp;
+        contact.lastText = matchingMessage?.text;
+        contact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
+        contactsWithTimestamps.push(contact);
+      }
     })
     return contactsWithTimestamps;
   }
