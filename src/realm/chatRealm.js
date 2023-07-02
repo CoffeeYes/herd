@@ -154,7 +154,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     //add new messages meant for this user to their corresponding chats
     const keys = newMessages.map(message => message.from.trim());
     const contacts = getContactsByKey(keys);
-    newMessages.map(message => {
+    newMessages.forEach(async message => {
       let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
       //if the message is for this user, but no contact exists create the contact
       if(contact === undefined && message.to.trim() == ownPublicKey.trim()) {
@@ -167,11 +167,11 @@ const addNewReceivedMessages = async (messages,dispatch) => {
         dispatch(addContact(contact));
       }
       if(contact && message.to.trim() === ownPublicKey.trim()) {
-        decryptString(message.text)
-        .then(decrypted => dispatch(addMessage(contact._id,{
+        const decryptedText = decryptString(message.text)
+        dispatch(addMessage(contact._id,{
           ...message,
           text : decrypted
-        })))
+        }))
       }
     })
     const chats = await getContactsWithChats();
@@ -185,8 +185,8 @@ const getContactsWithChats = async () => {
   const receivedMessages = messageReceivedRealm.objects('Message');
   let keys = [];
   //get unique keys in all messages
-  sentMessages.map(message => !keys.includes(message.to.trim()) && keys.push(message.to));
-  receivedMessages.map(message => !keys.includes(message.from.trim()) && keys.push(message.from));
+  sentMessages.forEach(message => !keys.includes(message.to.trim()) && keys.push(message.to));
+  receivedMessages.forEach(message => !keys.includes(message.from.trim()) && keys.push(message.from));
   if(keys.length > 0) {
     //get timestamp of last message for each key
     let lastMessages = {};
@@ -201,7 +201,7 @@ const getContactsWithChats = async () => {
     // because realm doesnt allow mutation in place
     let contacts = parseRealmObjects(getContactsByKey(keys));
     let contactsWithTimestamps = [];
-    contacts.map(contact => {
+    contacts.forEach(contact => {
       const matchingMessage = lastMessages[contact.key];
       if(matchingMessage) {
         contact.timestamp = matchingMessage?.timestamp;
@@ -279,7 +279,7 @@ const deleteMessages = messages => {
   //add deleted received messages to seperate realm to prevent them from being
   //re-added in the future
   deletedReceivedRealm.write(() => {
-    receivedMessagesToDelete.map(message => deletedReceivedRealm.create('Message',message,true))
+    receivedMessagesToDelete.forEach(message => deletedReceivedRealm.create('Message',message,true))
   })
   //remove deleted messages from received realm
   receivedMessagesToDelete.length > 0 &&
