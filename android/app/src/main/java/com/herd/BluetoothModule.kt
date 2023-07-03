@@ -330,19 +330,22 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun checkBTPermissions(promise : Promise) {
       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val scanGranted = ContextCompat.checkSelfPermission(
-          getReactApplicationContext(),
-          permission.BLUETOOTH_SCAN
-        ) === PackageManager.PERMISSION_GRANTED
-        val connectGranted = ContextCompat.checkSelfPermission(
-          getReactApplicationContext(),
-          permission.BLUETOOTH_CONNECT
-        ) === PackageManager.PERMISSION_GRANTED
-        val advertiseGranted = ContextCompat.checkSelfPermission(
-          getReactApplicationContext(),
+        val permissions = listOf(
+          permission.BLUETOOTH_SCAN,
+          permission.BLUETOOTH_CONNECT,
           permission.BLUETOOTH_ADVERTISE
-        ) === PackageManager.PERMISSION_GRANTED
-        promise.resolve(scanGranted && connectGranted && advertiseGranted)
+        );
+
+        val applicationContext = getReactApplicationContext();
+        for(permission in permissions) {
+          val granted = ContextCompat.checkSelfPermission(
+            applicationContext,
+            permission
+          ) == PackageManager.PERMISSION_GRANTED;
+          if(!granted) return promise.resolve(false)
+        }
+        
+        promise.resolve(true);
       }
       else {
         promise.resolve(true)
