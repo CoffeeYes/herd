@@ -288,12 +288,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         promise.reject("No BluetoothAdapter Found")
       }
       else {
-        if(adapter.isEnabled()) {
-          promise.resolve(true);
-        }
-        else {
-          promise.resolve(false);
-        }
+        promise.resolve(adapter.isEnabled())
       }
     }
 
@@ -344,7 +339,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           ) == PackageManager.PERMISSION_GRANTED;
           if(!granted) return promise.resolve(false)
         }
-        
+
         promise.resolve(true);
       }
       else {
@@ -398,22 +393,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun checkLocationPermission(promise : Promise) {
-      val backgroundLocationAllowed = ContextCompat.checkSelfPermission(
-        getReactApplicationContext(),
-        permission.ACCESS_BACKGROUND_LOCATION
-      ) === PackageManager.PERMISSION_GRANTED
-
-      val fineLocationAllowed = ContextCompat.checkSelfPermission(
-        getReactApplicationContext(),
+      val permissions = listOf(
+        permission.ACCESS_BACKGROUND_LOCATION,
         permission.ACCESS_FINE_LOCATION
-      ) === PackageManager.PERMISSION_GRANTED
-
-      if(backgroundLocationAllowed && fineLocationAllowed) {
-          promise.resolve(true)
+      )
+      val context = getReactApplicationContext();
+      for(permission in permissions) {
+        val granted = ContextCompat.checkSelfPermission(
+          context,
+          permission
+        ) === PackageManager.PERMISSION_GRANTED;
+        if (!granted) promise.resolve(false);
       }
-      else {
-        promise.resolve(false)
-      }
+      promise.resolve(true);
     }
 
     @ReactMethod
@@ -457,7 +449,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       intent.setData(uri);
       activity?.startActivityForResult(intent,NAVIGATE_TO_SETTINGS_REQUEST_CODE);
       navigateToSettingsPromise = promise;
-      /* promise.resolve(true); */
     }
 
     private var connectionThread : BTConnectionThread? = null;
