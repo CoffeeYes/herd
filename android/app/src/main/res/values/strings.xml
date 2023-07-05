@@ -19,5 +19,8 @@
     <string name="MTUCharacteristicUUID">
       7f9f74f7-2d7d-4f6a-b5c9-81983202ef1f
     </string>
+    <string name="BTConnectionUUID">
+      acc99392-7f38-11eb-9439-0242ac130002
+    </string>
 
 </resources>

@@ -66,6 +66,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     var locationEnabledPromise : Promise? = null;
     var navigateToSettingsPromise : Promise? = null;
 
+    val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
+
     override fun getName(): String {
         return "BluetoothModule"
     }
@@ -454,7 +456,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var connectionThread : BTConnectionThread? = null;
 
     private inner class createBTServerThread() : Thread() {
-      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
       var connectionSocket : BluetoothSocket? = null;
 
@@ -489,7 +490,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private inner class createBTClientThread(deviceAddress : String) : Thread() {
-      val btUUID = UUID.fromString("acc99392-7f38-11eb-9439-0242ac130002");
       val adapter = BluetoothAdapter.getDefaultAdapter();
       val device = adapter?.getRemoteDevice(deviceAddress);
 
