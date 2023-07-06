@@ -190,6 +190,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter);
     }
 
+    fun checkPermissionsGranted(permissions : List<String>) : Boolean {
+      val context = getReactApplicationContext();
+      for(permission in permissions) {
+        val granted = ContextCompat.checkSelfPermission(
+          context,
+          permission
+        ) === PackageManager.PERMISSION_GRANTED;
+        if (!granted) return false;
+      }
+      return true;
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
       for(i in 0..(permissions.size -1)) {
         Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
@@ -332,17 +344,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           permission.BLUETOOTH_CONNECT,
           permission.BLUETOOTH_ADVERTISE
         );
-
-        val applicationContext = getReactApplicationContext();
-        for(permission in permissions) {
-          val granted = ContextCompat.checkSelfPermission(
-            applicationContext,
-            permission
-          ) == PackageManager.PERMISSION_GRANTED;
-          if(!granted) return promise.resolve(false)
-        }
-
-        promise.resolve(true);
+        promise.resolve(checkPermissionsGranted(permissions));
       }
       else {
         promise.resolve(true)
@@ -399,15 +401,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         permission.ACCESS_BACKGROUND_LOCATION,
         permission.ACCESS_FINE_LOCATION
       )
-      val context = getReactApplicationContext();
-      for(permission in permissions) {
-        val granted = ContextCompat.checkSelfPermission(
-          context,
-          permission
-        ) === PackageManager.PERMISSION_GRANTED;
-        if (!granted) promise.resolve(false);
-      }
-      promise.resolve(true);
+      promise.resolve(checkPermissionsGranted(permissions));
     }
 
     @ReactMethod
