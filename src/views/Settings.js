@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, TouchableOpacity, ScrollView, View, Modal, Switch, Alert, Dimensions } from 'react-native';
+import { Text, TouchableOpacity, ScrollView,
+         View, Modal, Switch, Alert, Dimensions,
+         NativeEventEmitter } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -46,7 +48,17 @@ const Settings = ({ navigation }) => {
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
   useEffect(() => {
-    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running))
+    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
+
+    const eventEmitter = new NativeEventEmitter(ServiceInterface);
+
+    const BTStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
+      if(state === "ADAPTER_TURNED_OFF") {
+        setBackgroundTransfer(false);
+      }
+    })
+
+    return () => BTStateChangeListener.remove();
   },[]);
 
   const copyKeyToClipboard = async () => {

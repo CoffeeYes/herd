@@ -31,6 +31,8 @@ import android.content.ComponentName
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 
+import android.bluetooth.BluetoothAdapter
+
 /* @Parcelize */
 class HerdMessage(
   val _id : String,
@@ -100,6 +102,22 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           //pass object to JS through event emitter
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit("newHerdMessagesReceived",messageArray);
+        }
+      }
+    }
+  }
+
+  private final val BTStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val action : String? = intent.action
+      if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+        val state = intent.getIntExtra(
+          BluetoothAdapter.EXTRA_STATE,
+          BluetoothAdapter.ERROR
+        );
+        if (state == BluetoothAdapter.STATE_OFF) {
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTStateChange","ADAPTER_TURNED_OFF");
         }
       }
     }
@@ -181,6 +199,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
       context.registerReceiver(messageReceiver,IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED"));
+      context.registerReceiver(BTStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }
