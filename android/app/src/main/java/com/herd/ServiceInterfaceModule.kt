@@ -32,6 +32,7 @@ import android.content.BroadcastReceiver
 import android.content.IntentFilter
 
 import android.bluetooth.BluetoothAdapter
+import android.location.LocationManager
 
 /* @Parcelize */
 class HerdMessage(
@@ -107,17 +108,26 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     }
   }
 
-  private final val BTStateReceiver = object : BroadcastReceiver() {
+  private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action
-      if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-        val state = intent.getIntExtra(
-          BluetoothAdapter.EXTRA_STATE,
-          BluetoothAdapter.ERROR
-        );
-        if (state == BluetoothAdapter.STATE_OFF) {
-          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTStateChange","ADAPTER_TURNED_OFF");
+      val action : String? = intent.action;
+      when(action) {
+        BluetoothAdapter.ACTION_STATE_CHANGED -> {
+          val state = intent.getIntExtra(
+            BluetoothAdapter.EXTRA_STATE,
+            BluetoothAdapter.ERROR
+          );
+          if (state == BluetoothAdapter.STATE_OFF) {
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("BTStateChange","ADAPTER_TURNED_OFF");
+          }
+        }
+        "android.location.PROVIDERS_CHANGED" -> {
+          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+          if(!locationManager.isLocationEnabled()) {
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit("locationStateChange","LOCATION_DISABLED");
+          }
         }
       }
     }
@@ -199,7 +209,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
       context.registerReceiver(messageReceiver,IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED"));
-      context.registerReceiver(BTStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+      context.registerReceiver(locationAndBTStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+      context.registerReceiver(locationAndBTStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }

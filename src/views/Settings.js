@@ -52,13 +52,22 @@ const Settings = ({ navigation }) => {
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
 
-    const BTStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
+    const bluetoothStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
       if(state === "ADAPTER_TURNED_OFF") {
         setBackgroundTransfer(false);
       }
     })
 
-    return () => BTStateChangeListener.remove();
+    const locationStateChangeListener = eventEmitter.addListener("locationStateChange", state => {
+      if(state === "LOCATION_DISABLED") {
+        setBackgroundTransfer(false);
+      }
+    })
+
+    return () => {
+      bluetoothStateChangeListener.remove();
+      locationStateChangeListener.remove();
+    }
   },[]);
 
   const copyKeyToClipboard = async () => {
