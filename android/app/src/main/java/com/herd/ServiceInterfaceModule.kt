@@ -119,14 +119,14 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           );
           if (state == BluetoothAdapter.STATE_OFF) {
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTStateChange","ADAPTER_TURNED_OFF");
+            .emit("bluetoothOrLocationStateChange","ADAPTER_TURNED_OFF");
           }
         }
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("locationStateChange","LOCATION_DISABLED");
+            .emit("bluetoothOrLocationStateChange","LOCATION_DISABLED");
           }
         }
       }
