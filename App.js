@@ -77,7 +77,7 @@ const App = ({ }) => {
 
       let newMessages = []
       if(await ServiceInterface.isRunning()) {
-        newMessages = await ServiceInterface.getReceivedMessages();
+        newMessages = await ServiceInterface.getMessages("received");
 
         newMessages.length > 0 &&
         await addNewReceivedMessagesToRealm(newMessages,dispatch);

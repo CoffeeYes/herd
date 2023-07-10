@@ -248,20 +248,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun getReceivedMessages(promise : Promise) {
+  fun getMessages(name : String, promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
-      val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
-      messages = createArrayFromMessages(herdMessages);
-    }
-    promise.resolve(messages);
-  }
-
-  @ReactMethod
-  fun getCompletedMessages(promise : Promise) {
-    var messages : WritableArray = Arguments.createArray();
-    if(bound) {
-      val herdMessages : ArrayList<HerdMessage> = service.getCompletedMessages();
+      var herdMessages = ArrayList<HerdMessage>();
+      if(name === "received") {
+        herdMessages = service.getReceivedMessages();
+      }
+      else if(name === "completed") {
+        herdMessages = service.getCompletedMessages();
+      }
       messages = createArrayFromMessages(herdMessages);
     }
     promise.resolve(messages);
