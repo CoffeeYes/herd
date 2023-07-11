@@ -61,10 +61,9 @@ class HerdMessage(
         timestamp = parcel.readLong()
   )
   override fun writeToParcel(parcel: Parcel, flags: Int) {
-      parcel.writeString(_id)
-      parcel.writeString(to)
-      parcel.writeString(from)
-      parcel.writeString(text)
+      for(entry in listOf(_id,to,from,text)) {
+        parcel.writeString(entry)
+      }
       parcel.writeLong(timestamp)
   }
 
@@ -98,8 +97,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         val bundle : Bundle? = intent.getExtras();
         val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
         Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
-        if(messages != null && (messages?.size as Int) > 0) {
-          val messageArray = createArrayFromMessages(messages as ArrayList<HerdMessage>);
+        if(messages != null && messages.size > 0) {
+          val messageArray = createArrayFromMessages(messages);
           //pass object to JS through event emitter
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit("newHerdMessagesReceived",messageArray);
@@ -288,9 +287,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     }
     try {
       context.unregisterReceiver(messageReceiver);
+      context.unregisterReceiver(locationAndBTStateReceiver);
     }
     catch(e : Exception) {
-      Log.e(TAG,"error unregistering message receiver : $e")
+      Log.e(TAG,"error unregistering broadcastReceivers : $e")
     }
     bound = false;
   }
