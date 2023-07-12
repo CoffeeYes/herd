@@ -3,10 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, StatusBar,
          Dimensions, ScrollView, TouchableOpacity, Alert, SectionList,
          KeyboardAvoidingView, Keyboard} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import moment from 'moment';
-import { v4 as uuidv4 } from 'uuid';
-import {PanGestureHandler  } from 'react-native-gesture-handler'
+import { PanGestureHandler  } from 'react-native-gesture-handler'
 import {
   getMessagesWithContact,
   sendMessageToContact,
@@ -14,7 +12,6 @@ import {
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
-import _ from 'lodash'
 
 import {
   addChat,
@@ -23,7 +20,6 @@ import {
   prependMessagesForContact,
   addMessage,
   addMessagesToQueue,
-  removeMessagesFromQueue,
   deleteChats,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
@@ -50,7 +46,7 @@ const Chat = ({ route, navigation }) => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-messageLoadingSize);
-  const [messageEnd, setMessageEnd] = useState(undefined);
+  const [messageEnd, setMessageEnd] = useState();
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
@@ -145,11 +141,10 @@ const Chat = ({ route, navigation }) => {
   //length being used for decision making in deleting chat
   const messageLengthRef = useRef(0);
   useEffect(() => {
-    const [sentLength,receivedLength] = getMessageLength(true);
-    const messageLength = sentLength + receivedLength;
     // wait for loading to be done and messages to be rendered before calling
     // scrollToBottom so that it actually executes
     if(!loading) {
+      const messageLength = getMessageLength();
       if(messageLengthRef.current === 0 && messages.length > 0) {
         scrollToBottom(false);
       }
