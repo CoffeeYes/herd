@@ -62,7 +62,6 @@ const Chat = ({ route, navigation }) => {
   useEffect(() => {
     (async () => {
       const existingChat = chats.find(chat => chat._id == contactInfo._id);
-      const chatStarted = existingChat !== undefined;
       const doneLoading = existingChat?.doneLoading;
       if(messages.length === 0 && existingChat) {
         setLoading(true);
@@ -136,9 +135,8 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  //use a ref for messages length because when calling loadMoreMessages
-  //during deleteMessages process messages state is outdated, leading to wrong
-  //length being used for decision making in deleting chat
+  // track previous length of messages for logic, used throughout other logic
+  // because it is already available, not because a ref is necessary
   const messageLengthRef = useRef(0);
   useEffect(() => {
     // wait for loading to be done and messages to be rendered before calling
@@ -203,6 +201,23 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
+  const encryptString = async (string, keyToEncryptWith) => {
+    let encryptionFunction = Crypto.encryptString;
+    let keyToUse = "herdPersonal"
+    if(keyToEncryptWith) {
+      encryptionFunction = Crypto.encryptStringWithKey;
+      keyToUse = keyToEncryptWith;
+    }
+    const encryptedString = await encryptionFunction(
+      keyToUse,
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      string
+    )
+    return encryptedString;
+  }
+
   const sendMessage = async message => {
     setChatInput("");
     setCharacterCount(190);
@@ -227,22 +242,10 @@ const Chat = ({ route, navigation }) => {
     }
 
     //encrypt the message to be sent using the other users public key
-    const newMessageEncrypted = await Crypto.encryptStringWithKey(
-      contactInfo.key,
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      message
-    )
+    const newMessageEncrypted = await encryptString(message,contactInfo.key);
 
     //encrypt the passed in message using the users own public key
-    const newMessageEncryptedCopy = await Crypto.encryptString(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      message
-    )
+    const newMessageEncryptedCopy = await encryptString(message);
 
     //add message to UI
     const messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
@@ -250,7 +253,7 @@ const Chat = ({ route, navigation }) => {
     const selfEncryptedCopy = {...metaData,_id : messageID, text : newMessageEncryptedCopy};
 
     //add new chat to chats state in redux store if it isnt in chats state
-    if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
+    if(!chats.find(chat => chat.key === contactInfo.key)) {
       const newChat = {
         _id : contactInfo._id,
         image : contactInfo.image,
