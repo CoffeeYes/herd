@@ -202,14 +202,12 @@ const Chat = ({ route, navigation }) => {
   }
 
   const encryptString = async (string, keyToEncryptWith) => {
-    let encryptionFunction = Crypto.encryptString;
-    let keyToUse = "herdPersonal"
-    if(keyToEncryptWith) {
-      encryptionFunction = Crypto.encryptStringWithKey;
-      keyToUse = keyToEncryptWith;
-    }
-    const encryptedString = await encryptionFunction(
+    //use key to encrypt when it is passed, otherwise load key from store using alias
+    const loadKeyFromStore = !keyToEncryptWith;
+    const keyToUse = loadKeyFromStore ? "herdPersonal" : keyToEncryptWith;
+    const encryptedString = await Crypto.encryptString(
       keyToUse,
+      loadKeyFromStore,
       Crypto.algorithm.RSA,
       Crypto.blockMode.ECB,
       Crypto.padding.OAEP_SHA256_MGF1Padding,

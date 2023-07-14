@@ -77,8 +77,9 @@ const EditContact = ({ route, navigation }) => {
     setSaving(true);
     let errorSaving = []
     try {
-      const encryptedTest = await Crypto.encryptStringWithKey(
+      const encryptedTest = await Crypto.encryptString(
         publicKey.trim(),
+        false,
         Crypto.algorithm.RSA,
         Crypto.blockMode.ECB,
         Crypto.padding.OAEP_SHA256_MGF1Padding,

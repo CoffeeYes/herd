@@ -183,7 +183,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   @ReactMethod
   fun encryptString(
-  alias : String,
+  keyOrAlias : String,
+  loadKeyFromStore : Boolean,
   algorithm : String,
   blockMode : String,
   padding : String,
@@ -191,9 +192,22 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
-    val publicKey : PublicKey? = loadPublicKey(alias,"AndroidKeyStore");
+    var publicKey : PublicKey? = null;
+    if(loadKeyFromStore) {
+      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
+    }
+    else {
+      try {
+        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
+      }
+      catch(e : Exception) {
+        Log.i(TAG,"Error initialising public key passed in as parameter",e)
+      }
+    }
     if(publicKey === null) {
-      return promise.resolve("Public Key does not exist")
+      Log.i(TAG,"error loading or initialising publicKey in encryptString function")
+      return promise.resolve(null)
     }
 
     //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
@@ -210,36 +224,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
     catch(e : GeneralSecurityException) {
       return promise.reject("Encrypt string error",e)
-    }
-  }
-
-  @ReactMethod
-  fun encryptStringWithKey(
-  key : String,
-  algorithm : String,
-  blockMode : String,
-  padding : String,
-  stringToEncrypt : String,
-  promise : Promise) {
-    //create encryption type string to pass to cipher init
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-
-    try {
-      //convert passed in public key string to bytes and format it as public key
-      val publicBytes = Base64.decode(key,Base64.DEFAULT);
-      val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
-      //init encryption cipher
-      val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
-      //convert message to encrypt to bytes
-      val stringAsBytes = stringToEncrypt.toByteArray();
-      //encrypt message bytes
-      val encryptedBytes = cipher.doFinal(stringAsBytes);
-      //convert message bytes to base64 for javascript and resolve promise with string
-      val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
-      promise.resolve(encryptedStringBASE64);
-    }
-    catch(e : Exception) {
-      promise.reject("Encrypt string error",e)
     }
   }
 
