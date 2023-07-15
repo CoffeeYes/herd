@@ -62,8 +62,6 @@ class HerdBackgroundService : Service() {
   private var bluetoothAdapter : BluetoothAdapter? = null;
   private var BLEScanner : BluetoothLeScanner? = null;
   private var BLEAdvertiser : BluetoothLeAdvertiser? = null;
-  private val serviceUUID = UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa");
-  private final val parcelServiceUUID = ParcelUuid(serviceUUID);
   private var bluetoothManager : BluetoothManager? = null;
   private var gattServer : BluetoothGattServer? = null;
   private val context : Context = this;
@@ -83,6 +81,8 @@ class HerdBackgroundService : Service() {
   private lateinit var messageQueueCharacteristicUUID : UUID;
   private lateinit var messageQueueDescriptorUUID : UUID;
   private lateinit var transferCompleteCharacteristicUUID : UUID;
+  private lateinit var serviceUUID : UUID;
+  private lateinit var parcelServiceUUID : ParcelUuid;
 
   @Volatile
   private var allowBleScan : Boolean = true;
@@ -145,7 +145,9 @@ class HerdBackgroundService : Service() {
       messageQueueServiceUUID = UUID.fromString(getString(R.string.messageQueueServiceUUID));
       messageQueueCharacteristicUUID = UUID.fromString(getString(R.string.messageQueueCharacteristicUUID));
       messageQueueDescriptorUUID = UUID.fromString(getString(R.string.messageQueueDescriptorUUID));
-      transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID))
+      transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID));
+      serviceUUID =  UUID.fromString(getString(R.string.serviceUUID));
+      parcelServiceUUID = ParcelUuid(serviceUUID);
       try {
         bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager?.getAdapter();
