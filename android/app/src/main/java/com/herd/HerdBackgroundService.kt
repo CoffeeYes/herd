@@ -140,6 +140,17 @@ class HerdBackgroundService : Service() {
     }
   }
 
+  private fun initialiseNotificationChannel(
+    channelID : String,
+    channelName : String,
+    channelDescription : String,
+    channelImportance : Int,
+  ) : NotificationChannel {
+    val serviceChannel = NotificationChannel(channelID, channelName, channelImportance);
+    serviceChannel.description = channelDescription;
+    return serviceChannel;
+  }
+
   override fun onCreate() {
       Log.i(TAG, "Service onCreate")
       messageQueueServiceUUID = UUID.fromString(getString(R.string.messageQueueServiceUUID));
@@ -164,22 +175,21 @@ class HerdBackgroundService : Service() {
             PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
-        //create service notification channel
         val SERVICE_CHANNEL_ID = "HerdServiceChannel"
-        val serviceChannelName = "Herd Service Channel"
-        val serviceChannelDescriptionText = "Herd Background Service"
-        val serviceChannlImportance = NotificationManager.IMPORTANCE_DEFAULT
-        val serviceChannel = NotificationChannel(SERVICE_CHANNEL_ID, serviceChannelName, serviceChannlImportance)
-        serviceChannel.description = serviceChannelDescriptionText
+        val serviceChannel = initialiseNotificationChannel(
+          SERVICE_CHANNEL_ID,
+          "Herd Service Channel",
+          "Herd Background Service",
+          NotificationManager.IMPORTANCE_DEFAULT
+        )
 
-        //create message notification channel
-        val MESSAGE_CHANNEL_ID = "HerdMessageChannel"
-        val msgChannelName = "Herd Message Channel"
-        val msgChannelDescriptionText = "Herd Messages"
-        val msgChannelImportance = NotificationManager.IMPORTANCE_DEFAULT
-        val msgChannel = NotificationChannel(MESSAGE_CHANNEL_ID, msgChannelName, msgChannelImportance)
-        msgChannel.description = msgChannelDescriptionText
-
+        val MESSAGE_CHANNEL_ID = "HerdServiceChannel"
+        val msgChannel = initialiseNotificationChannel(
+          MESSAGE_CHANNEL_ID,
+          "Herd Message Channel",
+          "Herd Messages",
+          NotificationManager.IMPORTANCE_DEFAULT
+        )
 
         // Register the channel with the system; you can't change the importance
         // or other notification behaviors after this
