@@ -32,6 +32,7 @@ import android.bluetooth.BluetoothGattDescriptor
 
 import android.os.Handler
 import android.os.ParcelUuid
+import android.os.SystemClock
 import java.util.UUID
 import java.util.ArrayList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -83,6 +84,8 @@ class HerdBackgroundService : Service() {
   private lateinit var transferCompleteCharacteristicUUID : UUID;
   private lateinit var serviceUUID : UUID;
   private lateinit var parcelServiceUUID : ParcelUuid;
+
+  private final val MESSAGE_CHANNEL_ID = "HerdMessageChannel";
 
   @Volatile
   private var allowBleScan : Boolean = true;
@@ -183,7 +186,6 @@ class HerdBackgroundService : Service() {
           NotificationManager.IMPORTANCE_DEFAULT
         )
 
-        val MESSAGE_CHANNEL_ID = "HerdServiceChannel"
         val msgChannel = initialiseNotificationChannel(
           MESSAGE_CHANNEL_ID,
           "Herd Message Channel",
@@ -196,7 +198,7 @@ class HerdBackgroundService : Service() {
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannels(mutableListOf(serviceChannel,msgChannel))
 
-        //create notification
+        //create ongoing notification visible as long as the service is running
         val notification : Notification = Notification.Builder(this,SERVICE_CHANNEL_ID)
         .setOngoing(true)
         .setContentTitle("Herd Background Service")
@@ -218,13 +220,16 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  private fun sendNotification(title : String, text : String) {
+  private fun sendNotification(
+    title : String,
+    text : String) {
+      
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
         PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     //create notification
-    val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
+    val notification : Notification = Notification.Builder(this,MESSAGE_CHANNEL_ID)
     .setOngoing(false)
     .setContentTitle(title)
     .setContentText(text)
@@ -234,9 +239,10 @@ class HerdBackgroundService : Service() {
     .setAutoCancel(true)
     .build()
 
+    val notificationID : Int = SystemClock.uptimeMillis() as Int;
     Log.i(TAG,"Sending Notification for new messages");
     val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(1738,notification);
+    notificationManager.notify("com.herd.herd",notificationID,notification);
   }
 
   private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?) {
