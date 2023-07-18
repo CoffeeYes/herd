@@ -173,15 +173,10 @@ const Chat = ({ route, navigation }) => {
       // if there are any present in the database.
       const extractedMessageIDs = messages.map(section => section.data).flat(1).map(message => message._id)
 
-      let newMessagesToAdd = false;
-      const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
+      //generate array difference between new and existing messages to see if actual new messages are present
+      let newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
 
-      for(const message of newMessages) {
-        const found = extractedMessageIDs?.includes(message._id);
-        if(!found) {
-          newMessagesToAdd = true;
-        }
-      }
+      const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
 
       const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
       if(!newMessagesToAdd || noMoreMessagesToLoad) {
@@ -317,7 +312,7 @@ const Chat = ({ route, navigation }) => {
             //get remaining messages
             const updatedMessages = messages.map(section => ({
               ...section,
-              data : section.data.filter(message => fullHighlightedMessages.indexOf(message) === -1)
+              data : section.data.filter(message => !fullHighlightedMessages.includes(message))
             }))
             .filter(section => section.data.length > 0);
 
@@ -464,7 +459,7 @@ const Chat = ({ route, navigation }) => {
       activeOpacity={highlightedMessages.length === 0 && 0.8}
       onLongPress={useCallback(() => longPressMessage(item._id),[])}
       onPress={useCallback(() => shortPressMessage(item._id),[])}
-      highlighted={highlightedMessages.indexOf(item._id) !== -1}
+      highlighted={highlightedMessages.includes(item._id)}
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
       customStyle={customStyle}
