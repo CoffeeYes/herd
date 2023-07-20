@@ -48,17 +48,17 @@ const updateChat = (originalChat, newValues) => {
   let updatedChat = {...originalChat};
   const updateableValues = ["name","key","image", "doneLoading"];
 
-  Object.entries(newValues).map((key,value) => {
+  for(const [key,value] of Object.entries(newValues)) {
     if(typeof value === "undefined" || value === null) {
-      throw new Exception(`[updateChat] : passed invalid value '${value}' for key '${key}' when attempting to update chat`)
+      throw new Error(`[updateChat] : passed invalid value '${value}' for key '${key}' when attempting to update chat`)
     }
-    else if(!updateableValues.includes(key)) {
-      throw new Exception(`[updateChat] : invalid key '${key}' passed when attempting to update chat`)
+    else if(!updateableValues.includes(key) && key !== "_id") {
+      throw new Error(`[updateChat] : invalid key '${key}' passed when attempting to update chat`)
     }
     else {
       updatedChat[key] = value;
     }
-  })
+  }
 
   return updatedChat;
 }
