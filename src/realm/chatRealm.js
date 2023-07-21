@@ -185,8 +185,8 @@ const getContactsWithChats = async () => {
   const receivedMessages = messageReceivedRealm.objects('Message');
   let keys = [];
   //get unique keys in all messages
-  sentMessages.forEach(message => !keys.includes(message.to.trim()) && keys.push(message.to));
-  receivedMessages.forEach(message => !keys.includes(message.from.trim()) && keys.push(message.from));
+  sentMessages.forEach(message => !keys.includes(message.to.trim()) && keys.push(message.to.trim()));
+  receivedMessages.forEach(message => !keys.includes(message.from.trim()) && keys.push(message.from.trim()));
   if(keys.length > 0) {
     //get timestamp of last message for each key
     let lastMessages = {};
@@ -253,28 +253,27 @@ const deleteAllChats = async () => {
   })
 }
 
+const findMessagesById = (realm,messages = []) => {
+  return messages.map(id =>
+    realm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
+  ).filter(message => message !== undefined);
+}
+
+const findAndDeleteMessages = (realm, messages = []) => {
+  const messagesToDelete = findMessagesById(realm,messages);
+
+  messagesToDelete.length > 0 &&
+  realm.write(() => {
+    realm.delete(messagesToDelete)
+  })
+}
+
 const deleteMessages = messages => {
-  const sentMessageCopiesToDelete = messages.map(id =>
-    messageCopyRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
-  ).filter(message => message !== undefined);
 
-  sentMessageCopiesToDelete.length > 0 &&
-  messageCopyRealm.write(() => {
-    messageCopyRealm.delete(sentMessageCopiesToDelete)
-  })
+  findAndDeleteMessages(messageCopyRealm,messages);
+  findAndDeleteMessages(messageSentRealm,messages);
 
-  const sentMessagesToDelete = messages.map(id =>
-    messageSentRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
-  ).filter(message => message !== undefined);
-
-  sentMessagesToDelete.length > 0 &&
-  messageSentRealm.write(() => {
-    messageSentRealm.delete(sentMessagesToDelete)
-  })
-
-  const receivedMessagesToDelete = messages.map(id =>
-    messageReceivedRealm.objectForPrimaryKey('Message',Realm.BSON.ObjectId(id))
-  ).filter(message => message !== undefined);
+  const receivedMessagesToDelete = findMessagesById(messageReceivedRealm,messages);
 
   //add deleted received messages to seperate realm to prevent them from being
   //re-added in the future
@@ -380,17 +379,9 @@ const deleteAllMessages = () => {
 
   ServiceInterface.removeMessagesFromService([...sentMessages,...receivedMessages]);
 
-  messageSentRealm.write(() => {
-    messageSentRealm.deleteAll();
-  })
-  messageCopyRealm.write(() => {
-    messageCopyRealm.deleteAll();
-  })
-  messageReceivedRealm.write(() => {
-    messageReceivedRealm.deleteAll();
-  })
-  deletedReceivedRealm.write(() => {
-    deletedReceivedRealm.deleteAll();
+  [messageSentRealm,messageCopyRealm,messageReceivedRealm,deletedReceivedRealm]
+  .map(realm => {
+    realm.write(() => realm.deleteAll());
   })
 }
 

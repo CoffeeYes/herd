@@ -204,7 +204,12 @@ const chatReducer = (state = initialState,action) => {
       if(chatToUpdate) {
         return {
           ...state,
-          messageQueue : updateMessageQueue(state.messageQueue,{...chatToUpdate}.key,action.payload.key,action.payload.name)
+          messageQueue : updateMessageQueue(
+            state.messageQueue,
+            chatToUpdate.key,
+            action.payload.key,
+            action.payload.name
+          )
         }
       }
       else {
