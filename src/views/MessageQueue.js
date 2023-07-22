@@ -63,7 +63,7 @@ const MessageQueue = ({}) => {
       }
       return newMessage;
     }))
-    return parsedQueue.sort((a,b) => a.timestamp < b.timestamp);
+    return parsedQueue.sort((a,b) => b.timestamp - a.timestamp);
   }
 
   useEffect(() => {

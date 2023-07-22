@@ -81,7 +81,7 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   )
 
   let payload = {
-    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp > b.timestamp)
+    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp - b.timestamp)
   }
 
   //calculate new indices to send to frontend based on the sizes of the received/sent message arrays
@@ -192,7 +192,7 @@ const getContactsWithChats = async () => {
     let lastMessages = {};
     for(const key of keys) {
       const messages = (await getMessagesWithContact(key,-1)).messages;
-      const currentLastMessage = messages.sort((a,b) => a.timestamp < b.timestamp)[0];
+      const currentLastMessage = messages.sort((a,b) => b.timestamp - a.timestamp)[0];
       if(currentLastMessage) {
         lastMessages[key] = currentLastMessage;
       }

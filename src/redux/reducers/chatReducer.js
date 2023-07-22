@@ -17,9 +17,9 @@ const generateMessageDays = (existingMessages = [], newMessages) => {
     }
   }
   for (date of dates) {
-    date.data.sort((a,b) => a.timestamp > b.timestamp)
+    date.data.sort((a,b) => a.timestamp - b.timestamp)
   }
-  return dates.sort((a,b) => a.data[a.data.length -1].timestamp > b.data[b.data.length -1].timestamp)
+  return dates.sort((a,b) => a.data[a.data.length -1].timestamp - b.data[b.data.length -1].timestamp)
 }
 
 const initialState = {

@@ -98,7 +98,7 @@ const Chats = ({ navigation }) => {
         navigation.navigate("newChat",{type : "newChat", disableAddNew : true})
       }}/>
       <ScrollView>
-      {chats?.sort((a,b) => a.timestamp < b.timestamp)?.map( (chat, index) =>
+      {chats?.sort((a,b) => b.timestamp - a.timestamp)?.map( (chat, index) =>
         <ListItem
         name={chat.name}
         key={chat._id}
