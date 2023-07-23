@@ -58,19 +58,18 @@ const Contacts = ({ route, navigation }) => {
   }
 
   const handleLongPress = contact => {
-    if(highlightedContacts.indexOf(contact) == -1) {
+    if(!highlightedContacts.includes(contact)) {
       setHighlightedContacts([...highlightedContacts,contact]);
     }
   }
 
   const handlePress = contact => {
     if(highlightedContacts.length > 0) {
-      const contactIndex = highlightedContacts.indexOf(contact);
-      if(contactIndex === -1) {
+      if(!highlightedContacts.includes(contact)) {
         setHighlightedContacts([...highlightedContacts,contact]);
       }
       else {
-        setHighlightedContacts([...highlightedContacts].filter(highlightedContact => highlightedContact !== contact));
+        setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contact));
       }
     }
     else {
@@ -100,7 +99,7 @@ const Contacts = ({ route, navigation }) => {
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
           onPress={() => handlePress(contact)}
           onLongPress={() => handleLongPress(contact)}
-          highlighted={highlightedContacts.indexOf(contact) !== -1}
+          highlighted={highlightedContacts.includes(contact)}
           highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
           />
         )}

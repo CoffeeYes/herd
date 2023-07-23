@@ -57,19 +57,18 @@ const Chats = ({ navigation }) => {
   }
 
   const handleLongPress = chat => {
-    if(highlightedChats.indexOf(chat) == -1) {
+    if(!highlightedChats.includes(chat)) {
       setHighlightedChats([...highlightedChats,chat]);
     }
   }
 
   const handlePress = chat => {
     if(highlightedChats.length > 0) {
-      const chatIndex = highlightedChats.indexOf(chat);
-      if(chatIndex === -1) {
+      if(!highlightedChats.includes(chat)) {
         setHighlightedChats([...highlightedChats,chat]);
       }
       else {
-        setHighlightedChats([...highlightedChats].filter(highlightedChat => highlightedChat !== chat));
+        setHighlightedChats(highlightedChats.filter(highlightedChat => highlightedChat !== chat));
       }
     }
     else {
@@ -123,7 +122,7 @@ const Chats = ({ navigation }) => {
         rightIconStyle={{color : palette.primary}}
         onPress={() => handlePress(chat)}
         onLongPress={() => handleLongPress(chat)}
-        highlighted={highlightedChats.indexOf(chat) !== -1}
+        highlighted={highlightedChats.includes(chat)}
         rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText}/>
       )}
