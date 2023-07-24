@@ -220,10 +220,8 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  private fun sendNotification(
-    title : String,
-    text : String) {
-      
+  private fun sendNotification(title : String, text : String) {
+
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
         PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     }
@@ -239,7 +237,7 @@ class HerdBackgroundService : Service() {
     .setAutoCancel(true)
     .build()
 
-    val notificationID : Int = SystemClock.uptimeMillis() as Int;
+    val notificationID : Int = SystemClock.uptimeMillis().toInt();
     Log.i(TAG,"Sending Notification for new messages");
     val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.notify("com.herd.herd",notificationID,notification);
