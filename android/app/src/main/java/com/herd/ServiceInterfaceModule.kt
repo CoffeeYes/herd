@@ -117,6 +117,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
             BluetoothAdapter.ERROR
           );
           if (state == BluetoothAdapter.STATE_OFF) {
+            service.sendNotification(
+              "Herd has stopped sending messages in the background",
+              "because bluetooth was turned off"
+            )
+            service.stopRunning();
+            Log.i(TAG,"service running : ${HerdBackgroundService.running}")
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("bluetoothOrLocationStateChange","ADAPTER_TURNED_OFF");
           }
@@ -124,6 +130,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
+            service.sendNotification(
+              "Herd has stopped sending messages in the background",
+              "because location was turned off"
+            )
+            service.stopRunning();
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("bluetoothOrLocationStateChange","LOCATION_DISABLED");
           }

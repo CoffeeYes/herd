@@ -46,9 +46,6 @@ import kotlinx.parcelize.Parcelize
 import android.os.Looper
 import android.location.LocationManager
 
-import android.content.BroadcastReceiver
-import android.content.IntentFilter
-
 import android.app.Notification
 import android.app.NotificationManager
 import android.app.NotificationChannel
@@ -100,47 +97,9 @@ class HerdBackgroundService : Service() {
   }
   private val binder = LocalBinder();
 
-  private final val bluetoothStateReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action
-      if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-        val state = intent.getIntExtra(
-          BluetoothAdapter.EXTRA_STATE,
-          BluetoothAdapter.ERROR
-        );
-        if (state == BluetoothAdapter.STATE_OFF) {
-          Log.i(TAG,"Bluetooth Turned off, stopping service");
-          //let the user know the service is stopping
-          sendNotification(
-            "Herd has stopped sending messages in the background",
-            "because bluetooth was turned off"
-          )
-          //stop this service and remove constant notification
-          stopForeground(true);
-          running = false;
-        }
-      }
-    }
-  }
-
-  private final val locationStateReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action
-      if(action === "android.location.PROVIDERS_CHANGED") {
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-        if(!locationManager.isLocationEnabled()) {
-          Log.i(TAG,"Location has been turned off, stopping service");
-          //let the user know the service is stopping
-          sendNotification(
-            "Herd has stopped sending messages in the background",
-            "because location was turned off"
-          )
-          //stop this service and remove constant notification
-          stopForeground(true);
-          running = false;
-        }
-      }
-    }
+  public fun stopRunning() {
+    stopForeground(true);
+    running = false;
   }
 
   private fun initialiseNotificationChannel(
@@ -220,7 +179,7 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  private fun sendNotification(title : String, text : String) {
+  public fun sendNotification(title : String, text : String) {
 
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
         PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
@@ -1027,8 +986,6 @@ class HerdBackgroundService : Service() {
       startGATTService();
       scanLeDevice();
       advertiseLE();
-      this.registerReceiver(bluetoothStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-      this.registerReceiver(locationStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
       return Service.START_STICKY
     }
 
@@ -1044,8 +1001,6 @@ class HerdBackgroundService : Service() {
         BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
         gattServer?.close();
       }
-      this.unregisterReceiver(bluetoothStateReceiver);
-      this.unregisterReceiver(locationStateReceiver);
       running = false;
   }
 }
