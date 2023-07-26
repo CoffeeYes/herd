@@ -42,6 +42,7 @@ import java.io.FileOutputStream
 import android.os.Bundle
 import android.os.Parcelable
 import android.os.Parcel
+import android.os.Build
 import kotlinx.parcelize.Parcelize
 import android.os.Looper
 import android.location.LocationManager
@@ -98,7 +99,11 @@ class HerdBackgroundService : Service() {
   private val binder = LocalBinder();
 
   public fun stopRunning() {
-    stopForeground(true);
+    if(Build.VERSION.SDK_INT >= 33) {
+      stopForeground(STOP_FOREGROUND_REMOVE);
+    } else {
+      stopForeground(true);
+    }
     running = false;
   }
 

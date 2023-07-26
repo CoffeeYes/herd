@@ -466,7 +466,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 throw(e);
             }
             connectionSocket?.also {
-                /* manageBTServerConnection(it) */
                 Log.d(TAG, "SERVER SOCKET WAS CONNECTED")
                 connectionThread = BTConnectionThread(it, messageHandler)
                 connectionThread?.start();
@@ -500,8 +499,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           try {
             socket.connect();
             Log.d(TAG, "Bluetooth client socket connected")
-            //TODO do work with connected socket in seperate thread
-            /* manageBTClientConnection(socket); */
             connectionThread = BTConnectionThread(socket, messageHandler);
             connectionThread?.start();
           }
@@ -593,26 +590,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private fun manageBTServerConnection(socket : BluetoothSocket) {
-      val inputStream : InputStream = socket.getInputStream();
-      val outputStream : OutputStream = socket.getOutputStream();
-    }
-
-    private fun manageBTClientConnection(socket : BluetoothSocket) {
-      val inputStream : InputStream = socket.getInputStream();
-      val outputStream : OutputStream = socket.getOutputStream();
-      Thread {
-        var shouldRun = true;
-        while(shouldRun) {
-          var data : ByteArray = ByteArray(1024);
-          inputStream.read(data);
-          if(data.size > 0) {
-            shouldRun = false;
-          }
-        }
-      }
-    }
-
     private var BTServerThread : createBTServerThread? = null;
     @ReactMethod
     fun listenAsServer(promise : Promise) {
@@ -630,7 +607,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun cancelListenAsServer(promise : Promise) {
       try {
         val alive : Boolean? = BTServerThread?.isAlive();
-        if(alive != null && alive === true) {
+        if(alive != null && alive) {
             BTServerThread?.cancel();
         }
         promise.resolve(true);

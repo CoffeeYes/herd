@@ -52,7 +52,6 @@ class StorageInterface(val context : Context) {
         val currentByte : Int = inputStream.read();
         if(currentByte == -1) {
           finishedReading = true;
-          break;
         }
         else {
           buffer += currentByte.toByte();
@@ -129,7 +128,9 @@ class StorageInterface(val context : Context) {
       Log.e(TAG,"Error deleting file $filename",e);
       success = false;
     }
-    return success;
+    finally {
+      return success;
+    }
   }
 
   fun deleteStoredMessages(messagesFilename : String, sizesFilename : String) : Boolean {
