@@ -17,6 +17,7 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.bluetooth.BluetoothServerSocket
+import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.content.Context
 import android.content.IntentFilter
@@ -65,6 +66,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     var locationPermissionPromise : Promise? = null;
     var locationEnabledPromise : Promise? = null;
     var navigateToSettingsPromise : Promise? = null;
+
+    private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
     val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
 
@@ -164,7 +167,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             .emit("BTStateChange","DISCOVERY_STARTED")
           }
           BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-            val adapter = BluetoothAdapter.getDefaultAdapter();
+            val adapter = bluetoothManager.getAdapter();
             adapter.setName(adapter.getName().replace("_HERD",""));
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("BTStateChange","DISCOVERY_FINISHED")
@@ -252,7 +255,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun scanForDevices(promise : Promise) {
-      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
 
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found");
@@ -262,7 +265,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           if(adapter.isDiscovering()) {
             adapter.cancelDiscovery();
           }
-          val originalAdapterName = BluetoothAdapter.getDefaultAdapter().getName();
+          val originalAdapterName = bluetoothManager.getAdapter().getName();
           adapter?.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
@@ -281,7 +284,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun cancelScanForDevices(promise : Promise) {
-      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
       adapter?.setName(adapter.getName().replace("_HERD",""));
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found");
@@ -296,7 +299,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun checkBTEnabled(promise : Promise) {
-      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
 
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found")
@@ -308,7 +311,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun checkForBTAdapter(promise : Promise) {
-      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
 
       if(adapter === null) {
         promise.resolve(false);
@@ -353,7 +356,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun requestBTEnable(promise : Promise) {
-      val adapter : BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter();
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found")
       }
@@ -450,7 +453,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var connectionThread : BTConnectionThread? = null;
 
     private inner class createBTServerThread() : Thread() {
-      val adapter = BluetoothAdapter.getDefaultAdapter();
+      val adapter = bluetoothManager.getAdapter();
       var connectionSocket : BluetoothSocket? = null;
 
       @Volatile var shouldLoop = true
@@ -483,7 +486,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     private inner class createBTClientThread(deviceAddress : String) : Thread() {
-      val adapter = BluetoothAdapter.getDefaultAdapter();
+      val adapter = bluetoothManager.getAdapter();
       val device = adapter?.getRemoteDevice(deviceAddress);
 
       private val clientSocket: BluetoothSocket? by lazy(LazyThreadSafetyMode.NONE) {
