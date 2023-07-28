@@ -16,7 +16,7 @@ const BTDeviceList = () => {
   const [scanning, _setScanning] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -55,7 +55,7 @@ const BTDeviceList = () => {
     })
 
     const scanner = Bluetooth.scanForDevices()
-    .catch(e => setError("Something went wrong, please try again"))
+    .catch(e => setErrors(["Something went wrong, please try again"]))
 
     //cleanup
     return () => {
@@ -79,14 +79,22 @@ const BTDeviceList = () => {
   }
 
   const restartScan = async () => {
+    let restartErrors = [];
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
 
-    if (!btEnabled || ! locationEnabled) {
-      return setError("Bluetooth and Location must be enabled to scan for devices")
+    !btEnabled && restartErrors.push(
+      "Please enable bluetooth"
+    )
+    !locationEnabled && restartErrors.push(
+      "Please enable location services"
+    )
+
+    if (restartErrors.length > 0) {
+      return setErrors(restartErrors);
     }
     else {
-      setError("");
+      setErrors([]);
       await Bluetooth.scanForDevices();
     }
   }
@@ -101,10 +109,15 @@ const BTDeviceList = () => {
         <View>
           <Text style={{fontSize : customStyle.uiFontSize}}>{scanning ? "Scanning..." : ""}</Text>
           <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
+          {errors.map((error,index) =>
+            <Text
+            key={index}
+            style={{...styles.error,fontSize : customStyle.uiFontSize}}>
+              {error}
+            </Text>
+          )}
         </View>
 
-        {error.length > 0 &&
-        <Text style={{...styles.error,fontSize : customStyle.uiFontSize}}>{error}</Text>}
 
         <ScrollView contentContainerStyle={styles.BTList}>
           {deviceList.map((device,index) =>
