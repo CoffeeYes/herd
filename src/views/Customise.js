@@ -217,13 +217,24 @@ const Customise = ({ navigation }) => {
     }
   ]
 
-  const changeFonts = (val,index) => {
+  const changeFonts = (value,index) => {
+    const roundedValue = Math.round(value)
     if(synchroniseFontChanges) {
-      fontSizes.map(item => item.setValue(val))
+      fontSizes.map(item => item.setValue(roundedValue))
     }
     else {
-      fontSizes[index].setValue(val);
+      fontSizes[index].setValue(roundedValue);
     }
+  }
+
+  const getChatBubbleColor = () => {
+    return ({
+      sentBoxColor : fromHsv(sentBoxColor),
+      receivedBoxColor : fromHsv(receivedBoxColor),
+      sentTextColor : fromHsv(sentTextColor),
+      receivedTextColor : fromHsv(receivedTextColor),
+      messageFontSize : messageFontSize
+    })
   }
 
   return (
@@ -280,8 +291,8 @@ const Customise = ({ navigation }) => {
                 maximumTrackTintColor={palette.primary}
                 thumbTintColor={palette.primary}
                 tapToSeek
-                onSlidingComplete={val => changeFonts(Math.round(val),index)}
-                onValueChange={val => changeFonts(Math.round(val),index)}
+                onSlidingComplete={value => changeFonts(value,index)}
+                onValueChange={value => changeFonts(value,index)}
                 value={item.value}
                 min={defaultChatStyles.messageFontSize}
                 max={24}
@@ -300,26 +311,14 @@ const Customise = ({ navigation }) => {
           disableTouch
           text="This is a sample sent message"
           timestamp="12 : 20"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
+          customStyle={getChatBubbleColor()}
           messageFrom={true}/>
 
           <ChatBubble
           disableTouch
           text="This is a sample response message"
           timestamp="12 : 21"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
+          customStyle={getChatBubbleColor()}
           messageFrom={false}/>
         </View>
 
