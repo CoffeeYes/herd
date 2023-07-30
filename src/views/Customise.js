@@ -237,6 +237,22 @@ const Customise = ({ navigation }) => {
     })
   }
 
+  const checkStylesAreEqual = (original, updated) => {
+    const colorKeys = ["sentBoxColor","sentTextColor","receivedBoxColor","receivedTextColor"];
+    const fontKeys = ["uiFontSize","messageFontSize"];
+    for(const key of colorKeys) {
+      if(fromHsv(original[key]).toLowerCase() !== updated[key].toLowerCase()) {
+        return false;
+      }
+    }
+    for(const key of fontKeys) {
+      if(original[key] !== updated[key]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   return (
     <>
     <Header title="Customise" allowGoBack/>
@@ -346,26 +362,15 @@ const Customise = ({ navigation }) => {
           onPress={saveStyles}
           timeout={500}
           buttonStyle={{...styles.button, flexDirection : "row"}}
-          disabled={
-            fromHsv(sentBoxColor).toLowerCase() == originalStyles.sentBoxColor.toLowerCase() &&
-            fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
-            fromHsv(receivedBoxColor).toLowerCase() == originalStyles.receivedBoxColor.toLowerCase() &&
-            fromHsv(receivedTextColor).toLowerCase() == originalStyles.receivedTextColor.toLowerCase() &&
-            messageFontSize === originalStyles.messageFontSize &&
-            uiFontSize === originalStyles.uiFontSize
-          }/>
+          disabled={checkStylesAreEqual({
+            sentBoxColor,sentTextColor,receivedBoxColor,
+            receivedTextColor,messageFontSize,uiFontSize
+          },originalStyles)}/>
 
           <CustomButton
           text={"Restore Default"}
           onPress={restoreDefault}
-          disabled={
-            fromHsv(originalStyles.sentBoxColor).toLowerCase() == defaultChatStyles.sentBoxColor.toLowerCase() &&
-            fromHsv(originalStyles.sentTextColor).toLowerCase() == defaultChatStyles.sentTextColor.toLowerCase() &&
-            fromHsv(originalStyles.receivedBoxColor).toLowerCase() == defaultChatStyles.receivedBoxColor.toLowerCase() &&
-            fromHsv(originalStyles.receivedTextColor).toLowerCase() == defaultChatStyles.receivedTextColor.toLowerCase() &&
-            originalStyles.messageFontSize == defaultChatStyles.messageFontSize &&
-            originalStyles.uiFontSize == defaultChatStyles.uiFontSize
-          }
+          disabled={checkStylesAreEqual(originalStyles,defaultChatStyles)}
           buttonStyle={{ ...styles.button, marginLeft : 10}}/>
 
         </View>
