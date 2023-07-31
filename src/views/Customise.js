@@ -110,14 +110,14 @@ const Customise = ({ navigation }) => {
       e.preventDefault();
       const styles = JSON.parse(await AsyncStorage.getItem("styles"));
 
-      const unsavedChanges = (
-        fromHsv(sentBoxColorRef.current).toLowerCase() != styles.sentBoxColor.toLowerCase() ||
-        fromHsv(sentTextColorRef.current).toLowerCase() != styles.sentTextColor.toLowerCase() ||
-        fromHsv(receivedBoxColorRef.current).toLowerCase() != styles.receivedBoxColor.toLowerCase() ||
-        fromHsv(receivedTextColorRef.current).toLowerCase() != styles.receivedTextColor.toLowerCase() ||
-        messageFontSizeRef.current != styles.messageFontSize ||
-        uiFontSizeRef.current != styles.uiFontSize
-      )
+      const unsavedChanges = !checkStylesAreEqual({
+        sentBoxColor : sentBoxColorRef.current,
+        sentTextColor : sentTextColorRef.current,
+        receivedBoxColor : receivedBoxColorRef.current,
+        receivedTextColor : receivedTextColorRef.current,
+        messageFontSize : messageFontSizeRef.current,
+        uiFontSize : uiFontSizeRef.current,
+      },styles)
 
       if(unsavedChanges) {
         Alert.alert(
