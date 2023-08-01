@@ -7,6 +7,7 @@ import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
+import NavigationWarningWrapper from './NavigationWarningWrapper';
 
 import { getContactById, editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
@@ -161,54 +162,37 @@ const EditContact = ({ route, navigation }) => {
     });
   }
 
-
-  useEffect(() => {
-    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
-      e.preventDefault();
-
-      let unsavedChanges;
-      if(editingExistingContactRef.current) {
-        unsavedChanges = (
-          originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
-          originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
-          originalContactRef?.current?.image != imageRef?.current
-        )
-      }
-      else {
-        unsavedChanges = (
-          (nameRef?.current?.trim()?.length > 0 ||
-          keyRef?.current?.trim()?.length > 0 ||
-          imageRef?.current?.trim()?.length > 0) &&
-          !haveSavedContactRef.current
-        )
-      }
-
-      if(unsavedChanges) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure to discard them and leave the screen?',
-          [
-            {
-              text: 'Discard',
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-            { text: "Stay", style: 'cancel', onPress: () => {} },
-          ]
-        );
-      }
-      else {
-        navigation.dispatch(e.data.action);
-      }
-    })
-
-    return beforeGoingBack;
-  },[navigation])
+  const haveUnsavedChanges = () => {
+    let unsavedChanges;
+    if(editingExistingContactRef.current) {
+      unsavedChanges = (
+        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
+        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
+        originalContactRef?.current?.image != imageRef?.current
+      )
+    }
+    else {
+      unsavedChanges = (
+        (nameRef?.current?.trim()?.length > 0 ||
+        keyRef?.current?.trim()?.length > 0 ||
+        imageRef?.current?.trim()?.length > 0) &&
+        !haveSavedContactRef.current
+      )
+    }
+    return unsavedChanges;
+  }
 
   return (
-    <>
+    <NavigationWarningWrapper
+    navigation={navigation}
+    onCancel={() => {}}
+    onConfirm={e => navigation.dispatch(e.data.action)}
+    checkForChanges={haveUnsavedChanges}
+    alertTitle={"Discard Changes?"}
+    alertSubtitle={'You have unsaved changes. Are you sure to discard them and leave the screen?'}
+    cancelText="Stay"
+    confirmationText="Discard">
+    
       <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
       <ScrollView
       ref={scrollViewRef}
@@ -260,7 +244,7 @@ const EditContact = ({ route, navigation }) => {
         buttonStyle={styles.button}
         textStyle={styles.buttonText}/>
       </ScrollView>
-    </>
+    </NavigationWarningWrapper>
   )
 }
 
