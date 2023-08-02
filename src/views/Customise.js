@@ -13,6 +13,7 @@ import ListItem from './ListItem';
 import ChatBubble from './ChatBubble';
 import Dropdown from './Dropdown';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import NavigationWarningWrapper from './NavigationWarningWrapper';
 
 import Slider from './Slider';
 
@@ -105,44 +106,6 @@ const Customise = ({ navigation }) => {
     return true;
   }
 
-  useEffect(() => {
-    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
-      e.preventDefault();
-      const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-
-      const unsavedChanges = !checkStylesAreEqual({
-        sentBoxColor : sentBoxColorRef.current,
-        sentTextColor : sentTextColorRef.current,
-        receivedBoxColor : receivedBoxColorRef.current,
-        receivedTextColor : receivedTextColorRef.current,
-        messageFontSize : messageFontSizeRef.current,
-        uiFontSize : uiFontSizeRef.current,
-      },styles)
-
-      if(unsavedChanges) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure to discard them and leave the screen?',
-          [
-            {
-              text: 'Discard',
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-            { text: "Stay", style: 'cancel', onPress: () => {} },
-          ]
-        );
-      }
-      else {
-        navigation.dispatch(e.data.action);
-      }
-  })
-
-    return beforeGoingBack;
-  },[navigation])
-
   const restoreDefault = async () => {
     Alert.alert(
       'Discard you sure you want to restore default styles?',
@@ -163,6 +126,7 @@ const Customise = ({ navigation }) => {
       ]
     );
   }
+  
   const tabItems = [
     {
     	name : "sentBox",
@@ -253,130 +217,150 @@ const Customise = ({ navigation }) => {
     return true;
   }
 
+  const haveUnsavedChanges = async () => {
+    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    return !checkStylesAreEqual({
+      sentBoxColor : sentBoxColorRef.current,
+      sentTextColor : sentTextColorRef.current,
+      receivedBoxColor : receivedBoxColorRef.current,
+      receivedTextColor : receivedTextColorRef.current,
+      messageFontSize : messageFontSizeRef.current,
+      uiFontSize : uiFontSizeRef.current,
+    },styles);
+  }
+
   return (
-    <>
-    <Header title="Customise" allowGoBack/>
-    <ScrollView contentContainerStyle={{paddingBottom : 10}}>
+    <NavigationWarningWrapper
+    navigation={navigation}
+    onCancel={() => {}}
+    onConfirm={e => navigation.dispatch(e.data.action)}
+    checkForChanges={haveUnsavedChanges}
+    alertTitle={"Discard Changes?"}
+    alertSubtitle={'You have unsaved changes. Are you sure to discard them and leave the screen?'}
+    cancelText="Stay"
+    confirmationText="Discard">
+      <Header title="Customise" allowGoBack/>
+      <ScrollView contentContainerStyle={{paddingBottom : 10}}>
 
-      {loading ?
-      <ActivityIndicator size="large" color={palette.primary}/>
-      :
-      <>
+        {loading ?
+        <ActivityIndicator size="large" color={palette.primary}/>
+        :
+        <>
 
-        <Header
-        title="Preview"
-        textStyle={{fontSize : uiFontSize * 1.5}}
-        containerStyle={{marginTop : 10}}/>
+          <Header
+          title="Preview"
+          textStyle={{fontSize : uiFontSize * 1.5}}
+          containerStyle={{marginTop : 10}}/>
 
-        <View style={{alignItems : "center"}}>
-          <CardButton
-          disableTouch
-          text="Preview"
+          <View style={{alignItems : "center"}}>
+            <CardButton
+            disableTouch
+            text="Preview"
+            textStyle={{fontSize : uiFontSize}}
+            rightIcon="preview" iconSize={uiFontSize + 16}/>
+          </View>
+
+          <ListItem
+          name="Preview"
+          rightText="Preview"
+          subText="Preview"
+          rightTextStyle={{fontSize : uiFontSize * 0.8}}
+          subTextStyle={{fontSize : uiFontSize * 0.8}}
           textStyle={{fontSize : uiFontSize}}
-          rightIcon="preview" iconSize={uiFontSize + 16}/>
-        </View>
-
-        <ListItem
-        name="Preview"
-        rightText="Preview"
-        subText="Preview"
-        rightTextStyle={{fontSize : uiFontSize * 0.8}}
-        subTextStyle={{fontSize : uiFontSize * 0.8}}
-        textStyle={{fontSize : uiFontSize}}
-        disableTouch
-        />
-
-        <View style={styles.fontSlidersContainer}>
-          <TouchableOpacity
-          style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
-          onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
-            <Icon
-            size={32}
-            color={synchroniseFontChanges ? palette.primary : palette.black}
-            name={synchroniseFontChanges ? "lock" : "lock-open"}/>
-          </TouchableOpacity>
-
-          {fontSizes.map((item,index)=> {
-            return (
-              <Fragment key={item.tag}>
-                <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
-                <Slider
-                containerStyle={styles.sliderContainer}
-                sliderStyle={{flex : 1}}
-                minimumTrackTintColor={palette.secondary}
-                maximumTrackTintColor={palette.primary}
-                thumbTintColor={palette.primary}
-                tapToSeek
-                onSlidingComplete={value => changeFonts(value,index)}
-                onValueChange={value => changeFonts(value,index)}
-                value={item.value}
-                min={defaultChatStyles.messageFontSize}
-                max={24}
-                rightTitle={item.rightTitle}
-                rightText={item.rightText}
-                rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-                rightTitleStyle={{fontWeight : "bold"}}
-                />
-              </Fragment>
-            )
-          })}
-        </View>
-
-        <View style={styles.messagesContainer}>
-          <ChatBubble
           disableTouch
-          text="This is a sample sent message"
-          timestamp="12 : 20"
-          customStyle={getChatBubbleColor()}
-          messageFrom={true}/>
-
-          <ChatBubble
-          disableTouch
-          text="This is a sample response message"
-          timestamp="12 : 21"
-          customStyle={getChatBubbleColor()}
-          messageFrom={false}/>
-        </View>
-
-        <View style={styles.colorChoiceContainer}>
-          <Dropdown
-          onChangeOption={index => setActiveItem(index)}
-          choices={tabItems}
-          textStyle={{fontSize : originalStyles.uiFontSize}}
-          chosenStyle={{color : palette.primary}}
-          containerStyle={{borderRadius : 5}}
           />
 
-          <ColorChoice
-            title={tabItems[activeItem].name}
-            color={toHsv(tabItems[activeItem].color)}
-            setColor={tabItems[activeItem].setColor}
-            oldColor={originalStyles[tabItems[activeItem].originalColor]}
-          />
-        </View>
+          <View style={styles.fontSlidersContainer}>
+            <TouchableOpacity
+            style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
+            onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
+              <Icon
+              size={32}
+              color={synchroniseFontChanges ? palette.primary : palette.black}
+              name={synchroniseFontChanges ? "lock" : "lock-open"}/>
+            </TouchableOpacity>
 
-        <View style={styles.buttonRow}>
-          <FlashTextButton
-          normalText="Save"
-          flashText="Saved!"
-          onPress={saveStyles}
-          timeout={500}
-          buttonStyle={{...styles.button, flexDirection : "row"}}
-          disabled={checkStylesAreEqual({
-            sentBoxColor,sentTextColor,receivedBoxColor,
-            receivedTextColor,messageFontSize,uiFontSize
-          },originalStyles)}/>
+            {fontSizes.map((item,index)=> {
+              return (
+                <Fragment key={item.tag}>
+                  <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
+                  <Slider
+                  containerStyle={styles.sliderContainer}
+                  sliderStyle={{flex : 1}}
+                  minimumTrackTintColor={palette.secondary}
+                  maximumTrackTintColor={palette.primary}
+                  thumbTintColor={palette.primary}
+                  tapToSeek
+                  onSlidingComplete={value => changeFonts(value,index)}
+                  onValueChange={value => changeFonts(value,index)}
+                  value={item.value}
+                  min={defaultChatStyles.messageFontSize}
+                  max={24}
+                  rightTitle={item.rightTitle}
+                  rightText={item.rightText}
+                  rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
+                  rightTitleStyle={{fontWeight : "bold"}}
+                  />
+                </Fragment>
+              )
+            })}
+          </View>
 
-          <CustomButton
-          text={"Restore Default"}
-          onPress={restoreDefault}
-          disabled={checkStylesAreEqual(originalStyles,defaultChatStyles)}
-          buttonStyle={{ ...styles.button, marginLeft : 10}}/>
+          <View style={styles.messagesContainer}>
+            <ChatBubble
+            disableTouch
+            text="This is a sample sent message"
+            timestamp="12 : 20"
+            customStyle={getChatBubbleColor()}
+            messageFrom={true}/>
 
-        </View>
-      </>}
-    </ScrollView>
-    </>
+            <ChatBubble
+            disableTouch
+            text="This is a sample response message"
+            timestamp="12 : 21"
+            customStyle={getChatBubbleColor()}
+            messageFrom={false}/>
+          </View>
+
+          <View style={styles.colorChoiceContainer}>
+            <Dropdown
+            onChangeOption={index => setActiveItem(index)}
+            choices={tabItems}
+            textStyle={{fontSize : originalStyles.uiFontSize}}
+            chosenStyle={{color : palette.primary}}
+            containerStyle={{borderRadius : 5}}
+            />
+
+            <ColorChoice
+              title={tabItems[activeItem].name}
+              color={toHsv(tabItems[activeItem].color)}
+              setColor={tabItems[activeItem].setColor}
+              oldColor={originalStyles[tabItems[activeItem].originalColor]}
+            />
+          </View>
+
+          <View style={styles.buttonRow}>
+            <FlashTextButton
+            normalText="Save"
+            flashText="Saved!"
+            onPress={saveStyles}
+            timeout={500}
+            buttonStyle={{...styles.button, flexDirection : "row"}}
+            disabled={checkStylesAreEqual({
+              sentBoxColor,sentTextColor,receivedBoxColor,
+              receivedTextColor,messageFontSize,uiFontSize
+            },originalStyles)}/>
+
+            <CustomButton
+            text={"Restore Default"}
+            onPress={restoreDefault}
+            disabled={checkStylesAreEqual(originalStyles,defaultChatStyles)}
+            buttonStyle={{ ...styles.button, marginLeft : 10}}/>
+
+          </View>
+        </>}
+      </ScrollView>
+    </NavigationWarningWrapper>
   )
 }
 

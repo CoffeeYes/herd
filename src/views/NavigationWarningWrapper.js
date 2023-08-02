@@ -10,7 +10,7 @@ const NavigationWarningWrapper = ({ children, checkForChanges, navigation, confi
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
       e.preventDefault();
 
-      if(checkForChanges()) {
+      if(await checkForChanges()) {
         Alert.alert(
           alertTitle,
           alertSubtitle,
