@@ -126,7 +126,7 @@ const Customise = ({ navigation }) => {
       ]
     );
   }
-  
+
   const tabItems = [
     {
     	name : "sentBox",
@@ -232,13 +232,7 @@ const Customise = ({ navigation }) => {
   return (
     <NavigationWarningWrapper
     navigation={navigation}
-    onCancel={() => {}}
-    onConfirm={e => navigation.dispatch(e.data.action)}
-    checkForChanges={haveUnsavedChanges}
-    alertTitle={"Discard Changes?"}
-    alertSubtitle={'You have unsaved changes. Are you sure to discard them and leave the screen?'}
-    cancelText="Stay"
-    confirmationText="Discard">
+    checkForChanges={haveUnsavedChanges}>
       <Header title="Customise" allowGoBack/>
       <ScrollView contentContainerStyle={{paddingBottom : 10}}>
 

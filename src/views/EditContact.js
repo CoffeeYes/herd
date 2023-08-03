@@ -185,14 +185,8 @@ const EditContact = ({ route, navigation }) => {
   return (
     <NavigationWarningWrapper
     navigation={navigation}
-    onCancel={() => {}}
-    onConfirm={e => navigation.dispatch(e.data.action)}
-    checkForChanges={haveUnsavedChanges}
-    alertTitle={"Discard Changes?"}
-    alertSubtitle={'You have unsaved changes. Are you sure to discard them and leave the screen?'}
-    cancelText="Stay"
-    confirmationText="Discard">
-    
+    checkForChanges={haveUnsavedChanges}>
+
       <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
       <ScrollView
       ref={scrollViewRef}

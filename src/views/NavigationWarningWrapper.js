@@ -2,9 +2,15 @@ import React, { useEffect } from 'react';
 
 import { View, Alert } from 'react-native';
 
-const NavigationWarningWrapper = ({ children, checkForChanges, navigation, confirmationText = "",
-                                    cancelText = "", alertTitle = "", alertSubtitle = "",
-                                    onConfirm, onCancel}) => {
+const defaultTitle = 'Discard Changes?'
+const defaultSubtitle = 'You have unsaved changes. Are you sure to discard them and leave the screen?';
+
+const NavigationWarningWrapper = ({ children, checkForChanges, navigation,
+                                    confirmationText = "Discard", cancelText = "Stay",
+                                    alertTitle = defaultTitle, alertSubtitle = defaultSubtitle,
+                                    onConfirm = e => navigation.dispatch(e.data.action),
+                                    onCancel = () => {}
+                                  }) => {
 
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
