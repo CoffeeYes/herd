@@ -246,13 +246,12 @@ const Customise = ({ navigation }) => {
           textStyle={{fontSize : uiFontSize * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
-          <View style={{alignItems : "center"}}>
-            <CardButton
-            disableTouch
-            text="Preview"
-            textStyle={{fontSize : uiFontSize}}
-            rightIcon="preview" iconSize={uiFontSize + 16}/>
-          </View>
+          <CardButton
+          containerStyle={{alignSelf : "center"}}
+          disableTouch
+          text="Preview"
+          textStyle={{fontSize : uiFontSize}}
+          rightIcon="preview" iconSize={uiFontSize + 16}/>
 
           <ListItem
           name="Preview"

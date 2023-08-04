@@ -1,10 +1,28 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef } from 'react';
 import { View, Text, TextInput, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
+
+const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing},ref) => {
+  const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
+  const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize};
+
+  return (
+    <>
+      <Text style={titleStyle}>{name}</Text>
+      <TextInput
+      secureTextEntry
+      style={inputStyle}
+      onChangeText={onChangeText}
+      ref={ref}
+      onSubmitEditing={onSubmitEditing}
+      value={value}/>
+    </>
+  )
+})
 
 const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
@@ -14,7 +32,6 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
 
-  const primaryInputRef = useRef();
   const secondaryInputRef = useRef();
 
   const submit = async () => {
@@ -24,6 +41,9 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
       setSecondaryInputText("");
     }
   }
+
+  const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
+  const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize}
 
   return (
         <View style={{...mainContainerStyle, ...styles.card}}>
@@ -35,19 +55,16 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
 
           <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
 
-          <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>{primaryName}</Text>
-          <TextInput
-          secureTextEntry
-          style={{...styles.input, fontSize : customStyle.uiFontSize}}
+          <PasswordField
+          name={primaryName}
+          customStyle={customStyle}
           onChangeText={setPrimaryInputText}
-          ref={primaryInputRef}
           onSubmitEditing={() => secondaryInputRef.current.focus()}
           value={primaryInputText}/>
 
-          <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>{secondaryName}</Text>
-          <TextInput
-          secureTextEntry
-          style={{...styles.input, fontSize : customStyle.uiFontSize}}
+          <PasswordField
+          name={secondaryName}
+          customStyle={customStyle}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
           onSubmitEditing={() => submit()}
