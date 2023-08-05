@@ -67,7 +67,7 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
           customStyle={customStyle}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
-          onSubmitEditing={() => submit()}
+          onSubmitEditing={submit}
           value={secondaryInputText}/>
 
           <View style={{flexDirection : "row"}}>
@@ -75,7 +75,7 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
             normalText={primaryButtonText}
             flashText={primaryButtonFlashText}
             disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryButtonDisabled}
-            onPress={() => submit()}
+            onPress={submit}
             timeout={500}
             buttonStyle={styles.button}
             textStyle={styles.buttonText}/>
@@ -84,8 +84,7 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
             normalText={secondaryButtonText}
             flashText={secondaryButtonFlashText}
             disabled={secondaryButtonDisabled}
-            onPress={() => secondaryButtonOnPress()}
-            timeout={0}
+            onPress={secondaryButtonOnPress}
             buttonStyle={{...styles.button, marginLeft : 10}}
             textStyle={styles.buttonText}/>
           </View>
