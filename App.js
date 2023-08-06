@@ -42,7 +42,6 @@ import MessageQueue from './src/views/MessageQueue';
 import PasswordSettings from './src/views/PasswordSettings';
 import PasswordLockScreen from './src/views/PasswordLockScreen';
 import LoadingScreen from './src/views/LoadingScreen';
-import LockedScreen from './src/views/LockedScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
@@ -222,7 +221,7 @@ const App = ({ }) => {
           <Stack.Screen name="newChat" component={Contacts}/>
           <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
           <Stack.Screen name="QRScanner" component={QRScanner}/>
-          <Stack.Screen name="customise" component={Customise}/>
+          <Stack.Screen name="customise" component={LoadingScreen}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
       </Stack.Navigator>}
