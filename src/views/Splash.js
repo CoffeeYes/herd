@@ -4,6 +4,7 @@ import { View, Text, Button, Platform, Dimensions } from 'react-native';
 import Crypto from '../nativeWrapper/Crypto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from './CustomButton';
+import FullScreenSplash from './FullScreenSplash';
 
 import { setPublicKey } from '../redux/actions/userActions'
 
@@ -30,7 +31,8 @@ const Splash = ({ navigation }) => {
 
   const badVersion = Platform.OS === "android" && Platform.Version < 23;
   return (
-    <View style={styles.mainContainer}>
+    <FullScreenSplash
+    containerStyle={styles.mainContainer}>
       <View style={styles.contentContainer}>
       <Text style={{color : palette.white,marginBottom : 20}} onLayout={event => setTextWidth(event.nativeEvent.layout.width)}>
         Welcome to Herd, the peer-to-peer messaging app!
@@ -42,14 +44,14 @@ const Splash = ({ navigation }) => {
       buttonStyle={{borderWidth : 1,borderColor : palette.white}}
       disabled={badVersion}/>
 
-      { badVersion &&
-        <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold", width : textWidth}}>
-          Unfortunately, your device's software is too old to utilise the security features herd requires to run.
-          Please check for software updates. If there are none, herd will not function with your device.
-        </Text>
-      }
+      {badVersion &&
+      <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold", width : textWidth}}>
+        Unfortunately, your device's software is too old to utilise the security features herd requires to run.
+        Please check for software updates. If there are none, herd will not function with your device.
+      </Text>}
+
       </View>
-    </View>
+    </FullScreenSplash>
   )
 }
 
