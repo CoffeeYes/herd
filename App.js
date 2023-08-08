@@ -221,7 +221,7 @@ const App = ({ }) => {
           <Stack.Screen name="newChat" component={Contacts}/>
           <Stack.Screen name="BTDeviceList" component={BTDeviceList} />
           <Stack.Screen name="QRScanner" component={QRScanner}/>
-          <Stack.Screen name="customise" component={LoadingScreen}/>
+          <Stack.Screen name="customise" component={Customise}/>
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
       </Stack.Navigator>}

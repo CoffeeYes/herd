@@ -4,6 +4,7 @@ import { View, Text, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
+import FullScreenSplash from './FullScreenSplash';
 import { getPasswordHash } from '../realm/passwordRealm';
 import { deleteAllMessages } from '../realm/chatRealm';
 import { deleteAllContacts } from '../realm/contactRealm';
@@ -78,7 +79,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
   }
 
   return (
-    <View style={styles.container}>
+    <FullScreenSplash containerStyle={styles.container}>
       <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
       <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>Enter Your Password : </Text>
 
@@ -93,7 +94,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       buttonStyle={{backgroundColor : palette.offprimary,elevation : 2}}
       disabled={password.length == 0}
       onPress={checkPassword}/>
-    </View>
+    </FullScreenSplash>
   )
 }
 
