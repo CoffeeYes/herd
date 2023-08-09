@@ -28,6 +28,9 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   const checkPassword = async () => {
     setError("");
+    if(password.trim().length !== password.length) {
+      return setError("Your password cannot include leading or trailing spaces.")
+    }
     const passwordHash = await Crypto.createHash(password);
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
@@ -92,7 +95,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       <CustomButton
       text="Submit"
       buttonStyle={{backgroundColor : palette.offprimary,elevation : 2}}
-      disabled={password.length == 0}
+      disabled={password.trim().length == 0}
       onPress={checkPassword}/>
     </FullScreenSplash>
   )
