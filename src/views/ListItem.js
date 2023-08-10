@@ -6,7 +6,7 @@ import { imageValues, palette } from '../assets/palette';
 
 const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
-                    disableTouch, rightTextStyle, rightIcon, rightIconSize, rightIconStyle,
+                    disableTouch, rightTextStyle, rightIcon, rightIconSize = 24, rightIconStyle,
                     highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
 
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
@@ -51,7 +51,7 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
       <Text style={{...styles.rightTextStyle,...rightTextStyle}}>{rightText}</Text>}
 
       {rightIcon &&
-      <Icon name={rightIcon} size={rightIconSize || 24} style={rightIconStyle}/>}
+      <Icon name={rightIcon} size={rightIconSize} style={rightIconStyle}/>}
 
       {highlighted && useSingularDeleteButton &&
       <TouchableOpacity

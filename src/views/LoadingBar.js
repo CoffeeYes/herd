@@ -3,7 +3,9 @@ import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor, animationDuration = 500}) => {
+const LoadingBar = ({containerStyle, loadingBarStyle,
+                     barColor = palette.grey, sliderColor = palette.black,
+                     animationDuration = 500}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
   const [containerWidth, setContainerWidth] = useState(0);
   const [barWidth, setBarWidth] = useState(0);
@@ -36,7 +38,7 @@ const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor, ani
     <View style={{
       ...styles.loadingContainerView,
       ...containerStyle,
-      ...(barColor && {backgroundColor : barColor})
+      backgroundColor : barColor
     }}
     onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
       <Animated.View
@@ -44,7 +46,7 @@ const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor, ani
         ...styles.loadingView,
         ...loadingBarStyle,
         marginLeft : loadingViewPosition,
-        ...(sliderColor && {backgroundColor : sliderColor})
+        backgroundColor : sliderColor
       }}
       onLayout={e => setBarWidth(e.nativeEvent.layout.width)}/>
     </View>
@@ -60,13 +62,11 @@ const styles = {
     alignSelf : "center",
     height : 10,
     borderRadius : 5,
-    backgroundColor : palette.grey,
     overflow : "hidden"
   },
   loadingView : {
     width : "20%",
     height : "100%",
-    backgroundColor : palette.black,
     borderRadius : 5
   }
 }

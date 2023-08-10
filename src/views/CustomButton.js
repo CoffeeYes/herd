@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
 
-const CustomButton = ({ onPress, rightIcon, rightIconSize, leftIcon, leftIconSize,
+const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled, disabledStyle}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (

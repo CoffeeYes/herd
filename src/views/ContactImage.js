@@ -3,7 +3,7 @@ import { Image, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ContactImage = ({ iconSize, imageWidth, imageHeight, imageURI }) => {
+const ContactImage = ({ iconSize = 24, imageWidth = 20, imageHeight = 20, imageURI }) => {
 
   return (
     <>
