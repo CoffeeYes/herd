@@ -3,7 +3,7 @@ import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey, createContact } from './contactRealm';
-import { parseRealmObject, parseRealmObjects} from './helper';
+import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from './helper';
 import { cloneDeep } from 'lodash';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
@@ -151,8 +151,9 @@ const addNewReceivedMessages = async (messages,dispatch) => {
   if(dispatch) {
     //add messages to queue
     dispatch(addMessagesToQueue(newMessages));
-    //add new messages meant for this user to their corresponding chats
-    const keys = newMessages.map(message => message.from.trim());
+    //pull unique keys from messages
+    const keys = getUniqueKeysFromMessages(newMessages,"from");
+
     const contacts = getContactsByKey(keys);
     newMessages.forEach(async message => {
       let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
@@ -166,7 +167,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
         contacts.push(contact);
         dispatch(addContact(contact));
       }
-      if(contact && message.to.trim() === ownPublicKey.trim()) {
+      else if(contact && message.to.trim() === ownPublicKey.trim()) {
         const decryptedText = decryptString(message.text)
         dispatch(addMessage(contact._id,{
           ...message,
@@ -183,10 +184,12 @@ const getContactsWithChats = async () => {
   //get all messages sent and received
   const sentMessages = messageCopyRealm.objects('Message');
   const receivedMessages = messageReceivedRealm.objects('Message');
-  let keys = [];
-  //get unique keys in all messages
-  sentMessages.forEach(message => !keys.includes(message.to.trim()) && keys.push(message.to.trim()));
-  receivedMessages.forEach(message => !keys.includes(message.from.trim()) && keys.push(message.from.trim()));
+
+  let keys = [
+    ...getUniqueKeysFromMessages(sentMessages,"to"),
+    ...getUniqueKeysFromMessages(receivedMessages,"from"),
+  ];
+
   if(keys.length > 0) {
     //get timestamp of last message for each key
     let lastMessages = {};

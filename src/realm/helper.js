@@ -15,8 +15,23 @@ const parseRealmObject = object => {
 const parseRealmObjects = objects => {
   return objects?.map(object => parseRealmObject(object)) || []
 }
+
+const getUniqueKeysFromMessages = (messages = [], toOrFrom) => {
+  if(!["to","from"].includes(toOrFrom)) {
+    throw new Error("getUniqueKeysFromMessages parameter toOrFrom is not equal to either 'to' or 'from'")
+  }
+  let keys = [];
+  for(message of messages) {
+    const key = message[toOrFrom].trim();
+    if(!keys.includes(key)) {
+      keys.push(key)
+    }
+  }
+  return keys;
+}
 export {
   parseRealmID,
   parseRealmObject,
-  parseRealmObjects
+  parseRealmObjects,
+  getUniqueKeysFromMessages
 }
