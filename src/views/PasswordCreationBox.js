@@ -24,7 +24,7 @@ const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSub
   )
 })
 
-const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
+const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
                             secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
                             primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle }) => {
@@ -53,7 +53,12 @@ const PasswordCreationBox = ({ description, error, primaryName, secondaryName,
             {description}
           </Text>}
 
-          <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
+          {errors.map((error,index) =>
+          <Text
+          key={error.replace(" ","_")}
+          style={{...styles.error, fontSize : customStyle.uiFontSize}}>
+            {error}
+          </Text>)}
 
           <PasswordField
           name={primaryName}

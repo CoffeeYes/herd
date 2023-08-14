@@ -14,30 +14,34 @@ import Crypto from '../nativeWrapper/Crypto';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
-  const [loginPasswordError, setLoginPasswordError] = useState("");
-  const [erasurePasswordError, setErasurePasswordError] = useState("");
+  const [loginPasswordErrors, setLoginPasswordErrors] = useState([]);
+  const [erasurePasswordErrors, setErasurePasswordErrors] = useState([]);
 
   const hasErasurePassword = useSelector(state => state.userReducer.erasurePasswordHash)?.length > 0;
   const hasLoginPassword = useSelector(state => state.userReducer.loginPasswordHash)?.length > 0;
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
+    let result = {valid : true, errors : []}
     if(password.trim() === "" || confirmation.trim() === "") {
-      return {valid : false, error : "Fields cannot be empty"}
+      result.valid = false;
+      result.errors.push("Fields cannot be empty")
     }
     if(whitespace.test(password) || whitespace.test(confirmation)) {
-      return {valid : false, error : "Passwords cannot contain spaces"}
+      result.valid = false;
+      result.errors.push("Passwords cannot contain spaces")
     }
     if(password !== confirmation) {
-      return {valid : false, error : "Passwords do not match"};
+      result.valid = false;
+      result.errors.push("Passwords do not match")
     }
-    return {valid : true};
+    return result;
   }
 
-  const savePassword = async (name, password, confirmation, setError) => {
+  const savePassword = async (name, password, confirmation, setErrors) => {
     const validate = checkValidPassword(password,confirmation);
     if(!validate.valid) {
-      setError(validate.error);
+      setErrors(validate.errors);
       return false;
     }
     const hash = await Crypto.createHash(password);
@@ -65,7 +69,7 @@ const PasswordSettings = () => {
     const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);
 
     if(loginAndErasureAreIdentical) {
-      setError("Login and Erasure password cannot be the same");
+      setErrors("Login and Erasure password cannot be the same");
       return false;
     }
 
@@ -75,7 +79,7 @@ const PasswordSettings = () => {
     }
 
     //reset error after validation so that error text does not "flash" when re-submitting after error
-    setError("");
+    setErrors([]);
 
     if(originalHash.length > 0) {
       updatePassword(name,hash);
@@ -84,7 +88,7 @@ const PasswordSettings = () => {
       createNewPassword(name,hash);
     }
     dispatch(setPassword(shortName,hash));
-    
+
     return true;
   }
 
@@ -129,12 +133,12 @@ meaning all contacts who have previously added you will need to add you again.`
         primaryName="Main Password"
         secondaryName="Confirm Main Password"
         description={mainPasswordDescription}
-        error={loginPasswordError}
+        errors={loginPasswordErrors}
         primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
           "loginPassword",
           loginPassword,
           confirmLoginPassword,
-          setLoginPasswordError
+          setLoginPasswordErrors
         )}
         primaryButtonText="Save"
         primaryButtonFlashText="Saved!"
@@ -149,12 +153,12 @@ meaning all contacts who have previously added you will need to add you again.`
         primaryName="Erasure Password"
         secondaryName="Confirm Erasure Password"
         description={erasurePasswordDescription}
-        error={erasurePasswordError}
+        errors={erasurePasswordErrors}
         primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
           "erasurePassword",
           erasurePassword,
-          confirmErasurePassword,
-          setErasurePasswordError
+          confirmErasurePasswords,
+          setErasurePasswordErrors
         )}
         primaryButtonText="Save"
         primaryButtonFlashText="Saved!"
