@@ -22,26 +22,23 @@ const PasswordSettings = () => {
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
-    let result = {valid : true, errors : []}
+    let errors = [];
     if(password.trim() === "" || confirmation.trim() === "") {
-      result.valid = false;
-      result.errors.push("Fields cannot be empty")
+      errors.push("Fields cannot be empty")
     }
     if(whitespace.test(password) || whitespace.test(confirmation)) {
-      result.valid = false;
-      result.errors.push("Passwords cannot contain spaces")
+      errors.push("Passwords cannot contain spaces")
     }
     if(password !== confirmation) {
-      result.valid = false;
-      result.errors.push("Passwords do not match")
+      errors.push("Passwords do not match")
     }
-    return result;
+    return errors;
   }
 
   const savePassword = async (name, password, confirmation, setErrors) => {
-    const validate = checkValidPassword(password,confirmation);
-    if(!validate.valid) {
-      setErrors(validate.errors);
+    const validationErrors = checkValidPassword(password,confirmation);
+    if(validationErrors.length > 0) {
+      setErrors(validationErrors);
       return false;
     }
     const hash = await Crypto.createHash(password);
