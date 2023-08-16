@@ -71,7 +71,7 @@ const PasswordSettings = () => {
     }
 
     if(!hasLoginPassword && name === "erasurePassword") {
-      setErasurePasswordError("You must set up a normal password before an erasure password can be used")
+      setErasurePasswordErrors(["You must set up a normal password before an erasure password can be used"])
       return false;
     }
 
@@ -154,7 +154,7 @@ meaning all contacts who have previously added you will need to add you again.`
         primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
           "erasurePassword",
           erasurePassword,
-          confirmErasurePasswords,
+          confirmErasurePassword,
           setErasurePasswordErrors
         )}
         primaryButtonText="Save"
