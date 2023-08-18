@@ -37,6 +37,8 @@ const AddContact = ({ navigation }) => {
   const requestBTPermissions = async () => {
     setBTError("");
     setRequestedPermissions([]);
+    //disable lockability so that lockscreen doesn't crop up when a modal is shown
+    dispatch(setLockable(false));
     let currentRequestedPermissions = [];
     const locationAllowed = await Bluetooth.checkLocationPermission();
     if(!locationAllowed) {
@@ -60,7 +62,6 @@ const AddContact = ({ navigation }) => {
 
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
-    dispatch(setLockable(false));
     if(!btEnabled) {
       await Bluetooth.requestBTEnable()
     }
