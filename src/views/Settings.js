@@ -150,15 +150,12 @@ const Settings = ({ navigation }) => {
         const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
         if(!grantBluetoothScanPermissions) {
           currentRequestedPermissions.push("Nearby-devices");
-          dispatch(setLockable(true));
-          return;
         }
       }
 
       if(currentRequestedPermissions.length > 0) {
         setRequestedPermissions(currentRequestedPermissions);
         setShowPermissionModal(true);
-        dispatch(setLockable(true));
         return;
       }
 
@@ -318,11 +315,17 @@ for the following permissions in order to allow Herd to function correctly.`
         icon="location-on"
         visible={showPermissionModal}
         permissions={requestedPermissions}
-        modalOnPress={() => setShowPermissionModal(false)}
-        onRequestClose={() => setShowPermissionModal(false)}
+        modalOnPress={() => {
+          dispatch(setLockable(true))
+          setShowPermissionModal(false)
+        }}
+        onRequestClose={() => {
+          dispatch(setLockable(true))
+          setShowPermissionModal(false)
+        }}
         buttonOnPress={() => {
           setShowPermissionModal(false);
-          dispatch(setLockable(false));
+          dispatch(setLockable(true));
           Bluetooth.navigateToApplicationSettings();
         }}
         description={locationModalDescription}
