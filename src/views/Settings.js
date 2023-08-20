@@ -66,6 +66,10 @@ const Settings = ({ navigation }) => {
     return true;
   }
 
+  useEffect(() => {
+    showPermissionModal && dispatch(setLockable(true))
+  },[showPermissionModal])
+
   const deleteAllChats = async () => {
     Alert.alert(
       'Discard you sure you want to delete all chats?',
@@ -205,6 +209,7 @@ const Settings = ({ navigation }) => {
         ServiceInterface.disableService();
       }
     }
+    dispatch(setLockable(true))
   }
 
   const closeRealms = () => {
@@ -315,17 +320,10 @@ for the following permissions in order to allow Herd to function correctly.`
         icon="location-on"
         visible={showPermissionModal}
         permissions={requestedPermissions}
-        modalOnPress={() => {
-          dispatch(setLockable(true))
-          setShowPermissionModal(false)
-        }}
-        onRequestClose={() => {
-          dispatch(setLockable(true))
-          setShowPermissionModal(false)
-        }}
+        modalOnPress={() => setShowPermissionModal(false)}
+        onRequestClose={() => setShowPermissionModal(false)}
         buttonOnPress={() => {
           setShowPermissionModal(false);
-          dispatch(setLockable(true));
           Bluetooth.navigateToApplicationSettings();
         }}
         description={locationModalDescription}
