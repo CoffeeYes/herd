@@ -62,7 +62,7 @@ const Settings = ({ navigation }) => {
   },[]);
 
   const copyKeyToClipboard = async () => {
-    setClipboard(await Crypto.loadKeyFromKeystore("herdPersonal"));
+    setClipboard(publicKey);
     return true;
   }
 
@@ -193,13 +193,12 @@ const Settings = ({ navigation }) => {
         setBackgroundTransfer(true);
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
-        const publicKey = (await Crypto.loadKeyFromKeystore("herdPersonal")).trim();
         const receivedMessagesForSelf = await getReceivedMessagesForSelf();
         ServiceInterface.enableService(
           messageQueue,
           receivedMessagesForSelf,
           deletedReceivedMessages,
-          publicKey
+          publicKey.trim()
         );
       }
     }

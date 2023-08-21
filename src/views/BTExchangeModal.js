@@ -17,6 +17,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [keySent, _setKeySent] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const otherKeyRef = useRef();
   const keyReceivedRef = useRef();
@@ -45,8 +46,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
       stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
         if(state === "Connected") {
           setActivityText("Connected, Waiting for Data");
-          const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-          await Bluetooth.writeToBTConnection(JSON.stringify({key : key}));
+          await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
         }
       })
       //listen for messages to receive keys and ACKS
