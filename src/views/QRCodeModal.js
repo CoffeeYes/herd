@@ -6,6 +6,17 @@ import CustomModal from './CustomModal';
 
 import { palette } from '../assets/palette';
 
+const determineSize = () => {
+  const { height, width } = Dimensions.get("window");
+  //determine size based on portrait or landscape orientation
+  if(height > width) {
+    return width * 0.75;
+  }
+  else {
+    return width * 0.35;
+  }
+}
+
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
@@ -21,7 +32,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
         <View style={styles.QRContainer}>
           <QRCode
           value={JSON.stringify(value)}
-          size={300}/>
+          size={determineSize()}/>
         </View>
       </View>
     </CustomModal>
