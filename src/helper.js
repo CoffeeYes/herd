@@ -40,7 +40,7 @@ const useScreenAdjustedIconSize = (windowDimensions, portraitMultiplier = 0.5, l
       setSize(getIconSizeFromOrientation(windowDimensions,portraitMultiplier,landscapeMultiplier));
     })
 
-    return orientationListener.remove
+    return () => {orientationListener.remove()}
   },[])
 
   return size;

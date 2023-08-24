@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
@@ -14,6 +14,8 @@ import { palette } from '../assets/palette';
 
 import { setLockable } from '../redux/actions/appStateActions';
 
+import { useScreenAdjustedIconSize } from '../helper';
+
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
   const [BTError,setBTError] = useState("");
@@ -21,6 +23,8 @@ const AddContact = ({ navigation }) => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
   const publicKey = useSelector(state => state.userReducer.publicKey);
+
+  const iconSize = useScreenAdjustedIconSize(Dimensions,0.35,0.1);
 
   useEffect(() => {
     initialBTCheck();
@@ -106,14 +110,14 @@ with other phones using bluetooth.`;
           }
           errorText={BTError}
           icon="bluetooth-searching"
-          iconSize={120}
+          iconSize={iconSize}
           text="Start Bluetooth Scan"/>
 
           <Card
           onPress={() => navigation.navigate("editContact")}
           cardStyle={styles.rightCard}
           icon="import-export"
-          iconSize={120}
+          iconSize={iconSize}
           text="Import Key"/>
 
         </View>
@@ -124,14 +128,14 @@ with other phones using bluetooth.`;
           onPress={() => setShowQRCode(true)}
           cardStyle={styles.leftCard}
           icon="qr-code-2"
-          iconSize={120}
+          iconSize={iconSize}
           text="Show My QR Code"/>
 
           <Card
           onPress={() => navigation.navigate("QRScanner")}
           cardStyle={styles.rightCard}
           icon="qr-code-scanner"
-          iconSize={120}
+          iconSize={iconSize}
           text="Scan QR Code"/>
 
         </View>
