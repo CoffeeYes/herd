@@ -17,27 +17,32 @@ const timestampToText = (timestamp,format) => {
   }
 }
 
-const getIconSizeFromOrientation = (windowDimensions, portraitMultiplier, landscapeMultiplier) => {
-  const { width, height } = windowDimensions.get("window");
-
+const getIconSizeFromOrientation = (dimensions, portraitMultiplier, landscapeMultiplier, multiplyBy) => {
+  const windowDimensions = dimensions.get("window");
+  const { width, height } = windowDimensions;
+  const multiplicationBase = windowDimensions[multiplyBy];
   if(height > width) {
-    return width * portraitMultiplier;
+    return multiplicationBase * portraitMultiplier;
   }
   else {
-    return width * landscapeMultiplier;
+    return multiplicationBase * landscapeMultiplier;
   }
 }
 
-const useScreenAdjustedIconSize = (windowDimensions, portraitMultiplier = 0.5, landscapeMultiplier = 0.5) => {
+const useScreenAdjustedIconSize = (dimensions, portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width") => {
+  if(!["width","height"].includes(multiplyBy.toLowerCase())) {
+    throw new Error("argument 'multiplyBy' passed to useScreenAdjustedIconSize is not 'width' or 'height'");
+  }
+
   const [size, setSize] = useState(1);
 
   useEffect(() => {
     //set initial iconSize based on orientation
-    setSize(getIconSizeFromOrientation(windowDimensions,portraitMultiplier,landscapeMultiplier));
+    setSize(getIconSizeFromOrientation(dimensions,portraitMultiplier,landscapeMultiplier,multiplyBy));
 
     //adjust iconSize whenever orientation is changed
-    const orientationListener = windowDimensions.addEventListener("change",() => {
-      setSize(getIconSizeFromOrientation(windowDimensions,portraitMultiplier,landscapeMultiplier));
+    const orientationListener = dimensions.addEventListener("change",() => {
+      setSize(getIconSizeFromOrientation(dimensions,portraitMultiplier,landscapeMultiplier,multiplyBy));
     })
 
     return () => {orientationListener.remove()}
