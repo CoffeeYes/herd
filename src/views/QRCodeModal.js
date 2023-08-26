@@ -5,11 +5,11 @@ import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedIconSize } from '../helper';
+import { useScreenAdjustedSize } from '../helper';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const qrCodeSize = useScreenAdjustedIconSize(Dimensions,0.75,0.35);
+  const qrCodeSize = useScreenAdjustedSize(Dimensions,0.75,0.35);
   return (
     <CustomModal
     visible={visible}

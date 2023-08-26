@@ -6,12 +6,16 @@ import navigationRef from '../NavigationRef'
 
 import { palette } from '../assets/palette';
 
+import { useScreenAdjustedSize } from '../helper';
+
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
                   onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles)
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  const headerHeight = useScreenAdjustedSize(Dimensions,0.085,0.2,"height");
+  const rightButtonWidth = useScreenAdjustedSize(Dimensions,0.2,0.15);
   return (
-    <View style={{...styles.container,...containerStyle}}>
+    <View style={{...styles.container,...containerStyle,height : headerHeight}}>
       {allowGoBack &&
         <TouchableOpacity onPress={() => navigationRef.current.goBack()} style={{paddingVertical : 15}}>
           <Icon name="arrow-back" size={backArrowSize || customStyle.uiFontSize + 16} style={{...styles.backArrow,...backArrowStyle}}/>
@@ -29,7 +33,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
-      style={styles.rightButton}>
+      style={{...styles.rightButton,width : rightButtonWidth}}>
         <Icon name={rightButtonIcon} size={rightIconSize || customStyle.uiFontSize + 16} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
@@ -43,7 +47,6 @@ const styles = {
     alignItems : "center",
     backgroundColor : palette.primary,
     paddingLeft : 10,
-    height : Dimensions.get("window").height * 0.085
   },
   title : {
     color : palette.white,

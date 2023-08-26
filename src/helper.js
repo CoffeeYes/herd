@@ -29,9 +29,9 @@ const getIconSizeFromOrientation = (dimensions, portraitMultiplier, landscapeMul
   }
 }
 
-const useScreenAdjustedIconSize = (dimensions, portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width") => {
+const useScreenAdjustedSize = (dimensions, portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width") => {
   if(!["width","height"].includes(multiplyBy.toLowerCase())) {
-    throw new Error("argument 'multiplyBy' passed to useScreenAdjustedIconSize is not 'width' or 'height'");
+    throw new Error("argument 'multiplyBy' passed to useScreenAdjustedSize is not 'width' or 'height'");
   }
 
   const [size, setSize] = useState(1);
@@ -53,5 +53,5 @@ const useScreenAdjustedIconSize = (dimensions, portraitMultiplier = 0.5, landsca
 
 export {
   timestampToText,
-  useScreenAdjustedIconSize
+  useScreenAdjustedSize
 }

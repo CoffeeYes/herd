@@ -14,7 +14,7 @@ import { palette } from '../assets/palette';
 
 import { setLockable } from '../redux/actions/appStateActions';
 
-import { useScreenAdjustedIconSize } from '../helper';
+import { useScreenAdjustedSize } from '../helper';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,7 +24,7 @@ const AddContact = ({ navigation }) => {
   const [requestedPermissions, setRequestedPermissions] = useState([]);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
-  const iconSize = useScreenAdjustedIconSize(Dimensions,0.35,0.1);
+  const iconSize = useScreenAdjustedSize(Dimensions,0.35,0.1);
 
   useEffect(() => {
     initialBTCheck();
