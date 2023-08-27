@@ -3,6 +3,7 @@ import { Text, View, TouchableOpacity, Dimensions, Image } from 'react-native';
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues, palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
@@ -11,6 +12,8 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
 
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
+
+  const imageWidth = useScreenAdjustedSize(Dimensions,0.15,0.08);
 
   return (
     <TouchableOpacity
@@ -29,7 +32,12 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
     }}
     disabled={disableTouch}
     onLongPress={onLongPress}>
-      <View style={{...styles.imageContainer,...imageContainerStyle}}>
+      <View style={{
+      ...styles.imageContainer,
+      width : imageWidth,
+      height : imageWidth,
+      borderRadius : imageWidth / 2,
+      ...imageContainerStyle}}>
         <ContactImage
         imageURI={image}
         iconSize={24}
@@ -84,10 +92,7 @@ const styles = {
   imageContainer : {
     borderWidth : 1,
     borderColor : palette.grey,
-    width : Dimensions.get("window").width * imageValues.smallFactor,
-    height : Dimensions.get("window").width * imageValues.smallFactor,
     marginRight : 10,
-    borderRadius : Dimensions.get("window").width * (imageValues.smallFactor/2),
     overflow : "hidden",
     alignSelf : "center",
     alignItems : "center",
