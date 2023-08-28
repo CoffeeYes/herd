@@ -5,8 +5,12 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import CustomSlider from './Slider'
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const ColorChoice = ({ style, setColor, color, oldColor }) => {
+
+  const pickerHeight = useScreenAdjustedSize(Dimensions, 0.5,0.7, "height");
+  const pickerWidth = useScreenAdjustedSize(Dimensions,0.8,0.8);
 
   const Slider = useCallback(props => {
     return (
@@ -29,7 +33,11 @@ const ColorChoice = ({ style, setColor, color, oldColor }) => {
       <ColorPicker
         color={color}
         oldColor={oldColor}
-        style={{...styles.colorPicker,...style}}
+        style={{
+          height : pickerHeight,
+          width : pickerWidth,
+          ...style
+        }}
         sliderComponent={Slider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
       />
@@ -43,10 +51,6 @@ const styles = {
   colorPickerContainer : {
     alignItems : "center",
     paddingBottom : 10
-  },
-  colorPicker : {
-    width : Dimensions.get("window").width * 0.8,
-    height : Dimensions.get("window").height * 0.5
   },
   tab : {
     alignItems : "center",
