@@ -14,6 +14,7 @@ import CustomModal from './CustomModal';
 import { getContactById } from '../realm/contactRealm';
 
 import { largeImageContainerStyle } from '../assets/styles';
+import { useScreenAdjustedSize } from '../helper';
 
 const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
@@ -21,6 +22,7 @@ const Contact = ({route, navigation}) => {
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
 
+  const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9)
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
     return true;
@@ -55,6 +57,7 @@ const Contact = ({route, navigation}) => {
 
         <View style={{alignItems : "center"}}>
           <CardButton
+          containerStyle={{width : cardButtonWidth}}
           text="Copy Key"
           flashText="Copied!"
           timeout={500}
@@ -62,16 +65,19 @@ const Contact = ({route, navigation}) => {
           onPress={copyKeyToClipboard}/>
 
           <CardButton
+          containerStyle={{width : cardButtonWidth}}
           onPress={() => setShowQRCode(true)}
           rightIcon="qr-code"
           text="Show Contact's QR Code"/>
 
           <CardButton
+          containerStyle={{width : cardButtonWidth}}
           onPress={shareContact}
           rightIcon="share"
           text="Share Contact"/>
 
           <CardButton
+          containerStyle={{width : cardButtonWidth}}
           onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
           rightIcon="chat"
           text="Go To Chat"/>

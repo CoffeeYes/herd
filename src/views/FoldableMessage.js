@@ -18,9 +18,9 @@ const componentShouldUpdate = (props, nextProps) => {
 }
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
-                          openTimestamp}) => {
+                          openTimestamp, containerStyle}) => {
   return (
-    <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20}} onPress={onPress}>
+    <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress}>
       <View style={{width : "100%"}}>
         {loading ?
         <LoadingBar barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>

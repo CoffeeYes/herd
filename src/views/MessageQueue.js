@@ -10,7 +10,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 
-import { timestampToText } from '../helper.js';
+import { timestampToText, useScreenAdjustedSize } from '../helper.js';
 
 import moment from 'moment';
 
@@ -22,6 +22,8 @@ const MessageQueue = ({}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
+
+  const messageWidth = useScreenAdjustedSize(Dimensions, 0.8, 0.8)
 
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
@@ -83,7 +85,7 @@ const MessageQueue = ({}) => {
 
   const renderItemCallback = useCallback( ({ item }) => {
     return renderItem({ item })
-  },[parsedQueue,loading,openMessages])
+  },[parsedQueue,loading,openMessages, Dimensions.get("window").width])
 
   const renderItem = ({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
@@ -91,6 +93,7 @@ const MessageQueue = ({}) => {
 
     return (
       <FoldableMessage
+      containerStyle={{width : messageWidth}}
       to={item.toContactName}
       from={item.fromContactName}
       open={openMessages.includes(item._id)}

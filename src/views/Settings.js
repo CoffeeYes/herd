@@ -26,6 +26,8 @@ import { setLockable } from '../redux/actions/appStateActions';
 
 import { palette } from '../assets/palette';
 
+import { useScreenAdjustedSize } from '../helper';
+
 import {
   getMessageQueue,
   getDeletedReceivedMessages,
@@ -46,6 +48,8 @@ const Settings = ({ navigation }) => {
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
+
+  const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
@@ -229,7 +233,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
       <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={styles.backgroundTransferCard}>
+        <View style={{...styles.backgroundTransferCard, width : cardButtonWidth}}>
 
           {!backgroundTransfer &&
           <Text style={{...styles.warning, fontSize : customStyle.uiFontSize}}>
@@ -250,6 +254,7 @@ for the following permissions in order to allow Herd to function correctly.`
         </View>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Copy Your Key"
         flashText="Copied!"
         timeout={500}
@@ -257,21 +262,25 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={copyKeyToClipboard}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Show My QR Code"
         rightIcon="qr-code-2"
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Customise"
         rightIcon="edit"
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Message Queue"
         rightIcon="message"
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Password Protection"
         rightIcon="lock"
         onPress={() => userHasPassword ?
@@ -281,6 +290,7 @@ for the following permissions in order to allow Herd to function correctly.`
         />
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Delete All Chats"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -288,6 +298,7 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={deleteAllChats}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Delete All Contacts"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -295,6 +306,7 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={deleteAllContacts}/>
 
         <CardButton
+        containerStyle={{width : cardButtonWidth}}
         text="Delete All Messages"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
