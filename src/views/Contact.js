@@ -23,6 +23,8 @@ const Contact = ({route, navigation}) => {
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
 
   const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9)
+  const contactImageWidth = useScreenAdjustedSize(Dimensions,0.4,0.25)
+
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
     return true;
@@ -45,14 +47,19 @@ const Contact = ({route, navigation}) => {
 
       <ScrollView contentContainerStyle={{paddingVertical : 20}}>
         <TouchableOpacity
-        style={largeImageContainerStyle}
+        style={{
+          ...largeImageContainerStyle,
+          width : contactImageWidth,
+          height : contactImageWidth,
+          borderRadius : contactImageWidth / 2
+        }}
         disabled={contact?.image?.trim()?.length === 0}
         onPress={() => setShowLargeImage(true)}>
           <ContactImage
           imageURI={contact.image}
           iconSize={64}
-          imageWidth={Dimensions.get("window").width * 0.4}
-          imageHeight={Dimensions.get("window").height * 0.4}/>
+          imageWidth={contactImageWidth}
+          imageHeight={contactImageWidth}/>
         </TouchableOpacity>
 
         <View style={{alignItems : "center"}}>
