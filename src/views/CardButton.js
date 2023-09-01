@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { palette } from '../assets/palette';
 
 const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
-                      containerStyle, textStyle, flashText, timeout, disableTouch }) => {
+                      containerStyle, textStyle, textContainerStyle, flashText, timeout, disableTouch }) => {
   const customStyle = useSelector(state => state.chatReducer.styles)
   const [currentText, setCurrentText] = useState(text);
 
@@ -27,7 +27,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
     onPress={flash}>
 
       {currentText?.length > 0 &&
-      <View style={styles.textContainer}>
+      <View style={{...styles.textContainer, ...textContainerStyle}}>
         <Text style={{
         ...styles.text,
         fontSize : customStyle.uiFontSize,

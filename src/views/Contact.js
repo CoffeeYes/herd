@@ -23,6 +23,7 @@ const Contact = ({route, navigation}) => {
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
 
   const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9)
+  const cardButtonTextWidth = useScreenAdjustedSize(Dimensions, 0.4, 0.4)
   const contactImageWidth = useScreenAdjustedSize(Dimensions,0.4,0.25)
 
   const copyKeyToClipboard = () => {
@@ -65,6 +66,7 @@ const Contact = ({route, navigation}) => {
         <View style={{alignItems : "center"}}>
           <CardButton
           containerStyle={{width : cardButtonWidth}}
+          textContainerStyle={{width : cardButtonTextWidth}}
           text="Copy Key"
           flashText="Copied!"
           timeout={500}
@@ -73,18 +75,21 @@ const Contact = ({route, navigation}) => {
 
           <CardButton
           containerStyle={{width : cardButtonWidth}}
+          textContainerStyle={{width : cardButtonTextWidth}}
           onPress={() => setShowQRCode(true)}
           rightIcon="qr-code"
           text="Show Contact's QR Code"/>
 
           <CardButton
           containerStyle={{width : cardButtonWidth}}
+          textContainerStyle={{width : cardButtonTextWidth}}
           onPress={shareContact}
           rightIcon="share"
           text="Share Contact"/>
 
           <CardButton
           containerStyle={{width : cardButtonWidth}}
+          textContainerStyle={{width : cardButtonTextWidth}}
           onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
           rightIcon="chat"
           text="Go To Chat"/>

@@ -50,6 +50,7 @@ const Settings = ({ navigation }) => {
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
   const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9);
+  const cardButtonTextWidth = useScreenAdjustedSize(Dimensions, 0.4, 0.4);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
@@ -255,6 +256,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Copy Your Key"
         flashText="Copied!"
         timeout={500}
@@ -263,24 +265,28 @@ for the following permissions in order to allow Herd to function correctly.`
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Show My QR Code"
         rightIcon="qr-code-2"
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Customise"
         rightIcon="edit"
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Message Queue"
         rightIcon="message"
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Password Protection"
         rightIcon="lock"
         onPress={() => userHasPassword ?
@@ -291,6 +297,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Delete All Chats"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -299,6 +306,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Delete All Contacts"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -307,6 +315,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
         <CardButton
         containerStyle={{width : cardButtonWidth}}
+        textContainerStyle={{width : cardButtonTextWidth}}
         text="Delete All Messages"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
