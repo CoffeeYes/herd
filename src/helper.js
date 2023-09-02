@@ -1,5 +1,6 @@
 import moment from 'moment';
-import React, { useState, useEffect, Dimensions } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Dimensions } from 'react-native';
 
 const timestampToText = (timestamp,format) => {
   const today = moment();
@@ -17,8 +18,8 @@ const timestampToText = (timestamp,format) => {
   }
 }
 
-const getIconSizeFromOrientation = (dimensions, portraitMultiplier, landscapeMultiplier, multiplyBy) => {
-  const windowDimensions = dimensions.get("window");
+const getIconSizeFromOrientation = (portraitMultiplier, landscapeMultiplier, multiplyBy) => {
+  const windowDimensions = Dimensions.get("window");
   const { width, height } = windowDimensions;
   const multiplicationBase = windowDimensions[multiplyBy];
   if(height > width) {
@@ -29,7 +30,7 @@ const getIconSizeFromOrientation = (dimensions, portraitMultiplier, landscapeMul
   }
 }
 
-const useScreenAdjustedSize = (dimensions, portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width") => {
+const useScreenAdjustedSize = (portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width") => {
   if(!["width","height"].includes(multiplyBy.toLowerCase())) {
     throw new Error("argument 'multiplyBy' passed to useScreenAdjustedSize is not 'width' or 'height'");
   }
@@ -38,11 +39,11 @@ const useScreenAdjustedSize = (dimensions, portraitMultiplier = 0.5, landscapeMu
 
   useEffect(() => {
     //set initial iconSize based on orientation
-    setSize(getIconSizeFromOrientation(dimensions,portraitMultiplier,landscapeMultiplier,multiplyBy));
+    setSize(getIconSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy));
 
     //adjust iconSize whenever orientation is changed
-    const orientationListener = dimensions.addEventListener("change",() => {
-      setSize(getIconSizeFromOrientation(dimensions,portraitMultiplier,landscapeMultiplier,multiplyBy));
+    const orientationListener = Dimensions.addEventListener("change",() => {
+      setSize(getIconSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy));
     })
 
     return () => {orientationListener.remove()}

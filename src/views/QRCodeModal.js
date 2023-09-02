@@ -9,7 +9,7 @@ import { useScreenAdjustedSize } from '../helper';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const qrCodeSize = useScreenAdjustedSize(Dimensions,0.75,0.35);
+  const qrCodeSize = useScreenAdjustedSize(0.75,0.35);
   return (
     <CustomModal
     visible={visible}

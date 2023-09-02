@@ -49,8 +49,8 @@ const Settings = ({ navigation }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
-  const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9);
-  const cardButtonTextWidth = useScreenAdjustedSize(Dimensions, 0.4, 0.4);
+  const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9);
+  const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));

@@ -47,8 +47,8 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize};
 
-  const buttonWidth = useScreenAdjustedSize(Dimensions, 0.4, 0.4);
-  const inputWidth = useScreenAdjustedSize(Dimensions, 0.8, 0.8);
+  const buttonWidth = useScreenAdjustedSize( 0.4, 0.4);
+  const inputWidth = useScreenAdjustedSize( 0.8, 0.8);
 
   return (
         <View style={{...mainContainerStyle, ...styles.card}}>

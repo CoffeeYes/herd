@@ -12,8 +12,8 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
                   onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const headerHeight = useScreenAdjustedSize(Dimensions,0.085,0.2,"height");
-  const rightButtonWidth = useScreenAdjustedSize(Dimensions,0.2,0.15);
+  const headerHeight = useScreenAdjustedSize(0.085,0.2,"height");
+  const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
   return (
     <View style={{...styles.container,...containerStyle,height : headerHeight}}>
       {allowGoBack &&

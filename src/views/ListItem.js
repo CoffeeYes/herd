@@ -13,7 +13,7 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
-  const imageWidth = useScreenAdjustedSize(Dimensions,0.15,0.08);
+  const imageWidth = useScreenAdjustedSize(0.15,0.08);
 
   return (
     <TouchableOpacity

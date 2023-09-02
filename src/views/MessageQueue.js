@@ -23,7 +23,7 @@ const MessageQueue = ({}) => {
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
 
-  const messageWidth = useScreenAdjustedSize(Dimensions, 0.8, 0.8)
+  const messageWidth = useScreenAdjustedSize( 0.8, 0.8)
 
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;

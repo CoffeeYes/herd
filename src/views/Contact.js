@@ -22,9 +22,9 @@ const Contact = ({route, navigation}) => {
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
 
-  const cardButtonWidth = useScreenAdjustedSize(Dimensions, 0.9, 0.9)
-  const cardButtonTextWidth = useScreenAdjustedSize(Dimensions, 0.4, 0.4)
-  const contactImageWidth = useScreenAdjustedSize(Dimensions,0.4,0.25)
+  const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9)
+  const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4)
+  const contactImageWidth = useScreenAdjustedSize(0.4,0.25)
 
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
