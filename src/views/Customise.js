@@ -21,6 +21,7 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles } from '../assets/styles';
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -36,6 +37,8 @@ const Customise = ({ navigation }) => {
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
 
+  const buttonWidth = useScreenAdjustedSize(0.3,0.2);
+  const cardWidth = useScreenAdjustedSize(0.8,0.8);
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
@@ -247,7 +250,7 @@ const Customise = ({ navigation }) => {
           containerStyle={{marginTop : 10}}/>
 
           <CardButton
-          containerStyle={{alignSelf : "center"}}
+          containerStyle={{alignSelf : "center",width : cardWidth}}
           disableTouch
           text="Preview"
           textStyle={{fontSize : uiFontSize}}
@@ -334,6 +337,7 @@ const Customise = ({ navigation }) => {
 
           <View style={styles.buttonRow}>
             <FlashTextButton
+            buttonStyle={{width : buttonWidth}}
             normalText="Save"
             flashText="Saved!"
             onPress={saveStyles}
@@ -348,7 +352,7 @@ const Customise = ({ navigation }) => {
             text={"Restore Default"}
             onPress={restoreDefault}
             disabled={checkStylesAreEqual(originalStyles,defaultChatStyles)}
-            buttonStyle={{ ...styles.button, marginLeft : 10}}/>
+            buttonStyle={{ ...styles.button, marginLeft : 10, width : buttonWidth}}/>
 
           </View>
         </>}
