@@ -337,12 +337,11 @@ const Customise = ({ navigation }) => {
 
           <View style={styles.buttonRow}>
             <FlashTextButton
-            buttonStyle={{width : buttonWidth}}
             normalText="Save"
             flashText="Saved!"
             onPress={saveStyles}
             timeout={500}
-            buttonStyle={{...styles.button, flexDirection : "row"}}
+            buttonStyle={{...styles.button, flexDirection : "row", width : buttonWidth}}
             disabled={checkStylesAreEqual({
               sentBoxColor,sentTextColor,receivedBoxColor,
               receivedTextColor,messageFontSize,uiFontSize
