@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues, palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyle, textStyle,
+const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
                     disableTouch, rightTextStyle, rightIcon, rightIconSize = 24, rightIconStyle,
                     highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
@@ -40,7 +40,7 @@ const ListItem = ({ name, image, deleteItem, onPress, onLongPress, containerStyl
       ...imageContainerStyle}}>
         <ContactImage
         imageURI={image}
-        iconSize={24}
+        iconSize={imageIconSize}
         imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
         imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
       </View>
