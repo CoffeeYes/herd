@@ -39,24 +39,4 @@ const Main = ({ navigation, route }) => {
     )
 }
 
-const styles = {
-  navContainer : {
-    backgroundColor : palette.white,
-    flexDirection : "row",
-    justifyContent : "space-between",
-    width : "100%"
-  },
-  navItem : {
-    padding : 20,
-    flex : 1,
-    alignItems : "center"
-  },
-  navItemActive : {
-    padding : 20,
-    flex : 1,
-    alignItems : "center",
-    backgroundColor : palette.primary
-  }
-}
-
 export default Main

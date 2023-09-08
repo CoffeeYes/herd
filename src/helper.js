@@ -35,12 +35,9 @@ const useScreenAdjustedSize = (portraitMultiplier = 0.5, landscapeMultiplier = 0
     throw new Error("argument 'multiplyBy' passed to useScreenAdjustedSize is not 'width' or 'height'");
   }
 
-  const [size, setSize] = useState(1);
+  const [size, setSize] = useState(getIconSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy));
 
   useEffect(() => {
-    //set initial iconSize based on orientation
-    setSize(getIconSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy));
-
     //adjust iconSize whenever orientation is changed
     const orientationListener = Dimensions.addEventListener("change",() => {
       setSize(getIconSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy));
