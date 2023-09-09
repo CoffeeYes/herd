@@ -49,9 +49,10 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
 
   const buttonWidth = useScreenAdjustedSize( 0.4, 0.4);
   const inputWidth = useScreenAdjustedSize( 0.8, 0.8);
+  const containerWidth = useScreenAdjustedSize(0.9,0.9);
 
   return (
-        <View style={{...mainContainerStyle, ...styles.card}}>
+        <View style={{...styles.card, width : containerWidth,...mainContainerStyle }}>
 
           {description &&
           <Text multiline style={{fontSize : customStyle.uiFontSize}}>

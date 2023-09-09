@@ -21,12 +21,18 @@ const timestampToText = (timestamp,format) => {
 const getIconSizeFromOrientation = (portraitMultiplier, landscapeMultiplier, multiplyBy) => {
   const windowDimensions = Dimensions.get("window");
   const { width, height } = windowDimensions;
+
   const multiplicationBase = windowDimensions[multiplyBy];
+  let oversizeReductionFactor = 1;
+  
   if(height > width) {
     return multiplicationBase * portraitMultiplier;
   }
   else {
-    return multiplicationBase * landscapeMultiplier;
+    if(width > 1000) {
+      oversizeReductionFactor = 0.7;
+    }
+    return multiplicationBase * landscapeMultiplier * oversizeReductionFactor;
   }
 }
 
