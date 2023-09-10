@@ -8,15 +8,18 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 
+import { useScreenAdjustedSize } from '../helper';
+
 const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
                          description, instructionText, icon, iconSize = 48, permissions}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const containerWidth = useScreenAdjustedSize(0.9,0.9);
   return (
     <CustomModal
     onPress={modalOnPress}
     onRequestClose={onRequestClose}
     visible={visible}>
-      <View style={styles.modalContentContainer}>
+      <View style={{...styles.modalContentContainer, width : containerWidth}}>
         {icon &&
         <Icon name={icon} size={iconSize}/>}
 
@@ -50,9 +53,7 @@ const styles = {
     backgroundColor : palette.white,
     borderRadius : 5,
     padding : 30,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
+    alignItems : "center"
   }
 }
 
