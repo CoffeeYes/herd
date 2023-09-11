@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { View, ScrollView, Text, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -14,12 +14,14 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
                          description, instructionText, icon, iconSize = 48, permissions}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const containerWidth = useScreenAdjustedSize(0.9,0.9);
+  const screenHeight = useScreenAdjustedSize(1,1,"height");
   return (
     <CustomModal
     onPress={modalOnPress}
     onRequestClose={onRequestClose}
     visible={visible}>
-      <View style={{...styles.modalContentContainer, width : containerWidth}}>
+      <View style={{...styles.modalContentContainer, width : containerWidth, maxHeight : screenHeight * 0.9}}>
+        <ScrollView contentContainerStyle={{alignItems : "center"}}>
         {icon &&
         <Icon name={icon} size={iconSize}/>}
 
@@ -35,7 +37,7 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
 
         {permissions?.map(permission => {
           return(
-            <Text key={permission} style={{fontWeight : "bold"}}>{permission}</Text>
+            <Text key={permission} style={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}>{permission}</Text>
           )
         })}
 
@@ -43,6 +45,7 @@ const LocationModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
         buttonStyle={{marginTop : 20}}
         onPress={buttonOnPress}
         text="Go To Settings"/>
+        </ScrollView>
       </View>
     </CustomModal>
   )
