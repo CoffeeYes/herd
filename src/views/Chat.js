@@ -13,6 +13,8 @@ import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { imageValues } from '../assets/palette';
 
+import { useScreenAdjustedSize } from '../helper';
+
 import {
   addChat,
   updateChat,
@@ -58,6 +60,8 @@ const Chat = ({ route, navigation }) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
+  const tenPercentWidth = useScreenAdjustedSize(0.1,0.1);
+  const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
 
   useEffect(() => {
     (async () => {
@@ -508,7 +512,7 @@ const Chat = ({ route, navigation }) => {
     style={{flex : 1}}>
 
       {showPopup &&
-      <View style={styles.popup}>
+      <View style={{...styles.popup,marginLeft : tenPercentWidth, marginTop : tenPercentWidth, width : eightyPercentWidth}}>
         <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
       </View>}
 
@@ -601,9 +605,6 @@ const styles = {
   },
   popup : {
     position : "absolute",
-    marginLeft : Dimensions.get("window").width * 0.1,
-    marginTop : Dimensions.get("window").height * 0.1,
-    width : Dimensions.get("window").width * 0.8,
     zIndex : 999,
     elevation : 999,
     backgroundColor : palette.white,
