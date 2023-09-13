@@ -62,6 +62,7 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
   const tenPercentWidth = useScreenAdjustedSize(0.1,0.1);
   const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
+  const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
 
   useEffect(() => {
     (async () => {
@@ -388,8 +389,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
-    let windowHeight = Dimensions.get('window').height;
-    if(contentHeight < windowHeight * 0.8 ) {
+    if(contentHeight < contentTooSmallHeight) {
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
     }
