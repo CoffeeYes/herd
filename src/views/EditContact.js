@@ -17,6 +17,7 @@ import { updateContact, addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -36,6 +37,11 @@ const EditContact = ({ route, navigation }) => {
   const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
   const originalContactRef = useRef(originalContact || {});
   const haveSavedContactRef = useRef(false);
+
+  const imageWidth = useScreenAdjustedSize(0.4,0.4);
+  const imageHeight = useScreenAdjustedSize(0.4,0.4,"height");
+
+  const inputContainerWidth = useScreenAdjustedSize(0.9,0.9);
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
@@ -199,8 +205,8 @@ const EditContact = ({ route, navigation }) => {
           <ContactImage
           imageURI={contactImage}
           iconSize={64}
-          imageWidth={Dimensions.get("window").width * 0.4}
-          imageHeight={Dimensions.get("window").height * 0.4}/>
+          imageWidth={imageWidth}
+          imageHeight={imageHeight}/>
         </TouchableOpacity>
 
         {errors.map(error => {
@@ -209,18 +215,22 @@ const EditContact = ({ route, navigation }) => {
           )
         })}
 
-        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
-        <TextInput
-        style={{...styles.input,fontSize : customStyle.uiFontSize}}
-        onChangeText={text => setName(text)}
-        value={name}/>
+        <View style={{width : inputContainerWidth}}>
+          <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
+          <TextInput
+          style={{...styles.input, fontSize : customStyle.uiFontSize}}
+          onChangeText={text => setName(text)}
+          value={name}/>
+        </View>
 
-        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
-        <TextInput
-        multiline={editingExistingContact}
-        style={{...styles.input,fontSize : customStyle.uiFontSize}}
-        onChangeText={text => setPublicKey(text)}
-        value={publicKey}/>
+        <View style={{width : inputContainerWidth}}>
+          <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
+          <TextInput
+          multiline={editingExistingContact}
+          style={{...styles.input,fontSize : customStyle.uiFontSize}}
+          onChangeText={text => setPublicKey(text)}
+          value={publicKey}/>
+        </View>
 
         <FlashTextButton
         normalText="Save"
@@ -264,7 +274,7 @@ const styles = {
     borderColor: palette.gray,
     borderWidth: 1,
     marginBottom : 10,
-    width : Dimensions.get('window').width * 0.9,
+    width : "100%",
     alignSelf : "center",
     padding : 10,
     backgroundColor : palette.white,
