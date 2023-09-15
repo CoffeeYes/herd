@@ -38,8 +38,7 @@ const EditContact = ({ route, navigation }) => {
   const originalContactRef = useRef(originalContact || {});
   const haveSavedContactRef = useRef(false);
 
-  const imageWidth = useScreenAdjustedSize(0.4,0.4);
-  const imageHeight = useScreenAdjustedSize(0.4,0.4,"height");
+  const contactImageSize = useScreenAdjustedSize(0.4,0.25)
 
   const inputContainerWidth = useScreenAdjustedSize(0.9,0.9);
 
@@ -199,15 +198,12 @@ const EditContact = ({ route, navigation }) => {
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps='handled'>
 
-        <TouchableOpacity
-        style={largeImageContainerStyle}
-        onPress={editImage}>
-          <ContactImage
-          imageURI={contactImage}
-          iconSize={64}
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}/>
-        </TouchableOpacity>
+        <ContactImage
+        containerStyle={largeImageContainerStyle}
+        imageURI={contactImage}
+        iconSize={64}
+        onPress={editImage}
+        size={contactImageSize}/>
 
         {errors.map(error => {
           return (

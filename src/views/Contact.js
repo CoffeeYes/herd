@@ -24,7 +24,7 @@ const Contact = ({route, navigation}) => {
 
   const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9)
   const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4)
-  const contactImageWidth = useScreenAdjustedSize(0.4,0.25)
+  const contactImageSize = useScreenAdjustedSize(0.4,0.25)
 
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
@@ -47,21 +47,14 @@ const Contact = ({route, navigation}) => {
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
       <ScrollView contentContainerStyle={{paddingVertical : 20}}>
-        <TouchableOpacity
-        style={{
-          ...largeImageContainerStyle,
-          width : contactImageWidth,
-          height : contactImageWidth,
-          borderRadius : contactImageWidth / 2
-        }}
-        disabled={contact?.image?.trim()?.length === 0}
-        onPress={() => setShowLargeImage(true)}>
-          <ContactImage
-          imageURI={contact.image}
-          iconSize={64}
-          imageWidth={contactImageWidth}
-          imageHeight={contactImageWidth}/>
-        </TouchableOpacity>
+
+        <ContactImage
+        containerStyle={largeImageContainerStyle}
+        disableTouch={contact?.image?.trim()?.length === 0}
+        imageURI={contact.image}
+        iconSize={64}
+        onPress={() => setShowLargeImage(true)}
+        size={contactImageSize}/>
 
         <View style={{alignItems : "center"}}>
           <CardButton

@@ -13,7 +13,7 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
-  const imageWidth = useScreenAdjustedSize(0.15,0.08);
+  const contactImageSize = useScreenAdjustedSize(0.15,0.08);
 
   return (
     <TouchableOpacity
@@ -32,18 +32,16 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
     }}
     disabled={disableTouch}
     onLongPress={onLongPress}>
-      <View style={{
-      ...styles.imageContainer,
-      width : imageWidth,
-      height : imageWidth,
-      borderRadius : imageWidth / 2,
-      ...imageContainerStyle}}>
-        <ContactImage
-        imageURI={image}
-        iconSize={imageIconSize}
-        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
-        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
-      </View>
+
+      <ContactImage
+      containerStyle={{...styles.imageContainer, ...imageContainerStyle}}
+      size={contactImageSize}
+      disableTouch
+      imageURI={image}
+      iconSize={imageIconSize}
+      imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
+      imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
+
       <View style={{flex : 1}}>
         <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
 
