@@ -63,6 +63,7 @@ const Chat = ({ route, navigation }) => {
   const tenPercentWidth = useScreenAdjustedSize(0.1,0.1);
   const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
+  const contactImageSize = useScreenAdjustedSize(0.12,0.08);
 
   useEffect(() => {
     (async () => {
@@ -499,13 +500,12 @@ const Chat = ({ route, navigation }) => {
     onTextTouch={() => navigation.navigate("contact", {id : parseRealmID(contactInfo)})}
     preText={
       contactInfo?.image?.length > 0 &&
-      <View style={styles.imageContainer}>
-        <ContactImage
-        imageURI={contactInfo.image}
-        iconSize={24}
-        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
-        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
-      </View>
+      <ContactImage
+      imageURI={contactInfo.image}
+      iconSize={24}
+      size={contactImageSize}
+      containerStyle={styles.imageContainer}
+      disableTouch/>
     }/>
     <KeyboardAvoidingView
     onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}
@@ -586,10 +586,7 @@ const styles = {
   imageContainer : {
     borderWidth : 1,
     borderColor : palette.grey,
-    width : Dimensions.get("window").width * imageValues.smallFactor,
-    height : Dimensions.get("window").width * imageValues.smallFactor,
     marginLeft : 10,
-    borderRadius : Dimensions.get("window").width * (imageValues.smallFactor/2),
     overflow : "hidden",
     alignSelf : "center",
     alignItems : "center",

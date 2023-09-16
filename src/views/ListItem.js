@@ -38,9 +38,7 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
       size={contactImageSize}
       disableTouch
       imageURI={image}
-      iconSize={imageIconSize}
-      imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
-      imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
+      iconSize={imageIconSize}/>
 
       <View style={{flex : 1}}>
         <Text style={{...styles.chatText,...textStyle}}>{name}</Text>

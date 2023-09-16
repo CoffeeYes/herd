@@ -3,7 +3,7 @@ import { Image, Dimensions, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const ContactImage = ({ iconSize = 24, imageWidth = 20, imageHeight = 20, imageURI, disableTouch = false,
+const ContactImage = ({ iconSize = 24, imageURI, disableTouch = false,
                         onPress, size = 24, containerStyle}) => {
 
   return (
@@ -19,7 +19,7 @@ const ContactImage = ({ iconSize = 24, imageWidth = 20, imageHeight = 20, imageU
       {imageURI?.length > 0 ?
       <Image
       source={{uri : imageURI}}
-      style={{width : imageWidth, height : imageHeight}}/>
+      style={{width : size * 2, height : size * 2}}/>
       :
       <Icon name="contact-page" size={iconSize}/>
       }
