@@ -3,9 +3,6 @@ import { palette } from './palette';
 
 const largeImageContainerStyle = {
   alignSelf : "center",
-  width : Dimensions.get("window").width * 0.4,
-  height : Dimensions.get("window").width * 0.4,
-  borderRadius : Dimensions.get("window").width * 0.2,
   borderWidth : 1,
   borderColor : palette.grey,
   alignItems : "center",
