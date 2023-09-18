@@ -20,11 +20,14 @@ const Contact = ({route, navigation}) => {
   const [clipboardData, setClipboard] = useClipboard();
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLargeImage, setShowLargeImage] = useState(false);
-  const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id))
+  const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id));
 
-  const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9)
-  const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4)
-  const contactImageSize = useScreenAdjustedSize(0.4,0.25)
+  const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9);
+  const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4);
+  const contactImageSize = useScreenAdjustedSize(0.4,0.25);
+
+  const largeImageWidth = useScreenAdjustedSize(0.8,0.8);
+  const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
 
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
@@ -104,17 +107,10 @@ const Contact = ({route, navigation}) => {
       onRequestClose={() => setShowLargeImage(false)}>
         <Image
         source={{uri : contact.image}}
-        style={styles.largeImage}/>
+        style={{height : largeImageHeight, width : largeImageWidth}}/>
       </CustomModal>
     </>
   )
-}
-
-const styles = {
-  largeImage : {
-    width : Dimensions.get("window").width * 0.8,
-    height : Dimensions.get("window").height * 0.8
-  }
 }
 
 export default Contact;
