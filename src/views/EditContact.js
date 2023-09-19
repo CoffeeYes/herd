@@ -210,22 +210,24 @@ const EditContact = ({ route, navigation }) => {
             <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
           )
         })}
+        
+        <View style={{alignItems : "center", width : "100%"}}>
+          <View style={{width : inputContainerWidth}}>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
+            <TextInput
+            style={{...styles.input, fontSize : customStyle.uiFontSize}}
+            onChangeText={text => setName(text)}
+            value={name}/>
+          </View>
 
-        <View style={{width : inputContainerWidth}}>
-          <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
-          <TextInput
-          style={{...styles.input, fontSize : customStyle.uiFontSize}}
-          onChangeText={text => setName(text)}
-          value={name}/>
-        </View>
-
-        <View style={{width : inputContainerWidth}}>
-          <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
-          <TextInput
-          multiline={editingExistingContact}
-          style={{...styles.input,fontSize : customStyle.uiFontSize}}
-          onChangeText={text => setPublicKey(text)}
-          value={publicKey}/>
+          <View style={{width : inputContainerWidth}}>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
+            <TextInput
+            multiline={editingExistingContact}
+            style={{...styles.input,fontSize : customStyle.uiFontSize}}
+            onChangeText={text => setPublicKey(text)}
+            value={publicKey}/>
+          </View>
         </View>
 
         <FlashTextButton

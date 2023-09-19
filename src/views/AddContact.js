@@ -24,7 +24,7 @@ const AddContact = ({ navigation }) => {
   const [requestedPermissions, setRequestedPermissions] = useState([]);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
-  const iconSize = useScreenAdjustedSize(0.35,0.1);
+  const iconSize = useScreenAdjustedSize(0.35,0.075);
 
   useEffect(() => {
     initialBTCheck();
