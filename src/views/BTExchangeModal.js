@@ -8,6 +8,7 @@ import CustomButton from './CustomButton';
 import navigationRef from '../NavigationRef';
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
@@ -18,6 +19,8 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
+
+  const contentWidth = useScreenAdjustedSize(0.8,0.6);
 
   const otherKeyRef = useRef();
   const keyReceivedRef = useRef();
@@ -100,7 +103,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     visible={visible}
     onRequestClose={() => setVisible(false)}
     disableOnPress>
-        <View style={styles.modalContentContainer}>
+        <View style={{...styles.modalContentContainer, width : contentWidth}}>
           <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
           <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
           <CustomButton
