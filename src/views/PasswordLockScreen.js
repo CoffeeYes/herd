@@ -15,6 +15,7 @@ import { setPublicKey } from '../redux/actions/userActions';
 import { eraseState } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -25,6 +26,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  const inputWidth = useScreenAdjustedSize(0.9,0.8);
 
   const checkPassword = async () => {
     setError("");
@@ -88,13 +91,13 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
       <TextInput
       secureTextEntry
-      style={{...styles.input, fontSize : customStyle.uiFontSize}}
+      style={{...styles.input, fontSize : customStyle.uiFontSize, width : inputWidth}}
       onChangeText={setPassword}
       value={password}/>
 
       <CustomButton
       text="Submit"
-      buttonStyle={{backgroundColor : palette.offprimary,elevation : 2}}
+      buttonStyle={{backgroundColor : palette.offprimary, elevation : 2}}
       disabled={password.trim().length == 0}
       onPress={checkPassword}/>
     </FullScreenSplash>

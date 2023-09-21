@@ -64,6 +64,7 @@ const Chat = ({ route, navigation }) => {
   const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.08);
+  const inputHeight = useScreenAdjustedSize(0.075,0.15,"height");
 
   useEffect(() => {
     (async () => {
@@ -551,7 +552,8 @@ const Chat = ({ route, navigation }) => {
           ...styles.chatInput,
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           fontSize : customStyle?.uiFontSize,
-          flex : 1
+          flex : 1,
+          height : inputHeight
         }}
         value={chatInput}
         editable={!inputDisabled}
