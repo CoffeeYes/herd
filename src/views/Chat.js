@@ -62,6 +62,7 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
   const tenPercentWidth = useScreenAdjustedSize(0.1,0.1);
   const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
+  const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.08);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height");
@@ -513,7 +514,7 @@ const Chat = ({ route, navigation }) => {
     style={{flex : 1}}>
 
       {showPopup &&
-      <View style={{...styles.popup,marginLeft : tenPercentWidth, marginTop : tenPercentWidth, width : eightyPercentWidth}}>
+      <View style={{...styles.popup, marginTop : twentyFivePercentHeight, width : eightyPercentWidth}}>
         <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
       </View>}
 
@@ -608,6 +609,7 @@ const styles = {
     elevation : 999,
     backgroundColor : palette.white,
     padding : 20,
+    alignSelf : "center",
     alignItems : "center",
     borderRadius : 5,
     borderColor : palette.primary,
