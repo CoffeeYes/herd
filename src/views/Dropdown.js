@@ -3,7 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-nati
 import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
+const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, dropDownBoxStyle,
                     itemStyle, textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
   const [open, setOpen] = useState(false);
   const [chosenIndex, setChosenIndex] = useState(defaultIndex);
@@ -18,7 +18,9 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
   return (
     <View style={{...styles.container, ...containerStyle}}>
 
-      <TouchableOpacity style={{...styles.choice, borderBottomWidth : 2}} onPress={() => setOpen(!open)}>
+      <TouchableOpacity
+      style={{...styles.choice, borderBottomWidth : 2,...dropDownBoxStyle}}
+      onPress={() => setOpen(!open)}>
         <Text style={{...styles.text,...textStyle}}>{choices[chosenIndex].text}</Text>
         <Icon
         size={24}

@@ -7,7 +7,7 @@ import CustomSlider from './Slider'
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const ColorChoice = ({ style, setColor, color, oldColor }) => {
+const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
 
   const pickerHeight = useScreenAdjustedSize( 0.5,0.7, "height");
   const pickerWidth = useScreenAdjustedSize(0.8,0.8);
@@ -29,11 +29,12 @@ const ColorChoice = ({ style, setColor, color, oldColor }) => {
   },[])
 
   return (
-    <View style={styles.colorPickerContainer}>
+    <View style={{...styles.colorPickerContainer, ...containerStyle}}>
       <ColorPicker
         color={color}
         oldColor={oldColor}
         style={{
+          ...styles.colorPicker,
           height : pickerHeight,
           width : pickerWidth,
           ...style
@@ -48,9 +49,13 @@ const ColorChoice = ({ style, setColor, color, oldColor }) => {
 export default ColorChoice
 
 const styles = {
+  colorPicker : {
+    maxHeight : 400,
+    maxWidth : 400,
+  },
   colorPickerContainer : {
     alignItems : "center",
-    paddingBottom : 10
+    paddingBottom : 10,
   },
   tab : {
     alignItems : "center",

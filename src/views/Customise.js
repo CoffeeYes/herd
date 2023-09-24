@@ -324,14 +324,14 @@ const Customise = ({ navigation }) => {
             choices={tabItems}
             textStyle={{fontSize : originalStyles.uiFontSize}}
             chosenStyle={{color : palette.primary}}
-            containerStyle={{borderRadius : 5}}
+            dropDownBoxStyle={{borderRadius : 5}}
             />
 
             <ColorChoice
-              title={tabItems[activeItem].name}
-              color={toHsv(tabItems[activeItem].color)}
-              setColor={tabItems[activeItem].setColor}
-              oldColor={originalStyles[tabItems[activeItem].originalColor]}
+            title={tabItems[activeItem].name}
+            color={toHsv(tabItems[activeItem].color)}
+            setColor={tabItems[activeItem].setColor}
+            oldColor={originalStyles[tabItems[activeItem].originalColor]}
             />
           </View>
 
