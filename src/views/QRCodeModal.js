@@ -9,22 +9,27 @@ import { useScreenAdjustedSize } from '../helper';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const qrCodeSize = useScreenAdjustedSize(0.7,0.3);
+  const qrCodeSize = useScreenAdjustedSize(0.7,0.5);
+  const maxContainerHeight = useScreenAdjustedSize(0.8,0.8,"height", false);
+  const maxContainerWidth = useScreenAdjustedSize(0.8,0.8);
+  
   return (
     <CustomModal
     visible={visible}
     onRequestClose={onRequestClose}
     onPress={onPress}>
-      <View style={styles.modalContentContainer}>
+      <View style={{
+        ...styles.modalContentContainer,
+        maxHeight : maxContainerHeight,
+        maxWidth : maxContainerWidth
+      }}>
         {title &&
         <View style={styles.header}>
           <Text style={{...styles.title,fontSize : customStyle.uiFontSize}}>{title}</Text>
         </View>}
-        <View style={styles.QRContainer}>
-          <QRCode
-          value={JSON.stringify(value)}
-          size={qrCodeSize}/>
-        </View>
+        <QRCode
+        value={JSON.stringify(value)}
+        size={qrCodeSize}/>
       </View>
     </CustomModal>
   )
@@ -54,9 +59,7 @@ const styles = {
     backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
+    alignItems : "center"
   },
   header : {
     marginBottom : 10
