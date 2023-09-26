@@ -18,35 +18,75 @@ const timestampToText = (timestamp,format) => {
   }
 }
 
-const getSizeFromOrientation = (portraitMultiplier, landscapeMultiplier, multiplyBy, useOversizeReduction) => {
+const getSizeFromOrientation = (
+  portraitMultiplier,
+  landscapeMultiplier,
+  multiplyBy,
+  portraitOversizeCorrectionFactor = 1,
+  landscapeOversizeCorrectionFactor = 1,
+  portraitOversizeCorrectionThreshold,
+  landscapeOversizeCorrectionThreshold,
+) => {
   const windowDimensions = Dimensions.get("window");
   const { width, height } = windowDimensions;
 
   const multiplicationBase = windowDimensions[multiplyBy];
-  let oversizeReductionFactor = 1;
 
   if(height > width) {
-    return multiplicationBase * portraitMultiplier;
+    if(height > portraitOversizeCorrectionThreshold) {
+      return multiplicationBase * portraitMultiplier * portraitOversizeCorrectionFactor;
+    }
+    else {
+      return multiplicationBase * portraitMultiplier;
+    }
   }
   else {
-    if(width > 1000 && useOversizeReduction) {
-      oversizeReductionFactor = 0.7;
+    if(width > landscapeOversizeCorrectionThreshold) {
+      return multiplicationBase * landscapeMultiplier * landscapeOversizeCorrectionFactor;
     }
-    return multiplicationBase * landscapeMultiplier * oversizeReductionFactor;
+    else {
+      return multiplicationBase * landscapeMultiplier;
+    }
   }
 }
 
-const useScreenAdjustedSize = (portraitMultiplier = 0.5, landscapeMultiplier = 0.5, multiplyBy = "width", useOversizeReduction = true) => {
+const useScreenAdjustedSize = (
+  portraitMultiplier = 0.5,
+  landscapeMultiplier = 0.5,
+  multiplyBy = "width",
+  portraitOversizeCorrectionFactor = 1,
+  landscapeOversizeCorrectionFactor = 1,
+  portraitOversizeCorrectionThreshold,
+  landscapeOversizeCorrectionThreshold,
+) => {
   if(!["width","height"].includes(multiplyBy.toLowerCase())) {
     throw new Error("argument 'multiplyBy' passed to useScreenAdjustedSize is not 'width' or 'height'");
   }
 
-  const [size, setSize] = useState(getSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy, useOversizeReduction));
+  const [size, setSize] = useState(
+    getSizeFromOrientation(
+      portraitMultiplier,
+      landscapeMultiplier,
+      multiplyBy,
+      portraitOversizeCorrectionFactor,
+      landscapeOversizeCorrectionFactor,
+      portraitOversizeCorrectionThreshold,
+      landscapeOversizeCorrectionThreshold,
+    )
+  );
 
   useEffect(() => {
     //adjust iconSize whenever orientation is changed
     const orientationListener = Dimensions.addEventListener("change",() => {
-      setSize(getSizeFromOrientation(portraitMultiplier,landscapeMultiplier,multiplyBy, useOversizeReduction));
+      setSize(getSizeFromOrientation(
+        portraitMultiplier,
+        landscapeMultiplier,
+        multiplyBy,
+        portraitOversizeCorrectionFactor,
+        landscapeOversizeCorrectionFactor,
+        portraitOversizeCorrectionThreshold,
+        landscapeOversizeCorrectionThreshold,
+      ));
     })
 
     return () => {orientationListener.remove()}

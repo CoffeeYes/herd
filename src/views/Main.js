@@ -16,7 +16,7 @@ const Tab = createBottomTabNavigator();
 const Main = ({ navigation, route }) => {
 
     const iconSize = useScreenAdjustedSize(0.07,0.04);
-    const tabBarHeight = useScreenAdjustedSize(0.075,0.15,"height");
+    const tabBarHeight = useScreenAdjustedSize(0.075,0.15,"height",1,0.7,undefined,1000);
 
     return(
       <Tab.Navigator
