@@ -51,6 +51,7 @@ const Settings = ({ navigation }) => {
 
   const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9);
   const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4);
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
@@ -261,6 +262,7 @@ for the following permissions in order to allow Herd to function correctly.`
         flashText="Copied!"
         timeout={500}
         rightIcon="content-copy"
+        iconSize={cardIconSize}
         onPress={copyKeyToClipboard}/>
 
         <CardButton
@@ -268,6 +270,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textContainerStyle={{width : cardButtonTextWidth}}
         text="Show My QR Code"
         rightIcon="qr-code-2"
+        iconSize={cardIconSize}
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
@@ -275,6 +278,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textContainerStyle={{width : cardButtonTextWidth}}
         text="Customise"
         rightIcon="edit"
+        iconSize={cardIconSize}
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
@@ -282,6 +286,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textContainerStyle={{width : cardButtonTextWidth}}
         text="Message Queue"
         rightIcon="message"
+        iconSize={cardIconSize}
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
@@ -289,6 +294,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textContainerStyle={{width : cardButtonTextWidth}}
         text="Password Protection"
         rightIcon="lock"
+        iconSize={cardIconSize}
         onPress={() => userHasPassword ?
           navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
           :
@@ -302,6 +308,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
         rightIcon="delete"
+        iconSize={cardIconSize}
         onPress={deleteAllChats}/>
 
         <CardButton
@@ -311,6 +318,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
         rightIcon="delete"
+        iconSize={cardIconSize}
         onPress={deleteAllContacts}/>
 
         <CardButton
@@ -320,6 +328,7 @@ for the following permissions in order to allow Herd to function correctly.`
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
         rightIcon="delete-forever"
+        iconSize={cardIconSize}
         onPress={deleteAllMessages}/>
 
         {__DEV__ &&
