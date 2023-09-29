@@ -11,6 +11,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const seventyPercentWidth = useScreenAdjustedSize(0.7,0.7);
   const seventyPercentHeight = useScreenAdjustedSize(0.7,0.7, "height");
+  const fivePercentHeight = useScreenAdjustedSize(0.05,0.05,"height");
   const maxContainerHeight = useScreenAdjustedSize(0.8,0.8,"height");
   const maxContainerWidth = useScreenAdjustedSize(0.8,0.8);
 
@@ -26,11 +27,18 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
       }}>
         {title &&
         <View style={styles.header}>
-          <Text style={{...styles.title,fontSize : customStyle.uiFontSize}}>{title}</Text>
+          <Text
+          style={{
+            ...styles.title,
+            height : fivePercentHeight,
+            fontSize : customStyle.uiFontSize,
+          }}>
+            {title}
+          </Text>
         </View>}
         <QRCode
         value={JSON.stringify(value)}
-        size={seventyPercentWidth > seventyPercentHeight ? seventyPercentHeight : seventyPercentWidth}/>
+        size={seventyPercentWidth > seventyPercentHeight ? seventyPercentHeight - 20 : seventyPercentWidth}/>
       </View>
     </CustomModal>
   )
