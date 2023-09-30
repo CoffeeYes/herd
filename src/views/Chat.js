@@ -64,8 +64,8 @@ const Chat = ({ route, navigation }) => {
   const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
-  const contactImageSize = useScreenAdjustedSize(0.12,0.08);
-  const inputHeight = useScreenAdjustedSize(0.075,0.15,"height");
+  const contactImageSize = useScreenAdjustedSize(0.12,0.07);
+  const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
 
   useEffect(() => {
     (async () => {
@@ -494,7 +494,7 @@ const Chat = ({ route, navigation }) => {
     <>
     <Header
     title={contactInfo.name}
-    touchStyle={{backgroundColor : palette.offprimary}}
+    touchStyle={{backgroundColor : palette.offprimary, paddingVertical : 10}}
     textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
     rightButtonOnClick={() => deleteMessages()}
