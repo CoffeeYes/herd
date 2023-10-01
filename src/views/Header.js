@@ -13,33 +13,34 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
                   onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height");
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
   const leftButtonWidth = useScreenAdjustedSize(0.1,0.1);
   const leftIconSize = useScreenAdjustedSize(0.03,0.025)
   const scaledLeftIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
   return (
-    <View style={{...styles.container, ...containerStyle}}>
-        {allowGoBack &&
-        <TouchableOpacity
-        onPress={() => navigationRef.current.goBack()}
-        style={{paddingVertical : 15, alignItems : "center", width : leftButtonWidth}}>
-          <Icon name="arrow-back" size={backArrowSize || scaledLeftIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
-        </TouchableOpacity>}
+    <View style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
+      {allowGoBack &&
+      <TouchableOpacity
+      onPress={() => navigationRef.current.goBack()}
+      style={{paddingVertical : 15, alignItems : "center", width : leftButtonWidth}}>
+        <Icon name="arrow-back" size={backArrowSize || scaledLeftIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
+      </TouchableOpacity>}
 
-        <TouchableOpacity
-        disabled={!onTextTouch}
-        onPress={onTextTouch}
-        style={{...styles.pressContainer,...touchStyle}}>
-          {preText}
-          <Text style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+      disabled={!onTextTouch}
+      onPress={onTextTouch}
+      style={{...styles.pressContainer,...touchStyle}}>
+        {preText}
+        <Text style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
+      </TouchableOpacity>
 
 
       {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
-      style={{...styles.rightButton,width : rightButtonWidth}}>
+      style={{...styles.rightButton,width : rightButtonWidth,minHeight : minimumHeight}}>
         <Icon name={rightButtonIcon} size={rightIconSize || customStyle.uiFontSize + 16} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
@@ -61,10 +62,8 @@ const styles = {
   },
   rightButton : {
     backgroundColor : palette.secondary,
-    height : "100%",
     alignItems : "center",
     justifyContent : "center",
-    width : Dimensions.get("window").width * 0.20,
     maxWidth : 150
   },
   pressContainer : {
