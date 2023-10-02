@@ -16,16 +16,16 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height");
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
   const leftButtonWidth = useScreenAdjustedSize(0.1,0.1);
-  const leftIconSize = useScreenAdjustedSize(0.03,0.025)
-  const scaledLeftIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
+  const leftIconSize = useScreenAdjustedSize(0.05,0.025)
+  const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
   return (
     <View style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
       {allowGoBack &&
       <TouchableOpacity
       onPress={() => navigationRef.current.goBack()}
-      style={{paddingVertical : 15, alignItems : "center", width : leftButtonWidth}}>
-        <Icon name="arrow-back" size={backArrowSize || scaledLeftIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
+      style={{paddingVertical : 15, alignItems : "center",}}>
+        <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>}
 
       <TouchableOpacity
@@ -41,7 +41,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={{...styles.rightButton,width : rightButtonWidth,minHeight : minimumHeight}}>
-        <Icon name={rightButtonIcon} size={rightIconSize || customStyle.uiFontSize + 16} style={{color : palette.white}}/>
+        <Icon name={rightButtonIcon} size={rightIconSize || scaledIconSize} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
   )
