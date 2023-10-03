@@ -13,7 +13,7 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
   const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
-  const contactImageSize = useScreenAdjustedSize(0.15,0.08);
+  const contactImageSize = useScreenAdjustedSize(0.12,0.07);
 
   return (
     <TouchableOpacity
