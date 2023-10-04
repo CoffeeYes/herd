@@ -15,7 +15,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
-  const leftButtonWidth = useScreenAdjustedSize(0.1,0.1);
+  const leftButtonWidth = useScreenAdjustedSize(0.15,0.1, "width", 0.7, 0.7, 1000, 1000);
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
@@ -24,7 +24,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       {allowGoBack &&
       <TouchableOpacity
       onPress={() => navigationRef.current.goBack()}
-      style={{paddingVertical : 15, alignItems : "center",}}>
+      style={{paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>}
 
