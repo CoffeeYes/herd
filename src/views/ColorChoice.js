@@ -9,8 +9,8 @@ import { useScreenAdjustedSize } from '../helper';
 
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
 
-  const pickerHeight = useScreenAdjustedSize( 0.5,0.7, "height");
-  const pickerWidth = useScreenAdjustedSize(0.8,0.8);
+  const pickerHeight = useScreenAdjustedSize(0.3,0.5, "height");
+  const pickerWidth = useScreenAdjustedSize(0.8,0.5);
 
   const Slider = useCallback(props => {
     return (
@@ -37,6 +37,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
           ...styles.colorPicker,
           height : pickerHeight,
           width : pickerWidth,
+          maxHeight : pickerHeight,
+          maxWidth : pickerWidth,
           ...style
         }}
         sliderComponent={Slider}
