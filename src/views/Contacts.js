@@ -95,7 +95,6 @@ const Contacts = ({ route, navigation }) => {
           key={contact._id}
           navigation={navigation}
           image={contact.image}
-          imageIconSize={32}
           textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
           onPress={() => handlePress(contact)}

@@ -504,7 +504,7 @@ const Chat = ({ route, navigation }) => {
       contactInfo?.image?.length > 0 &&
       <ContactImage
       imageURI={contactInfo.image}
-      iconSize={24}
+      iconSize={contactImageSize}
       size={contactImageSize}
       containerStyle={styles.imageContainer}
       disableTouch/>

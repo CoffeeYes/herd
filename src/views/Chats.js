@@ -103,7 +103,6 @@ const Chats = ({ navigation }) => {
         key={chat._id}
         navigation={navigation}
         image={chat.image}
-        imageIconSize={32}
         textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}

@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { imageValues, palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLongPress, containerStyle, textStyle,
+const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress, containerStyle, textStyle,
                     imageContainerStyle, imageSize, rightText, subText, subTextStyle,
                     disableTouch, rightTextStyle, rightIcon, rightIconSize = 24, rightIconStyle,
                     highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
@@ -14,6 +14,7 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
   const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
 
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
+  const defaultIconSize = useScreenAdjustedSize(0.07,0.04);
 
   return (
     <TouchableOpacity
@@ -38,7 +39,7 @@ const ListItem = ({ name, image, imageIconSize = 24, deleteItem, onPress, onLong
       size={contactImageSize}
       disableTouch
       imageURI={image}
-      iconSize={imageIconSize}/>
+      iconSize={imageIconSize || defaultIconSize}/>
 
       <View style={{flex : 1}}>
         <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
