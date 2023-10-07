@@ -27,7 +27,7 @@ const contactReducer = (state = initialState,action) => {
     	  let newContact  = {
     	      ...contact,
     	      ...(name && {name : name}),
-    	      ...(image && {image : image}),
+    	      ...(image?.length >= 0 && {image : image}),
     	      ...(key && {key : key}),
     	  };
         const contactIndex = state.contacts.indexOf(contact);

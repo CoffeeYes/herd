@@ -205,12 +205,18 @@ const EditContact = ({ route, navigation }) => {
         onPress={editImage}
         size={contactImageSize}/>
 
+        {contactImage.length > 0 &&
+        <FlashTextButton
+        normalText="Delete Image"
+        flashText="Delete Image"
+        onPress={() => setContactImage("")}/>}
+
         {errors.map(error => {
           return (
             <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
           )
         })}
-        
+
         <View style={{alignItems : "center", width : "100%"}}>
           <View style={{width : inputContainerWidth}}>
             <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
