@@ -42,14 +42,14 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
       iconSize={imageIconSize || defaultIconSize}/>
 
       <View style={{flex : 1}}>
-        <Text style={{...styles.chatText,...textStyle}}>{name}</Text>
+        <Text
+        numberOfLines={1}
+        style={{...styles.chatText,...textStyle}}>{name}</Text>
 
         {subText &&
-        <View style={styles.subTextContainer}>
-          <Text
-          numberOfLines={1}
-          style={{...styles.subText,...subTextStyle}}>{subText}</Text>
-        </View>}
+        <Text
+        numberOfLines={1}
+        style={{...styles.subText,...subTextStyle}}>{subText}</Text>}
       </View>
 
       {rightText &&
@@ -97,16 +97,14 @@ const styles = {
   },
   chatText : {
     fontSize : 16,
-  },
-  subTextContainer : {
-
+    marginRight : 20
   },
   subText : {
     color : palette.grey
   },
   rightTextStyle : {
     marginLeft : "auto",
-    marginRight : 10
+    marginRight : 10,
   }
 }
 
