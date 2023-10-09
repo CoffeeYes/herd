@@ -33,7 +33,9 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       onPress={onTextTouch}
       style={{...styles.pressContainer,...touchStyle}}>
         {preText}
-        <Text style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
+        <Text
+        numberOfLines={1}
+        style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
 
@@ -58,7 +60,8 @@ const styles = {
   title : {
     color : palette.white,
     fontSize : 18,
-    marginRight : "auto"
+    marginRight : "auto",
+    maxWidth : "95%"
   },
   rightButton : {
     backgroundColor : palette.secondary,
