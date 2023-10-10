@@ -11,7 +11,7 @@ import { defaultChatStyles } from '../assets/styles'
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
                   onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
-                  backArrowStyle, rightIconSize }) => {
+                  backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1 }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
@@ -34,7 +34,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       style={{...styles.pressContainer,...touchStyle}}>
         {preText}
         <Text
-        numberOfLines={1}
+        {...(limitTitleLines && {numberOfLines : titleNumberOfLines})}
         style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
