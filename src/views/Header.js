@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -19,8 +19,12 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
+  const [headerHeight, setHeaderHeight] = useState(minimumHeight);
+
   return (
-    <View style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
+    <View
+    onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+    style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
       {allowGoBack &&
       <TouchableOpacity
       onPress={() => navigationRef.current.goBack()}
@@ -42,7 +46,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
-      style={{...styles.rightButton,width : rightButtonWidth,minHeight : minimumHeight}}>
+      style={{...styles.rightButton,width : rightButtonWidth,minHeight : headerHeight}}>
         <Icon name={rightButtonIcon} size={rightIconSize || scaledIconSize} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
