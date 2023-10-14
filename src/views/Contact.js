@@ -28,6 +28,7 @@ const Contact = ({route, navigation}) => {
 
   const largeImageWidth = useScreenAdjustedSize(0.8,0.8);
   const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
+  const [expandName, setExpandName] = useState(true);
 
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
@@ -45,9 +46,11 @@ const Contact = ({route, navigation}) => {
     <>
       <Header
       title={contact.name}
+      containerStyle={expandName && ({flexShrink : 1})}
       allowGoBack
-      limitTitleLines={false}
+      limitTitleLines={expandName}
       rightButtonIcon="edit"
+      onTextTouch={() => setExpandName(!expandName)}
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
 
       <ScrollView contentContainerStyle={{paddingVertical : 20}}>
