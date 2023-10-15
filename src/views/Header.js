@@ -9,8 +9,8 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { defaultChatStyles } from '../assets/styles'
 
-const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText,
-                  onTextTouch, touchStyle, containerStyle, textStyle, backArrowSize,
+const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextLayout,
+                  onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1 }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
@@ -33,11 +33,12 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       </TouchableOpacity>}
 
       <TouchableOpacity
-      disabled={!onTextTouch}
+      disabled={!onTextTouch || disableTextTouch}
       onPress={onTextTouch}
       style={{...styles.pressContainer,...touchStyle}}>
         {preText}
         <Text
+        onTextLayout={onTextLayout}
         {...(limitTitleLines && {numberOfLines : titleNumberOfLines})}
         style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
