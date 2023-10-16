@@ -47,7 +47,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
       {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
-      style={{...styles.rightButton,width : rightButtonWidth,minHeight : headerHeight}}>
+      style={{...styles.rightButton,width : rightButtonWidth}}>
         <Icon name={rightButtonIcon} size={rightIconSize || scaledIconSize} style={{color : palette.white}}/>
       </TouchableOpacity>}
     </View>
@@ -72,7 +72,8 @@ const styles = {
     backgroundColor : palette.secondary,
     alignItems : "center",
     justifyContent : "center",
-    maxWidth : 150
+    maxWidth : 150,
+    alignSelf : "stretch"
   },
   pressContainer : {
     flex : 1,
