@@ -28,7 +28,7 @@ const Contact = ({route, navigation}) => {
 
   const largeImageWidth = useScreenAdjustedSize(0.8,0.8);
   const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
-  const [expandName, setExpandName] = useState(true);
+  const [expandName, setExpandName] = useState(false);
   const [disableTextTouch, setDisableTextTouch] = useState(false);
 
   const copyKeyToClipboard = () => {
@@ -51,7 +51,7 @@ const Contact = ({route, navigation}) => {
       allowGoBack
       onTextLayout={e => e.nativeEvent.lines.length <= 1 && setDisableTextTouch(true)}
       disableTextTouch={disableTextTouch}
-      limitTitleLines={expandName}
+      titleNumberOfLines={expandName ? 6 : 1}
       rightButtonIcon="edit"
       onTextTouch={() => setExpandName(!expandName)}
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>

@@ -19,11 +19,8 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
-  const [headerHeight, setHeaderHeight] = useState(minimumHeight);
-
   return (
     <View
-    onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
     style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
       {allowGoBack &&
       <TouchableOpacity
