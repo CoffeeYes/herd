@@ -47,7 +47,6 @@ const Contact = ({route, navigation}) => {
     <>
       <Header
       title={contact.name}
-      containerStyle={expandName && ({flexShrink : 1})}
       allowGoBack
       onTextLayout={e => e.nativeEvent.lines.length <= 1 && setDisableTextTouch(true)}
       disableTextTouch={disableTextTouch}
