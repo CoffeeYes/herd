@@ -17,8 +17,8 @@ const componentShouldUpdate = (props, nextProps) => {
   return true;
 }
 
-const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, style, onPress, loading,
-                          openTimestamp, containerStyle, headerNumberOfLines = 1}) => {
+const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, onPress, loading,
+                          openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress}>
       <View style={{width : "100%"}}>
@@ -28,15 +28,15 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
         <>
           <View style={styles.messageHeader}>
             <View style={styles.headerTextContainer}>
-              <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold"}}>From:</Text>
-              <Text numberOfLines={headerNumberOfLines}>{from}</Text>
+              <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>From:</Text>
+              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{from}</Text>
             </View>
             <View style={styles.headerTextContainer}>
-            <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold"}}>To:</Text>
-              <Text numberOfLines={headerNumberOfLines}>{to}</Text>
+            <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>To:</Text>
+              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{to}</Text>
             </View>
             <View style={{...styles.headerTextContainer, alignSelf : "center"}}>
-              <Text numberOfLines={headerNumberOfLines}>{closedTimestamp}</Text>
+              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{closedTimestamp}</Text>
             </View>
           </View>
           {open &&
