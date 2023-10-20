@@ -279,7 +279,13 @@ const Customise = ({ navigation }) => {
             {fontSizes.map((item,index)=> {
               return (
                 <Fragment key={item.tag}>
-                  <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
+                  <Text style={{
+                    alignSelf : "center",
+                    fontWeight : "bold",
+                    fontSize : originalStyles.uiFontSize
+                  }}>
+                    {item.title}
+                  </Text>
                   <Slider
                   containerStyle={styles.sliderContainer}
                   sliderStyle={{flex : 1}}
@@ -295,7 +301,8 @@ const Customise = ({ navigation }) => {
                   rightTitle={item.rightTitle}
                   rightText={item.rightText}
                   rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-                  rightTitleStyle={{fontWeight : "bold"}}
+                  rightTitleStyle={{fontWeight : "bold", fontSize : originalStyles.uiFontSize}}
+                  rightTextStyle={{fontSize : originalStyles.uiFontSize}}
                   />
                 </Fragment>
               )
@@ -332,6 +339,8 @@ const Customise = ({ navigation }) => {
             color={toHsv(tabItems[activeItem].color)}
             setColor={tabItems[activeItem].setColor}
             oldColor={originalStyles[tabItems[activeItem].originalColor]}
+            sliderTitleSize={originalStyles.uiFontSize}
+            sliderTextSize={originalStyles.uiFontSize}
             />
           </View>
 

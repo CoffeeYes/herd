@@ -7,7 +7,8 @@ import CustomSlider from './Slider'
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
+const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
+                       sliderTextSize}) => {
 
   const pickerHeight = useScreenAdjustedSize(0.3,0.5, "height");
   const pickerWidth = useScreenAdjustedSize(0.8,0.5);
@@ -23,10 +24,12 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
       rightText={props.value.toFixed(2)}
       value={props.value}
       sliderStyle={styles.slider}
+      rightTitleStyle={{fontSize : sliderTitleSize}}
+      rightTextStyle={{fontSize : sliderTextSize}}
       containerStyle={styles.sliderContainer}
       onValueChange={props.onValueChange}/>
     )
-  },[])
+  },[sliderTitleSize, sliderTextSize])
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
@@ -37,9 +40,9 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle }) => {
           ...styles.colorPicker,
           height : pickerHeight,
           width : pickerWidth,
-          maxHeight : pickerHeight,
-          maxWidth : pickerWidth,
-          ...style
+          ...style,
+          borderWidth : 1,
+          borderColor : "red"
         }}
         sliderComponent={Slider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
