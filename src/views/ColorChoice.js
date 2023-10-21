@@ -10,7 +10,7 @@ import { useScreenAdjustedSize } from '../helper';
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize}) => {
 
-  const pickerHeight = useScreenAdjustedSize(0.3,0.5, "height");
+  const pickerHeight = useScreenAdjustedSize(0.6,0.6, "height");
   const pickerWidth = useScreenAdjustedSize(0.8,0.5);
 
   const Slider = useCallback(props => {
@@ -37,12 +37,9 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
         color={color}
         oldColor={oldColor}
         style={{
-          ...styles.colorPicker,
           height : pickerHeight,
           width : pickerWidth,
-          ...style,
-          borderWidth : 1,
-          borderColor : "red"
+          ...style
         }}
         sliderComponent={Slider}
         onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
@@ -54,12 +51,9 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
 export default ColorChoice
 
 const styles = {
-  colorPicker : {
-    maxHeight : 400,
-    maxWidth : 400,
-  },
   colorPickerContainer : {
     alignItems : "center",
+    justifyContent : "center",
     paddingBottom : 10,
   },
   tab : {
