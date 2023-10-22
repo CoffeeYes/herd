@@ -12,6 +12,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
 
   const pickerHeight = useScreenAdjustedSize(0.6,0.6, "height");
   const pickerWidth = useScreenAdjustedSize(0.8,0.5);
+  const sliderWidth = useScreenAdjustedSize(0.8, 0.6);
 
   const Slider = useCallback(props => {
     return (
@@ -26,10 +27,10 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       sliderStyle={styles.slider}
       rightTitleStyle={{fontSize : sliderTitleSize}}
       rightTextStyle={{fontSize : sliderTextSize}}
-      containerStyle={styles.sliderContainer}
+      containerStyle={{...styles.sliderContainer, width : sliderWidth}}
       onValueChange={props.onValueChange}/>
     )
-  },[sliderTitleSize, sliderTextSize])
+  },[sliderTitleSize, sliderTextSize, sliderWidth])
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
@@ -56,26 +57,12 @@ const styles = {
     justifyContent : "center",
     paddingBottom : 10,
   },
-  tab : {
-    alignItems : "center",
-    justifyContent : "center",
-    backgroundColor : palette.white,
-    paddingVertical : 20,
-    flexDirection : "row"
-  },
-  icon : {
-    marginRight : 10
-  },
-  error : {
-    fontWeight : "bold",
-    color : palette.red,
-    marginTop : 10
-  },
   slider : {
       flex : 1,
   },
   sliderContainer : {
     alignItems : "center",
+    alignSelf : "center",
     flexDirection : "row",
     marginHorizontal : 10,
     backgroundColor : palette.white,
