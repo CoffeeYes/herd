@@ -18,7 +18,8 @@ const componentShouldUpdate = (props, nextProps) => {
 }
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, onPress, loading,
-                          openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1}) => {
+                          openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1,
+                          openTimestampStyle}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress}>
       <View style={{width : "100%"}}>
@@ -42,7 +43,13 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
           {open &&
           <View style={styles.messageText}>
             <Text style={{fontSize : textFontSize}}>{text}</Text>
-            <Text style={{alignSelf : "flex-end"}}>{openTimestamp}</Text>
+            <Text style={{
+              alignSelf : "flex-end",
+              fontSize : textFontSize,
+              ...openTimestampStyle
+            }}>
+              {openTimestamp}
+            </Text>
           </View>}
         </>}
       </View>
