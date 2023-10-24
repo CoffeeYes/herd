@@ -15,6 +15,7 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
 
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const defaultIconSize = useScreenAdjustedSize(0.07,0.04);
+  const minHeight = useScreenAdjustedSize(0.1,0.2,"height");
 
   return (
     <TouchableOpacity
@@ -22,6 +23,7 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
       ...styles.listItem,
       paddingVertical : highlighted && useSingularDeleteButton ? 0 : 10,
       paddingLeft : 10,
+      minHeight : minHeight,
       ...(highlighted ? highlightedStyle : containerStyle)
     }}
     onPress={onPress}
