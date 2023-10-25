@@ -48,7 +48,7 @@ const Contact = ({route, navigation}) => {
       <Header
       title={contact.name}
       allowGoBack
-      onTextLayout={e => e.nativeEvent.lines.length <= 1 && setDisableTextTouch(true)}
+      onTextLayout={e => setDisableTextTouch(e.nativeEvent.lines.length <= 1)}
       disableTextTouch={disableTextTouch}
       titleNumberOfLines={expandName ? 6 : 1}
       rightButtonIcon="edit"
