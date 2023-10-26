@@ -69,7 +69,7 @@ const styles = {
     marginRight : "auto",
     flexDirection : "row",
     justifyContent : "flex-start",
-    width : Dimensions.get('window').width * 0.4,
+    width : "60%",
   },
   iconContainer : {
     justifyContent : "center"
