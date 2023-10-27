@@ -49,8 +49,6 @@ const Settings = ({ navigation }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
-  const cardButtonWidth = useScreenAdjustedSize( 0.9, 0.9);
-  const cardButtonTextWidth = useScreenAdjustedSize( 0.4, 0.4);
   const cardIconSize = useScreenAdjustedSize(0.075,0.05);
 
   useEffect(() => {
@@ -235,7 +233,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
       <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={{...styles.backgroundTransferCard, width : cardButtonWidth}}>
+        <View style={{...styles.backgroundTransferCard, width : "90%"}}>
 
           {!backgroundTransfer &&
           <Text style={{...styles.warning, fontSize : customStyle.uiFontSize}}>
@@ -256,8 +254,8 @@ for the following permissions in order to allow Herd to function correctly.`
         </View>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Copy Your Key"
         flashText="Copied!"
         timeout={500}
@@ -266,32 +264,32 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={copyKeyToClipboard}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Show My QR Code"
         rightIcon="qr-code-2"
         iconSize={cardIconSize}
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Customise"
         rightIcon="edit"
         iconSize={cardIconSize}
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Message Queue"
         rightIcon="message"
         iconSize={cardIconSize}
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Password Protection"
         rightIcon="lock"
         iconSize={cardIconSize}
@@ -302,8 +300,8 @@ for the following permissions in order to allow Herd to function correctly.`
         />
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Delete All Chats"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -312,8 +310,8 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={deleteAllChats}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Delete All Contacts"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
@@ -322,8 +320,8 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={deleteAllContacts}/>
 
         <CardButton
-        containerStyle={{width : cardButtonWidth}}
-        textContainerStyle={{width : cardButtonTextWidth}}
+        containerStyle={{width : "90%"}}
+        textContainerStyle={{width : "60%"}}
         text="Delete All Messages"
         textStyle={{color : palette.red}}
         iconStyle={{color : palette.red}}
