@@ -254,8 +254,6 @@ for the following permissions in order to allow Herd to function correctly.`
         </View>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Copy Your Key"
         flashText="Copied!"
         timeout={500}
@@ -264,32 +262,24 @@ for the following permissions in order to allow Herd to function correctly.`
         onPress={copyKeyToClipboard}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Show My QR Code"
         rightIcon="qr-code-2"
         iconSize={cardIconSize}
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Customise"
         rightIcon="edit"
         iconSize={cardIconSize}
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Message Queue"
         rightIcon="message"
         iconSize={cardIconSize}
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Password Protection"
         rightIcon="lock"
         iconSize={cardIconSize}
@@ -300,31 +290,25 @@ for the following permissions in order to allow Herd to function correctly.`
         />
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Delete All Chats"
-        textStyle={{color : palette.red}}
-        iconStyle={{color : palette.red}}
+        textStyle={styles.deleteCardTextStyle}
+        iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
         onPress={deleteAllChats}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Delete All Contacts"
-        textStyle={{color : palette.red}}
-        iconStyle={{color : palette.red}}
+        textStyle={styles.deleteCardTextStyle}
+        iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
         onPress={deleteAllContacts}/>
 
         <CardButton
-        containerStyle={{width : "90%"}}
-        textContainerStyle={{width : "60%"}}
         text="Delete All Messages"
-        textStyle={{color : palette.red}}
-        iconStyle={{color : palette.red}}
+        textStyle={styles.deleteCardTextStyle}
+        iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete-forever"
         iconSize={cardIconSize}
         onPress={deleteAllMessages}/>
@@ -378,6 +362,12 @@ const styles = {
     padding : 20,
     marginVertical : 10,
     width : Dimensions.get('window').width * 0.9
+  },
+  deleteCardTextStyle : {
+    color : palette.red
+  },
+  deleteCardIconStyle : {
+    color : palette.red
   }
 }
 

@@ -53,7 +53,7 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-around",
     alignItems : "center",
-    width : Dimensions.get('window').width * 0.9,
+    width : "90%",
     padding : 20,
     borderRadius : 10,
     backgroundColor : palette.white,
