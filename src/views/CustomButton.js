@@ -40,7 +40,6 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     flexDirection : "row",
-    width : Dimensions.get("window").width * 0.3,
     borderWidth : 1,
     borderColor : palette.white
   },

@@ -33,10 +33,10 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
               <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{from}</Text>
             </View>
             <View style={styles.headerTextContainer}>
-            <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>To:</Text>
+              <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>To:</Text>
               <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{to}</Text>
             </View>
-            <View style={{...styles.headerTextContainer, alignSelf : "center"}}>
+            <View style={{...styles.headerTextContainer, alignSelf : "center", maxWidth : "40%"}}>
               <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{closedTimestamp}</Text>
             </View>
           </View>
@@ -66,7 +66,7 @@ const styles = {
     overflow : "hidden"
   },
   headerTextContainer : {
-    maxWidth : "40%"
+    maxWidth : "30%",
   },
   messageText : {
     marginTop : 10,

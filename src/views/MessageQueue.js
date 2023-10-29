@@ -142,7 +142,8 @@ const styles = {
     marginTop : 10,
     elevation : 2,
     borderColor : palette.offprimary,
-    marginBottom : 10
+    marginBottom : 10,
+    width : "50%"
   },
   listStyle : {
     alignItems : "center",
