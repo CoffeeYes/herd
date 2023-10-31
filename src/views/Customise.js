@@ -39,6 +39,7 @@ const Customise = ({ navigation }) => {
 
   const buttonWidth = useScreenAdjustedSize(0.3,0.2);
   const cardWidth = useScreenAdjustedSize(0.8,0.8);
+  const iconSize = useScreenAdjustedSize(0.1,0.065);
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
@@ -254,7 +255,7 @@ const Customise = ({ navigation }) => {
           disableTouch
           text="Preview"
           textStyle={{fontSize : uiFontSize}}
-          rightIcon="preview" iconSize={uiFontSize + 16}/>
+          rightIcon="preview"/>
 
           <ListItem
           name="Preview"
@@ -271,7 +272,7 @@ const Customise = ({ navigation }) => {
             style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
             onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
               <Icon
-              size={32}
+              size={iconSize}
               color={synchroniseFontChanges ? palette.primary : palette.black}
               name={synchroniseFontChanges ? "lock" : "lock-open"}/>
             </TouchableOpacity>
