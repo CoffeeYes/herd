@@ -47,12 +47,8 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize};
 
-  const buttonWidth = useScreenAdjustedSize( 0.4, 0.4);
-  const inputWidth = useScreenAdjustedSize( 0.8, 0.8);
-  const containerWidth = useScreenAdjustedSize(0.9,0.9);
-
   return (
-        <View style={{...styles.card, width : containerWidth,...mainContainerStyle }}>
+        <View style={{...styles.card,...mainContainerStyle }}>
 
           {description &&
           <Text multiline style={{fontSize : customStyle.uiFontSize}}>
@@ -69,7 +65,6 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           <PasswordField
           name={primaryName}
           customStyle={customStyle}
-          customInputStyle={{width : inputWidth}}
           onChangeText={setPrimaryInputText}
           onSubmitEditing={() => secondaryInputRef.current.focus()}
           value={primaryInputText}/>
@@ -77,7 +72,6 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           <PasswordField
           name={secondaryName}
           customStyle={customStyle}
-          customInputStyle={{width : inputWidth}}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
           onSubmitEditing={submit}
@@ -90,7 +84,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryButtonDisabled}
             onPress={submit}
             timeout={500}
-            buttonStyle={{...styles.button, width : buttonWidth}}
+            buttonStyle={{...styles.button, width : "50%"}}
             textStyle={styles.buttonText}/>
 
             <FlashTextButton
@@ -98,7 +92,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             flashText={secondaryButtonFlashText}
             disabled={secondaryButtonDisabled}
             onPress={secondaryButtonOnPress}
-            buttonStyle={{...styles.button, marginLeft : 10,width : buttonWidth}}
+            buttonStyle={{...styles.button, marginLeft : 10,width : "50%"}}
             textStyle={styles.buttonText}/>
           </View>
         </View>
@@ -127,8 +121,7 @@ const styles = {
     borderColor: 'gray',
     borderWidth: 1,
     marginBottom : 10,
-    width : Dimensions.get('window').width * 0.8,
-    alignSelf : "center",
+    alignSelf : "stretch",
     padding : 10,
     backgroundColor : palette.white,
     borderRadius : 5
