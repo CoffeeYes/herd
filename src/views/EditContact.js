@@ -38,9 +38,7 @@ const EditContact = ({ route, navigation }) => {
   const originalContactRef = useRef(originalContact || {});
   const haveSavedContactRef = useRef(false);
 
-  const contactImageSize = useScreenAdjustedSize(0.4,0.25)
-
-  const inputContainerWidth = useScreenAdjustedSize(0.9,0.9);
+  const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 
   //refs for accessing state in event listeners, used to prevent discarding unsaved changes
   const setPublicKey = data => {
@@ -217,8 +215,8 @@ const EditContact = ({ route, navigation }) => {
           )
         })}
 
-        <View style={{alignItems : "center", width : "100%"}}>
-          <View style={{width : inputContainerWidth}}>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputContainer}>
             <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
             <TextInput
             style={{...styles.input, fontSize : customStyle.uiFontSize}}
@@ -226,7 +224,7 @@ const EditContact = ({ route, navigation }) => {
             value={name}/>
           </View>
 
-          <View style={{width : inputContainerWidth}}>
+          <View style={{width : "100%"}}>
             <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
             <TextInput
             multiline={editingExistingContact}
@@ -258,7 +256,7 @@ const EditContact = ({ route, navigation }) => {
 
 const styles = {
   container : {
-    padding : 20,
+    padding : 30,
     alignItems : "flex-start"
   },
   button : {
@@ -283,6 +281,9 @@ const styles = {
     padding : 10,
     backgroundColor : palette.white,
     borderRadius : 5
+  },
+  inputContainer : {
+    width : "100%"
   },
   inputTitle : {
     fontWeight : "bold",
