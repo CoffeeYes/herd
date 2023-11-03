@@ -37,8 +37,6 @@ const Customise = ({ navigation }) => {
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
 
-  const buttonWidth = useScreenAdjustedSize(0.3,0.2);
-  const cardWidth = useScreenAdjustedSize(0.8,0.8);
   const iconSize = useScreenAdjustedSize(0.1,0.065);
 
   const sentBoxColorRef = useRef();
@@ -251,7 +249,7 @@ const Customise = ({ navigation }) => {
           containerStyle={{marginTop : 10}}/>
 
           <CardButton
-          containerStyle={{alignSelf : "center",width : cardWidth}}
+          containerStyle={{alignSelf : "center"}}
           disableTouch
           text="Preview"
           textStyle={{fontSize : uiFontSize}}
@@ -351,7 +349,7 @@ const Customise = ({ navigation }) => {
             flashText="Saved!"
             onPress={saveStyles}
             timeout={500}
-            buttonStyle={{...styles.button, flexDirection : "row", width : buttonWidth}}
+            buttonStyle={{...styles.button, flexDirection : "row", width : "45%"}}
             disabled={checkStylesAreEqual({
               sentBoxColor,sentTextColor,receivedBoxColor,
               receivedTextColor,messageFontSize,uiFontSize
@@ -361,7 +359,7 @@ const Customise = ({ navigation }) => {
             text={"Restore Default"}
             onPress={restoreDefault}
             disabled={checkStylesAreEqual(originalStyles,defaultChatStyles)}
-            buttonStyle={{ ...styles.button, marginLeft : 10, width : buttonWidth}}/>
+            buttonStyle={{ ...styles.button, marginLeft : 10, width : "45%"}}/>
 
           </View>
         </>}

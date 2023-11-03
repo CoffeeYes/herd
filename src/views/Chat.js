@@ -60,8 +60,7 @@ const Chat = ({ route, navigation }) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
-  const tenPercentWidth = useScreenAdjustedSize(0.1,0.1);
-  const eightyPercentWidth = useScreenAdjustedSize(0.8,0.8);
+
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
@@ -514,7 +513,7 @@ const Chat = ({ route, navigation }) => {
     style={{flex : 1}}>
 
       {showPopup &&
-      <View style={{...styles.popup, marginTop : twentyFivePercentHeight, width : eightyPercentWidth}}>
+      <View style={{...styles.popup, marginTop : twentyFivePercentHeight, width : "80%"}}>
         <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
       </View>}
 
