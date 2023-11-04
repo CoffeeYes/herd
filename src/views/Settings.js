@@ -331,12 +331,13 @@ for the following permissions in order to allow Herd to function correctly.`
         icon="location-on"
         visible={showPermissionModal}
         permissions={requestedPermissions}
-        modalOnPress={() => setShowPermissionModal(false)}
         onRequestClose={() => setShowPermissionModal(false)}
         buttonOnPress={() => {
           setShowPermissionModal(false);
           Bluetooth.navigateToApplicationSettings();
         }}
+        disableOnPress
+        useCloseButton
         description={locationModalDescription}
         instructionText={locationModalInstructionText}/>
       </ScrollView>

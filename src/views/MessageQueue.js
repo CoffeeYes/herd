@@ -23,8 +23,6 @@ const MessageQueue = ({}) => {
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [loading, setLoading] = useState(true);
 
-  const messageWidth = useScreenAdjustedSize( 0.8, 0.8)
-
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
 
@@ -93,7 +91,7 @@ const MessageQueue = ({}) => {
 
     return (
       <FoldableMessage
-      containerStyle={{width : messageWidth}}
+      containerStyle={{width : "80%"}}
       to={item.toContactName}
       from={item.fromContactName}
       open={openMessages.includes(item._id)}
