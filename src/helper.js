@@ -95,7 +95,30 @@ const useScreenAdjustedSize = (
   return size;
 }
 
+const useOrientationBasedStyle = (portraitStyle, landscapeStyle) => {
+  const [style, setStyle] = useState(portraitStyle);
+
+  useEffect(() => {
+    //adjust iconSize whenever orientation is changed
+    const orientationListener = Dimensions.addEventListener("change", dimensions => {
+      const { height, width } = dimensions.window;
+
+      if(height > width) {
+        setStyle(portraitStyle);
+      }
+      else {
+        setStyle(landscapeStyle)
+      }
+    })
+
+    return () => {orientationListener.remove()}
+  },[])
+
+  return style;
+}
+
 export {
   timestampToText,
-  useScreenAdjustedSize
+  useScreenAdjustedSize,
+  useOrientationBasedStyle
 }
