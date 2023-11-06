@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 
 import { palette } from '../assets/palette';
 
-import { useScreenAdjustedSize } from '../helper';
-
 import FlashTextButton from './FlashTextButton';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {

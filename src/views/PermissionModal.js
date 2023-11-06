@@ -8,10 +8,9 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 
-import { useScreenAdjustedSize } from '../helper';
-
 const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose, useCloseButton=false,
                          description, instructionText, icon, iconSize = 48, permissions, disableOnPress=false}) => {
+                           
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   return (
