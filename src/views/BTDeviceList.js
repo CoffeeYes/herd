@@ -20,7 +20,6 @@ const BTDeviceList = () => {
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const deviceListWidth = useScreenAdjustedSize(0.9,0.9)
 
   const deviceRef = useRef(deviceList);
   const scanningRef = useRef(scanning);
@@ -121,7 +120,7 @@ const BTDeviceList = () => {
         </View>
 
 
-        <ScrollView contentContainerStyle={{...styles.BTList,width : deviceListWidth}}>
+        <ScrollView contentContainerStyle={{...styles.BTList}}>
           {deviceList.map((device,index) =>
             <TouchableOpacity
             key={device.macAddress}
@@ -155,9 +154,9 @@ const styles = {
   },
   BTList : {
     backgroundColor : palette.mediumgrey,
-    width : Dimensions.get("window").width - 40,
     padding : 10,
-    flex : 1
+    flexGrow : 1,
+    minWidth : "100%"
   },
   deviceContainer : {
     padding : 10,

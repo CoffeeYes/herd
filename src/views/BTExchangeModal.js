@@ -8,7 +8,7 @@ import CustomButton from './CustomButton';
 import navigationRef from '../NavigationRef';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
+import { useOrientationBasedStyle } from '../helper';
 
 const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
-  const contentWidth = useScreenAdjustedSize(0.8,0.6);
+  const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});
 
   const otherKeyRef = useRef();
   const keyReceivedRef = useRef();
@@ -103,7 +103,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     visible={visible}
     onRequestClose={() => setVisible(false)}
     disableOnPress>
-        <View style={{...styles.modalContentContainer, width : contentWidth}}>
+        <View style={{...styles.modalContentContainer, ...contentWidth}}>
           <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
           <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
           <CustomButton
