@@ -46,6 +46,7 @@ const Contact = ({route, navigation}) => {
       <Header
       title={contact.name}
       allowGoBack
+      containerStyle={{maxHeight : "50%"}}
       onTextLayout={e => setDisableTextTouch(e.nativeEvent.lines.length <= 1)}
       disableTextTouch={disableTextTouch}
       titleNumberOfLines={expandName ? 6 : 1}
