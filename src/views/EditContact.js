@@ -185,12 +185,26 @@ const EditContact = ({ route, navigation }) => {
     return unsavedChanges;
   }
 
+  const hideSaveButton = () => {
+    return (
+      (name.trim().length === 0 || publicKey.trim().length === 0) ||
+      (name.trim() === originalContact?.name?.trim() &&
+      publicKey.trim() === originalContact?.key?.trim() &&
+      contactImage === originalContact?.image)
+    )
+  }
+
   return (
     <NavigationWarningWrapper
     navigation={navigation}
     checkForChanges={haveUnsavedChanges}>
 
-      <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
+      <Header
+      title={editingExistingContact ? "Edit Contact" : "Add Contact"}
+      allowGoBack
+      rightButtonIcon={!hideSaveButton() && "save"}
+      rightButtonOnClick={save}/>
+
       <ScrollView
       ref={scrollViewRef}
       contentContainerStyle={styles.container}
@@ -233,22 +247,6 @@ const EditContact = ({ route, navigation }) => {
             value={publicKey}/>
           </View>
         </View>
-
-        <FlashTextButton
-        normalText="Save"
-        flashText="Saved!"
-        onPress={save}
-        loading={saving}
-        timeout={editingExistingContact ? 500 : 0}
-        disabled={
-          (name.trim().length === 0 || publicKey.trim().length === 0) ||
-          (name.trim() === originalContact?.name?.trim() &&
-          publicKey.trim() === originalContact?.key?.trim() &&
-          contactImage === originalContact?.image) ||
-          saving
-        }
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}/>
       </ScrollView>
     </NavigationWarningWrapper>
   )
@@ -258,19 +256,6 @@ const styles = {
   container : {
     padding : 30,
     alignItems : "flex-start"
-  },
-  button : {
-    backgroundColor : palette.primary,
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5,
-  },
-  buttonText : {
-    color : palette.white,
-    fontWeight : "bold",
-    fontFamily : "Open-Sans",
-    textAlign : "center"
   },
   input : {
     borderColor: palette.gray,
