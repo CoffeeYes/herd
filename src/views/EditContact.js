@@ -89,9 +89,6 @@ const EditContact = ({ route, navigation }) => {
         Crypto.padding.OAEP_SHA256_MGF1Padding,
         "test"
       )
-      if(!encryptedTest) {
-        throw new Error("Encrypting test string with specified key returned null")
-      }
     }
     catch(e) {
       errorSaving.push({

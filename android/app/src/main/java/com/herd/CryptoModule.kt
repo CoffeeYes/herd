@@ -202,12 +202,15 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
       }
       catch(e : Exception) {
-        Log.i(TAG,"Error initialising public key passed in as parameter",e)
+        val errorMessage = "Error initialising public key passed in as parameter"
+        Log.i(TAG,errorMessage,e)
+        return promise.reject(errorMessage,e)
       }
     }
     if(publicKey === null) {
-      Log.i(TAG,"error loading or initialising publicKey in encryptString function")
-      return promise.resolve(null)
+      val errorMessage = "error loading or initialising publicKey in encryptString function, publicKey was null";
+      Log.i(TAG,errorMessage)
+      return promise.reject(errorMessage)
     }
 
     //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
@@ -220,6 +223,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       val encryptedBytes = cipher.doFinal(stringAsBytes);
       //encode encrypted string to base64 for javascript and pass upwards
       val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
+      Log.i(TAG,"encrypted string : $encryptedStringBASE64")
       return promise.resolve(encryptedStringBASE64);
     }
     catch(e : GeneralSecurityException) {
