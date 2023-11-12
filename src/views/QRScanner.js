@@ -8,6 +8,8 @@ import Orientation from "react-native-orientation-locker";
 
 import { palette } from '../assets/palette';
 
+import { useScreenAdjustedSize } from '../helper';
+
 const QRScanner = ({ navigation }) => {
 
   const scannerRef = useRef();
@@ -26,8 +28,8 @@ const QRScanner = ({ navigation }) => {
   })
 
   useEffect(() => {
-    Orientation.lockToPortrait();
-    return Orientation.unlockAllOrientations;
+    // Orientation.lockToPortrait();
+    // return Orientation.unlockAllOrientations;
   },[])
 
   return (
@@ -36,15 +38,8 @@ const QRScanner = ({ navigation }) => {
     ref={ref => {scannerRef.current = ref}}
     onRead={handleRead}
     reactivate={false}
-    customMarker={<CameraMarker borderWidth={5} borderColor={palette.white}/>}
-    cameraStyle={styles.camera}
-    containerStyle={styles.container}
-    bottomContent={
-      <CustomButton
-      text="Cancel"
-      onPress={() => navigation.goBack()}
-      buttonStyle={{marginTop : 30}}/>
-    }/>
+    customMarker={<CameraMarker borderWidth={5}/>}
+    containerStyle={styles.container}/>
   )
 }
 
