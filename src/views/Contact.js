@@ -21,6 +21,7 @@ const Contact = ({route, navigation}) => {
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id));
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 
@@ -28,6 +29,11 @@ const Contact = ({route, navigation}) => {
   const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
   const [expandName, setExpandName] = useState(false);
   const [disableTextTouch, setDisableTextTouch] = useState(false);
+
+  const cardFontSizeScaler = useScreenAdjustedSize(0.005,0.005);
+  const cardTextStyle = {
+    fontSize : customStyle.uiFontSize + cardFontSizeScaler
+  }
 
   const copyKeyToClipboard = () => {
     setClipboard(contact.key)
@@ -67,22 +73,26 @@ const Contact = ({route, navigation}) => {
         <View style={{alignItems : "center"}}>
           <CardButton
           text="Copy Key"
+          textStyle={cardTextStyle}
           flashText="Copied!"
           timeout={500}
           rightIcon="content-copy"
           onPress={copyKeyToClipboard}/>
 
           <CardButton
+          textStyle={cardTextStyle}
           onPress={() => setShowQRCode(true)}
           rightIcon="qr-code"
           text="Show Contact's QR Code"/>
 
           <CardButton
+          textStyle={cardTextStyle}
           onPress={shareContact}
           rightIcon="share"
           text="Share Contact"/>
 
           <CardButton
+          textStyle={cardTextStyle}
           onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
           rightIcon="chat"
           text="Go To Chat"/>
