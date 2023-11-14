@@ -23,7 +23,7 @@ const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
       {text?.length > 0 &&
       <Text style={{
         ...styles.text,
-        fontSize : customStyle.uiFontSize,
+        fontSize : customStyle.scaledUIFontSize,
         ...textStyle}}>{text}</Text>}
     </TouchableOpacity>
   )

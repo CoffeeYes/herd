@@ -108,12 +108,12 @@ const BTDeviceList = () => {
 
       <View style={styles.mainContainer}>
         <View>
-          <Text style={{fontSize : customStyle.uiFontSize}}>{scanning ? "Scanning..." : ""}</Text>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>{scanning ? "Scanning..." : ""}</Text>
           <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
           {errors.map((error,index) =>
             <Text
             key={index}
-            style={{...styles.error,fontSize : customStyle.uiFontSize}}>
+            style={{...styles.error,fontSize : customStyle.scaledUIFontSize}}>
               {error}
             </Text>
           )}
@@ -126,8 +126,8 @@ const BTDeviceList = () => {
             key={device.macAddress}
             style={styles.deviceContainer}
             onPress={ () => handleDeviceClick(device)}>
-              <Text style={{fontSize : customStyle.uiFontSize}}>{device.name || "Nameless Device"}</Text>
-              <Text style={{fontSize : customStyle.uiFontSize}}>{device.macAddress}</Text>
+              <Text style={{fontSize : customStyle.scaledUIFontSize}}>{device.name || "Nameless Device"}</Text>
+              <Text style={{fontSize : customStyle.scaledUIFontSize}}>{device.macAddress}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>

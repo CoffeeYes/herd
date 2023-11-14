@@ -30,7 +30,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
       <View style={{...styles.textContainer, ...textContainerStyle}}>
         <Text style={{
         ...styles.text,
-        fontSize : customStyle.uiFontSize,
+        fontSize : customStyle.scaledUIFontSize,
         ...textStyle}}>
           {currentText}
         </Text>
@@ -41,7 +41,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
         <Icon
         style={{...styles.icon, ...iconStyle}}
         name={rightIcon}
-        size={iconSize || customStyle.uiFontSize + 16}/>
+        size={iconSize || customStyle.scaledUIFontSize}/>
       </View>}
 
     </TouchableOpacity>

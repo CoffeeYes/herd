@@ -50,10 +50,6 @@ const Settings = ({ navigation }) => {
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05);
-  const cardFontSizeScaler = useScreenAdjustedSize(0.005,0.005);
-  const cardTextStyle = {
-    fontSize : customStyle.uiFontSize + cardFontSizeScaler
-  }
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
@@ -240,13 +236,13 @@ for the following permissions in order to allow Herd to function correctly.`
         <View style={{...styles.backgroundTransferCard, width : "90%"}}>
 
           {!backgroundTransfer &&
-          <Text style={{...styles.warning, fontSize : customStyle.uiFontSize}}>
+          <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
           </Text>}
 
           <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text style={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}>Background Transfers</Text>
+            <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
             onValueChange={toggleBackgroundTransfer}
@@ -263,35 +259,30 @@ for the following permissions in order to allow Herd to function correctly.`
         timeout={500}
         rightIcon="content-copy"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={copyKeyToClipboard}/>
 
         <CardButton
         text="Show My QR Code"
         rightIcon="qr-code-2"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={() => setQRCodeVisible(true)}/>
 
         <CardButton
         text="Customise"
         rightIcon="edit"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={() => navigation.navigate("customise")}/>
 
         <CardButton
         text="Message Queue"
         rightIcon="message"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={() => navigation.navigate("messageQueue")}/>
 
         <CardButton
         text="Password Protection"
         rightIcon="lock"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={() => userHasPassword ?
           navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
           :
@@ -304,7 +295,6 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={deleteAllChats}/>
 
         <CardButton
@@ -313,7 +303,6 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={deleteAllContacts}/>
 
         <CardButton
@@ -322,7 +311,6 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete-forever"
         iconSize={cardIconSize}
-        textStyle={cardTextStyle}
         onPress={deleteAllMessages}/>
 
         {__DEV__ &&

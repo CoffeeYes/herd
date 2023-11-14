@@ -9,7 +9,8 @@ import {
   StatusBar,
   Button,
   NativeEventEmitter,
-  AppState
+  AppState,
+  Dimensions
 } from 'react-native';
 
 import {
@@ -67,9 +68,11 @@ const App = ({ }) => {
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const locked = useSelector(state => state.appStateReducer.locked);
   const lockable = useSelector(state => state.appStateReducer.lockable);
+  const customStyle = useSelector(state => state.chatReducer.styles)
 
   const passwordSetRef = useRef();
   const lockableRef = useRef();
+  const uiFontSizeRef = useRef(customStyle.uiFontSize);
 
   useEffect(() => {
     (async () => {
@@ -120,9 +123,15 @@ const App = ({ }) => {
       }
     })
 
+    const orientationListener = Dimensions.addEventListener("change", () => {
+      const { width, height } = Dimensions.get("window");
+      dispatch(setStyles({...customStyle, scaledUIFontSize : uiFontSizeRef.current + width * 0.005}));
+    })
+
     return () => {
       messagesListener.remove();
       appStateListener.remove();
+      orientationListener.remove();
     }
   },[])
 
@@ -133,6 +142,10 @@ const App = ({ }) => {
   useEffect(() => {
     lockableRef.current = lockable;
   },[lockable])
+
+  useEffect(() => {
+    uiFontSizeRef.current = customStyle.uiFontSize;
+  },[customStyle])
 
   const loadInitialState = async () => {
     //get stored data
@@ -164,9 +177,14 @@ const App = ({ }) => {
     dispatch(setChats(contactsWithChats))
 
     //load styles into store
-    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-    styles &&
-    dispatch(setStyles(styles));
+    let styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    const { width } = Dimensions.get("window");
+    if(styles) {
+      dispatch(setStyles({
+        ...styles,
+        scaledUIFontSize : styles.uiFontSize + width * 0.005
+      }));
+    }
 
     //load password hashes into store
     loginPassword.length > 0 &&
