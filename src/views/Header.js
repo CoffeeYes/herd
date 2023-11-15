@@ -37,7 +37,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         <Text
         onTextLayout={onTextLayout}
         {...(limitTitleLines && {numberOfLines : titleNumberOfLines})}
-        style={{...styles.title, fontSize : customStyle.titleSize,...textStyle}}>{title}</Text>
+        style={{...styles.title, fontSize : customStyle.scaledTitleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
 

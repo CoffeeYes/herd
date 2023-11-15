@@ -72,7 +72,7 @@ const App = ({ }) => {
 
   const passwordSetRef = useRef();
   const lockableRef = useRef();
-  const uiFontSizeRef = useRef(customStyle.uiFontSize);
+  const customStyleRef = useRef(customStyle);
 
   useEffect(() => {
     (async () => {
@@ -125,7 +125,13 @@ const App = ({ }) => {
 
     const orientationListener = Dimensions.addEventListener("change", () => {
       const { width, height } = Dimensions.get("window");
-      dispatch(setStyles({...customStyle, scaledUIFontSize : uiFontSizeRef.current + width * 0.005}));
+      const scaledFontSizeAddition = (width * 0.005)
+      dispatch(setStyles({
+        ...customStyle,
+        scaledUIFontSize : customStyleRef.current.uiFontSize + scaledFontSizeAddition,
+        scaledTitleSize : customStyleRef.current.titleSize + scaledFontSizeAddition
+      })
+      );
     })
 
     return () => {
@@ -144,7 +150,7 @@ const App = ({ }) => {
   },[lockable])
 
   useEffect(() => {
-    uiFontSizeRef.current = customStyle.uiFontSize;
+    customStyleRef.current = customStyle;
   },[customStyle])
 
   const loadInitialState = async () => {
@@ -182,7 +188,8 @@ const App = ({ }) => {
     if(styles) {
       dispatch(setStyles({
         ...styles,
-        scaledUIFontSize : styles.uiFontSize + width * 0.005
+        scaledUIFontSize : styles.uiFontSize + (width * 0.005),
+        scaledTitleSize : styles.titleSize + (width * 0.005)
       }));
     }
 
