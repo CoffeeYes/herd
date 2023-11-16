@@ -103,17 +103,17 @@ const Chats = ({ navigation }) => {
         key={chat._id}
         navigation={navigation}
         image={chat.image}
-        textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
+        textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}
         highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
         subTextStyle={{
-          fontSize : customStyle.subTextSize,
+          fontSize : customStyle.scaledSubTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
           marginRight : 10,
-          fontSize : customStyle.subTextSize,
+          fontSize : customStyle.scaledSubTextSize,
           color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}

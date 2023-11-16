@@ -129,9 +129,9 @@ const App = ({ }) => {
       dispatch(setStyles({
         ...customStyle,
         scaledUIFontSize : customStyleRef.current.uiFontSize + scaledFontSizeAddition,
-        scaledTitleSize : customStyleRef.current.titleSize + scaledFontSizeAddition
-      })
-      );
+        scaledSubTextSize : customStyleRef.current.subTextSize + scaledFontSizeAddition,
+        scaledTitleSize : customStyleRef.current.titleSize + scaledFontSizeAddition,
+      }));
     })
 
     return () => {
@@ -151,7 +151,7 @@ const App = ({ }) => {
 
   useEffect(() => {
     customStyleRef.current = customStyle;
-  },[customStyle])
+  },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize])
 
   const loadInitialState = async () => {
     //get stored data
@@ -189,7 +189,8 @@ const App = ({ }) => {
       dispatch(setStyles({
         ...styles,
         scaledUIFontSize : styles.uiFontSize + (width * 0.005),
-        scaledTitleSize : styles.titleSize + (width * 0.005)
+        scaledTitleSize : styles.titleSize + (width * 0.005),
+        scaledSubTextSize : styles.subTextSize + (width * 0.005)
       }));
     }
 
