@@ -192,7 +192,9 @@ const chatReducer = (state = initialState,action) => {
       break;
     }
     case "SET_STYLES": {
-      return {...state,styles : action.payload}
+      let oldStyles = {...state.styles};
+      const newStyles = {...oldStyles,...action.payload}
+      return {...state, styles : newStyles}
       break;
     }
     case "SET_MESSAGE_QUEUE": {
