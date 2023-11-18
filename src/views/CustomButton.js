@@ -21,7 +21,7 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
       <Icon name={leftIcon} size={leftIconSize}/>}
 
       {text &&
-      <Text style={{...styles.buttonText,fontSize : customStyle.uiFontSize, ...textStyle}}>
+      <Text style={{...styles.buttonText,fontSize : customStyle.scaledUIFontSize, ...textStyle}}>
         {text}
       </Text>}
 

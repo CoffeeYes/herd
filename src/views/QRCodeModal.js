@@ -30,7 +30,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
           numberOfLines={1}
           style={{
             ...styles.title,
-            fontSize : customStyle.uiFontSize,
+            fontSize : customStyle.scaledUIFontSize,
           }}>
             {title}
           </Text>

@@ -33,7 +33,7 @@ const FlashTextButton = ({ onPress, flashText, normalText,
       {loading ?
       <ActivityIndicator color={loadingColor} size={loadingSize}/>
       :
-      <Text style={{...styles.buttonText,fontSize : customStyle.uiFontSize,...textStyle}}>
+      <Text style={{...styles.buttonText,fontSize : customStyle.scaledUIFontSize,...textStyle}}>
         {buttonText + " "}
       </Text>}
     </TouchableOpacity>
