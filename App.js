@@ -124,13 +124,17 @@ const App = ({ }) => {
     })
 
     const orientationListener = Dimensions.addEventListener("change", () => {
-      const { width, height } = Dimensions.get("window");
-      const scaledFontSizeAddition = (width * 0.005)
+
+      const [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes([
+        customStyleRef.current.uiFontSize,
+        customStyleRef.current.titleSize,
+        customStyleRef.current.subTextSize
+      ])
+
       dispatch(setStyles({
-        ...customStyle,
-        scaledUIFontSize : customStyleRef.current.uiFontSize + scaledFontSizeAddition,
-        scaledSubTextSize : customStyleRef.current.subTextSize + scaledFontSizeAddition,
-        scaledTitleSize : customStyleRef.current.titleSize + scaledFontSizeAddition,
+        scaledUIFontSize,
+        scaledSubTextSize,
+        scaledTitleSize
       }));
     })
 
@@ -151,7 +155,21 @@ const App = ({ }) => {
 
   useEffect(() => {
     customStyleRef.current = customStyle;
+    [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes([
+      customStyle.uiFontSize,customStyle.titleSize,customStyle.subTextSize
+    ])
+    dispatch(setStyles({
+      scaledUIFontSize,
+      scaledTitleSize,
+      scaledSubTextSize
+    }))
   },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize])
+
+  const calculateScaledFontSizes = (fontSizes = []) => {
+    const addedWidth = Dimensions.get("window").width * 0.005;
+    const scaledFonts = fontSizes.map(fontSize => Math.round(fontSize + addedWidth));
+    return scaledFonts;
+  }
 
   const loadInitialState = async () => {
     //get stored data
@@ -184,13 +202,15 @@ const App = ({ }) => {
 
     //load styles into store
     let styles = JSON.parse(await AsyncStorage.getItem("styles"));
-    const { width } = Dimensions.get("window");
     if(styles) {
+      const [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes(
+        [styles.uiFontSize,styles.titleSize,styles.subTextSize]
+      )
       dispatch(setStyles({
         ...styles,
-        scaledUIFontSize : styles.uiFontSize + (width * 0.005),
-        scaledTitleSize : styles.titleSize + (width * 0.005),
-        scaledSubTextSize : styles.subTextSize + (width * 0.005)
+        scaledUIFontSize,
+        scaledTitleSize,
+        scaledSubTextSize
       }));
     }
 
