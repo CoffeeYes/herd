@@ -231,18 +231,18 @@ const EditContact = ({ route, navigation }) => {
 
         <View style={styles.inputContainer}>
           <View style={styles.inputContainer}>
-            <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.scaledUIFontSize}}>Name</Text>
             <TextInput
-            style={{...styles.input, fontSize : customStyle.uiFontSize}}
+            style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setName(text)}
             value={name}/>
           </View>
 
           <View style={{width : "100%"}}>
-            <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.scaledUIFontSize}}>Public Key</Text>
             <TextInput
             multiline={editingExistingContact}
-            style={{...styles.input,fontSize : customStyle.uiFontSize}}
+            style={{...styles.input,fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setPublicKey(text)}
             value={publicKey}/>
           </View>

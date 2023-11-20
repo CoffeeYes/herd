@@ -7,8 +7,8 @@ import { palette } from '../assets/palette';
 import FlashTextButton from './FlashTextButton';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
-  const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
-  const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize, ...customInputStyle};
+  const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
+  const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
 
   return (
     <>
@@ -49,14 +49,14 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
         <View style={{...styles.card,...mainContainerStyle }}>
 
           {description &&
-          <Text multiline style={{fontSize : customStyle.uiFontSize}}>
+          <Text multiline style={{fontSize : customStyle.scaledUIFontSize}}>
             {description}
           </Text>}
 
           {errors.map((error,index) =>
           <Text
           key={error.replace(" ","_")}
-          style={{...styles.error, fontSize : customStyle.uiFontSize}}>
+          style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
             {error}
           </Text>)}
 
