@@ -27,6 +27,8 @@ const Contact = ({route, navigation}) => {
 
   const largeImageWidth = useScreenAdjustedSize(0.8,0.8);
   const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
+
   const [expandName, setExpandName] = useState(false);
   const [disableTextTouch, setDisableTextTouch] = useState(false);
 
@@ -71,21 +73,25 @@ const Contact = ({route, navigation}) => {
           flashText="Copied!"
           timeout={500}
           rightIcon="content-copy"
+          iconSize={cardIconSize}
           onPress={copyKeyToClipboard}/>
 
           <CardButton
           onPress={() => setShowQRCode(true)}
           rightIcon="qr-code"
+          iconSize={cardIconSize}
           text="Show Contact's QR Code"/>
 
           <CardButton
           onPress={shareContact}
           rightIcon="share"
+          iconSize={cardIconSize}
           text="Share Contact"/>
 
           <CardButton
           onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
           rightIcon="chat"
+          iconSize={cardIconSize}
           text="Go To Chat"/>
 
         </View>
