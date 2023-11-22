@@ -99,9 +99,9 @@ const MessageQueue = ({}) => {
       loading={loading}
       closedTimestamp={date}
       openTimestamp={hours}
-      textFontSize={customStyle.uiFontSize}
-      headerTitleStyle={{fontSize : customStyle.uiFontSize}}
-      headerTextStyle={{fontSize : customStyle.uiFontSize}}
+      textFontSize={customStyle.scaledUIFontSize}
+      headerTitleStyle={{fontSize : customStyle.scaledUIFontSize}}
+      headerTextStyle={{fontSize : customStyle.scaledUIFontSize}}
       text={item.text}/>
     )
   }

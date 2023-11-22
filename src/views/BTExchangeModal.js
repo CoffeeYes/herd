@@ -105,7 +105,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     disableOnPress>
         <View style={{...styles.modalContentContainer, ...contentWidth}}>
           <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
-          <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
           <CustomButton
           onPress={() => cancel()}
           buttonStyle={{marginTop : 10}}

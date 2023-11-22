@@ -16,7 +16,7 @@ const TabItem = ({ text, containerStyle, textStyle, active, onPress}) => {
     onPress={onPress}>
       <Text style={{
         ...styles.text,
-        fontSize : customStyle.uiFontSize,
+        fontSize : customStyle.scaledUIFontSize,
         ...textStyle,
         color : active ? palette.primary : palette.black}}>
           {text}

@@ -42,8 +42,8 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
     }
   }
 
-  const titleStyle = {...styles.inputTitle, fontSize : customStyle.uiFontSize};
-  const inputStyle = {...styles.input, fontSize : customStyle.uiFontSize};
+  const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
+  const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize};
 
   return (
         <View style={{...styles.card,...mainContainerStyle }}>

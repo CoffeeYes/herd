@@ -10,7 +10,7 @@ import { palette } from '../assets/palette';
 
 const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose, useCloseButton=false,
                          description, instructionText, icon, iconSize = 48, permissions, disableOnPress=false}) => {
-                           
+
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   return (
@@ -25,18 +25,18 @@ const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
           <Icon name={icon} size={iconSize}/>}
 
           {description?.length > 0 &&
-          <Text style={{fontSize : customStyle.uiFontSize}}>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>
             {description}
           </Text>}
 
           {instructionText?.length > 0 &&
-          <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.uiFontSize}}>
+          <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.scaledUIFontSize}}>
             {instructionText}
           </Text>}
 
           {permissions?.map(permission => {
             return(
-              <Text key={permission} style={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}>{permission}</Text>
+              <Text key={permission} style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>{permission}</Text>
             )
           })}
 

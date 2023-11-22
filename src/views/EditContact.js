@@ -225,7 +225,7 @@ const EditContact = ({ route, navigation }) => {
 
         {errors.map(error => {
           return (
-            <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
+            <Text key={error.type} style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error.message}</Text>
           )
         })}
 

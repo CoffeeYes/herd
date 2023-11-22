@@ -514,7 +514,7 @@ const Chat = ({ route, navigation }) => {
 
       {showPopup &&
       <View style={{...styles.popup, marginTop : twentyFivePercentHeight, width : "80%"}}>
-        <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
+        <Text style={{...styles.popupText, fontSize : customStyle.scaledUIFontSize}}>No more messages to load</Text>
       </View>}
 
       <PanGestureHandler
@@ -551,7 +551,7 @@ const Chat = ({ route, navigation }) => {
         style={{
           ...styles.chatInput,
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
-          fontSize : customStyle?.uiFontSize,
+          fontSize : customStyle?.scaledUIFontSize,
           flex : 1,
           height : inputHeight
         }}
@@ -569,7 +569,7 @@ const Chat = ({ route, navigation }) => {
           backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
           justifyContent : "center"}
         }>
-          <Text style={{fontSize : customStyle.uiFontSize}}>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>
             {`${characterCount} / 190`}
           </Text>
         </View>

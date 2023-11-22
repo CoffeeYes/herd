@@ -86,12 +86,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   return (
     <FullScreenSplash containerStyle={styles.container}>
-      <Text style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error}</Text>
-      <Text style={{...styles.inputTitle, fontSize : customStyle.uiFontSize}}>Enter Your Password : </Text>
+      <Text style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error}</Text>
+      <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Enter Your Password : </Text>
 
       <TextInput
       secureTextEntry
-      style={{...styles.input, fontSize : customStyle.uiFontSize, ...inputWidth}}
+      style={{...styles.input, fontSize : customStyle.scaledUIFontSize, ...inputWidth}}
       onChangeText={setPassword}
       value={password}/>
 
