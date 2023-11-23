@@ -35,9 +35,11 @@ const Customise = ({ navigation }) => {
   const [originalStyles, setOriginalStyles] = useState({});
   const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
+  const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
 
   const iconSize = useScreenAdjustedSize(0.1,0.065);
+  const screenFontScaler = useScreenAdjustedSize(0.005,0.005);
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
@@ -75,6 +77,10 @@ const Customise = ({ navigation }) => {
   useEffect(() => {
     loadStyles().then(() => setLoading(false));
   },[])
+
+  useEffect(() => {
+    setScaledFontSize(uiFontSize + screenFontScaler)
+  },[uiFontSize, screenFontScaler])
 
   const loadStyles = async () => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
@@ -245,23 +251,23 @@ const Customise = ({ navigation }) => {
 
           <Header
           title="Preview"
-          textStyle={{fontSize : uiFontSize * 1.5}}
+          textStyle={{fontSize : scaledFontSize * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
           <CardButton
           containerStyle={{alignSelf : "center"}}
           disableTouch
           text="Preview"
-          textStyle={{fontSize : uiFontSize}}
+          textStyle={{fontSize : scaledFontSize}}
           rightIcon="preview"/>
 
           <ListItem
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : uiFontSize * 0.8}}
-          subTextStyle={{fontSize : uiFontSize * 0.8}}
-          textStyle={{fontSize : uiFontSize}}
+          rightTextStyle={{fontSize : scaledFontSize * 0.8}}
+          subTextStyle={{fontSize : scaledFontSize * 0.8}}
+          textStyle={{fontSize : scaledFontSize}}
           disableTouch
           />
 
