@@ -155,15 +155,16 @@ const App = ({ }) => {
 
   useEffect(() => {
     customStyleRef.current = customStyle;
-    [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes([
-      customStyle.uiFontSize,customStyle.titleSize,customStyle.subTextSize
+    [scaledUIFontSize, scaledTitleSize, scaledSubTextSize, scaledMessageFontSize] = calculateScaledFontSizes([
+      customStyle.uiFontSize,customStyle.titleSize,customStyle.subTextSize, customStyle.messageFontSize
     ])
     dispatch(setStyles({
       scaledUIFontSize,
       scaledTitleSize,
-      scaledSubTextSize
+      scaledSubTextSize,
+      scaledMessageFontSize
     }))
-  },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize])
+  },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize, customStyle.messageFontSize])
 
   const calculateScaledFontSizes = (fontSizes = []) => {
     const addedWidth = Dimensions.get("window").width * 0.005;
