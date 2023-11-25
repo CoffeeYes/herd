@@ -318,6 +318,7 @@ const Customise = ({ navigation }) => {
             <ChatBubble
             disableTouch
             text="This is a sample sent message"
+            textStyle={{fontSize : messageFontSize + screenFontScaler}}
             timestamp="12 : 20"
             customStyle={getChatBubbleColor()}
             messageFrom={true}/>
@@ -325,6 +326,7 @@ const Customise = ({ navigation }) => {
             <ChatBubble
             disableTouch
             text="This is a sample response message"
+            textStyle={{fontSize : messageFontSize + screenFontScaler}}
             timestamp="12 : 21"
             customStyle={getChatBubbleColor()}
             messageFrom={false}/>
