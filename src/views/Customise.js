@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -37,6 +37,8 @@ const Customise = ({ navigation }) => {
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
+
+  const customStyle = useSelector(state => state.chatReducer.styles);
 
   const iconSize = useScreenAdjustedSize(0.1,0.065);
   const screenFontScaler = useScreenAdjustedSize(0.005,0.005);
@@ -287,7 +289,7 @@ const Customise = ({ navigation }) => {
                   <Text style={{
                     alignSelf : "center",
                     fontWeight : "bold",
-                    fontSize : originalStyles.uiFontSize
+                    fontSize : customStyle.scaledUIFontSize
                   }}>
                     {item.title}
                   </Text>
@@ -306,8 +308,8 @@ const Customise = ({ navigation }) => {
                   rightTitle={item.rightTitle}
                   rightText={item.rightText}
                   rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-                  rightTitleStyle={{fontWeight : "bold", fontSize : originalStyles.uiFontSize}}
-                  rightTextStyle={{fontSize : originalStyles.uiFontSize}}
+                  rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
+                  rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
                   />
                 </Fragment>
               )
@@ -336,18 +338,16 @@ const Customise = ({ navigation }) => {
             <Dropdown
             onChangeOption={index => setActiveItem(index)}
             choices={tabItems}
-            textStyle={{fontSize : originalStyles.uiFontSize}}
+            textStyle={{fontSize : customStyle.scaledUIFontSize}}
             chosenStyle={{color : palette.primary}}
             dropDownBoxStyle={{borderRadius : 5}}
             />
 
             <ColorChoice
-            title={tabItems[activeItem].name}
             color={toHsv(tabItems[activeItem].color)}
             setColor={tabItems[activeItem].setColor}
             oldColor={originalStyles[tabItems[activeItem].originalColor]}
-            sliderTitleSize={originalStyles.uiFontSize}
-            sliderTextSize={originalStyles.uiFontSize}
+            sliderTextSize={customStyle.scaledUIFontSize}
             />
           </View>
 
