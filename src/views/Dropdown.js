@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Dimensions, Pressable } from 'react-native';
 import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -18,7 +18,7 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, d
   return (
     <View style={{...styles.container, ...containerStyle}}>
 
-      <TouchableOpacity
+      <Pressable
       style={{...styles.choice, borderBottomWidth : 2,...dropDownBoxStyle}}
       onPress={() => setOpen(!open)}>
         <Text style={{...styles.text,...textStyle}}>{choices[chosenIndex].text}</Text>
@@ -26,13 +26,13 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, d
         size={24}
         style={{marginLeft : "auto"}}
         name={open ? "arrow-back" : "arrow-downward"}/>
-      </TouchableOpacity>
+      </Pressable>
 
       {open &&
       <View style={{...styles.choiceContainer, ...choiceContainerStyle}}>
         {choices.map((choice,index) => {
           return (
-            <TouchableOpacity
+            <Pressable
             activeOpacity={1}
             style={{
               ...styles.choice,
@@ -49,7 +49,7 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, d
               }}>
                 {choice.text}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           )
         })}
       </View>}
