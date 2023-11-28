@@ -41,6 +41,7 @@ const Customise = ({ navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   const iconSize = useScreenAdjustedSize(0.1,0.065);
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
   const screenFontScaler = useScreenAdjustedSize(0.005,0.005);
 
   const sentBoxColorRef = useRef();
@@ -194,7 +195,7 @@ const Customise = ({ navigation }) => {
   const changeFonts = (value,index) => {
     const roundedValue = Math.round(value)
     if(synchroniseFontChanges) {
-      fontSizes.map(item => item.setValue(roundedValue))
+      fontSizes.forEach(item => item.setValue(roundedValue))
     }
     else {
       fontSizes[index].setValue(roundedValue);
@@ -258,6 +259,7 @@ const Customise = ({ navigation }) => {
 
           <CardButton
           containerStyle={{alignSelf : "center"}}
+          iconSize={cardIconSize}
           disableTouch
           text="Preview"
           textStyle={{fontSize : scaledFontSize}}
@@ -267,8 +269,8 @@ const Customise = ({ navigation }) => {
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : scaledFontSize * 0.8}}
-          subTextStyle={{fontSize : scaledFontSize * 0.8}}
+          rightTextStyle={{fontSize : (scaledFontSize * 0.8) + screenFontScaler}}
+          subTextStyle={{fontSize : (scaledFontSize * 0.8) + screenFontScaler}}
           textStyle={{fontSize : scaledFontSize}}
           disableTouch
           />
