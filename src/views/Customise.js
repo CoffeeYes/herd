@@ -387,7 +387,8 @@ const styles = {
     backgroundColor : palette.white,
     marginHorizontal : 10,
     borderRadius : 5,
-    elevation : 2
+    elevation : 2,
+    zIndex : 10
   },
   tabRow : {
     flexDirection : "row",
