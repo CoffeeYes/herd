@@ -149,9 +149,10 @@ with other phones using bluetooth.`;
       value={{key : publicKey}}/>
 
       <PermissionModal
+      useCloseButton
+      disableOnPress
       icon="location-on"
       visible={showPermissionModal}
-      modalOnPress={() => setShowPermissionModal(false)}
       onRequestClose={() => setShowPermissionModal(false)}
       buttonOnPress={() => {
         setShowPermissionModal(false);
