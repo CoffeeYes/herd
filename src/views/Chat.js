@@ -186,7 +186,7 @@ const Chat = ({ route, navigation }) => {
       const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
 
       const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
-      if(!newMessagesToAdd || noMoreMessagesToLoad) {
+      if(!newMessagesToAdd || noMoreMessagesToLoad && !(messageStart == -messageLoadingSize)) {
         showNoMoreMessagePopup();
       }
     }
