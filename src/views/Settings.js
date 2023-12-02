@@ -49,7 +49,7 @@ const Settings = ({ navigation }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
-  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));

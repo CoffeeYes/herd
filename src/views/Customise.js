@@ -259,7 +259,7 @@ const Customise = ({ navigation }) => {
 
           <CardButton
           containerStyle={{alignSelf : "center"}}
-          iconSize={cardIconSize}
+          iconSize={cardIconSize + (scaledFontSize*0.2)}
           disableTouch
           text="Preview"
           textStyle={{fontSize : scaledFontSize}}

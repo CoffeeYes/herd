@@ -27,7 +27,7 @@ const Contact = ({route, navigation}) => {
 
   const largeImageWidth = useScreenAdjustedSize(0.8,0.8);
   const largeImageHeight = useScreenAdjustedSize(0.8,0.8,"height");
-  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize * 0.2);
 
   const [expandName, setExpandName] = useState(false);
   const [disableTextTouch, setDisableTextTouch] = useState(false);
