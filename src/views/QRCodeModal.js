@@ -14,6 +14,10 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const maxContainerHeight = useScreenAdjustedSize(0.8,0.8,"height");
   const maxContainerWidth = useScreenAdjustedSize(0.8,0.8);
 
+  // use height to size QR code when landscape, and width when portrait
+  // orientation === landscape ? height - textHeight : width;
+  const qrSize = seventyPercentWidth > seventyPercentHeight ? seventyPercentHeight - 30 : seventyPercentWidth;
+
   return (
     <CustomModal
     visible={visible}
@@ -30,6 +34,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
           numberOfLines={1}
           style={{
             ...styles.title,
+            maxWidth : qrSize,
             fontSize : customStyle.scaledUIFontSize,
           }}>
             {title}
@@ -37,7 +42,7 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
         </View>}
         <QRCode
         value={JSON.stringify(value)}
-        size={seventyPercentWidth > seventyPercentHeight ? seventyPercentHeight - 30 : seventyPercentWidth}/>
+        size={qrSize}/>
       </View>
     </CustomModal>
   )
