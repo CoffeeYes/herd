@@ -11,8 +11,6 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const seventyPercentWidth = useScreenAdjustedSize(0.7,0.7);
   const seventyPercentHeight = useScreenAdjustedSize(0.7,0.7, "height");
-  const maxContainerHeight = useScreenAdjustedSize(0.8,0.8,"height");
-  const maxContainerWidth = useScreenAdjustedSize(0.8,0.8);
 
   // use height to size QR code when landscape, and width when portrait
   // orientation === landscape ? height - textHeight : width;
@@ -25,8 +23,6 @@ const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
     onPress={onPress}>
       <View style={{
         ...styles.modalContentContainer,
-        maxHeight : maxContainerHeight,
-        maxWidth : maxContainerWidth
       }}>
         {title &&
         <View style={styles.header}>
