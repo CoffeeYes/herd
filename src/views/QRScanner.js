@@ -1,14 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import CameraMarker from './CameraMarker';
-import CustomButton from './CustomButton';
-import Orientation from "react-native-orientation-locker";
-
-import { palette } from '../assets/palette';
-
-import { useScreenAdjustedSize } from '../helper';
 
 const QRScanner = ({ navigation }) => {
 
@@ -27,11 +20,6 @@ const QRScanner = ({ navigation }) => {
     scannerRef.current.reactivate();
   })
 
-  useEffect(() => {
-    // Orientation.lockToPortrait();
-    // return Orientation.unlockAllOrientations;
-  },[])
-
   return (
     <QRCodeScanner
     showMarker
@@ -47,11 +35,7 @@ const styles = {
   container : {
     alignItems : "center",
     justifyContent : "center"
-  },
-  camera : {
-    maxHeight : Dimensions.get('window').height * 0.8,
-    maxWidth : Dimensions.get('window').width
-  },
+  }
 }
 
 export default QRScanner;
