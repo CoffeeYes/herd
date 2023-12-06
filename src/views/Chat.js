@@ -33,7 +33,7 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
 
-const swipeSize = Dimensions.get('window').height * 0.25;
+const maxCharacterCount = 190;
 
 const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ const Chat = ({ route, navigation }) => {
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
-  const [characterCount, setCharacterCount] = useState(190);
+  const [characterCount, setCharacterCount] = useState(maxCharacterCount);
   const [highlightedMessages, setHighlightedMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -65,6 +65,7 @@ const Chat = ({ route, navigation }) => {
   const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
+  const swipeSize = useScreenAdjustedSize(0.25, 0.4, "height");
 
   useEffect(() => {
     (async () => {
@@ -220,7 +221,7 @@ const Chat = ({ route, navigation }) => {
 
   const sendMessage = async message => {
     setChatInput("");
-    setCharacterCount(190);
+    setCharacterCount(maxCharacterCount);
     if(message.trim() === "") {
       return;
     }
@@ -558,10 +559,10 @@ const Chat = ({ route, navigation }) => {
         }}
         value={chatInput}
         editable={!inputDisabled}
-        maxLength={190}
+        maxLength={maxCharacterCount}
         onChangeText={text => {
           setChatInput(text)
-          setCharacterCount(190 - text.length)
+          setCharacterCount(maxCharacterCount - text.length)
         }}
         multiline={true}
         blurOnSubmit={true}
@@ -571,7 +572,7 @@ const Chat = ({ route, navigation }) => {
           justifyContent : "center"}
         }>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>
-            {`${characterCount} / 190`}
+            {`${characterCount} / ${maxCharacterCount}`}
           </Text>
         </View>
       </View>
@@ -595,10 +596,6 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     marginRight : 20
-  },
-  image : {
-    width : Dimensions.get("window").width * imageValues.smallFactor,
-    height : Dimensions.get("window").width * imageValues.smallFactor,
   },
   messageDay : {
     alignSelf : "center",
