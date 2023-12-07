@@ -10,7 +10,7 @@ import LoadingBar from './LoadingBar';
 
 const componentShouldUpdate = (props, nextProps) => {
   for(const key of Object.keys(props)) {
-    if(typeof props[key] !== "function" && props[key] !== nextProps[key]) {
+    if(typeof props[key] !== "function" && typeof props[key] != "object" && props[key] !== nextProps[key]) {
       return false;
     }
   }
@@ -66,7 +66,7 @@ const styles = {
     overflow : "hidden"
   },
   headerTextContainer : {
-    maxWidth : "30%",
+    width : "30%",
   },
   messageText : {
     marginTop : 10,
