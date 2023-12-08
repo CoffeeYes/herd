@@ -10,9 +10,6 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
                     disableTouch, rightTextStyle, rightIcon, rightIconSize = 24, rightIconStyle,
                     highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
 
-  const [deleteButtonHeight,setDeleteButtonHeight] = useState(10);
-  const [deleteButtonHeightAdjusted, setDeleteButtonHeightAdjusted] = useState(false);
-
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const defaultIconSize = useScreenAdjustedSize(0.07,0.04);
   const minHeight = useScreenAdjustedSize(0.1,0.2,"height");
@@ -27,12 +24,6 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
       ...(highlighted ? highlightedStyle : containerStyle)
     }}
     onPress={onPress}
-    onLayout={event => {
-      if(!deleteButtonHeightAdjusted) {
-        setDeleteButtonHeight(event.nativeEvent.layout.height);
-        setDeleteButtonHeightAdjusted(true);
-      }
-    }}
     disabled={disableTouch}
     onLongPress={onLongPress}>
 
@@ -62,7 +53,7 @@ const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress
 
       {highlighted && useSingularDeleteButton &&
       <TouchableOpacity
-      style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto", height : deleteButtonHeight}}
+      style={{...styles.deleteButton,marginLeft : rightText ? 0 : "auto"}}
       onPress={() => deleteItem()}>
         <Icon name="delete" size={24} style={{color : palette.black}}/>
       </TouchableOpacity>}
@@ -83,10 +74,11 @@ const styles = {
   },
   deleteButton : {
     backgroundColor : palette.primary,
+    alignSelf : "stretch",
     alignItems : "center",
     justifyContent : "center",
     width : Dimensions.get("window").width * 0.20,
-    maxWidth :150
+    maxWidth :150,
   },
   imageContainer : {
     borderWidth : 1,
