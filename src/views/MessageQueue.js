@@ -42,37 +42,46 @@ const MessageQueue = ({}) => {
     return [message,textToDecrypt];
   }
 
-  const parseMessageQueue = async queue => {
-    const parsedQueue = await Promise.all(queue.map( async message => {
+  const parseMessageQueue = queue => {
+    const sortedQueue = queue.sort((a,b) => b.timestamp - a.timestamp);
+    const parsedQueue = sortedQueue.map( (message,index) => {
 
       let [newMessage, textToDecrypt] = assignParticipantsToMessage({...message})
 
       if(textToDecrypt) {
-        newMessage.text = await Crypto.decryptString(
+        newMessage.loading = true;
+        //dispatches async text decryption per-message, updates the state array when the promise returns
+        //we no longer wait for all messages to decrypt and instead display available messages as soon as
+        //encryption is complete
+        Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
           message.text
-        )
+        ).then(data => {
+          setParsedQueue(() => {
+            let updatedQueue = [...parsedQueue];
+            updatedQueue[index].text = data;
+            updatedQueue[index].loading = false;
+            return updatedQueue
+          })
+        })
       }
       else {
         newMessage.text = "Encrypted message for other user"
         newMessage.toContactName = "N/A";
         newMessage.fromContactName = "N/A";
+        newMessage.loading = false;
       }
       return newMessage;
-    }))
-    return parsedQueue.sort((a,b) => b.timestamp - a.timestamp);
+    })
+    return parsedQueue;
   }
 
   useEffect(() => {
-    ( async () => {
-      setLoading(true);
-      setParsedQueue(await parseMessageQueue(messageQueue))
-      setLoading(false);
-    })()
-  },[messageQueue])
+    setParsedQueue(parseMessageQueue(messageQueue))
+  },[])
 
   const onMessagePress = useCallback(id => {
     setOpenMessages(oldOpenMessages => oldOpenMessages.includes(id) ?
@@ -96,7 +105,7 @@ const MessageQueue = ({}) => {
       from={item.fromContactName}
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
-      loading={loading}
+      loading={item.loading}
       closedTimestamp={date}
       openTimestamp={hours}
       textFontSize={customStyle.scaledUIFontSize}
@@ -117,7 +126,7 @@ const MessageQueue = ({}) => {
       onPress={() => {
         setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
       }}
-      disabled={loading}
+      disabled={parsedQueue.some(item => item.loading)}
       buttonStyle={styles.buttonStyle}/>
 
       <FlatList
@@ -129,13 +138,6 @@ const MessageQueue = ({}) => {
   )
 }
 const styles = {
-  messageTo : {
-    fontWeight : "bold",
-    marginRight : 10
-  },
-  messageText : {
-    width : Dimensions.get('window').width * 0.7,
-  },
   buttonStyle : {
     marginTop : 10,
     elevation : 2,
