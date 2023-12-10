@@ -20,8 +20,10 @@ const MessageQueue = ({}) => {
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [parsedQueue, setParsedQueue] = useState(messageQueue);
-  const [loading, setLoading] = useState(true);
+  const [parsedQueue, setParsedQueue] = useState(
+    messageQueue.sort( (a,b) => a.timestamp - b.timestamp)
+    .map(message => ({...message, loading : true}))
+  );
 
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
@@ -42,45 +44,36 @@ const MessageQueue = ({}) => {
     return [message,textToDecrypt];
   }
 
-  const parseMessageQueue = queue => {
-    const sortedQueue = queue.sort((a,b) => b.timestamp - a.timestamp);
-    const parsedQueue = sortedQueue.map( (message,index) => {
+  const decryptMessages = queue => {
+    queue.forEach( async (message,index) => {
 
       let [newMessage, textToDecrypt] = assignParticipantsToMessage({...message})
 
       if(textToDecrypt) {
-        newMessage.loading = true;
-        //dispatches async text decryption per-message, updates the state array when the promise returns
-        //we no longer wait for all messages to decrypt and instead display available messages as soon as
-        //encryption is complete
-        Crypto.decryptString(
+        newMessage.text = await Crypto.decryptString(
           "herdPersonal",
           Crypto.algorithm.RSA,
           Crypto.blockMode.ECB,
           Crypto.padding.OAEP_SHA256_MGF1Padding,
           message.text
-        ).then(data => {
-          setParsedQueue(() => {
-            let updatedQueue = [...parsedQueue];
-            updatedQueue[index].text = data;
-            updatedQueue[index].loading = false;
-            return updatedQueue
-          })
-        })
+        )
       }
       else {
         newMessage.text = "Encrypted message for other user"
         newMessage.toContactName = "N/A";
         newMessage.fromContactName = "N/A";
-        newMessage.loading = false;
       }
-      return newMessage;
+      newMessage.loading = false;
+      setParsedQueue(oldQueue => {
+        let updatedQueue = [...oldQueue];
+        updatedQueue[index] = newMessage;
+        return updatedQueue
+      })
     })
-    return parsedQueue;
   }
 
   useEffect(() => {
-    setParsedQueue(parseMessageQueue(messageQueue))
+    decryptMessages(parsedQueue)
   },[])
 
   const onMessagePress = useCallback(id => {
@@ -92,7 +85,7 @@ const MessageQueue = ({}) => {
 
   const renderItemCallback = useCallback( ({ item }) => {
     return renderItem({ item })
-  },[parsedQueue,loading,openMessages, Dimensions.get("window").width])
+  },[parsedQueue,openMessages, Dimensions.get("window").width])
 
   const renderItem = ({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
