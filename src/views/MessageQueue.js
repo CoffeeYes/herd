@@ -119,6 +119,8 @@ const MessageQueue = ({}) => {
       onPress={() => {
         setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
       }}
+      useLoadingIndicator
+      loading={parsedQueue.some(item => item.loading)}
       disabled={parsedQueue.some(item => item.loading)}
       buttonStyle={styles.buttonStyle}/>
 
