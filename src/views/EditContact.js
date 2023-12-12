@@ -203,6 +203,8 @@ const EditContact = ({ route, navigation }) => {
       title={editingExistingContact ? "Edit Contact" : "Add Contact"}
       allowGoBack
       rightButtonIcon={!hideSaveButton() && "save"}
+      useAlternativeIcon={saving}
+      alternativeIcon={<ActivityIndicator size="large" color={palette.primary}/>}
       rightButtonOnClick={save}/>
 
       <ScrollView

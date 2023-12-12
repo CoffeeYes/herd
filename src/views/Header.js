@@ -11,7 +11,8 @@ import { defaultChatStyles } from '../assets/styles'
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextLayout,
                   onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
-                  backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1 }) => {
+                  backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
+                  useAlternativeIcon, alternativeIcon}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
@@ -40,12 +41,14 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         style={{...styles.title, fontSize : customStyle.scaledTitleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
-
       {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       onPress={rightButtonOnClick}
       style={{...styles.rightButton,width : rightButtonWidth}}>
-        <Icon name={rightButtonIcon} size={rightIconSize || scaledIconSize} style={{color : palette.white}}/>
+        {useAlternativeIcon ?
+        alternativeIcon
+        :
+        <Icon name={rightButtonIcon} size={rightIconSize || scaledIconSize} style={{color : palette.white}}/>}
       </TouchableOpacity>}
     </View>
   )
