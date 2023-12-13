@@ -10,7 +10,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 
-import { timestampToText, useScreenAdjustedSize } from '../helper.js';
+import { timestampToText } from '../helper.js';
 
 import moment from 'moment';
 

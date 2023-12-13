@@ -10,7 +10,6 @@ import Header from './Header';
 import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
 
 const BTDeviceList = () => {
   const [deviceList, _setDeviceList] = useState([]);
@@ -139,7 +138,8 @@ const BTDeviceList = () => {
 
         <BTExchangeModal
         visible={showModal}
-        setVisible={setShowModal}/>
+        onRequestClose={() => setShowModal(false)}
+        onCancel={() => setShowModal(false)}/>
 
       </View>
     </>

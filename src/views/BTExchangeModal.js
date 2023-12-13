@@ -10,7 +10,7 @@ import navigationRef from '../NavigationRef';
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 
-const BTExchangeModal = ({ navigation, visible, setVisible}) => {
+const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device");
   const [otherKey, _setOtherKey] = useState("");
@@ -87,7 +87,7 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
       navigationRef.current.navigate("editContact",{publicKey : otherKeyRef.current});
-      setVisible(false);
+      onCancel();
     }
   },[keySentRef.current,keyReceivedRef.current])
 
@@ -95,22 +95,22 @@ const BTExchangeModal = ({ navigation, visible, setVisible}) => {
     await Bluetooth.cancelListenAsServer();
     await Bluetooth.cancelConnectAsClient();
     await Bluetooth.cancelBTConnectionThread();
-    setVisible(false);
+    onCancel();
   }
 
   return (
     <CustomModal
     visible={visible}
-    onRequestClose={() => setVisible(false)}
+    onRequestClose={onRequestClose}
     disableOnPress>
-        <View style={{...styles.modalContentContainer, ...contentWidth}}>
-          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
-          <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
-          <CustomButton
-          onPress={() => cancel()}
-          buttonStyle={{marginTop : 10}}
-          text="Cancel"/>
-        </View>
+      <View style={{...styles.modalContentContainer, ...contentWidth}}>
+        <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
+        <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
+        <CustomButton
+        onPress={() => cancel()}
+        buttonStyle={{marginTop : 10}}
+        text="Cancel"/>
+      </View>
     </CustomModal>
   )
 }

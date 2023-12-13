@@ -233,7 +233,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
       <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={{...styles.backgroundTransferCard, width : "90%"}}>
+        <View style={styles.backgroundTransferCard}>
 
           {!backgroundTransfer &&
           <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
@@ -362,7 +362,7 @@ const styles = {
     borderRadius : 10,
     padding : 20,
     marginVertical : 10,
-    width : Dimensions.get('window').width * 0.9
+    width : "90%"
   },
   deleteCardTextStyle : {
     color : palette.red
