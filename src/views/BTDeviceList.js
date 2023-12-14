@@ -34,8 +34,14 @@ const BTDeviceList = () => {
   }
 
   const updateDeviceList = newDevice => {
-    if(!deviceRef.current.find(existingDevice => existingDevice.macAddress === newDevice.macAddress)) {
-      setDeviceList([...deviceRef.current,newDevice]);
+    const existingDevice = deviceRef.current.findIndex(existingDevice => existingDevice.macAddress === newDevice.macAddress);
+    if(existingDevice === -1) {
+      setDeviceList([...deviceRef.current,{...newDevice, foundAgain : true}]);
+    }
+    else {
+      let listCopy = [...deviceRef.current];
+      listCopy[existingDevice] = {...listCopy[existingDevice], foundAgain : true}
+      setDeviceList(listCopy)
     }
   }
 
@@ -51,6 +57,7 @@ const BTDeviceList = () => {
       }
       else if (state === "DISCOVERY_FINISHED") {
         setScanning(false);
+        setDeviceList(deviceRef.current.filter(device => device.foundAgain))
       }
     })
 
@@ -95,6 +102,7 @@ const BTDeviceList = () => {
     }
     else {
       setErrors([]);
+      setDeviceList(deviceList.map(device => ({...device, foundAgain : false})))
       await Bluetooth.scanForDevices();
     }
   }
