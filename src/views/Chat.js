@@ -481,9 +481,9 @@ const Chat = ({ route, navigation }) => {
 
   const getItemLayout = (data, index) => {
     //multiply by 1.1 for each point increase in fontsize
-    const fontSizeFactor = (1 + ((customStyle.messageFontSize - 14)  * 0.1))
-    // min height at 14 fontsize ~= 80, max ~= 150, (80 + 150) / 2 = 115
-    const estimatedMessageHeight = 115 * fontSizeFactor;
+    const fontSizeFactor = (1 + ((customStyle.scaledMessageFontSize - 16)  * 0.1))
+    // min height at 16 fontsize ~= 90, max ~= 216, (90 + 216) / 2 ~= 150
+    const estimatedMessageHeight = 150 * fontSizeFactor;
     return {
       length : estimatedMessageHeight,
       offset : estimatedMessageHeight * index,
@@ -536,7 +536,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={renderItemCallback}
+          renderItem={renderItem}
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
