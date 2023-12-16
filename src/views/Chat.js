@@ -11,7 +11,7 @@ import {
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
-import { imageValues } from '../assets/palette';
+import { defaultChatStyles } from '../assets/styles';
 
 import { useScreenAdjustedSize } from '../helper';
 
@@ -480,10 +480,18 @@ const Chat = ({ route, navigation }) => {
   },[messages,highlightedMessages])
 
   const getItemLayout = (data, index) => {
-    //multiply by 1.1 for each point increase in fontsize
-    const fontSizeFactor = (1 + ((customStyle.scaledMessageFontSize - 16)  * 0.1))
-    // min height at 16 fontsize ~= 90, max ~= 216, (90 + 216) / 2 ~= 150
-    const estimatedMessageHeight = 150 * fontSizeFactor;
+    
+    //measured with onLayout for 1 character and 190 characters
+    const maximumBoxHeight = 216;
+    const minimumBoxHeight = 90;
+
+    const maxFontSize = 24;
+    const minFontSize = 16;
+    const stepSize = (maximumBoxHeight - minimumBoxHeight) / (maxFontSize - minFontSize);
+    const sizeAdjustment = (customStyle.messageFontSize - minFontSize) * stepSize
+
+    const estimatedMessageHeight = 90 + sizeAdjustment;
+
     return {
       length : estimatedMessageHeight,
       offset : estimatedMessageHeight * index,
