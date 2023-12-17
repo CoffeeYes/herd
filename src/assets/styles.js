@@ -12,18 +12,24 @@ const largeImageContainerStyle = {
   marginBottom : 10
 }
 
+const boundaryValues = {
+  minFontSize : 16,
+  maxFontSize : 24,
+}
+
 const defaultChatStyles = {
   sentBoxColor : palette.mediumgrey,
   sentTextColor : palette.offwhite,
   receivedBoxColor : palette.offprimary,
   receivedTextColor : palette.offwhite,
-  messageFontSize : 16,
-  titleSize : 24,
+  messageFontSize : boundaryValues.minFontSize,
+  titleSize : boundaryValues.maxFontSize,
   subTextSize : 14,
-  uiFontSize : 16
+  uiFontSize : boundaryValues.minFontSize
 }
 
 export {
   largeImageContainerStyle,
-  defaultChatStyles
+  defaultChatStyles,
+  boundaryValues
 }

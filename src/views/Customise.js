@@ -19,7 +19,7 @@ import Slider from './Slider';
 
 import { setStyles } from '../redux/actions/chatActions';
 
-import { defaultChatStyles } from '../assets/styles';
+import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
@@ -305,8 +305,8 @@ const Customise = ({ navigation }) => {
                   onSlidingComplete={value => changeFonts(value,index)}
                   onValueChange={value => changeFonts(value,index)}
                   value={item.value}
-                  min={defaultChatStyles.messageFontSize}
-                  max={24}
+                  min={boundaryValues.minFontSize}
+                  max={boundaryValues.maxFontSize}
                   rightTitle={item.rightTitle}
                   rightText={item.rightText}
                   rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}

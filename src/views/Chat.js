@@ -11,7 +11,7 @@ import {
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
-import { defaultChatStyles } from '../assets/styles';
+import { defaultChatStyles, boundaryValues } from '../assets/styles';
 
 import { useScreenAdjustedSize } from '../helper';
 
@@ -480,13 +480,12 @@ const Chat = ({ route, navigation }) => {
   },[messages,highlightedMessages])
 
   const getItemLayout = (data, index) => {
-    
+
     //measured with onLayout for 1 character and 190 characters
     const maximumBoxHeight = 216;
     const minimumBoxHeight = 90;
 
-    const maxFontSize = 24;
-    const minFontSize = 16;
+    const { maxFontSize, minFontSize } = boundaryValues;
     const stepSize = (maximumBoxHeight - minimumBoxHeight) / (maxFontSize - minFontSize);
     const sizeAdjustment = (customStyle.messageFontSize - minFontSize) * stepSize
 
@@ -544,7 +543,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={renderItem}
+          renderItem={renderItemCallback}
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (
