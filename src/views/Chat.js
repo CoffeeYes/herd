@@ -479,25 +479,27 @@ const Chat = ({ route, navigation }) => {
     return renderItem({item})
   },[messages,highlightedMessages])
 
-  const getItemLayout = (data, index) => {
-    const textLength = data.map(item => item.data).flat()[index]?.text.length;
-
+  const estimateMessageHeight = messageLength => {
+    if(isNaN(messageLength)) {
+      throw new Error("[estimateMessageHeight] non-number messageLength was passed as parameter")
+    }
     //measured with onLayout for 1 character and 190 characters
-    const maximumBoxHeight = 150;
+    const maximumBoxHeight = 216;
     const minimumBoxHeight = 90;
 
     //190 is max character count, interpolate boxHeight based on number of characters;
     const boxHeightStepSize = (maximumBoxHeight - minimumBoxHeight) / 190;
-    let characterCountAdjustment = 0;
-    if(textLength) {
-      characterCountAdjustment = boxHeightStepSize * textLength;
-    }
 
-    const { maxFontSize, minFontSize } = boundaryValues;
-    const stepSize = (maximumBoxHeight - minimumBoxHeight) / (maxFontSize - minFontSize);
-    const sizeAdjustment = (customStyle.messageFontSize - minFontSize) * stepSize
+    const characterCountAdjustment = boxHeightStepSize * messageLength;
+    const estimatedMessageHeight = minimumBoxHeight + characterCountAdjustment;
+    
+    return estimatedMessageHeight;
+  }
 
-    const estimatedMessageHeight = 90 + sizeAdjustment + characterCountAdjustment;
+  const getItemLayout = (data, index) => {
+    const textLength = data.map(item => item.data).flat()[index]?.text.length || 0;
+
+    const estimatedMessageHeight = estimateMessageHeight(textLength);
 
     return {
       length : estimatedMessageHeight,
