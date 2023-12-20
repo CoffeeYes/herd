@@ -479,20 +479,35 @@ const Chat = ({ route, navigation }) => {
     return renderItem({item})
   },[messages,highlightedMessages])
 
+
+  //measured chatBubble height LUT for fontsizes in range min to max
+  const fontSizeLUT = [
+    [90,216],
+    [93,228],
+    [95,235],
+    [98,271],
+    [101,284],
+    [104,295],
+    [106,330],
+    [109,344],
+    [111,389]
+  ];
+
   const estimateMessageHeight = messageLength => {
     if(isNaN(messageLength)) {
       throw new Error("[estimateMessageHeight] non-number messageLength was passed as parameter")
     }
+    const fontSizeIndex = customStyle.messageFontSize - boundaryValues.minFontSize;
     //measured with onLayout for 1 character and 190 characters
-    const maximumBoxHeight = 216;
-    const minimumBoxHeight = 90;
+    const minimumBoxHeight = fontSizeLUT[fontSizeIndex][0];
+    const maximumBoxHeight = fontSizeLUT[fontSizeIndex][1];
 
     //190 is max character count, interpolate boxHeight based on number of characters;
     const boxHeightStepSize = (maximumBoxHeight - minimumBoxHeight) / 190;
 
     const characterCountAdjustment = boxHeightStepSize * messageLength;
     const estimatedMessageHeight = minimumBoxHeight + characterCountAdjustment;
-    
+
     return estimatedMessageHeight;
   }
 
