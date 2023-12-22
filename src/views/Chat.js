@@ -462,7 +462,7 @@ const Chat = ({ route, navigation }) => {
     });
   }
 
-  const renderItem = ({item}) => {
+  const renderItem = useCallback(({item}) => {
     return (
       <ChatBubble
       text={item.text}
@@ -476,12 +476,7 @@ const Chat = ({ route, navigation }) => {
       customStyle={customStyle}
       />
     )
-  }
-
-  const renderItemCallback = useCallback( ({item}) => {
-    return renderItem({item})
-  },[messages,highlightedMessages])
-
+  },[messages, highlightedMessages])
 
   //measured chatBubble height LUT for fontsizes in range min to max
   const fontSizeLUT = [
@@ -514,7 +509,7 @@ const Chat = ({ route, navigation }) => {
     return estimatedMessageHeight;
   }
 
-  const getItemLayout = (data, index) => {
+  const getItemLayout = useCallback((data, index) => {
     const textLength = flattenedMessages[index]?.text.length || 0;
 
     const estimatedMessageHeight = estimateMessageHeight(textLength);
@@ -524,7 +519,7 @@ const Chat = ({ route, navigation }) => {
       offset : estimatedMessageHeight * index,
       index
     }
-  }
+  },[])
 
   return (
     <>
@@ -571,7 +566,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={renderItemCallback}
+          renderItem={renderItem}
           onContentSizeChange={handleContentSizeChange}
           getItemLayout={getItemLayout}
           renderSectionHeader={({ section: { day } }) => (

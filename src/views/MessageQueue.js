@@ -83,11 +83,7 @@ const MessageQueue = ({}) => {
     [...oldOpenMessages,id])
   },[])
 
-  const renderItemCallback = useCallback( ({ item }) => {
-    return renderItem({ item })
-  },[parsedQueue,openMessages, Dimensions.get("window").width])
-
-  const renderItem = ({ item }) => {
+  const renderItem = useCallback(({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
@@ -106,7 +102,7 @@ const MessageQueue = ({}) => {
       headerTextStyle={{fontSize : customStyle.scaledUIFontSize}}
       text={item.text}/>
     )
-  }
+  },[parsedQueue,openMessages, Dimensions.get("window").width])
 
   return (
     <View style={{flex : 1}}>
@@ -128,7 +124,7 @@ const MessageQueue = ({}) => {
       contentContainerStyle={styles.listStyle}
       data={parsedQueue}
       keyExtractor={item => item._id}
-      renderItem={renderItemCallback}/>
+      renderItem={renderItem}/>
     </View>
   )
 }
