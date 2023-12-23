@@ -514,9 +514,10 @@ const Chat = ({ route, navigation }) => {
 
     const estimatedMessageHeight = estimateMessageHeight(textLength);
 
+    const messageMargin = 6;
     return {
-      length : estimatedMessageHeight,
-      offset : estimatedMessageHeight * index,
+      length : (estimatedMessageHeight + messageMargin),
+      offset : (estimatedMessageHeight + messageMargin) * index,
       index
     }
   },[])
