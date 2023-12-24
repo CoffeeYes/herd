@@ -41,7 +41,7 @@ const Chat = ({ route, navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
-  const [flattenedMessages, setFlattenedMessages] = useState(messages.map(item => item.data).flat())
+  const [flattenedMessages, setFlattenedMessages] = useState(messages.map(item => [...item.data,item.day]).flat())
   const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [characterCount, setCharacterCount] = useState(maxCharacterCount);
@@ -157,7 +157,7 @@ const Chat = ({ route, navigation }) => {
       }
       messageLengthRef.current = messageLength;
 
-      setFlattenedMessages(messages.map(item => item.data).flat())
+      setFlattenedMessages(messages.map(item => [...item.data,item.day]).flat())
     }
   },[messages,loading])
 
@@ -510,7 +510,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const getItemLayout = useCallback((data, index) => {
-    const textLength = flattenedMessages[index]?.text.length || 0;
+    const textLength = flattenedMessages[index]?.text?.length || 0;
 
     const estimatedMessageHeight = estimateMessageHeight(textLength);
 
