@@ -474,6 +474,7 @@ const Chat = ({ route, navigation }) => {
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
       customStyle={customStyle}
+      showCopyButton={highlightedMessages.length === 1 && highlightedMessages.includes(item._id)}
       />
     )
   },[messages, highlightedMessages])

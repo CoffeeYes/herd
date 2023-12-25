@@ -1,11 +1,13 @@
 import React, { useState, memo } from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useClipboard } from '@react-native-community/clipboard';
 
 import { palette } from '../assets/palette';
 
 const ChatBubble = ({ text, textStyle, timestamp, messageFrom, customStyle, activeOpacity,
-                      onLongPress, onPress, disableTouch = false, highlighted, onLayout }) => {
+                      onLongPress, onPress, disableTouch = false, highlighted, onLayout, showCopyButton }) => {
 
   const boxStyle = {
     ...styles.message,
@@ -23,6 +25,8 @@ const ChatBubble = ({ text, textStyle, timestamp, messageFrom, customStyle, acti
     })
   }
 
+  const [clipboard, setClipboard] = useClipboard();
+
   return (
     <TouchableOpacity
     onLayout={onLayout}
@@ -31,6 +35,10 @@ const ChatBubble = ({ text, textStyle, timestamp, messageFrom, customStyle, acti
     onLongPress={onLongPress}
     onPress={onPress}
     style={boxStyle}>
+      {showCopyButton &&
+      <TouchableOpacity onPress={() => setClipboard(text)} style={{alignSelf : "center"}}>
+        <Icon name="content-copy" size={36} color={palette.white}></Icon >
+      </TouchableOpacity>}
       <Text
       style={{...getTextStyle("messageText"),...textStyle}}>
         {text}
