@@ -46,7 +46,6 @@ const Chat = ({ route, navigation }) => {
   const [chatInput, setChatInput] = useState("");
   const [characterCount, setCharacterCount] = useState(maxCharacterCount);
   const [highlightedMessages, setHighlightedMessages] = useState([]);
-  const [inputDisabled, setInputDisabled] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-messageLoadingSize);
   const [messageEnd, setMessageEnd] = useState();
@@ -228,7 +227,6 @@ const Chat = ({ route, navigation }) => {
     if(message.trim() === "") {
       return;
     }
-    setInputDisabled(true);
 
     const timestamp = Date.now();
 
@@ -283,8 +281,6 @@ const Chat = ({ route, navigation }) => {
       toContactName : contactInfo.name,
     }]));
 
-    setInputDisabled(false);
-
     !enableGestureHandler &&
     scrollToBottom();
 
@@ -306,7 +302,6 @@ const Chat = ({ route, navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            setInputDisabled(true);
             deleteMessagesFromRealm(highlightedMessages);
 
             const fullHighlightedMessages = messages.map(section => section.data).flat(1)
@@ -356,7 +351,6 @@ const Chat = ({ route, navigation }) => {
             }
 
             setHighlightedMessages([]);
-            setInputDisabled(false);
           },
         },
       ]
@@ -584,13 +578,12 @@ const Chat = ({ route, navigation }) => {
         placeholder="Send a Message"
         style={{
           ...styles.chatInput,
-          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
+          backgroundColor : palette.white,
           fontSize : customStyle?.scaledUIFontSize,
           flex : 1,
           height : inputHeight
         }}
         value={chatInput}
-        editable={!inputDisabled}
         maxLength={maxCharacterCount}
         onChangeText={text => {
           setChatInput(text)
@@ -600,7 +593,7 @@ const Chat = ({ route, navigation }) => {
         blurOnSubmit={true}
         onSubmitEditing={event => sendMessage(event.nativeEvent.text.trim())}/>
         <View style={{
-          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
+          backgroundColor : palette.white,
           justifyContent : "center"}
         }>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>
