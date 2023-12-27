@@ -6,7 +6,7 @@ import { useClipboard } from '@react-native-community/clipboard';
 
 import { palette } from '../assets/palette';
 
-const ChatBubble = ({ text, textStyle, timestamp, messageFrom, customStyle, activeOpacity,
+const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, activeOpacity,
                       onLongPress, onPress, disableTouch = false, highlighted, onLayout, showCopyButton }) => {
 
   const boxStyle = {
@@ -40,7 +40,7 @@ const ChatBubble = ({ text, textStyle, timestamp, messageFrom, customStyle, acti
         <Icon name="content-copy" size={36} color={palette.white}></Icon >
       </TouchableOpacity>}
       <Text
-      style={{...getTextStyle("messageText"),...textStyle}}>
+      style={{...getTextStyle("messageText"),fontSize : textFontSize}}>
         {text}
       </Text>
       <Text
