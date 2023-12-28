@@ -21,27 +21,31 @@ const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
     visible={visible}>
       <View style={{...styles.modalContentContainer, width : "90%", maxHeight : "90%"}}>
         <ScrollView contentContainerStyle={{alignItems : "center"}}>
+
           {icon &&
-          <Icon name={icon} size={iconSize}/>}
+          <Icon name={icon} size={iconSize} style={{marginBottom : 10}}/>}
 
-          {description?.length > 0 &&
-          <Text style={{fontSize : customStyle.scaledUIFontSize}}>
-            {description}
-          </Text>}
+          <View>
+            {description?.length > 0 &&
+            <Text style={{fontSize : customStyle.scaledUIFontSize}}>
+              {description}
+            </Text>}
 
-          {instructionText?.length > 0 &&
-          <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.scaledUIFontSize}}>
-            {instructionText}
-          </Text>}
-
+            {instructionText?.length > 0 &&
+            <Text style={{fontWeight : "bold", marginVertical : 20, fontSize : customStyle.scaledUIFontSize}}>
+              {instructionText}
+            </Text>}
+          </View>
           {permissions?.map(permission => {
             return(
-              <Text key={permission} style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>{permission}</Text>
+              <Text key={permission} style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>
+                {permission}
+              </Text>
             )
           })}
 
           <CustomButton
-          buttonStyle={styles.button}
+          buttonStyle={{...styles.button, marginTop : permissions?.length > 0 ? 10 : 0}}
           onPress={buttonOnPress}
           text="Go To Settings"/>
         </ScrollView>
