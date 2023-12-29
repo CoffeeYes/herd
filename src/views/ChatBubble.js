@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
@@ -35,18 +35,22 @@ const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, a
     onLongPress={onLongPress}
     onPress={onPress}
     style={boxStyle}>
-      {showCopyButton &&
-      <TouchableOpacity onPress={() => setClipboard(text)} style={{alignSelf : "center"}}>
-        <Icon name="content-copy" size={36} color={palette.white}></Icon >
-      </TouchableOpacity>}
-      <Text
-      style={{...getTextStyle("messageText"),fontSize : textFontSize}}>
-        {text}
-      </Text>
-      <Text
-      style={getTextStyle("timestamp")}>
-        {timestamp}
-      </Text>
+      <View style={{flexDirection : "row"}}>
+        {showCopyButton &&
+        <TouchableOpacity onPress={() => setClipboard(text)} style={styles.copyButton}>
+          <Icon name="content-copy" size={36} color={palette.white}></Icon >
+        </TouchableOpacity>}
+        <View style={styles.textContainer}>
+          <Text
+          style={{...getTextStyle("messageText"),fontSize : textFontSize}}>
+            {text}
+          </Text>
+          <Text
+          style={getTextStyle("timestamp")}>
+            {timestamp}
+          </Text>
+        </View>
+      </View>
     </TouchableOpacity>
   )
 }
@@ -82,6 +86,14 @@ const styles = {
     borderWidth : 2,
     borderColor : palette.black,
     borderStyle : "dotted"
+  },
+  copyButton : {
+    alignSelf : "center",
+    marginRight : 20
+  },
+  textContainer : {
+    overflow : "hidden",
+    flexShrink : 1
   }
 }
 
