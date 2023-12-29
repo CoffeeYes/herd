@@ -1,5 +1,6 @@
 import Foundation
 import CoreBluetooth
+import CoreLocation
 
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
@@ -12,10 +13,12 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       print("CBCentralManager State is : \(central.state)")
     }
   
-    var manager : CBCentralManager?
+    var bluetoothManager : CBCentralManager?
+    var locationManager : CLLocationManager?
     override init() {
         super.init()
-        manager = CBCentralManager(delegate: self,queue : nil, options : nil);
+        bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
+        locationManager = CLLocationManager();
     }
     
     @objc
@@ -66,17 +69,29 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func checkLocationPermission(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      resolve(
+        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
+        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse
+      )
     }
     @objc
     func requestLocationPermissions(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      if(locationManager?.authorizationStatus == CLAuthorizationStatus.notDetermined ||
+         locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse) {
+          locationManager?.requestAlwaysAuthorization();
+          if(locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
+             locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse) {
+              resolve(true)
+          }
+      }
+      resolve(false)
     }
     @objc
     func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+        resolve(locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
+                locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse)
     }
     @objc
     func requestLocationEnable(_ resolve : RCTPromiseResolveBlock,
