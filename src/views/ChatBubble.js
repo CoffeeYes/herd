@@ -35,9 +35,12 @@ const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, a
     onLongPress={onLongPress}
     onPress={onPress}
     style={boxStyle}>
-      <View style={{flexDirection : "row"}}>
+      <View style={{flexDirection : messageFrom ? "row" : "row-reverse"}}>
         {showCopyButton &&
-        <TouchableOpacity onPress={() => setClipboard(text)} style={styles.copyButton}>
+        <TouchableOpacity onPress={() => setClipboard(text)} style={{
+          ...styles.copyButton,
+          ...(messageFrom ? {marginRight : 20} : {marginLeft : 20})
+        }}>
           <Icon name="content-copy" size={36} color={palette.white}></Icon >
         </TouchableOpacity>}
         <View style={styles.textContainer}>
@@ -89,7 +92,6 @@ const styles = {
   },
   copyButton : {
     alignSelf : "center",
-    marginRight : 20
   },
   textContainer : {
     overflow : "hidden",
