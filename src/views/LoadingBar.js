@@ -8,24 +8,29 @@ const LoadingBar = ({containerStyle, loadingBarStyle,
                      animationDuration = 500}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
 
-  const moveToEnd = () => {
-    return Animated.timing(loadingViewPosition, {
-      toValue: 100,
-      duration: animationDuration,
-      useNativeDriver : false
-    }).start(moveToBeginning)
+  const runAnimation = () => {
+    return Animated.loop(
+      Animated.sequence([
+        moveToEnd,
+        moveToBeginning
+      ])
+    ).start()
   }
 
-  const moveToBeginning = () => {
-    Animated.timing(loadingViewPosition, {
-      toValue: 0,
-      duration: animationDuration,
-      useNativeDriver : false
-    }).start(moveToEnd)
-  }
+  const moveToEnd = Animated.timing(loadingViewPosition, {
+    toValue: 100,
+    duration: animationDuration,
+    useNativeDriver : false
+  })
+
+  const moveToBeginning = Animated.timing(loadingViewPosition, {
+    toValue: 0,
+    duration: animationDuration,
+    useNativeDriver : false
+  })
 
   useEffect(() => {
-    moveToEnd();
+    runAnimation();
   },[])
 
   return (
