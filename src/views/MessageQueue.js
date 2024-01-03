@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Dimensions, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, Dimensions, ActivityIndicator, FlatList, InteractionManager } from 'react-native';
 import Header from './Header';
 
 import Crypto from '../nativeWrapper/Crypto';
@@ -73,7 +73,7 @@ const MessageQueue = ({}) => {
   }
 
   useEffect(() => {
-    decryptMessages(parsedQueue)
+    InteractionManager.runAfterInteractions(() => decryptMessages(parsedQueue));
   },[])
 
   const onMessagePress = useCallback(id => {

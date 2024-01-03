@@ -20,13 +20,15 @@ const LoadingBar = ({containerStyle, loadingBarStyle,
   const moveToEnd = Animated.timing(loadingViewPosition, {
     toValue: 100,
     duration: animationDuration,
-    useNativeDriver : false
+    useNativeDriver : false,
+    isInteraction : false //https://github.com/facebook/react-native/issues/8624
   })
 
   const moveToBeginning = Animated.timing(loadingViewPosition, {
     toValue: 0,
     duration: animationDuration,
-    useNativeDriver : false
+    useNativeDriver : false,
+    isInteraction : false
   })
 
   useEffect(() => {
