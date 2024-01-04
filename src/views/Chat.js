@@ -322,20 +322,16 @@ const Chat = ({ route, navigation }) => {
             }))
             .filter(section => section.data.length > 0);
 
-            if(updatedMessages.length > 0) {
-              const lastSection = updatedMessages[updatedMessages.length -1];
-              const lastMessageIndex = lastSection.data.length -1;
-              const lastMessage = lastSection.data[lastMessageIndex];
-              dispatch(setLastText(contactInfo._id,lastMessage))
-            }
-            else if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading){
-              //if all messages were deleted attempt to load more
-              await loadMoreMessages(true,messageStart + messageLoadingExtension);
-            }
-            else {
-              //all messages were deleted and there are no more messages to load
-              //so remove chat from chats page
-              dispatch(deleteChats([contactInfo]))
+            if(updatedMessages.length === 0) {
+              if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
+                //if all messages were deleted attempt to load more
+                await loadMoreMessages(true,messageStart + messageLoadingExtension);
+              }
+              else {
+                //all messages were deleted and there are no more messages to load
+                //so remove chat from chats page
+                dispatch(deleteChats([contactInfo]))
+              }
             }
 
             const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));

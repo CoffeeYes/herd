@@ -127,13 +127,6 @@ const chatReducer = (state = initialState,action) => {
       return newState;
       break;
     }
-    case "ADD_MESSAGE_TO_QUEUE": {
-      return {
-        ...state,
-        messageQueue : [...state.messageQueue, action.payload.message]
-      }
-      break;
-    }
     case "ADD_MESSAGES_TO_QUEUE": {
       return {
         ...state,
@@ -166,8 +159,12 @@ const chatReducer = (state = initialState,action) => {
       ))
       .filter(section => section.data.length !== 0)
 
+      const lastSection = newSections[newSections.length -1]?.data
+      const lastMessage = lastSection && lastSection[lastSection.length -1];
+
       const newState = {
         ...state,
+        ...(lastMessage && {chats : setLastText(state,id,lastMessage)}),
         messages : {
           ...state.messages,
           [id] : newSections
