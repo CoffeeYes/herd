@@ -155,7 +155,8 @@ const Chat = ({ route, navigation }) => {
         scrollToBottom(false);
       }
       messageLengthRef.current = messageLength;
-
+      
+      messageLength > 0 &&
       setFlattenedMessages(messages.map(item => [...item.data,item.day]).flat())
     }
   },[messages,loading])
