@@ -18,7 +18,6 @@ import { useScreenAdjustedSize } from '../helper';
 import {
   addChat,
   updateChat,
-  setLastText,
   prependMessagesForContact,
   addMessage,
   addMessagesToQueue,
@@ -155,7 +154,7 @@ const Chat = ({ route, navigation }) => {
         scrollToBottom(false);
       }
       messageLengthRef.current = messageLength;
-      
+
       messageLength > 0 &&
       setFlattenedMessages(messages.map(item => [...item.data,item.day]).flat())
     }
@@ -202,8 +201,6 @@ const Chat = ({ route, navigation }) => {
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
-      const newLastText = {...newMessages[newMessages.length-1]};
-      dispatch(setLastText(contactInfo._id, newLastText));
     }
   }
 
