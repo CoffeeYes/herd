@@ -118,7 +118,7 @@ const Chat = ({ route, navigation }) => {
     let flattenedMessages = [];
     if(customMessages?.length > 0) {
       if(customMessages?.[0]?.data) {
-        flattenedMessages = customMessages.map(section => section.data).flat(1);
+        flattenedMessages = flattenMessages(customMessages);
       }
       else if (customMessages?.[0]?._id?.length > 0) {
         flattenedMessages = customMessages
@@ -156,9 +156,20 @@ const Chat = ({ route, navigation }) => {
       messageLengthRef.current = messageLength;
 
       messageLength > 0 &&
-      setFlattenedMessages(messages.map(item => [...item.data,item.day]).flat())
+      setFlattenedMessages(flattenMessages(messages,true))
     }
   },[messages,loading])
+
+  const flattenMessages = (messages, includeDays = false) => {
+    let extractedArray = [];
+    if(includeDays) {
+      extractedArray = messages.map(section => [...section.data, section.day])
+    }
+    else {
+      extractedArray = messages.map(section => section.data);
+    }
+    return extractedArray.flat()
+  }
 
   const loadMessages = async (messageStart, messageEnd) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
@@ -181,7 +192,7 @@ const Chat = ({ route, navigation }) => {
       //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
       //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
       // if there are any present in the database.
-      const extractedMessageIDs = messages.map(section => section.data).flat(1).map(message => message._id)
+      const extractedMessageIDs = flattenMessages(messages).map(message => message._id)
 
       //generate array difference between new and existing messages to see if actual new messages are present
       let newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
@@ -302,7 +313,7 @@ const Chat = ({ route, navigation }) => {
           onPress: async () => {
             deleteMessagesFromRealm(highlightedMessages);
 
-            const fullHighlightedMessages = messages.map(section => section.data).flat(1)
+            const fullHighlightedMessages = flattenMessages(messages)
             .filter(message => highlightedMessages.includes(message._id));
 
             const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
