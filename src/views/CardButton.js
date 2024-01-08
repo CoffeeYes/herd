@@ -5,17 +5,20 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
 
-const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
+const CardButton = ({ onPress, text, rightIcon, flashIcon, iconSize, iconStyle, iconContainerStyle,
                       containerStyle, textStyle, textContainerStyle, flashText, timeout, disableTouch }) => {
   const customStyle = useSelector(state => state.chatReducer.styles)
   const [currentText, setCurrentText] = useState(text);
+  const [displayedIcon, setDisplayedIcon] = useState(rightIcon);
 
   const flash = async () => {
     const success = await onPress();
     if(success && flashText?.length > 0 && timeout > 0) {
       setCurrentText(flashText);
+      flashIcon?.length > 0 && setDisplayedIcon(flashIcon);
       setTimeout(() => {
         setCurrentText(text);
+        setDisplayedIcon(rightIcon);
       },timeout)
     }
   }
@@ -40,7 +43,7 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
       <View style={{...styles.iconContainer,...iconContainerStyle}}>
         <Icon
         style={{...styles.icon, ...iconStyle}}
-        name={rightIcon}
+        name={displayedIcon}
         size={iconSize || customStyle.scaledUIFontSize}/>
       </View>}
 
