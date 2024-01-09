@@ -30,6 +30,7 @@ const EditContact = ({ route, navigation }) => {
   const [errors, setErrors] = useState([]);
   const [haveSavedContact, _setHaveSavedContact] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [headerIcon, setHeaderIcon] = useState("save");
 
   const nameRef = useRef(originalContact?.name || "");
   const keyRef = useRef(originalContact?.key || "");
@@ -142,6 +143,10 @@ const EditContact = ({ route, navigation }) => {
       dispatch(addContact(createdContact));
       navigation.navigate('main');
     }
+    setHeaderIcon("check");
+    setTimeout(() => {
+      setHeaderIcon("save");
+    },500)
     setSaving(false);
     return true;
   }
@@ -190,6 +195,7 @@ const EditContact = ({ route, navigation }) => {
       (name.trim().length === 0 || publicKey.trim().length === 0) ||
       (name.trim() === originalContact?.name?.trim() &&
       publicKey.trim() === originalContact?.key?.trim() &&
+      headerIcon !== "check" &&
       contactImage === originalContact?.image)
     )
   }
@@ -202,7 +208,7 @@ const EditContact = ({ route, navigation }) => {
       <Header
       title={editingExistingContact ? "Edit Contact" : "Add Contact"}
       allowGoBack
-      rightButtonIcon={!hideSaveButton() && "save"}
+      rightButtonIcon={!hideSaveButton() && headerIcon}
       useAlternativeIcon={saving}
       alternativeIcon={<ActivityIndicator size="large" color={palette.primary}/>}
       rightButtonOnClick={save}/>
