@@ -143,10 +143,12 @@ const EditContact = ({ route, navigation }) => {
       dispatch(addContact(createdContact));
       navigation.navigate('main');
     }
-    setHeaderIcon("check");
-    setTimeout(() => {
-      setHeaderIcon("save");
-    },500)
+    if(editingExistingContact) {
+      setHeaderIcon("check");
+      setTimeout(() => {
+        setHeaderIcon("save");
+      },500)
+    }
     setSaving(false);
     return true;
   }
