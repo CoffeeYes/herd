@@ -13,12 +13,12 @@ const CardButton = ({ onPress, text, rightIcon, flashIcon, iconSize, iconStyle, 
 
   const flash = async () => {
     const success = await onPress();
-    if(success && flashText?.length > 0 && timeout > 0) {
-      setCurrentText(flashText);
+    if(success && timeout > 0) {
+      flashText?.length > 0 && setCurrentText(flashText);
       flashIcon?.length > 0 && setDisplayedIcon(flashIcon);
       setTimeout(() => {
         setCurrentText(text);
-        setDisplayedIcon(rightIcon);
+        setDisplayedIcon(rightIcon)
       },timeout)
     }
   }

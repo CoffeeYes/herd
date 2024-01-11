@@ -180,7 +180,7 @@ const Customise = ({ navigation }) => {
       setValue : setMessageFontSize,
       title : "Messages",
       rightTitle : "font size",
-      rightText : messageFontSize?.toString()
+      rightText : messageFontSize
     },
     {
       tag : "ui_size",
@@ -188,7 +188,7 @@ const Customise = ({ navigation }) => {
       setValue : setUiFontSize,
       title : "User Interface",
       rightTitle : "font size",
-      rightText : uiFontSize?.toString()
+      rightText : uiFontSize
     }
   ]
 
