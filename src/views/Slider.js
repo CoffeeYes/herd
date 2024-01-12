@@ -6,7 +6,7 @@ const CustomSlider = ({ value, onValueChange, onSlidingComplete, min, max,
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
                         tapToSeek, minimumTrackTintColor, maximumTrackTintColor,
-                        thumbTintColor }) => {
+                        thumbTintColor, step }) => {
   return (
     <View style={containerStyle}>
       <Slider
@@ -18,6 +18,7 @@ const CustomSlider = ({ value, onValueChange, onSlidingComplete, min, max,
       onSlidingComplete={onSlidingComplete}
       onValueChange={onValueChange}
       value={value}
+      step={step}
       minimumValue={min}
       maximumValue={max}/>
       <View style={rightTextContainerStyle}>

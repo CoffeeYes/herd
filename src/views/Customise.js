@@ -307,6 +307,7 @@ const Customise = ({ navigation }) => {
                   value={item.value}
                   min={boundaryValues.minFontSize}
                   max={boundaryValues.maxFontSize}
+                  step={1}
                   rightTitle={item.rightTitle}
                   rightText={item.rightText}
                   rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
