@@ -23,7 +23,6 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       maximumTrackTintColor={palette.primary}
       thumbTintColor={palette.primary}
       rightText={props.value.toFixed(2)}
-      value={props.value}
       sliderStyle={styles.slider}
       rightTitleStyle={{fontSize : sliderTitleSize}}
       rightTextStyle={{fontSize : sliderTextSize}}
