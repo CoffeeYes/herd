@@ -36,7 +36,7 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
               <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>To:</Text>
               <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{to}</Text>
             </View>
-            <View style={{...styles.headerTextContainer, alignSelf : "center", maxWidth : "40%"}}>
+            <View style={{...styles.headerTextContainer, alignSelf : "center", maxWidth : "20%", alignItems : "flex-end"}}>
               <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{closedTimestamp}</Text>
             </View>
           </View>
@@ -60,7 +60,7 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
 const styles = {
   messageHeader : {
     flexDirection : "row",
-    justifyContent : "space-between",
+    justifyContent : "space-around",
     width : "100%",
     paddingHorizontal : 20,
     overflow : "hidden"
@@ -78,26 +78,10 @@ const styles = {
     flexDirection : "row",
     backgroundColor : palette.white,
     paddingVertical : 20,
-    backgroundColor : palette.white,
-    width : Dimensions.get('window').width * 0.8,
     marginVertical : 5,
     borderRadius : 10,
     elevation : 2
   },
-  loadingContainerView : {
-    width : "90%",
-    alignSelf : "center",
-    height : 10,
-    borderRadius : 5,
-    backgroundColor : palette.grey,
-    overflow : "hidden"
-  },
-  loadingView : {
-    width : "20%",
-    height : "100%",
-    backgroundColor : palette.black,
-    borderRadius : 5
-  }
 }
 
 export default memo(FoldableMessage,componentShouldUpdate);
