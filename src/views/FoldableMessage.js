@@ -17,6 +17,18 @@ const componentShouldUpdate = (props, nextProps) => {
   return true;
 }
 
+const HeaderItem = ({title, text, numberOfLines, containerStyle, titleStyle, textStyle}) => {
+  return (
+    <View style={containerStyle}>
+      {title?.toString().length > 0 &&
+      <Text numberOfLines={numberOfLines} style={titleStyle}>{title}</Text>}
+
+      {text?.toString().length > 0 &&
+      <Text numberOfLines={numberOfLines} style={textStyle}>{text}</Text>}
+    </View>
+  )
+}
+
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, onPress, loading,
                           openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1,
                           openTimestampStyle}) => {
@@ -28,18 +40,30 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
         :
         <>
           <View style={styles.messageHeader}>
-            <View style={styles.headerTextContainer}>
-              <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>From:</Text>
-              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{from}</Text>
-            </View>
-            <View style={styles.headerTextContainer}>
-              <Text numberOfLines={headerNumberOfLines} style={{fontWeight : "bold", ...headerTitleStyle}}>To:</Text>
-              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{to}</Text>
-            </View>
-            <View style={{...styles.headerTextContainer, alignSelf : "center", maxWidth : "20%", alignItems : "flex-end"}}>
-              <Text numberOfLines={headerNumberOfLines} style={headerTextStyle}>{closedTimestamp}</Text>
-            </View>
+            <HeaderItem
+            title="From:"
+            text={from}
+            numberOfLines={headerNumberOfLines}
+            containerStyle={styles.headerTextContainer}
+            titleStyle={{fontWeight : "bold", ...headerTitleStyle}}
+            textStyle={headerTextStyle}/>
+
+            <HeaderItem
+            title="To:"
+            text={to}
+            numberOfLines={headerNumberOfLines}
+            containerStyle={styles.headerTextContainer}
+            titleStyle={{fontWeight : "bold", ...headerTitleStyle}}
+            textStyle={headerTextStyle}/>
+
+            <HeaderItem
+            text={closedTimestamp}
+            numberOfLines={headerNumberOfLines}
+            containerStyle={{...styles.headerTextContainer, alignSelf : "center", alignItems : "flex-end"}}
+            textStyle={headerTextStyle}/>
+
           </View>
+
           {open &&
           <View style={styles.messageText}>
             <Text style={{fontSize : textFontSize}}>{text}</Text>
@@ -51,6 +75,7 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
               {openTimestamp}
             </Text>
           </View>}
+          
         </>}
       </View>
     </TouchableOpacity>
