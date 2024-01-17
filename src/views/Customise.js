@@ -303,7 +303,7 @@ const Customise = ({ navigation }) => {
                   thumbTintColor={palette.primary}
                   tapToSeek
                   onSlidingComplete={value => changeFonts(value,index)}
-                  onValueChange={value => item.setValue(Math.round(value))}
+                  onValueChange={value => changeFonts(value,index)}
                   value={item.value}
                   min={boundaryValues.minFontSize}
                   max={boundaryValues.maxFontSize}

@@ -63,6 +63,7 @@ const styles = {
     paddingLeft : 10,
   },
   title : {
+    flex : 1,
     color : palette.white,
     fontSize : 18,
     marginRight : "auto",
@@ -80,7 +81,9 @@ const styles = {
     height : "100%",
     justifyContent : "center",
     flexDirection : "row",
-    alignItems : "center"
+    alignItems : "center",
+    borderWidth : 1,
+    borderColor : "black"
   },
   backArrow : {
     color : palette.white,
