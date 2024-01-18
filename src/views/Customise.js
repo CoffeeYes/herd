@@ -275,6 +275,12 @@ const Customise = ({ navigation }) => {
           disableTouch
           />
 
+          <CustomButton
+          text="Preview"
+          buttonStyle={{marginTop : 10}}
+          textStyle={{fontSize : scaledFontSize}}
+          />
+
           <View style={styles.fontSlidersContainer}>
             <TouchableOpacity
             style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}

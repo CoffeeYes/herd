@@ -82,8 +82,6 @@ const styles = {
     justifyContent : "center",
     flexDirection : "row",
     alignItems : "center",
-    borderWidth : 1,
-    borderColor : "black"
   },
   backArrow : {
     color : palette.white,
