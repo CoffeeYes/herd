@@ -19,6 +19,7 @@ const ContactImage = ({ iconSize = 24, imageURI, disableTouch = false,
       {imageURI?.length > 0 ?
       <Image
       source={{uri : imageURI}}
+      resizeMode="contain"
       style={{width : size * 2, height : size * 2}}/>
       :
       <Icon name="contact-page" size={iconSize}/>

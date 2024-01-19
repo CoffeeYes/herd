@@ -111,6 +111,7 @@ const Contact = ({route, navigation}) => {
       onRequestClose={() => setShowLargeImage(false)}>
         <Image
         source={{uri : contact.image}}
+        resizeMode="contain"
         style={{height : largeImageHeight, width : largeImageWidth}}/>
       </CustomModal>
     </>
