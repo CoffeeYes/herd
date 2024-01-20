@@ -25,7 +25,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
     style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
       {allowGoBack &&
       <TouchableOpacity
-      onPress={() => navigationRef.current.goBack()}
+      onPress={() => navigationRef.current.canGoBack() && navigationRef.current.goBack()}
       style={{paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>}
