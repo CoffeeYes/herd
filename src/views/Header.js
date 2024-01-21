@@ -19,13 +19,21 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const leftButtonWidth = useScreenAdjustedSize(0.15,0.1, "width", 0.7, 0.7, 1000, 1000);
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
+  const [hasGoneBack, setHasGoneBack] = useState(false);
+
+  const navigateBack = () => {
+    if(navigationRef.current.canGoBack() && !hasGoneBack) {
+      setHasGoneBack(true);
+      navigationRef.current.goBack();
+    }
+  }
 
   return (
     <View
     style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
       {allowGoBack &&
       <TouchableOpacity
-      onPress={() => navigationRef.current.canGoBack() && navigationRef.current.goBack()}
+      onPress={navigateBack}
       style={{paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>}
