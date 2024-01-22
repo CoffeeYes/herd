@@ -38,7 +38,8 @@ const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
+  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])
+  .map(section => ({...section, data : [...section.data].reverse()})).reverse();
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [flattenedMessages, setFlattenedMessages] = useState(messages.map(item => [...item.data,item.day]).flat())
   const [loading, setLoading] = useState(false);
@@ -155,8 +156,8 @@ const Chat = ({ route, navigation }) => {
       }
       messageLengthRef.current = messageLength;
 
-      messageLength > 0 &&
-      setFlattenedMessages(flattenMessages(messages,true))
+      // messageLength > 0 &&
+      // setFlattenedMessages(flattenMessages(messages,true))
     }
   },[messages,loading])
 
@@ -383,12 +384,17 @@ const Chat = ({ route, navigation }) => {
 
       setLoadingMoreMessages(false);
 
+      const lastSectionIndex = messages?.length -1;
+      const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
+
       messageLengthRef.current > 0 &&
+      lastSectionIndex >= 0 &&
+      lastMessageIndex >= 0 &&
       scrollRef.current.scrollToLocation({
         animated : true,
-        sectionIndex : 0,
-        itemIndex : 0,
-        viewOffset : -20
+        sectionIndex : lastSectionIndex,
+        itemIndex : lastMessageIndex,
+        viewOffset : 20
       })
     }
   }
@@ -430,16 +436,12 @@ const Chat = ({ route, navigation }) => {
   const scrollRef = useRef();
 
   const scrollToBottom = (animated = true) => {
-    const lastSectionIndex = messages?.length -1;
-    const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-
     messages.length > 0 &&
-    lastSectionIndex >= 0 &&
-    lastMessageIndex >= 0 &&
+    messages?.[0]?.data?.length > 0 &&
     scrollRef.current.scrollToLocation({
       animated : animated,
-      sectionIndex : lastSectionIndex,
-      itemIndex : lastMessageIndex
+      sectionIndex : 0,
+      itemIndex : 0
     });
   }
 
@@ -476,50 +478,6 @@ const Chat = ({ route, navigation }) => {
       />
     )
   },[messages, highlightedMessages])
-
-  //measured chatBubble height LUT for fontsizes in range min to max
-  const fontSizeLUT = [
-    [90,216],
-    [93,228],
-    [95,235],
-    [98,271],
-    [101,284],
-    [104,295],
-    [106,330],
-    [109,344],
-    [111,389]
-  ];
-
-  const estimateMessageHeight = messageLength => {
-    if(isNaN(messageLength)) {
-      throw new Error("[estimateMessageHeight] non-number messageLength was passed as parameter")
-    }
-    const fontSizeIndex = customStyle.messageFontSize - boundaryValues.minFontSize;
-    //measured with onLayout for 1 character and 190 characters
-    const minimumBoxHeight = fontSizeLUT[fontSizeIndex][0];
-    const maximumBoxHeight = fontSizeLUT[fontSizeIndex][1];
-
-    //190 is max character count, interpolate boxHeight based on number of characters;
-    const boxHeightStepSize = (maximumBoxHeight - minimumBoxHeight) / 190;
-
-    const characterCountAdjustment = boxHeightStepSize * messageLength;
-    const estimatedMessageHeight = minimumBoxHeight + characterCountAdjustment;
-
-    return estimatedMessageHeight;
-  }
-
-  const getItemLayout = useCallback((data, index) => {
-    const textLength = flattenedMessages[index]?.text?.length || 0;
-
-    const estimatedMessageHeight = estimateMessageHeight(textLength);
-
-    const messageMargin = 6;
-    return {
-      length : (estimatedMessageHeight + messageMargin),
-      offset : (estimatedMessageHeight + messageMargin) * index,
-      index
-    }
-  },[])
 
   return (
     <>
@@ -560,16 +518,16 @@ const Chat = ({ route, navigation }) => {
 
           <SectionList
           removeClippedSubviews
-          contentContainerStyle={{paddingBottom : 5}}
+          contentContainerStyle={{paddingBottom : 5, flexGrow : 1, justifyContent : "flex-end"}}
           windowSize={chatWindowSize}
           sections={messages}
           ref={scrollRef}
-          onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
           renderItem={renderItem}
           onContentSizeChange={handleContentSizeChange}
-          getItemLayout={getItemLayout}
-          renderSectionHeader={({ section: { day } }) => (
+          inverted
+          onEndReached={() => allowScrollToLoadMessages && handleScroll()}
+          renderSectionFooter={({ section: { day } }) => (
             <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
               {day === moment().format("DD/MM") ? "Today" : day}
             </Text>
