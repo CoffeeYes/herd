@@ -38,10 +38,12 @@ const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const chat = chats.find(chat => chat._id == route.params.contactID);
+
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])
   .map(section => ({...section, data : [...section.data].reverse()})).reverse();
+
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
-  const [flattenedMessages, setFlattenedMessages] = useState(messages.map(item => [...item.data,item.day]).flat())
   const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [characterCount, setCharacterCount] = useState(maxCharacterCount);
@@ -69,7 +71,7 @@ const Chat = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      const existingChat = chats.find(chat => chat._id == contactInfo._id);
+      const existingChat = chat;
       const doneLoading = existingChat?.doneLoading;
       if(messages.length === 0 && existingChat) {
         setLoading(true);
@@ -155,9 +157,6 @@ const Chat = ({ route, navigation }) => {
         scrollToBottom(false);
       }
       messageLengthRef.current = messageLength;
-
-      // messageLength > 0 &&
-      // setFlattenedMessages(flattenMessages(messages,true))
     }
   },[messages,loading])
 
@@ -265,7 +264,7 @@ const Chat = ({ route, navigation }) => {
     const selfEncryptedCopy = {...metaData,_id : messageID, text : newMessageEncryptedCopy};
 
     //add new chat to chats state in redux store if it isnt in chats state
-    if(!chats.find(chat => chat.key === contactInfo.key)) {
+    if(!chat) {
       const newChat = {
         _id : contactInfo._id,
         image : contactInfo.image,
@@ -333,7 +332,7 @@ const Chat = ({ route, navigation }) => {
             .filter(section => section.data.length > 0);
 
             if(updatedMessages.length === 0) {
-              if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading) {
+              if(!chat?.doneLoading) {
                 //if all messages were deleted attempt to load more
                 await loadMoreMessages(true,messageStart + messageLoadingExtension);
               }
