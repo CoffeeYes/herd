@@ -62,7 +62,10 @@ const BTDeviceList = () => {
     })
 
     const scanner = Bluetooth.scanForDevices()
-    .catch(e => setErrors(["Something went wrong, please try again"]))
+    .catch(e => setErrors([{
+      type : "general_bluetooth",
+      text : "Something went wrong, please try again"
+    }]))
 
     //cleanup
     return () => {
@@ -90,12 +93,14 @@ const BTDeviceList = () => {
     const btEnabled = await Bluetooth.checkBTEnabled();
     const locationEnabled = await Bluetooth.checkLocationEnabled();
 
-    !btEnabled && restartErrors.push(
-      "Please enable bluetooth"
-    )
-    !locationEnabled && restartErrors.push(
-      "Please enable location services"
-    )
+    !btEnabled && restartErrors.push({
+      type : "bluetooth_not_enabled",
+      text : "Please enable bluetooth"
+    })
+    !locationEnabled && restartErrors.push({
+      type : "location_not_enabled",
+      text : "Please enable location services"
+    })
 
     if (restartErrors.length > 0) {
       return setErrors(restartErrors);
@@ -119,9 +124,9 @@ const BTDeviceList = () => {
           <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
           {errors.map((error,index) =>
             <Text
-            key={index}
+            key={error.type}
             style={{...styles.error,fontSize : customStyle.scaledUIFontSize}}>
-              {error}
+              {error.text}
             </Text>
           )}
         </View>
