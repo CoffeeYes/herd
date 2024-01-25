@@ -26,6 +26,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       rightText={props.value.toFixed(2)}
       sliderStyle={styles.slider}
       value={initialValue}
+      min={0.01}
+      step={0.01}
       rightTitleStyle={{fontSize : sliderTitleSize}}
       rightTextStyle={{fontSize : sliderTextSize}}
       containerStyle={{...styles.sliderContainer, width : sliderWidth}}
@@ -44,7 +46,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
           ...style
         }}
         sliderComponent={Slider}
-        onColorChange={color => color.s === 0 ? setColor({...color,s : 0.001}) : setColor(color)}
+        onColorChange={color => setColor(color)}
       />
     </View>
   )
