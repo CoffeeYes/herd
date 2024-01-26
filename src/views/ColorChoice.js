@@ -7,6 +7,27 @@ import CustomSlider from './Slider'
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
+const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, onValueChange}) => {
+  const initialValue = useRef(value).current;
+  return (
+    <CustomSlider
+    tapToSeek
+    onSlidingComplete={val => onValueChange(val)}
+    minimumTrackTintColor={palette.secondary}
+    maximumTrackTintColor={palette.primary}
+    thumbTintColor={palette.primary}
+    rightText={value.toFixed(2)}
+    sliderStyle={styles.slider}
+    value={initialValue}
+    min={0.01}
+    step={0.01}
+    rightTitleStyle={{fontSize : sliderTitleSize}}
+    rightTextStyle={{fontSize : sliderTextSize}}
+    containerStyle={{...styles.sliderContainer, width : sliderWidth}}
+    onValueChange={onValueChange}/>
+  )
+}
+
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize}) => {
 
@@ -14,26 +35,11 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
   const pickerWidth = useScreenAdjustedSize(0.8,0.5);
   const sliderWidth = useScreenAdjustedSize(0.8, 0.6);
 
-  const Slider = useCallback(props => {
-    const initialValue = useRef(props.value).current;
-    return (
-      <CustomSlider
-      tapToSeek
-      onSlidingComplete={val => props.onValueChange(val)}
-      minimumTrackTintColor={palette.secondary}
-      maximumTrackTintColor={palette.primary}
-      thumbTintColor={palette.primary}
-      rightText={props.value.toFixed(2)}
-      sliderStyle={styles.slider}
-      value={initialValue}
-      min={0.01}
-      step={0.01}
-      rightTitleStyle={{fontSize : sliderTitleSize}}
-      rightTextStyle={{fontSize : sliderTextSize}}
-      containerStyle={{...styles.sliderContainer, width : sliderWidth}}
-      onValueChange={props.onValueChange}/>
-    )
-  },[sliderTitleSize, sliderTextSize, sliderWidth])
+  const sliderProps = {
+    sliderTextSize,
+    sliderTitleSize,
+    sliderWidth
+  }
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
@@ -45,9 +51,15 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
           width : pickerWidth,
           ...style
         }}
-        sliderComponent={Slider}
+        hideSliders
         onColorChange={color => setColor(color)}
       />
+      <Slider
+      {...sliderProps}
+      value={color.s} onValueChange={value => setColor({...color, s : value})}/>
+      <Slider
+      {...sliderProps}
+      value={color.v} onValueChange={value => setColor({...color, v : value})}/>
     </View>
   )
 }
