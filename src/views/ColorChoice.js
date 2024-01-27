@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
 import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -8,17 +8,18 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, onValueChange}) => {
-  const initialValue = useRef(value).current;
+  const [sliding, setSliding] = useState(false);
   return (
     <CustomSlider
     tapToSeek
-    onSlidingComplete={val => onValueChange(val)}
+    onSlidingStart={() => setSliding(true)}
+    onSlidingComplete={val => {onValueChange(val); setSliding(false)}}
     minimumTrackTintColor={palette.secondary}
     maximumTrackTintColor={palette.primary}
     thumbTintColor={palette.primary}
     rightText={value.toFixed(2)}
     sliderStyle={styles.slider}
-    value={initialValue}
+    {...(!sliding && {value})}
     min={0.01}
     step={0.01}
     rightTitleStyle={{fontSize : sliderTitleSize}}
@@ -40,6 +41,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
     sliderTitleSize,
     sliderWidth
   }
+
+
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
