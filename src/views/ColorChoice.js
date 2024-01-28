@@ -8,18 +8,21 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, onValueChange}) => {
-  const [sliding, setSliding] = useState(false);
+  const slidingRef = useRef(false);
   return (
     <CustomSlider
     tapToSeek
-    onSlidingStart={() => setSliding(true)}
-    onSlidingComplete={val => {onValueChange(val); setSliding(false)}}
+    onSlidingStart={() => {slidingRef.current = true}}
+    onSlidingComplete={val => {
+      slidingRef.current = false;
+      onValueChange(val);
+    }}
     minimumTrackTintColor={palette.secondary}
     maximumTrackTintColor={palette.primary}
     thumbTintColor={palette.primary}
     rightText={value.toFixed(2)}
     sliderStyle={styles.slider}
-    {...(!sliding && {value})}
+    {...(!slidingRef.current && {value})}
     min={0.01}
     step={0.01}
     rightTitleStyle={{fontSize : sliderTitleSize}}
