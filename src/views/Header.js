@@ -9,7 +9,8 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { defaultChatStyles } from '../assets/styles'
 
-const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preText, onTextLayout,
+const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disableRightButton, disableBackButton,
+                  preText, onTextLayout,
                   onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
                   useAlternativeIcon, alternativeIcon}) => {
@@ -22,7 +23,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   const [hasGoneBack, setHasGoneBack] = useState(false);
 
   const navigateBack = () => {
-    if(navigationRef.current.canGoBack() && !hasGoneBack) {
+    if(!hasGoneBack) {
       setHasGoneBack(true);
       navigationRef.current.goBack();
     }
@@ -31,8 +32,9 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
   return (
     <View
     style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
-      {allowGoBack &&
+      {allowGoBack && navigationRef.current.canGoBack() &&
       <TouchableOpacity
+      disabled={disableBackButton}
       onPress={navigateBack}
       style={{paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
@@ -49,8 +51,9 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, preTe
         style={{...styles.title, fontSize : customStyle.scaledTitleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
-      {rightButtonIcon?.length > 0 && rightButtonOnClick &&
+      {rightButtonIcon?.length > 0 && (rightButtonOnClick || disableRightButton) &&
       <TouchableOpacity
+      disabled={disableRightButton}
       onPress={rightButtonOnClick}
       style={{...styles.rightButton,width : rightButtonWidth}}>
         {useAlternativeIcon ?

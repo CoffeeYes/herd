@@ -254,6 +254,10 @@ const Customise = ({ navigation }) => {
 
           <Header
           title="Preview"
+          allowGoBack
+          disableBackButton
+          rightButtonIcon="test"
+          disableRightButton
           textStyle={{fontSize : scaledFontSize * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
