@@ -43,6 +43,8 @@ const Customise = ({ navigation }) => {
   const iconSize = useScreenAdjustedSize(0.1,0.065);
   const cardIconSize = useScreenAdjustedSize(0.075,0.05);
   const screenFontScaler = useScreenAdjustedSize(0.005,0.005);
+  const headerIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
+  const scaledHeaderIconSize = ((uiFontSize + 16) / defaultChatStyles.uiFontSize) * headerIconSize
 
   const sentBoxColorRef = useRef();
   const sentTextColorRef = useRef();
@@ -256,8 +258,10 @@ const Customise = ({ navigation }) => {
           title="Preview"
           allowGoBack
           disableBackButton
-          rightButtonIcon="test"
+          rightButtonIcon="delete"
           disableRightButton
+          backArrowSize={scaledHeaderIconSize}
+          rightIconSize={scaledHeaderIconSize}
           textStyle={{fontSize : scaledFontSize * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
