@@ -383,18 +383,7 @@ const Chat = ({ route, navigation }) => {
 
       setLoadingMoreMessages(false);
 
-      const lastSectionIndex = messages?.length -1;
-      const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-
-      messageLengthRef.current > 0 &&
-      lastSectionIndex >= 0 &&
-      lastMessageIndex >= 0 &&
-      scrollRef.current.scrollToLocation({
-        animated : true,
-        sectionIndex : lastSectionIndex,
-        itemIndex : lastMessageIndex,
-        viewOffset : 20
-      })
+      scrollToTop();
     }
   }
 
@@ -442,6 +431,21 @@ const Chat = ({ route, navigation }) => {
       sectionIndex : 0,
       itemIndex : 0
     });
+  }
+
+  const scrollToTop = (animated = true) => {
+    const lastSectionIndex = messages?.length -1;
+    const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
+
+    messages.length > 0 &&
+    lastSectionIndex >= 0 &&
+    lastMessageIndex >= 0 &&
+    scrollRef.current.scrollToLocation({
+      animated : animated,
+      sectionIndex : lastSectionIndex,
+      itemIndex : lastMessageIndex,
+      viewOffset : 20
+    })
   }
 
   const longPressMessage = id => {
