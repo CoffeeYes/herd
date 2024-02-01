@@ -24,13 +24,13 @@ const PasswordSettings = () => {
     const whitespace = /\s/;
     let errors = [];
     if(password.trim() === "" || confirmation.trim() === "") {
-      errors.push("Fields cannot be empty")
+      errors.push({type : "empty_field", text : "Fields cannot be empty"})
     }
     if(whitespace.test(password) || whitespace.test(confirmation)) {
-      errors.push("Passwords cannot contain spaces")
+      errors.push({type : "contains_spaces", text : "Passwords cannot contain spaces"})
     }
     if(password !== confirmation) {
-      errors.push("Passwords do not match")
+      errors.push({type : "dont_match", text : "Passwords do not match"})
     }
     return errors;
   }
@@ -66,12 +66,15 @@ const PasswordSettings = () => {
     const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);
 
     if(loginAndErasureAreIdentical) {
-      setErrors("Login and Erasure password cannot be the same");
+      setErrors([{type : "login_erasure_match", text : "Login and Erasure password cannot be the same"}]);
       return false;
     }
 
     if(!hasLoginPassword && name === "erasurePassword") {
-      setErasurePasswordErrors(["You must set up a normal password before an erasure password can be used"])
+      setErasurePasswordErrors([{
+        type : "eraure_before_login",
+        text : "You must set up a normal password before an erasure password can be used"}
+      ])
       return false;
     }
 
