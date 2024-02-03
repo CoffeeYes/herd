@@ -46,6 +46,20 @@ const Contact = ({route, navigation}) => {
     })
   }
 
+  const calculateMaxNumberOfLines = lines => {
+    let totalHeight = 0;
+    let maxLineCount = 0;
+    for(const line of lines) {
+      if((totalHeight + line.height) < halfHeight) {
+        totalHeight += line.height;
+        maxLineCount += 1;
+      }
+      else {
+        return maxLineCount;
+      }
+    }
+  }
+
   return (
     <>
       <Header
@@ -53,11 +67,11 @@ const Contact = ({route, navigation}) => {
       allowGoBack
       containerStyle={{maxHeight : halfHeight}}
       onTextLayout={e => {
-        setHeaderLineHeight(e.nativeEvent.lines[0].height)
+        setHeaderLineHeight(calculateMaxNumberOfLines(e.nativeEvent.lines))
         setDisableTextTouch(e.nativeEvent.lines.length <= 1)
       }}
       disableTextTouch={disableTextTouch}
-      titleNumberOfLines={expandName ? Math.floor(halfHeight / headerLineHeight) : 1}
+      titleNumberOfLines={expandName ? headerLineHeight : 1}
       rightButtonIcon="edit"
       onTextTouch={() => setExpandName(!expandName)}
       rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
