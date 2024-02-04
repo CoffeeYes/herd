@@ -55,9 +55,10 @@ const Contact = ({route, navigation}) => {
         maxLineCount += 1;
       }
       else {
-        return maxLineCount;
+        break;
       }
     }
+    return maxLineCount
   }
 
   return (
