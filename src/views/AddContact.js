@@ -18,7 +18,7 @@ import { useScreenAdjustedSize } from '../helper';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [BTError,setBTError] = useState("");
+  const [bluetoothError,setBluetoothError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
@@ -34,12 +34,12 @@ const AddContact = ({ navigation }) => {
     let adapter = await Bluetooth.checkForBTAdapter();
 
     if(!adapter) {
-      return setBTError("No Bluetooth Adapters Found");
+      return setBluetoothError("No Bluetooth Adapters Found");
     }
   }
 
   const requestBTPermissions = async () => {
-    setBTError("");
+    setBluetoothError("");
     setRequestedPermissions([]);
     //disable lockability so that lockscreen doesn't crop up when a modal is shown
     dispatch(setLockable(false));
@@ -102,13 +102,13 @@ with other phones using bluetooth.`;
 
           <Card
           onPress={requestBTPermissions}
-          disabled={BTError.length > 0}
-          cardStyle={BTError.length > 0 ?
+          disabled={bluetoothError.length > 0}
+          cardStyle={bluetoothError.length > 0 ?
             styles.cardDisabled
             :
             styles.leftCard
           }
-          errorText={BTError}
+          errorText={bluetoothError}
           icon="bluetooth-searching"
           iconSize={iconSize}
           text="Start Bluetooth Scan"/>

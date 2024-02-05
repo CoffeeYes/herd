@@ -521,7 +521,7 @@ const Chat = ({ route, navigation }) => {
 
           <SectionList
           removeClippedSubviews
-          contentContainerStyle={{paddingBottom : 5, flexGrow : 1, justifyContent : "flex-end"}}
+          contentContainerStyle={{paddingTop : 5, flexGrow : 1, justifyContent : "flex-end"}}
           windowSize={chatWindowSize}
           sections={messages}
           ref={scrollRef}
@@ -575,7 +575,7 @@ const styles = {
   chatInput : {
     backgroundColor : palette.white,
     marginTop : "auto",
-    paddingLeft : 10
+    paddingLeft : 10,
   },
   imageContainer : {
     borderWidth : 1,
