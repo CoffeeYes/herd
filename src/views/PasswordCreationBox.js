@@ -53,12 +53,14 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             {description}
           </Text>}
 
-          {errors.map((error,index) =>
-          <Text
-          key={error?.type || error.replace(" ","_")}
-          style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
-            {error?.text || error}
-          </Text>)}
+          <View style={styles.errorContainer}>
+            {errors.map((error,index) =>
+            <Text
+            key={error?.type || error.replace(" ","_")}
+            style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
+              {` - ${error?.text || error}`}
+            </Text>)}
+          </View>
 
           <PasswordField
           name={primaryName}
@@ -139,6 +141,9 @@ const styles = {
   error : {
     color : palette.red,
     fontWeight : "bold"
+  },
+  errorContainer : {
+    marginVertical : 10
   }
 }
 
