@@ -9,24 +9,20 @@ import { palette } from '../assets/palette';
 const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, activeOpacity,
                       onLongPress, onPress, disableTouch = false, highlighted, onLayout, showCopyButton }) => {
 
+  const [clipboard, setClipboard] = useClipboard();
+  const [showCopyConfirmation, setShowCopyConfirmation] = useState(false);
+
   const boxStyle = {
     ...styles.message,
-    ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
     backgroundColor : messageFrom ? customStyle.sentBoxColor : customStyle.receivedBoxColor,
+    ...(messageFrom ? {...styles.messageFromYou} : {...styles.messageFromOther}),
     ...(highlighted && {...styles.highlighted})
   }
 
-  const getTextStyle = textType => {
-    return ({
-      ...(textType === "messageText" && {...styles.messageText}),
-      ...(textType === "timestamp" && {...styles.timestamp}),
+  const sharedTextStyle = {
       color : messageFrom ? customStyle.sentTextColor : customStyle.receivedTextColor,
       fontSize : customStyle.messageFontSize
-    })
   }
-
-  const [clipboard, setClipboard] = useClipboard();
-  const [showCopyConfirmation, setShowCopyConfirmation] = useState(false);
 
   const handleCopyPress = text => {
     setClipboard(text);
@@ -35,7 +31,7 @@ const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, a
       setShowCopyConfirmation(false);
     },500)
   }
-  
+
   return (
     <TouchableOpacity
     onLayout={onLayout}
@@ -54,11 +50,11 @@ const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, a
         </TouchableOpacity>}
         <View style={styles.textContainer}>
           <Text
-          style={{...getTextStyle("messageText"),fontSize : textFontSize}}>
+          style={{...sharedTextStyle, ...styles.text, fontSize : textFontSize}}>
             {text}
           </Text>
           <Text
-          style={getTextStyle("timestamp")}>
+          style={{...sharedTextStyle, ...styles.timestamp }}>
             {timestamp}
           </Text>
         </View>
