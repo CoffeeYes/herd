@@ -10,7 +10,7 @@ import navigationRef from '../NavigationRef';
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 
-const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel}) => {
+const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState("Waiting On Other Device");
   const [otherKey, _setOtherKey] = useState("");
@@ -74,9 +74,7 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel}) => {
     else {
       messageListener?.remove();
       stateChangeListener?.remove();
-      Bluetooth.cancelListenAsServer();
-      Bluetooth.cancelConnectAsClient();
-      Bluetooth.cancelBTConnectionThread();
+      cancelBluetoothActions();
       setKeySent(false);
       setKeyReceived(false);
       setOtherKey("");
@@ -86,16 +84,14 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel}) => {
   //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
-      navigationRef.current.navigate("editContact",{publicKey : otherKeyRef.current});
-      onCancel();
+      onSucces({publicKey : otherKeyRef.current})
     }
   },[keySentRef.current,keyReceivedRef.current])
 
-  const cancel = async () => {
+  const cancelBluetoothActions = async () => {
     await Bluetooth.cancelListenAsServer();
     await Bluetooth.cancelConnectAsClient();
     await Bluetooth.cancelBTConnectionThread();
-    onCancel();
   }
 
   return (
@@ -107,7 +103,10 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel}) => {
         <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
         <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
         <CustomButton
-        onPress={() => cancel()}
+        onPress={() => {
+          cancelBluetoothActions();
+          onCancel();
+        }}
         buttonStyle={{marginTop : 10}}
         text="Cancel"/>
       </View>

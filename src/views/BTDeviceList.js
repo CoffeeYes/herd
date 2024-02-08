@@ -152,6 +152,10 @@ const BTDeviceList = () => {
         <BTExchangeModal
         visible={showModal}
         onRequestClose={() => setShowModal(false)}
+        onSuccess={value => {
+          setShowModal(false);
+          navigationRef.current.navigate("editContact",value);
+        }}
         onCancel={() => setShowModal(false)}/>
 
       </View>
