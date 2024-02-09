@@ -5,7 +5,6 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 import Crypto from '../nativeWrapper/Crypto';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
-import navigationRef from '../NavigationRef';
 
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
@@ -84,7 +83,7 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSucc
   //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
-      onSucces({publicKey : otherKeyRef.current})
+      onSuccess({publicKey : otherKeyRef.current})
     }
   },[keySentRef.current,keyReceivedRef.current])
 

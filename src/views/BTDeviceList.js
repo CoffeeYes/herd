@@ -9,6 +9,7 @@ import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
 
+import navigationRef from '../NavigationRef';
 import { palette } from '../assets/palette';
 
 const BTDeviceList = () => {
