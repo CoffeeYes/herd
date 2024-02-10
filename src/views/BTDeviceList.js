@@ -14,7 +14,7 @@ import { palette } from '../assets/palette';
 
 const BTDeviceList = () => {
   const [deviceList, _setDeviceList] = useState([]);
-  const [scanning, _setScanning] = useState(true);
+  const [scanning, _setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [chosenDevice, setChosenDevice] = useState({});
   const [errors, setErrors] = useState([]);
@@ -78,8 +78,7 @@ const BTDeviceList = () => {
   //cancel bluetooth scan when user unfocuses this component
   useFocusEffect(useCallback(() => {
     return async () => await Bluetooth.cancelScanForDevices();
-  },[])
-  )
+  },[]))
 
   const handleDeviceClick = async device => {
     await Bluetooth.cancelScanForDevices();

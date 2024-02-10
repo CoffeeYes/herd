@@ -80,9 +80,9 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSucc
     }
   },[visible])
 
-  //navigate to createContact when keys have been exchanged
   useEffect(() => {
     if(keySentRef.current && keyReceivedRef.current) {
+      cancelBluetoothActions();
       onSuccess({publicKey : otherKeyRef.current})
     }
   },[keySentRef.current,keyReceivedRef.current])
