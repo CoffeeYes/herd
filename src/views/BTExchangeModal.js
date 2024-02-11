@@ -9,9 +9,14 @@ import CustomButton from './CustomButton';
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 
+const activityStateText = {
+  waiting :  "Waiting On Other Device",
+  connected : "Connected, Waiting for Data",
+};
+
 const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
-  const [activityText, setActivityText] = useState("Waiting On Other Device");
+  const [activityText, setActivityText] = useState(activityStateText.waiting);
   const [otherKey, _setOtherKey] = useState("");
   const [keyReceived, _setKeyReceived] = useState(false);
   const [keySent, _setKeySent] = useState(false);
@@ -47,7 +52,7 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSucc
       //listen for connected state to begin key exchange
       stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
         if(state === "Connected") {
-          setActivityText("Connected, Waiting for Data");
+          setActivityText(activityStateText.connected);
           await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
         }
       })
@@ -77,6 +82,7 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSucc
       setKeySent(false);
       setKeyReceived(false);
       setOtherKey("");
+      setActivityText(activityStateText.waiting);
     }
   },[visible])
 
