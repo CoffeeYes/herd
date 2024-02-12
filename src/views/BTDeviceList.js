@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Dimensions,
+import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, 
   NativeEventEmitter } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -16,7 +16,6 @@ const BTDeviceList = () => {
   const [deviceList, _setDeviceList] = useState([]);
   const [scanning, _setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [chosenDevice, setChosenDevice] = useState({});
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
@@ -62,11 +61,14 @@ const BTDeviceList = () => {
       }
     })
 
-    const scanner = Bluetooth.scanForDevices()
-    .catch(e => setErrors([{
-      type : "general_bluetooth",
-      text : "Something went wrong, please try again"
-    }]))
+    Bluetooth.scanForDevices()
+    .catch(e => {
+      setErrors([{
+        type : "general_bluetooth",
+        text : "Something went wrong, please try again"
+      }])
+      __DEV__ && console.log(e)
+    })
 
     //cleanup
     return () => {
@@ -82,9 +84,8 @@ const BTDeviceList = () => {
 
   const handleDeviceClick = async device => {
     await Bluetooth.cancelScanForDevices();
-    const server = await Bluetooth.listenAsServer();
-    const client = await Bluetooth.connectAsClient(device.macAddress);
-    setChosenDevice(device);
+    await Bluetooth.listenAsServer();
+    await Bluetooth.connectAsClient(device.macAddress);
     setShowModal(true);
   }
 
@@ -122,7 +123,7 @@ const BTDeviceList = () => {
         <View>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>{scanning ? "Scanning..." : ""}</Text>
           <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
-          {errors.map((error,index) =>
+          {errors.map((error) =>
             <Text
             key={error.type}
             style={{...styles.error,fontSize : customStyle.scaledUIFontSize}}>
@@ -133,7 +134,7 @@ const BTDeviceList = () => {
 
 
         <ScrollView contentContainerStyle={{...styles.BTList}}>
-          {deviceList.map((device,index) =>
+          {deviceList.map((device) =>
             <TouchableOpacity
             key={device.macAddress}
             style={styles.deviceContainer}

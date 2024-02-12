@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator, NativeEventEmitter } from 'react-native';
+import { View, Text, ActivityIndicator, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
-import Crypto from '../nativeWrapper/Crypto';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 
@@ -14,34 +13,17 @@ const activityStateText = {
   connected : "Connected, Waiting for Data",
 };
 
-const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSuccess}) => {
+const BTExchangeModal = ({ visible, onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState(activityStateText.waiting);
-  const [otherKey, _setOtherKey] = useState("");
-  const [keyReceived, _setKeyReceived] = useState(false);
-  const [keySent, _setKeySent] = useState(false);
+  const [otherKey, setOtherKey] = useState("");
+  const [keyReceived, setKeyReceived] = useState(false);
+  const [keySent, setKeySent] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});
-
-  const otherKeyRef = useRef();
-  const keyReceivedRef = useRef();
-  const keySentRef = useRef();
-
-  const setOtherKey = data => {
-    otherKeyRef.current = data;
-    _setOtherKey(data);
-  }
-  const setKeyReceived = data => {
-    keyReceivedRef.current = data;
-    _setKeyReceived(data);
-  }
-  const setKeySent = data => {
-    keySentRef.current = data;
-    _setKeySent(data);
-  }
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
@@ -87,11 +69,11 @@ const BTExchangeModal = ({ navigation, visible, onRequestClose, onCancel, onSucc
   },[visible])
 
   useEffect(() => {
-    if(keySentRef.current && keyReceivedRef.current) {
+    if(keyReceived && keySent) {
       cancelBluetoothActions();
-      onSuccess({publicKey : otherKeyRef.current})
+      onSuccess({publicKey : otherKey})
     }
-  },[keySentRef.current,keyReceivedRef.current])
+  },[keySent, keyReceived])
 
   const cancelBluetoothActions = async () => {
     await Bluetooth.cancelListenAsServer();
