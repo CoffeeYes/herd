@@ -150,14 +150,13 @@ const BTDeviceList = () => {
         onPress={() => scanning ? Bluetooth.cancelScanForDevices() : restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
-        <BTExchangeModal
-        visible={showModal}
+        {showModal && <BTExchangeModal
         onRequestClose={() => setShowModal(false)}
         onSuccess={value => {
           setShowModal(false);
           navigationRef.current.navigate("editContact",value);
         }}
-        onCancel={() => setShowModal(false)}/>
+        onCancel={() => setShowModal(false)}/>}
 
       </View>
     </>

@@ -13,7 +13,7 @@ const activityStateText = {
   connected : "Connected, Waiting for Data",
 };
 
-const BTExchangeModal = ({ visible, onRequestClose, onCancel, onSuccess}) => {
+const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState(activityStateText.waiting);
   const [otherKey, setOtherKey] = useState("");
@@ -27,46 +27,38 @@ const BTExchangeModal = ({ visible, onRequestClose, onCancel, onSuccess}) => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    let messageListener;
-    let stateChangeListener;
 
-    if(visible) {
       //listen for connected state to begin key exchange
-      stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
-        if(state === "Connected") {
-          setActivityText(activityStateText.connected);
-          await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
+    const stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
+      if(state === "Connected") {
+        setActivityText(activityStateText.connected);
+        await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
+      }
+    })
+    //listen for messages to receive keys and ACKS
+    const messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
+      try {
+        const message = JSON.parse(msg);
+        if(message?.key) {
+          setOtherKey(message.key);
+          setKeyReceived(true);
+          Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
         }
-      })
-      //listen for messages to receive keys and ACKS
-      messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
-        try {
-          const message = JSON.parse(msg);
-          if(message?.key) {
-            setOtherKey(message.key);
-            setKeyReceived(true);
-            Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
-          }
-          if(message?.haveReceivedKey) {
-            setKeySent(true);
-          }
+        if(message?.haveReceivedKey) {
+          setKeySent(true);
         }
-        catch(e) {
-          console.log("Error parsing JSON : ",e);
-        }
-      });
-    }
+      }
+      catch(e) {
+        console.log("Error parsing JSON : ",e);
+      }
+    });
     //remove all listeners and cancel threads, reset variables
-    else {
+    return () => {
       messageListener?.remove();
       stateChangeListener?.remove();
       cancelBluetoothActions();
-      setKeySent(false);
-      setKeyReceived(false);
-      setOtherKey("");
-      setActivityText(activityStateText.waiting);
     }
-  },[visible])
+  },[])
 
   useEffect(() => {
     if(keyReceived && keySent) {
@@ -83,7 +75,6 @@ const BTExchangeModal = ({ visible, onRequestClose, onCancel, onSuccess}) => {
 
   return (
     <CustomModal
-    visible={visible}
     onRequestClose={onRequestClose}
     disableOnPress>
       <View style={{...styles.modalContentContainer, ...contentWidth}}>
