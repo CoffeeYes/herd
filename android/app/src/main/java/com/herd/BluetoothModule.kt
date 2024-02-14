@@ -481,6 +481,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       public fun cancel() {
         connectionSocket?.close();
         shouldLoop = false;
+        connectionThread?.cancel();
       }
 
     }
@@ -513,6 +514,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       fun cancel() {
         clientSocket?.close()
+        connectionThread?.cancel();
       }
     }
 
@@ -520,7 +522,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       private val inputStream : InputStream = socket.inputStream;
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(8192);
-
+      private var shouldRun : Boolean = true;
       override fun run() {
           Log.d(TAG, "Bluetooth Connection Thread Started")
 
@@ -529,7 +531,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
           var numBytes: Int;
           // Keep listening to the InputStream until an exception occurs.
-          while (true) {
+          while (shouldRun) {
               // Read from the InputStream.
               numBytes = try {
                   inputStream.read(buffer);
@@ -551,6 +553,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                         buffer)
               readMsg.sendToTarget();
           }
+          return;
       }
 
       fun write(bytes: ByteArray) {
@@ -563,7 +566,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       fun cancel() {
         try {
+          Log.i(TAG,"Attempted to close BTConnectionThread socket")
+          context.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTConnectionStateChange","Disconnected")
           socket.close();
+          shouldRun = false;
         }
         catch(e : Exception) {
           Log.e(TAG, "Could not close BT connection socket",e)
