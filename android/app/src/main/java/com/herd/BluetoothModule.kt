@@ -461,6 +461,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         Log.d(TAG, "Bluetooth Server Thread Was Started")
         val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
         while (shouldLoop) {
+            Log.i(TAG,"BT Server thread is running")
             connectionSocket = try {
                 serverSocket?.accept()
             } catch (e: Exception) {
@@ -479,9 +480,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
 
       public fun cancel() {
-        connectionSocket?.close();
-        shouldLoop = false;
-        connectionThread?.cancel();
+        Log.d(TAG,"Bluetooth Server Thread was cancelled");
+        return;
       }
 
     }
@@ -502,9 +502,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         clientSocket?.let { socket ->
           try {
             socket.connect();
-            Log.d(TAG, "Bluetooth client socket connected")
-            connectionThread = BTConnectionThread(socket, messageHandler);
-            connectionThread?.start();
+            if(socket.isConnected()) {
+              Log.d(TAG, "Bluetooth client socket connected")
+              connectionThread = BTConnectionThread(socket, messageHandler);
+              connectionThread?.start();
+            }
+            else {
+              Log.d(TAG, "Bluetooth client socket could not connect");
+              return;
+            }
           }
           catch(e : Exception) {
             Log.e(TAG, "Error Connecting Bluetooth Client socket", e);
@@ -513,8 +519,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
 
       fun cancel() {
-        clientSocket?.close()
-        connectionThread?.cancel();
+        Log.d(TAG,"Bluetooth Client Thread was cancelle")
+        return;
       }
     }
 
@@ -553,6 +559,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                         buffer)
               readMsg.sendToTarget();
           }
+          Log.i(TAG,"BTConnectionThread shouldRun is false, returning");
           return;
       }
 
