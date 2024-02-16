@@ -36,7 +36,7 @@ const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text,
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress}>
       <View style={{width : "100%"}}>
         {loading ?
-        <LoadingBar barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
+        <LoadingBar numBars={2} barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
         :
         <>
           <View style={styles.messageHeader}>

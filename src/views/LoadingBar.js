@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const LoadingBar = ({containerStyle, loadingBarStyle,
+const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
                      barColor = palette.grey, sliderColor = palette.black,
                      animationDuration = 500}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
@@ -34,7 +34,29 @@ const LoadingBar = ({containerStyle, loadingBarStyle,
   useEffect(() => {
     runAnimation();
   },[])
-
+  return (
+    [...Array(numBars).keys()].map(num => {
+    return (
+      <View key={num} style={{
+        ...styles.loadingContainerView,
+        ...containerStyle,
+        backgroundColor : barColor,
+        marginTop : (numBars > 1 && num > 0) ? 10: 0
+      }}>
+        <Animated.View
+        style={{
+          ...styles.loadingView,
+          ...loadingBarStyle,
+          marginLeft : loadingViewPosition.interpolate({
+            inputRange : [0,100],
+            outputRange : ["0%","80%"]
+          }),
+          backgroundColor : sliderColor
+        }}/>
+      </View>
+    )
+    })
+  )
   return (
     <View style={{
       ...styles.loadingContainerView,
