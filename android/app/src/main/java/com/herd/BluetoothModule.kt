@@ -455,33 +455,40 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private inner class createBTServerThread() : Thread() {
       val adapter = bluetoothManager.getAdapter();
       var connectionSocket : BluetoothSocket? = null;
+      
+      private val serverSocket : BluetoothServerSocket? by lazy(LazyThreadSafetyMode.NONE) {
+        adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
+      }
 
       @Volatile var shouldLoop = true
       public override fun run() {
         Log.d(TAG, "Bluetooth Server Thread Was Started")
-        val serverSocket : BluetoothServerSocket? = adapter?.listenUsingRfcommWithServiceRecord("herd",btUUID);
         while (shouldLoop) {
-            Log.i(TAG,"BT Server thread is running")
-            connectionSocket = try {
-                serverSocket?.accept()
-            } catch (e: Exception) {
-                Log.d(TAG, "Accepting Bluetooth Socket Failed")
-                shouldLoop = false
-                throw(e);
-            }
-            connectionSocket?.also {
-                Log.d(TAG, "SERVER SOCKET WAS CONNECTED")
-                connectionThread = BTConnectionThread(it, messageHandler)
-                connectionThread?.start();
-                serverSocket?.close()
-                shouldLoop = false
-            }
+          Log.i(TAG,"BT Server thread is running")
+          connectionSocket = try {
+              serverSocket?.accept()
+          } catch (e: Exception) {
+              Log.d(TAG, "Accepting Bluetooth Socket Failed")
+              shouldLoop = false
+              null
+          }
+          connectionSocket?.also {
+              Log.d(TAG, "SERVER SOCKET WAS CONNECTED")
+              connectionThread = BTConnectionThread(it, messageHandler)
+              connectionThread?.start();
+              serverSocket?.close()
+              shouldLoop = false
+          }
         }
       }
 
       public fun cancel() {
-        Log.d(TAG,"Bluetooth Server Thread was cancelled");
-        return;
+        try {
+          serverSocket?.close();
+        }
+        catch(e : Exception) {
+          Log.d(TAG,"Error closing Bluetooth Server Socket when calling cancel() on BTServerThread",e)
+        }
       }
 
     }
