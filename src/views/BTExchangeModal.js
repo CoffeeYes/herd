@@ -11,6 +11,7 @@ import { useOrientationBasedStyle } from '../helper';
 const activityStateText = {
   waiting :  "Waiting On Other Device",
   connected : "Connected, Waiting for Data",
+  disconnected : "Disconnected"
 };
 
 const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
@@ -33,6 +34,11 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
       if(state === "Connected") {
         setActivityText(activityStateText.connected);
         await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
+      }
+      else if (state === "Disconnected") {
+        setActivityText(activityStateText.disconnected);
+        setLoading(false);
+        cancelBluetoothActions();
       }
     })
     //listen for messages to receive keys and ACKS
