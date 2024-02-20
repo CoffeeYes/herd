@@ -176,6 +176,26 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private val BTScanModeReceiver = object : BroadcastReceiver() {
+      override fun onReceive(context : Context, intent : Intent) {
+        val action : String? = intent.action;
+        Log.d(TAG,"BTScanModeReceiver received action $action");
+        val scanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE,0);
+        if(scanMode != 0) {
+          var scanModeString = "Unknown scan mode";
+          when(scanMode) {
+            BluetoothAdapter.SCAN_MODE_NONE -> scanModeString = "SCAN_MODE_NONE";
+            BluetoothAdapter.SCAN_MODE_CONNECTABLE -> scanModeString = "SCAN_MDOE_CONNECTABLE";
+            BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE -> scanModeString = "SCAN_MODE_CONNECTABLE_DISCOVERABLE";
+          }
+          Log.d(TAG,"BTScanModeReceiver scanMode : $scanModeString($scanMode)");
+        }
+        else {
+          Log.d(TAG,"Getting intent from scanMode action resulted in default value $scanMode");
+        }
+      }
+    }
+
     private val messageHandler = object : Handler(Looper.getMainLooper()) {
 
       override fun handleMessage(msg : Message) {
@@ -189,8 +209,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
       val BTStateFilter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
       BTStateFilter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+      val BTScanModeFilter = IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
+
       reactContext.getApplicationContext().registerReceiver(BTReceiver,BTFilter);
       reactContext.getApplicationContext().registerReceiver(BTStateReceiver,BTStateFilter);
+      reactContext.getApplicationContext().registerReceiver(BTScanModeReceiver,BTScanModeFilter);
     }
 
     fun checkPermissionsGranted(permissions : List<String>) : Boolean {
