@@ -109,8 +109,14 @@ const BTDeviceList = () => {
     else {
       setErrors([]);
       setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
-      await Bluetooth.requestBTMakeDiscoverable(60);
-      await Bluetooth.scanForDevices();
+      let discoverable = await Bluetooth.checkBTDiscoverable();
+      if(discoverable) {
+        await Bluetooth.scanForDevices();
+      }
+      else {
+        discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
+        discoverable && (await Bluetooth.scanForDevices());
+      }
     }
   }
 
