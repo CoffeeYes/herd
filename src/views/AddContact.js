@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TouchableOpacity, Alert, Dimensions } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, Alert } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
-import Crypto from '../nativeWrapper/Crypto';
 import Header from './Header';
 import Card from './Card';
 
@@ -81,7 +79,7 @@ const AddContact = ({ navigation }) => {
       )
     }
     else {
-      !(await Bluetooth.checkBTDiscoverablecheckBTDiscoverable()) &&
+      !(await Bluetooth.checkBTDiscoverable()) &&
       await Bluetooth.requestBTMakeDiscoverable(30);
 
       navigation.navigate("BTDeviceList");

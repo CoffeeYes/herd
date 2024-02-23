@@ -17,8 +17,7 @@ const activityStateText = {
 const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState(activityStateText.waiting);
-  const [otherKey, setOtherKey] = useState("");
-  const [keyReceived, setKeyReceived] = useState(false);
+  const [receivedKey, setReceivedKey] = useState("");
   const [keySent, setKeySent] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
@@ -29,7 +28,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
 
-      //listen for connected state to begin key exchange
+    //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
       if(state === "Connected") {
         setActivityText(activityStateText.connected);
@@ -41,13 +40,13 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
         cancelBluetoothActions();
       }
     })
+
     //listen for messages to receive keys and ACKS
     const messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
       try {
         const message = JSON.parse(msg);
         if(message?.key) {
-          setOtherKey(message.key);
-          setKeyReceived(true);
+          setReceivedKey(message.key);
           Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
         }
         if(message?.haveReceivedKey) {
@@ -67,11 +66,11 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   },[])
 
   useEffect(() => {
-    if(keyReceived && keySent) {
+    if(receivedKey.length > 0 && keySent) {
       cancelBluetoothActions();
-      onSuccess({publicKey : otherKey})
+      onSuccess({publicKey : receivedKey})
     }
-  },[keySent, keyReceived])
+  },[keySent, receivedKey])
 
   const cancelBluetoothActions = async () => {
     await Bluetooth.cancelListenAsServer();

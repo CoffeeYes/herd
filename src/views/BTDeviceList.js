@@ -14,19 +14,13 @@ import { palette } from '../assets/palette';
 
 const BTDeviceList = () => {
   const [deviceList, _setDeviceList] = useState([]);
-  const [scanning, _setScanning] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   const deviceRef = useRef(deviceList);
-  const scanningRef = useRef(scanning);
-
-  const setScanning = data => {
-    scanningRef.current = data;
-    _setScanning(data)
-  }
 
   const setDeviceList = data => {
     deviceRef.current = data;
