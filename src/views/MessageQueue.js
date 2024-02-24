@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Dimensions, ActivityIndicator, FlatList, InteractionManager } from 'react-native';
+import { View, Dimensions, FlatList, InteractionManager } from 'react-native';
 import Header from './Header';
 
 import Crypto from '../nativeWrapper/Crypto';

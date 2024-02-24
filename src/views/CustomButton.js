@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { TouchableOpacity, Text, Dimensions, ActivityIndicator, View } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
@@ -20,14 +20,12 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
       {leftIcon &&
       <Icon name={leftIcon} size={leftIconSize}/>}
 
-      <View style={{flexDirection : "row"}}>
-        {loading && useLoadingIndicator &&
-        <ActivityIndicator color={palette.primary} style={{marginRight : 10}}/>}
-        {text &&
-        <Text style={{...styles.buttonText,fontSize : customStyle.scaledUIFontSize, ...textStyle}}>
-          {text}
-        </Text>}
-      </View>
+      {useLoadingIndicator &&
+      <ActivityIndicator animating={loading} color={palette.primary} style={styles.loadingIndicator}/>}
+      {text &&
+      <Text style={{...styles.buttonText,fontSize : customStyle.scaledUIFontSize, ...textStyle}}>
+        {text}
+      </Text>}
 
       {rightIcon &&
       <Icon name={rightIcon} size={rightIconSize}/>}
@@ -42,7 +40,6 @@ const styles = {
     borderRadius : 5,
     alignSelf : "center",
     alignItems : "center",
-    justifyContent : "center",
     flexDirection : "row",
     borderWidth : 1,
     borderColor : palette.white
@@ -58,6 +55,10 @@ const styles = {
   disabled : {
     backgroundColor : palette.grey,
     borderColor : palette.grey
+  },
+  loadingIndicator : {
+    position : "absolute",
+    marginLeft : "5%",
   }
 }
 
