@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
+  Platform,
   SafeAreaView,
+  Fragment,
   StyleSheet,
   ScrollView,
   View,
@@ -199,8 +201,21 @@ const App = ({ }) => {
     removeCompletedMessagesFromRealm(messagesToRemove);
   }
 
+  const PrimaryWrapper = ({children}) => {
+    return (
+      Platform.OS === "ios" ?
+      <SafeAreaView style={{flex : 1}}>
+        {children}
+      </SafeAreaView>
+      :
+      <>
+      {children}
+      </>
+    )
+  }
+
   return (
-    <>
+    <PrimaryWrapper>
       {loading ?
       <LoadingScreen/>
       :
@@ -225,7 +240,7 @@ const App = ({ }) => {
           <Stack.Screen name="messageQueue" component={MessageQueue}/>
           <Stack.Screen name="passwordSettings" component={PasswordSettings}/>
       </Stack.Navigator>}
-    </>
+    </PrimaryWrapper>
   );
 };
 
