@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Dimensions, ScrollView, TouchableOpacity, Alert, SectionList,
+import { Text, View, TextInput, ActivityIndicator, 
+         Alert, SectionList,
          KeyboardAvoidingView, Keyboard} from 'react-native';
 import moment from 'moment';
 import { PanGestureHandler  } from 'react-native-gesture-handler'
@@ -9,9 +9,7 @@ import {
   getMessagesWithContact,
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
-import { getContactById } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
-import { defaultChatStyles, boundaryValues } from '../assets/styles';
 
 import { useScreenAdjustedSize } from '../helper';
 
@@ -48,7 +46,6 @@ const Chat = ({ route, navigation }) => {
   const [chatInput, setChatInput] = useState("");
   const [characterCount, setCharacterCount] = useState(maxCharacterCount);
   const [highlightedMessages, setHighlightedMessages] = useState([]);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-messageLoadingSize);
   const [messageEnd, setMessageEnd] = useState();
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
@@ -58,7 +55,7 @@ const Chat = ({ route, navigation }) => {
   const [showedPopup, setShowedPopup] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [chatWindowSize, setChatWindowSize] = useState(1);
-
+  const [scrolling, setScrolling] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
@@ -343,8 +340,6 @@ const Chat = ({ route, navigation }) => {
               }
             }
 
-            const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));
-
             const deletedReceivedMessages = highlightedMessages.filter(message =>
               message.to === ownPublicKey
             )
@@ -362,7 +357,7 @@ const Chat = ({ route, navigation }) => {
     );
   }
 
-  const handleScroll = async event => {
+  const handleScroll = () => {
     if(!showedPopup) {
       const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
       loadMoreMessages(overrideLoadInitial);
@@ -387,7 +382,7 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const handleContentSizeChange = (contentWidth, contentHeight) => {
+  const handleContentSizeChange = (contentHeight) => {
     if(contentHeight < contentTooSmallHeight) {
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
@@ -527,9 +522,13 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           keyExtractor={item => item._id}
           renderItem={renderItem}
-          onContentSizeChange={handleContentSizeChange}
+          onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
           inverted
-          onEndReached={() => allowScrollToLoadMessages && handleScroll()}
+          onEndReached={() => allowScrollToLoadMessages && scrolling && handleScroll()}
+          onScrollBeginDrag={() => setScrolling(true)}
+          onScrollEndDrag={() => setScrolling(false)}
+          onMomentumScrollBegin={() => setScrolling(true)}
+          onMomentumScrollEnd={() => setScrolling(false)}
           renderSectionFooter={({ section: { day } }) => (
             <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
               {day === moment().format("DD/MM") ? "Today" : day}
