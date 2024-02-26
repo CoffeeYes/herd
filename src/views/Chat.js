@@ -56,6 +56,7 @@ const Chat = ({ route, navigation }) => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [chatWindowSize, setChatWindowSize] = useState(1);
   const [scrolling, setScrolling] = useState(false);
+  const [momentumScrolling, setMomentumScrolling] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
@@ -524,11 +525,11 @@ const Chat = ({ route, navigation }) => {
           renderItem={renderItem}
           onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
           inverted
-          onEndReached={() => allowScrollToLoadMessages && scrolling && handleScroll()}
+          onEndReached={() => allowScrollToLoadMessages && (scrolling || momentumScrolling) && handleScroll()}
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
-          onMomentumScrollBegin={() => setScrolling(true)}
-          onMomentumScrollEnd={() => setScrolling(false)}
+          onMomentumScrollBegin={() => setMomentumScrolling(true)}
+          onMomentumScrollEnd={() => setMomentumScrolling(false)}
           renderSectionFooter={({ section: { day } }) => (
             <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
               {day === moment().format("DD/MM") ? "Today" : day}
