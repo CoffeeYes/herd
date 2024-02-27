@@ -418,6 +418,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
+  const canMomentumEndFire = useRef(false);
 
   const scrollToBottom = (animated = true) => {
     messages.length > 0 &&
@@ -528,8 +529,15 @@ const Chat = ({ route, navigation }) => {
           onEndReached={() => allowScrollToLoadMessages && (scrolling || momentumScrolling) && handleScroll()}
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
-          onMomentumScrollBegin={() => setMomentumScrolling(true)}
-          onMomentumScrollEnd={() => setMomentumScrolling(false)}
+          onMomentumScrollBegin={() => {
+            setMomentumScrolling(true);
+            canMomentumEndFire.current = true;
+          }}
+          onMomentumScrollEnd={() => {
+            canMomentumEndFire.current &&
+            setMomentumScrolling(false);
+            canMomentumEndFire.current = false;
+          }}
           renderSectionFooter={({ section: { day } }) => (
             <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
               {day === moment().format("DD/MM") ? "Today" : day}
