@@ -446,7 +446,12 @@ const Chat = ({ route, navigation }) => {
   }
 
   const longPressMessage = id => {
-    setHighlightedMessages(highlightedMessages => [...highlightedMessages,id]);
+    setHighlightedMessages(highlightedMessages => 
+      highlightedMessages.includes(id) ? 
+      highlightedMessages 
+      : 
+      [...highlightedMessages,id]
+    );
   }
 
   const shortPressMessage = id => {
