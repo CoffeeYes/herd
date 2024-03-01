@@ -57,6 +57,7 @@ const Chat = ({ route, navigation }) => {
   const [chatWindowSize, setChatWindowSize] = useState(1);
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
+  const [noMoreMessages, setNoMoreMessages] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
@@ -146,17 +147,6 @@ const Chat = ({ route, navigation }) => {
   // track previous length of messages for logic, used throughout other logic
   // because it is already available, not because a ref is necessary
   const messageLengthRef = useRef(0);
-  useEffect(() => {
-    // wait for loading to be done and messages to be rendered before calling
-    // scrollToBottom so that it actually executes
-    if(!loading) {
-      const messageLength = getMessageLength();
-      if(messageLengthRef.current === 0 && messages.length > 0) {
-        scrollToBottom(false);
-      }
-      messageLengthRef.current = messageLength;
-    }
-  },[messages,loading])
 
   const flattenMessages = (messages, includeDays = false) => {
     let extractedArray = [];
@@ -174,17 +164,7 @@ const Chat = ({ route, navigation }) => {
     const newMessages = messagePackage.messages;
 
     if(newMessages.length === 0) {
-      if(messageLengthRef.current === 0) {
-        dispatch(deleteChats([contactInfo]))
-      }
-      else {
-        //show popup that no more messages can be loaded, but only do so when
-        //there are already messages in the chat to prevent the popup from showing
-        //when a new chat is started
-        showNoMoreMessagePopup();
-        return;
-      }
-      setAllowScrollToLoadMessages(false);
+      setNoMoreMessages(true)
     }
     else {
       //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
@@ -378,12 +358,20 @@ const Chat = ({ route, navigation }) => {
       setMessageStart(start - messageLoadingSize);
 
       setLoadingMoreMessages(false);
-
-      scrollToTop();
     }
   }
 
   const handleContentSizeChange = (contentHeight) => {
+    //compare old message length against new message length
+    //scroll to bottom on initial load and to top when new messages are added
+    const messageLength = getMessageLength();
+    if(messageLengthRef.current === 0 && messages.length > 0) {
+      scrollToBottom(false);
+    }
+    else if((messageLength - messageLengthRef.current > 1) && messageLength > 0){
+      scrollToTop();
+    }
+
     if(contentHeight < contentTooSmallHeight) {
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
@@ -391,6 +379,16 @@ const Chat = ({ route, navigation }) => {
     else {
       !showedPopup && setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
+    }
+
+    messageLengthRef.current = messageLength;
+    if(noMoreMessages) {
+      if(messageLength === 0) {
+        dispatch(deleteChats([contactInfo]))
+      } else {
+        showNoMoreMessagePopup();
+        setAllowScrollToLoadMessages(false);
+      }
     }
   }
 
