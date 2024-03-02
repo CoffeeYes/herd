@@ -16,7 +16,7 @@ const generateMessageDays = (existingMessages = [], newMessages) => {
       dates.push({day : messageDate, data : [message]})
     }
   }
-  for (date of dates) {
+  for (let date of dates) {
     date.data.sort((a,b) => a.timestamp - b.timestamp)
   }
   return dates.sort((a,b) => a.data[a.data.length -1].timestamp - b.data[b.data.length -1].timestamp)
@@ -83,7 +83,6 @@ const chatReducer = (state = initialState,action) => {
       return {...state,
         chats : action.payload
       }
-      break;
     }
     case "DELETE_CHATS": {
       return {...state,
@@ -92,11 +91,9 @@ const chatReducer = (state = initialState,action) => {
           chatToDelete => chatToDelete._id == chat._id) === undefined
         )
       };
-      break;
     }
     case "ADD_CHAT": {
       return {...state, chats : [...state.chats, action.payload]};
-      break;
     }
     case "UPDATE_CHAT": {
       const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
@@ -113,7 +110,6 @@ const chatReducer = (state = initialState,action) => {
         console.log("NO CHAT TO UPDATE NAME WAS FOUND");
         return state
       }
-      break;
     }
     case "ADD_MESSAGE": {
       const { message, id } = action.payload
@@ -125,14 +121,12 @@ const chatReducer = (state = initialState,action) => {
         }
       };
       return newState;
-      break;
     }
     case "ADD_MESSAGES_TO_QUEUE": {
       return {
         ...state,
         messageQueue : [...state.messageQueue, ...action.payload]
       }
-      break;
     }
     case "REMOVE_MESSAGES_FROM_QUEUE": {
       return {
@@ -140,7 +134,6 @@ const chatReducer = (state = initialState,action) => {
         messageQueue : [...state.messageQueue].filter
         (message => !action.payload.includes(message._id))
       }
-      break;
     }
     case "FILTER_QUEUE_BY_KEYS": {
       return {
@@ -148,7 +141,6 @@ const chatReducer = (state = initialState,action) => {
         messageQueue : [...state.messageQueue].filter
         (message => !action.payload.includes(message.to))
       }
-      break;
     }
     case "DELETE_MESSAGES": {
       const { id, messageIDs } = action.payload;
@@ -171,14 +163,12 @@ const chatReducer = (state = initialState,action) => {
         }
       }
       return newState;
-      break;
     }
     case "RESET_MESSAGES": {
       return {...state,
         messages : {},
         chats : []
       };
-      break;
     }
     case "SET_LAST_TEXT": {
       const {id, message} = action.payload;
@@ -186,17 +176,14 @@ const chatReducer = (state = initialState,action) => {
         ...state,
         chats : setLastText(state,id,message)
       }
-      break;
     }
     case "SET_STYLES": {
       let oldStyles = {...state.styles};
       const newStyles = {...oldStyles,...action.payload}
       return {...state, styles : newStyles}
-      break;
     }
     case "SET_MESSAGE_QUEUE": {
       return {...state, messageQueue : action.payload}
-      break;
     }
     case "UPDATE_MESSAGE_QUEUE": {
       const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
@@ -214,7 +201,6 @@ const chatReducer = (state = initialState,action) => {
       else {
         return state;
       }
-      break;
     }
     case "SET_MESSAGES_FOR_CONTACTS": {
       let messagesCopy = {...state.messages};
@@ -224,7 +210,6 @@ const chatReducer = (state = initialState,action) => {
       return {...state,
         messages : messagesCopy
       }
-      break;
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {
       const {id, messages} = action.payload
@@ -236,7 +221,6 @@ const chatReducer = (state = initialState,action) => {
         }
       }
       return newState;
-      break;
     }
     default:
       return state

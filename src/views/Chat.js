@@ -58,6 +58,7 @@ const Chat = ({ route, navigation }) => {
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [noMoreMessages, setNoMoreMessages] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
   const messageLoadingSize = 5;
@@ -91,6 +92,7 @@ const Chat = ({ route, navigation }) => {
           setEnableGestureHandler(false);
         }
       }
+      setInitialLoad(false);
     })()
 
     const keyboardDidShowListener = Keyboard.addListener(
@@ -178,7 +180,7 @@ const Chat = ({ route, navigation }) => {
       const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
 
       const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
-      if(!newMessagesToAdd || noMoreMessagesToLoad && !(messageStart == -messageLoadingSize)) {
+      if(!newMessagesToAdd || noMoreMessagesToLoad && !initialLoad) {
         showNoMoreMessagePopup();
       }
     }
@@ -382,13 +384,9 @@ const Chat = ({ route, navigation }) => {
     }
 
     messageLengthRef.current = messageLength;
-    if(noMoreMessages) {
-      if(messageLength === 0) {
-        dispatch(deleteChats([contactInfo]))
-      } else {
-        showNoMoreMessagePopup();
-        setAllowScrollToLoadMessages(false);
-      }
+    if(noMoreMessages && messageLength > 0) {
+      showNoMoreMessagePopup();
+      setAllowScrollToLoadMessages(false);
     }
   }
 
@@ -439,7 +437,7 @@ const Chat = ({ route, navigation }) => {
       animated : animated,
       sectionIndex : lastSectionIndex,
       itemIndex : lastMessageIndex,
-      viewOffset : 20
+      viewPosition : 1
     })
   }
 
