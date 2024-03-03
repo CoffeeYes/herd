@@ -39,7 +39,6 @@ const Chat = ({ route, navigation }) => {
   const chat = chats.find(chat => chat._id == route.params.contactID);
 
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])
-  .map(section => ({...section, data : [...section.data].reverse()})).reverse();
 
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(false);

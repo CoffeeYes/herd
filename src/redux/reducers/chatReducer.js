@@ -1,7 +1,7 @@
 import { defaultChatStyles } from '../../assets/styles'
 import { timestampToText } from '../../helper';
 
-const generateMessageDays = (existingMessages = [], newMessages) => {
+const generateMessageDays = (existingMessages = [], newMessages, reverseOrder = true) => {
   let dates = [...existingMessages]
   for(let message of newMessages) {
     let messageDate = timestampToText(message.timestamp, "DD/MM");
@@ -17,9 +17,12 @@ const generateMessageDays = (existingMessages = [], newMessages) => {
     }
   }
   for (let date of dates) {
-    date.data.sort((a,b) => a.timestamp - b.timestamp)
+    date.data.sort((a,b) => a.timestamp - b.timestamp);
+    reverseOrder && date.data.reverse();
   }
-  return dates.sort((a,b) => a.data[a.data.length -1].timestamp - b.data[b.data.length -1].timestamp)
+  dates.sort((a,b) => a.data[a.data.length -1].timestamp - b.data[b.data.length -1].timestamp);
+  reverseOrder && dates.reverse();
+  return dates;
 }
 
 const initialState = {
@@ -151,8 +154,8 @@ const chatReducer = (state = initialState,action) => {
       ))
       .filter(section => section.data.length !== 0)
 
-      const lastSection = newSections[newSections.length -1]?.data
-      const lastMessage = lastSection && lastSection[lastSection.length -1];
+      const lastSection = newSections[0]?.data
+      const lastMessage = lastSection && lastSection[0];
 
       const newState = {
         ...state,
