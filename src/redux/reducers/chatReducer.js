@@ -215,13 +215,16 @@ const chatReducer = (state = initialState,action) => {
       }
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {
-      const {id, messages} = action.payload
+      const {id, messages} = action.payload;
+      const generatedDays = generateMessageDays(state.messages[id],messages);
+      const allPreviousMessagesDeleted = state.messages?.[id]?.length === 0;
       const newState = {
         ...state,
         messages : {
           ...state.messages,
-          [id] : generateMessageDays(state.messages[id],messages)
-        }
+          [id] : generatedDays,
+        },
+        ...(allPreviousMessagesDeleted && ({chats : setLastText(state,id,generatedDays[0].data[0])}))
       }
       return newState;
     }
