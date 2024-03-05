@@ -164,24 +164,22 @@ const Chat = ({ route, navigation }) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
     const newMessages = messagePackage.messages;
 
-    if(newMessages.length === 0) {
+    //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
+    //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
+    // if there are any present in the database.
+    const extractedMessageIDs = flattenMessages(messages).map(message => message._id)
+
+    //generate array difference between new and existing messages to see if actual new messages are present
+    let newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
+
+    const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
+
+    const noMoreMessagesToLoad = (receivedMessageCount < messageLoadingSize) && (sentMessageCount < messageLoadingSize)
+    if(noMoreMessagesToLoad) {
       setNoMoreMessages(true)
     }
-    else {
-      //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
-      //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
-      // if there are any present in the database.
-      const extractedMessageIDs = flattenMessages(messages).map(message => message._id)
-
-      //generate array difference between new and existing messages to see if actual new messages are present
-      let newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
-
-      const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
-
-      const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
-      if(!newMessagesToAdd || noMoreMessagesToLoad && !initialLoad) {
-        showNoMoreMessagePopup();
-      }
+    if(!newMessagesToAdd || (noMoreMessagesToLoad && !initialLoad)) {
+      showNoMoreMessagePopup();
     }
 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
