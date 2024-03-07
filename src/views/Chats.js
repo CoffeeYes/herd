@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TouchableOpacity, Dimensions, Image, ScrollView, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView, Alert } from 'react-native';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getContactsWithChats, deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
+import { deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
 import { toHsv } from 'react-native-color-picker';
 

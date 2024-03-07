@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import navigationRef from '../NavigationRef'

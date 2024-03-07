@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, TouchableOpacity, ScrollView,
-         View, Modal, Switch, Alert, Dimensions,
+import { Text, ScrollView,
+         View, Switch, Alert, 
          NativeEventEmitter } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
-import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
@@ -17,11 +14,11 @@ import PermissionModal from './PermissionModal';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
-import { getPasswordHash, closePasswordRealm } from '../realm/passwordRealm';
+import { closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 
-import { setChats, resetMessages, setMessageQueue } from '../redux/actions/chatActions';
-import { setContacts, resetContacts } from '../redux/actions/contactActions';
+import { setChats, setMessageQueue } from '../redux/actions/chatActions';
+import { resetContacts } from '../redux/actions/contactActions';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { palette } from '../assets/palette';
@@ -41,7 +38,6 @@ const Settings = ({ navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);

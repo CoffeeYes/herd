@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 
-import { palette } from '../assets/palette';
-
 const FullScreenSplash = ({ children, title, titleStyle, containerStyle }) => {
   return (
     <View style={{...styles.container, ...containerStyle}}>

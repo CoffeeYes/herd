@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView, Alert} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ScrollView, Alert} from 'react-native';
 import Header from './Header';
 import ListItem from './ListItem';
-import { getAllContacts, deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
-import { getContactsWithChats } from '../realm/chatRealm';
+import { deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
 import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
 import { deleteContacts } from '../redux/actions/contactActions';
-import { deleteChat } from '../redux/actions/chatActions';
 
 
 const Contacts = ({ route, navigation }) => {
@@ -24,7 +21,7 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts);
   const [highlightedContacts, setHighlightedContacts ] = useState([]);
 
-  const onPressDelete = async index => {
+  const onPressDelete = () => {
     Alert.alert(
       'Are you sure ?',
       '',

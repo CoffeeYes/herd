@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, Text, TextInput, Dimensions } from 'react-native';
+import { Text, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
 import FullScreenSplash from './FullScreenSplash';
-import { getPasswordHash } from '../realm/passwordRealm';
 import { deleteAllMessages } from '../realm/chatRealm';
 import { deleteAllContacts } from '../realm/contactRealm';
 

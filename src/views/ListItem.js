@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Text, View, TouchableOpacity, Dimensions, Image } from 'react-native';
+import React  from 'react';
+import { Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import ContactImage from './ContactImage';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { imageValues, palette } from '../assets/palette';
+import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress, containerStyle, textStyle,

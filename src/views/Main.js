@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from 'react';
-import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { palette } from '../assets/palette';
@@ -13,7 +12,7 @@ import { useScreenAdjustedSize } from '../helper';
 
 const Tab = createBottomTabNavigator();
 
-const Main = ({ navigation, route }) => {
+const Main = ({ route }) => {
 
     const iconSize = useScreenAdjustedSize(0.07,0.04);
     const tabBarHeight = useScreenAdjustedSize(0.075,0.15,"height",1,0.7,undefined,1000);
@@ -28,7 +27,7 @@ const Main = ({ navigation, route }) => {
         tabBarActiveTintColor: palette.primary,
         tabBarStyle : {height : tabBarHeight},
         tabBarIconStyle : {width : iconSize},
-        tabBarIcon : ({ color, size }) => {
+        tabBarIcon : ({ color }) => {
           return <Icon name={route.name === "chats" ? "chat" : route.name} size={iconSize} color={color}/>
         }
       })}>

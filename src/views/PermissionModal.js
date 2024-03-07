@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 

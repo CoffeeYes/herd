@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';

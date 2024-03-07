@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { View, Text, TouchableOpacity, ScrollView, TextInput, Share,
-         Image, Dimensions , ActivityIndicator, Modal} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useSelector } from 'react-redux';
+import { View, ScrollView, Share,
+         Image } from 'react-native';
 import { useClipboard } from '@react-native-community/clipboard';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './Header';
 import ContactImage from './ContactImage';
 
 import QRCodeModal from './QRCodeModal';
 import CardButton from './CardButton';
 import CustomModal from './CustomModal';
-import { getContactById } from '../realm/contactRealm';
 
 import { largeImageContainerStyle } from '../assets/styles';
 import { useScreenAdjustedSize } from '../helper';
@@ -40,7 +37,7 @@ const Contact = ({route, navigation}) => {
   }
 
   const shareContact = async () => {
-    const shared = await Share.share({
+    await Share.share({
       title : "I'd like to share my Herd Contact with you!",
       message : contact.key
     })

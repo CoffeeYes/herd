@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { View, Alert } from 'react-native';
+import { Alert } from 'react-native';
 
 const defaultTitle = 'Discard Changes?'
 const defaultSubtitle = 'You have unsaved changes. Are you sure to discard them and leave the screen?';

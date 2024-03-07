@@ -1,6 +1,5 @@
 import React, { useState, memo } from 'react';
 import { TouchableOpacity, Text, View } from 'react-native';
-import { fromHsv, toHsv } from 'react-native-color-picker';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useClipboard } from '@react-native-community/clipboard';
 

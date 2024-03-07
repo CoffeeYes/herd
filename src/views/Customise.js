@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
+import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
-import TabItem from './TabItem';
 import ListItem from './ListItem';
 import ChatBubble from './ChatBubble';
 import Dropdown from './Dropdown';
@@ -30,7 +29,6 @@ const Customise = ({ navigation }) => {
   const [receivedBoxColor, _setReceivedBoxColor] = useState("");
   const [receivedTextColor, _setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState(0);
-  const [tabWidth, setTabWidth] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
   const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);

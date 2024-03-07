@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, Pressable } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 

@@ -1,10 +1,7 @@
-import React, { useState, useEffect, memo } from 'react';
-import { useSelector } from 'react-redux';
-import { View, Text, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native';
+import React, { memo } from 'react';
+import { View, Text, TouchableOpacity, } from 'react-native';
 
 import { palette } from '../assets/palette';
-
-import Crypto from '../nativeWrapper/Crypto';
 
 import LoadingBar from './LoadingBar';
 

@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { View, ScrollView, Text, TextInput, Dimensions, Alert } from 'react-native';
+import { ScrollView, Alert } from 'react-native';
 
 import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import { setPassword } from '../redux/actions/userActions';
 
 import Header from './Header';
-import FlashTextButton from './FlashTextButton';
 import PasswordCreationBox from './PasswordCreationBox';
 
 import Crypto from '../nativeWrapper/Crypto';
@@ -60,7 +59,6 @@ const PasswordSettings = () => {
     }
     else {
       throw new error("invalid password name used when attempting to save password");
-      return;
     }
 
     const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);

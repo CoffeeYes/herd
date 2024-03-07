@@ -1,5 +1,5 @@
 import React, { useState, useRef, forwardRef } from 'react';
-import { View, Text, TextInput, Dimensions } from 'react-native';
+import { View, Text, TextInput } from 'react-native';
 import { useSelector } from 'react-redux';
 
 import { palette } from '../assets/palette';
@@ -41,9 +41,6 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
       setSecondaryInputText("");
     }
   }
-
-  const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
-  const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize};
 
   return (
         <View style={{...styles.card,...mainContainerStyle }}>

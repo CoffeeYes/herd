@@ -1,7 +1,6 @@
-import React, { useEffect, useCallback, useRef, useState } from 'react';
-import { View, Dimensions, Text, TouchableOpacity } from 'react-native';
-import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useRef } from 'react';
+import { View } from 'react-native';
+import { ColorPicker } from 'react-native-color-picker';
 import CustomSlider from './Slider'
 
 import { palette } from '../assets/palette';

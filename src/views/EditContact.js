@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
+import { View, TextInput, Text, 
          ActivityIndicator, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 
-import { getContactById, editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
+import { editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
-import { updateContact, addContact } from '../redux/actions/contactActions';
+import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
@@ -82,7 +81,7 @@ const EditContact = ({ route, navigation }) => {
     setSaving(true);
     let errorSaving = []
     try {
-      const encryptedTest = await Crypto.encryptString(
+      await Crypto.encryptString(
         publicKey.trim(),
         false,
         Crypto.algorithm.RSA,
