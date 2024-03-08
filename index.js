@@ -1,3 +1,7 @@
+// This poly-fill is required for generating ObjectIDs within Realm
+// do not remove, even if it seems 'unused'
+import 'react-native-get-random-values';
+
 import React from 'react';
 import {AppRegistry} from 'react-native';
 import App from './App';

@@ -34,6 +34,7 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
   useEffect(() => {
     runAnimation();
   },[])
+
   return (
     [...Array(numBars).keys()].map(num => {
     return (
@@ -56,24 +57,6 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
       </View>
     )
     })
-  )
-  return (
-    <View style={{
-      ...styles.loadingContainerView,
-      ...containerStyle,
-      backgroundColor : barColor
-    }}>
-      <Animated.View
-      style={{
-        ...styles.loadingView,
-        ...loadingBarStyle,
-        marginLeft : loadingViewPosition.interpolate({
-          inputRange : [0,100],
-          outputRange : ["0%","80%"]
-        }),
-        backgroundColor : sliderColor
-      }}/>
-    </View>
   )
 }
 

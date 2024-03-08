@@ -170,7 +170,7 @@ const Chat = ({ route, navigation }) => {
     const extractedMessageIDs = flattenMessages(messages).map(message => message._id)
 
     //generate array difference between new and existing messages to see if actual new messages are present
-    let newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
+    const newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
 
     const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
 
@@ -182,6 +182,7 @@ const Chat = ({ route, navigation }) => {
       showNoMoreMessagePopup();
     }
 
+    newMessagesToAdd && 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned than expected
     //As such, adjust the message
@@ -381,10 +382,6 @@ const Chat = ({ route, navigation }) => {
     }
 
     messageLengthRef.current = messageLength;
-    if(noMoreMessages && messageLength > 0) {
-      showNoMoreMessagePopup();
-      setAllowScrollToLoadMessages(false);
-    }
   }
 
   const handleGesture = event => {
