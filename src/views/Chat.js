@@ -56,7 +56,6 @@ const Chat = ({ route, navigation }) => {
   const [chatWindowSize, setChatWindowSize] = useState(1);
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
-  const [noMoreMessages, setNoMoreMessages] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
@@ -175,11 +174,16 @@ const Chat = ({ route, navigation }) => {
     const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
 
     const noMoreMessagesToLoad = (receivedMessageCount < messageLoadingSize) && (sentMessageCount < messageLoadingSize)
-    if(noMoreMessagesToLoad) {
-      setNoMoreMessages(true)
-    }
+
     if(!newMessagesToAdd || (noMoreMessagesToLoad && !initialLoad)) {
       showNoMoreMessagePopup();
+    }
+    
+    //edge case, where all messages are deleted and there are no more messages to load
+    //this edge case doesn't trigger normal chat deletion flow because doneLoading will
+    //not have been set
+    if(!newMessagesToAdd && noMoreMessagesToLoad) {
+      dispatch(deleteChats([contactInfo]));
     }
 
     newMessagesToAdd && 
