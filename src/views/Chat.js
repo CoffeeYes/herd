@@ -179,13 +179,6 @@ const Chat = ({ route, navigation }) => {
       showNoMoreMessagePopup();
     }
     
-    //edge case, where all messages are deleted and there are no more messages to load
-    //this edge case doesn't trigger normal chat deletion flow because doneLoading will
-    //not have been set
-    if(!newMessagesToAdd && noMoreMessagesToLoad) {
-      dispatch(deleteChats([contactInfo]));
-    }
-
     newMessagesToAdd && 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
     //if this is the first load, more messages can be returned than expected
@@ -195,6 +188,7 @@ const Chat = ({ route, navigation }) => {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
     }
+    return newMessagesToAdd;
   }
 
   const encryptString = async (string, keyToEncryptWith) => {
@@ -314,14 +308,12 @@ const Chat = ({ route, navigation }) => {
             .filter(section => section.data.length > 0);
 
             if(updatedMessages.length === 0) {
-              if(!chat?.doneLoading) {
-                //if all messages were deleted attempt to load more
-                await loadMoreMessages(true,messageStart + messageLoadingExtension);
+              let doneLoading = chat?.doneLoading;
+              if(!doneLoading) {
+                doneLoading = !(await loadMoreMessages(true,messageStart + messageLoadingExtension));
               }
-              else {
-                //all messages were deleted and there are no more messages to load
-                //so remove chat from chats page
-                dispatch(deleteChats([contactInfo]))
+              if(doneLoading) {
+                dispatch(deleteChats([contactInfo]));
               }
             }
 
@@ -351,17 +343,19 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     if(!loadingMoreMessages) {
+      let loadedMoreMessages = false
       setLoadingMoreMessages(true)
       if(overrideLoadInitial) {
-        await loadMessages(start)
+        loadedMoreMessages = await loadMessages(start)
       }
       else {
-        await loadMessages(start,end)
+        loadedMoreMessages = await loadMessages(start,end)
       }
       setMessageEnd(start);
       setMessageStart(start - messageLoadingSize);
 
       setLoadingMoreMessages(false);
+      return loadedMoreMessages;
     }
   }
 
