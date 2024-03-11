@@ -367,6 +367,11 @@ const Chat = ({ route, navigation }) => {
       scrollToBottom(false);
     }
     else if((messageLength - messageLengthRef.current > 1) && messageLength > 0){
+      console.log({
+        messageLength,
+        ref : messageLengthRef.current,
+        loading
+      })
       scrollToTop();
     }
 
@@ -522,6 +527,9 @@ const Chat = ({ route, navigation }) => {
           onEndReached={() => allowScrollToLoadMessages && (scrolling || momentumScrolling) && handleScroll()}
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
+          onScrollToIndexFailed={e => {
+            console.log("scroll failed", e)
+          }}
           onMomentumScrollBegin={() => {
             setMomentumScrolling(true);
           }}
