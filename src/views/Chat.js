@@ -367,11 +367,6 @@ const Chat = ({ route, navigation }) => {
       scrollToBottom(false);
     }
     else if((messageLength - messageLengthRef.current > 1) && messageLength > 0){
-      console.log({
-        messageLength,
-        ref : messageLengthRef.current,
-        loading
-      })
       scrollToTop();
     }
 
@@ -423,7 +418,7 @@ const Chat = ({ route, navigation }) => {
     });
   }
 
-  const scrollToTop = (animated = true) => {
+  const scrollToTop = (animated = true, optionalTargetIndex) => {
     const lastSectionIndex = messages?.length -1;
     const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
 
@@ -433,7 +428,7 @@ const Chat = ({ route, navigation }) => {
     scrollRef.current.scrollToLocation({
       animated : animated,
       sectionIndex : lastSectionIndex,
-      itemIndex : lastMessageIndex,
+      itemIndex : optionalTargetIndex ? optionalTargetIndex : lastMessageIndex,
       viewPosition : 1
     })
   }
@@ -528,6 +523,8 @@ const Chat = ({ route, navigation }) => {
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
           onScrollToIndexFailed={e => {
+            e.index > 0 &&
+            scrollToTop(true,e.highestMeasuredFrameIndex);
             console.log("scroll failed", e)
           }}
           onMomentumScrollBegin={() => {
