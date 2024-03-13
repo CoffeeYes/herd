@@ -4,7 +4,6 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey, createContact } from './contactRealm';
 import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from './helper';
-import { cloneDeep } from 'lodash';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
@@ -157,22 +156,24 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     const contacts = getContactsByKey(keys);
     newMessages.forEach(async message => {
       let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
-      //if the message is for this user, but no contact exists create the contact
-      if(contact === undefined && message.to.trim() == ownPublicKey.trim()) {
-        contact = createContact({
-          name : "Unknown User",
-          key : message.from.trim(),
-          image : ""
-        });
-        contacts.push(contact);
-        dispatch(addContact(contact));
-      }
-      else if(contact && message.to.trim() === ownPublicKey.trim()) {
-        const decryptedText = decryptString(message.text)
-        dispatch(addMessage(contact._id,{
-          ...message,
-          text : decrypted
-        }))
+      if(message.to.trim() === ownPublicKey.trim()) {
+        if(contact) {
+          const decryptedText = decryptString(message.text)
+          dispatch(addMessage(contact._id,{
+            ...message,
+            text : decryptedText 
+          }))
+        }
+        //if the message is for this user, but no contact exists create the contact
+        else {
+          contact = createContact({
+            name : "Unknown User",
+            key : message.from.trim(),
+            image : ""
+          });
+          contacts.push(contact);
+          dispatch(addContact(contact));
+        }
       }
     })
     const chats = await getContactsWithChats();
