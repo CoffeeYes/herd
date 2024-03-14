@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Text, ScrollView,
          View, Switch, Alert, 
          NativeEventEmitter } from 'react-native';
-import { useClipboard } from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
@@ -36,7 +36,6 @@ import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contact
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [data, setClipboard] = useClipboard();
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [backgroundTransfer, setBackgroundTransfer] = useState(false);
@@ -62,7 +61,7 @@ const Settings = ({ navigation }) => {
   },[]);
 
   const copyKeyToClipboard = async () => {
-    setClipboard(publicKey);
+    Clipboard.setString(publicKey);
     return true;
   }
 

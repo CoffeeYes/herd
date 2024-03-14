@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { View, ScrollView, Share,
          Image } from 'react-native';
-import { useClipboard } from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 import Header from './Header';
 import ContactImage from './ContactImage';
 
@@ -14,7 +14,6 @@ import { largeImageContainerStyle } from '../assets/styles';
 import { useScreenAdjustedSize } from '../helper';
 
 const Contact = ({route, navigation}) => {
-  const [clipboardData, setClipboard] = useClipboard();
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id));
@@ -32,7 +31,7 @@ const Contact = ({route, navigation}) => {
   const [headerLineHeight, setHeaderLineHeight] = useState(1);
 
   const copyKeyToClipboard = () => {
-    setClipboard(contact.key)
+    Clipboard.setString(contact.key)
     return true;
   }
 

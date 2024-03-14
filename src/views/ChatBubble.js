@@ -1,14 +1,13 @@
 import React, { useState, memo } from 'react';
 import { TouchableOpacity, Text, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useClipboard } from '@react-native-community/clipboard';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import { palette } from '../assets/palette';
 
 const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, activeOpacity,
                       onLongPress, onPress, disableTouch = false, highlighted, onLayout, showCopyButton }) => {
 
-  const [clipboard, setClipboard] = useClipboard();
   const [showCopyConfirmation, setShowCopyConfirmation] = useState(false);
 
   const boxStyle = {
@@ -24,7 +23,7 @@ const ChatBubble = ({ text, textFontSize, timestamp, messageFrom, customStyle, a
   }
 
   const handleCopyPress = text => {
-    setClipboard(text);
+    Clipboard.setString(text);
     setShowCopyConfirmation(true);
     setTimeout(() => {
       setShowCopyConfirmation(false);
