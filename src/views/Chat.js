@@ -492,7 +492,6 @@ const Chat = ({ route, navigation }) => {
       disableTouch/>
     }/>
     <KeyboardAvoidingView
-    onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}
     style={{flex : 1}}>
 
       {showPopup &&
@@ -503,7 +502,8 @@ const Chat = ({ route, navigation }) => {
       <PanGestureHandler
       enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
       onGestureEvent={handleGesture}>
-        <View style={{flex : 1}}>
+        <View style={{flex : 1}}
+        onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}>
           {((loading || loadingMoreMessages) && !showPopup) &&
           <ActivityIndicator
           size="large"
