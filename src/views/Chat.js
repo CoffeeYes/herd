@@ -548,6 +548,7 @@ const Chat = ({ route, navigation }) => {
       <View style={{flexDirection : "row"}}>
         <TextInput
         placeholder="Send a Message"
+        returnKeyType='send'
         style={{
           ...styles.chatInput,
           backgroundColor : palette.white,

@@ -17,7 +17,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
-  const leftButtonWidth = useScreenAdjustedSize(0.15,0.1, "width", 0.7, 0.7, 1000, 1000);
+  const leftButtonWidth = useScreenAdjustedSize(0.2,0.1, "width", 0.7, 0.7, 1000, 1000);
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
   const [hasGoneBack, setHasGoneBack] = useState(false);
@@ -36,7 +36,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
       <TouchableOpacity
       disabled={disableBackButton}
       onPress={navigateBack}
-      style={{paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
+      style={{...styles.leftButton, paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>}
 
@@ -71,7 +71,6 @@ const styles = {
     justifyContent : "space-between",
     alignItems : "center",
     backgroundColor : palette.primary,
-    paddingLeft : 10,
   },
   title : {
     flex : 1,
@@ -79,6 +78,11 @@ const styles = {
     fontSize : 18,
     marginRight : "auto",
     maxWidth : "95%"
+  },
+  leftButton : {
+    alignItems : "center",
+    justifyContent : "center",
+    alignSelf : "stretch"
   },
   rightButton : {
     backgroundColor : palette.secondary,
