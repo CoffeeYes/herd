@@ -29,10 +29,18 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
     }
   }
 
+  let renderLeftButton = allowGoBack && navigationRef.current.canGoBack();
+
   return (
     <View
-    style={{...styles.container,minHeight : minimumHeight, ...containerStyle}}>
-      {allowGoBack && navigationRef.current.canGoBack() &&
+    style={{
+      ...styles.container,
+      minHeight : minimumHeight, 
+      ...(!renderLeftButton && {paddingLeft : 10}),
+      ...containerStyle
+    }}>
+
+      {renderLeftButton &&
       <TouchableOpacity
       disabled={disableBackButton}
       onPress={navigateBack}

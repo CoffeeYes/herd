@@ -414,7 +414,8 @@ const Chat = ({ route, navigation }) => {
     scrollRef.current.scrollToLocation({
       animated : animated,
       sectionIndex : 0,
-      itemIndex : 0
+      itemIndex : 0,
+      viewOffset : 6 
     });
   }
 
