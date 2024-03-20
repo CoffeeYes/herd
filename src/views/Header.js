@@ -41,12 +41,17 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
     }}>
 
       {renderLeftButton &&
+      <>
+      <TouchableOpacity style={{width : 1}}>
+        <Text></Text>
+      </TouchableOpacity>
       <TouchableOpacity
       disabled={disableBackButton}
       onPress={navigateBack}
       style={{...styles.leftButton, paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
-      </TouchableOpacity>}
+      </TouchableOpacity>
+      </>}
 
       <TouchableOpacity
       disabled={!onTextTouch || disableTextTouch}
