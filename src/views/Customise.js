@@ -297,7 +297,36 @@ const Customise = ({ navigation }) => {
               name={synchroniseFontChanges ? "lock" : "lock-open"}/>
             </TouchableOpacity>
 
-            {fontSizes.map((item,index)=> {
+            {synchroniseFontChanges ? 
+            <Fragment>
+              <Text style={{
+                alignSelf : "center",
+                fontWeight : "bold",
+                fontSize : customStyle.scaledUIFontSize
+              }}>
+                {fontSizes.map(item => item.title).join(" + ")}
+              </Text>
+              <Slider
+              containerStyle={styles.sliderContainer}
+              sliderStyle={{flex : 1}}
+              minimumTrackTintColor={palette.secondary}
+              maximumTrackTintColor={palette.primary}
+              thumbTintColor={palette.primary}
+              tapToSeek
+              onSlidingComplete={value => changeFonts(value)}
+              onValueChange={value => changeFonts(value)}
+              value={uiFontSize}
+              min={boundaryValues.minFontSize}
+              max={boundaryValues.maxFontSize}
+              step={1}
+              rightText={uiFontSize}
+              rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
+              rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
+              rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
+              />
+            </Fragment>
+            :
+            fontSizes.map((item,index)=> {
               return (
                 <Fragment key={item.tag}>
                   <Text style={{
