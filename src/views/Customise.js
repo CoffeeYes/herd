@@ -22,6 +22,37 @@ import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
+const FontSlider = ({title, value, customStyle, ...props}) => {
+
+  return (
+    <>
+      <Text style={{
+        alignSelf : "center",
+        fontWeight : "bold",
+        fontSize : customStyle.scaledUIFontSize
+      }}>
+        {title}
+      </Text>
+      <Slider
+      value={value}
+      containerStyle={styles.sliderContainer}
+      sliderStyle={{flex : 1}}
+      minimumTrackTintColor={palette.secondary}
+      maximumTrackTintColor={palette.primary}
+      thumbTintColor={palette.primary}
+      tapToSeek
+      min={boundaryValues.minFontSize}
+      max={boundaryValues.maxFontSize}
+      step={1}
+      rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
+      rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
+      rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
+      {...props} 
+      />
+    </>
+  )
+}
+
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
   const [sentBoxColor, _setSentBoxColor] = useState("");
@@ -251,8 +282,7 @@ const Customise = ({ navigation }) => {
         <ActivityIndicator size="large" color={palette.primary}/>
         :
         <>
-
-          <Header
+         <Header
           title="Preview"
           allowGoBack
           disableBackButton
@@ -298,64 +328,26 @@ const Customise = ({ navigation }) => {
             </TouchableOpacity>
 
             {synchroniseFontChanges ? 
-            <Fragment>
-              <Text style={{
-                alignSelf : "center",
-                fontWeight : "bold",
-                fontSize : customStyle.scaledUIFontSize
-              }}>
-                {fontSizes.map(item => item.title).join(" + ")}
-              </Text>
-              <Slider
-              containerStyle={styles.sliderContainer}
-              sliderStyle={{flex : 1}}
-              minimumTrackTintColor={palette.secondary}
-              maximumTrackTintColor={palette.primary}
-              thumbTintColor={palette.primary}
-              tapToSeek
-              onSlidingComplete={value => changeFonts(value)}
-              onValueChange={value => changeFonts(value)}
-              value={uiFontSize}
-              min={boundaryValues.minFontSize}
-              max={boundaryValues.maxFontSize}
-              step={1}
-              rightText={uiFontSize}
-              rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-              rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
-              rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
-              />
-            </Fragment>
+            <FontSlider
+            customStyle={customStyle}
+            value={uiFontSize}
+            title={fontSizes.map(item => item.title).join(" + ")}
+            onSlidingComplete={value => changeFonts(value)}
+            onValueChange={value => changeFonts(value)}
+            rightText={uiFontSize}
+            />
             :
             fontSizes.map((item,index)=> {
               return (
-                <Fragment key={item.tag}>
-                  <Text style={{
-                    alignSelf : "center",
-                    fontWeight : "bold",
-                    fontSize : customStyle.scaledUIFontSize
-                  }}>
-                    {item.title}
-                  </Text>
-                  <Slider
-                  containerStyle={styles.sliderContainer}
-                  sliderStyle={{flex : 1}}
-                  minimumTrackTintColor={palette.secondary}
-                  maximumTrackTintColor={palette.primary}
-                  thumbTintColor={palette.primary}
-                  tapToSeek
-                  onSlidingComplete={value => changeFonts(value,index)}
-                  onValueChange={value => changeFonts(value,index)}
-                  value={item.value}
-                  min={boundaryValues.minFontSize}
-                  max={boundaryValues.maxFontSize}
-                  step={1}
-                  rightTitle={item.rightTitle}
-                  rightText={item.rightText}
-                  rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-                  rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
-                  rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
-                  />
-                </Fragment>
+                <FontSlider
+                customStyle={customStyle}
+                key={item.title}
+                onSlidingComplete={value => changeFonts(value,index)}
+                onValueChange={value => changeFonts(value,index)}
+                value={item.value}
+                rightTitle={item.rightTitle}
+                rightText={item.rightText}
+                />
               )
             })}
           </View>
