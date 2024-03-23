@@ -23,7 +23,7 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const FontSlider = ({title, value, customStyle, ...props}) => {
-
+  const valueRef = useRef(value)
   return (
     <>
       <Text style={{
@@ -34,7 +34,7 @@ const FontSlider = ({title, value, customStyle, ...props}) => {
         {title}
       </Text>
       <Slider
-      value={value}
+      value={valueRef.current}
       containerStyle={styles.sliderContainer}
       sliderStyle={{flex : 1}}
       minimumTrackTintColor={palette.secondary}
@@ -65,7 +65,8 @@ const Customise = ({ navigation }) => {
   const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
   const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
-  const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
+  const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
+  const [synchronisedFontSize, setSynchronisedFontSize] = useState(uiFontSize);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -227,6 +228,7 @@ const Customise = ({ navigation }) => {
     const roundedValue = Math.round(value)
     if(synchroniseFontChanges) {
       fontSizes.forEach(item => item.setValue(roundedValue))
+      setSynchronisedFontSize(roundedValue);
     }
     else {
       fontSizes[index].setValue(roundedValue);
@@ -330,17 +332,18 @@ const Customise = ({ navigation }) => {
             {synchroniseFontChanges ? 
             <FontSlider
             customStyle={customStyle}
-            value={uiFontSize}
+            value={synchronisedFontSize}
             title={fontSizes.map(item => item.title).join(" + ")}
             onSlidingComplete={value => changeFonts(value)}
             onValueChange={value => changeFonts(value)}
-            rightText={uiFontSize}
+            rightText={synchronisedFontSize}
             />
             :
             fontSizes.map((item,index)=> {
               return (
                 <FontSlider
                 customStyle={customStyle}
+                title={item.title}
                 key={item.title}
                 onSlidingComplete={value => changeFonts(value,index)}
                 onValueChange={value => changeFonts(value,index)}
