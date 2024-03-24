@@ -79,9 +79,12 @@ const AddContact = ({ navigation }) => {
       )
     }
     else {
-      !(await Bluetooth.checkBTDiscoverable()) &&
-      await Bluetooth.requestBTMakeDiscoverable(30);
+      let discoverable = await Bluetooth.checkBTDiscoverable();
+      if(!discoverable) {
+        discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
+      }
 
+      discoverable &&
       navigation.navigate("BTDeviceList");
     }
     dispatch(setLockable(true));
