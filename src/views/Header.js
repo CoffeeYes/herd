@@ -24,8 +24,8 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
 
   const navigateBack = () => {
     if(!hasGoneBack) {
+      navigationRef.current.goBack() &&
       setHasGoneBack(true);
-      navigationRef.current.goBack();
     }
   }
 
