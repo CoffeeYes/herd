@@ -8,6 +8,7 @@ import { palette } from '../assets/palette';
 
 import { useScreenAdjustedSize } from '../helper';
 import { defaultChatStyles } from '../assets/styles'
+import { useIsFocused } from '@react-navigation/native';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disableRightButton, disableBackButton,
                   preText, onTextLayout,
@@ -20,13 +21,10 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   const leftButtonWidth = useScreenAdjustedSize(0.2,0.1, "width", 0.7, 0.7, 1000, 1000);
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
-  const [hasGoneBack, setHasGoneBack] = useState(false);
-
+  
+  const isFocused = useIsFocused();
   const navigateBack = () => {
-    if(!hasGoneBack) {
-      navigationRef.current.goBack() &&
-      setHasGoneBack(true);
-    }
+    isFocused && navigationRef.current.goBack();
   }
 
   let renderLeftButton = allowGoBack && navigationRef.current.canGoBack();
