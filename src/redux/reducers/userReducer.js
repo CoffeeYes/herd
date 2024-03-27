@@ -1,5 +1,3 @@
-import { setPublicKey } from '../actions/userActions';
-
 const initialState = {
   publicKey : "",
   loginPasswordHash : "",

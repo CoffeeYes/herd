@@ -6,10 +6,8 @@ const contactReducer = (state = initialState,action) => {
   switch(action.type) {
     case "SET_CONTACTS":
       return {...state, contacts : action.payload}
-      break;
     case "ADD_CONTACT":
       return {...state, contacts : [...state.contacts,action.payload]};
-      break;
     case "DELETE_CONTACTS":
       return {
         ...state,
@@ -18,7 +16,6 @@ const contactReducer = (state = initialState,action) => {
             contactToDelete => contactToDelete._id == contact._id) === undefined
           )
         }
-      break;
     case "UPDATE_CONTACT": {
       const { _id, name, key, image } = action.payload;
       let contact = state.contacts.find(contact => contact._id == _id);
@@ -36,7 +33,6 @@ const contactReducer = (state = initialState,action) => {
       } else {
         return state;
       }
-      break;
     }
     default:
       return state;
