@@ -24,12 +24,16 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func scanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+        bluetoothManager?.scanForPeripherals(withServices : nil);
+        resolve(true);
     }
     @objc
     func cancelScanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+        if(bluetoothManager?.isScanning != nil) {
+            bluetoothManager?.stopScan();
+        }
+        resolve(true);
     }
 
     @objc
@@ -41,7 +45,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func checkBTPermissions(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+        resolve(CBCentralManager.authorization == .allowedAlways)
     }
     @objc
     func requestBTPermissions(_ resolve : RCTPromiseResolveBlock,
@@ -69,29 +73,29 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func checkLocationPermission(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      resolve(
-        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
-        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse
-      )
+      resolve(checkLocationIsAuthorized())
     }
+
+    func checkLocationIsAuthorized() -> Bool {
+        return locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
+        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse
+    }
+
     @objc
     func requestLocationPermissions(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      if(locationManager?.authorizationStatus == CLAuthorizationStatus.notDetermined ||
-         locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse) {
+        var authorized = checkLocationIsAuthorized();
+        if(!authorized) {
           locationManager?.requestAlwaysAuthorization();
-          if(locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
-             locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse) {
-              resolve(true)
-          }
-      }
-      resolve(false)
+          authorized = checkLocationIsAuthorized();
+        }
+        resolve(authorized)
     }
+
     @objc
     func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
-                locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse)
+        resolve(checkLocationIsAuthorized())
     }
     @objc
     func requestLocationEnable(_ resolve : RCTPromiseResolveBlock,
