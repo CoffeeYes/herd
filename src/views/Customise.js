@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
@@ -20,7 +20,7 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
+import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
 const FontSlider = ({title, value, customStyle, ...props}) => {
   const valueRef = useRef(value)
@@ -55,15 +55,9 @@ const FontSlider = ({title, value, customStyle, ...props}) => {
 
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [sentBoxColor, _setSentBoxColor] = useState("");
-  const [sentTextColor, _setSentTextColor] = useState("");
-  const [receivedBoxColor, _setReceivedBoxColor] = useState("");
-  const [receivedTextColor, _setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState(0);
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
-  const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
-  const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(uiFontSize);
@@ -76,38 +70,12 @@ const Customise = ({ navigation }) => {
   const headerIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledHeaderIconSize = ((uiFontSize + 16) / defaultChatStyles.uiFontSize) * headerIconSize
 
-  const sentBoxColorRef = useRef();
-  const sentTextColorRef = useRef();
-  const receivedBoxColorRef = useRef();
-  const receivedTextColorRef = useRef();
-  const messageFontSizeRef = useRef();
-  const uiFontSizeRef = useRef();
-
-  const setSentBoxColor = data => {
-    sentBoxColorRef.current = data
-    _setSentBoxColor(data)
-  }
-  const setSentTextColor = data => {
-    sentTextColorRef.current = data
-    _setSentTextColor(data)
-  }
-  const setReceivedBoxColor = data => {
-    receivedBoxColorRef.current = data
-    _setReceivedBoxColor(data)
-  }
-  const setReceivedTextColor = data => {
-    receivedTextColorRef.current = data
-    _setReceivedTextColor(data)
-  }
-
-  const setMessageFontSize = data => {
-    messageFontSizeRef.current = data;
-    _setMessageFontSize(data)
-  }
-  const setUiFontSize = data => {
-    uiFontSizeRef.current = data;
-    _setUiFontSize(data)
-  }
+  const [sentBoxColor, setSentBoxColor, sentBoxColorRef] = useStateAndRef("");
+  const [sentTextColor, setSentTextColor, sentTextColorRef] = useStateAndRef("");
+  const [receivedBoxColor, setReceivedBoxColor, receivedBoxColorRef] = useStateAndRef("");
+  const [receivedTextColor, setReceivedTextColor, receivedTextColorRef] = useStateAndRef("");
+  const [messageFontSize, setMessageFontSize, messageFontSizeRef] = useStateAndRef(defaultChatStyles.messageFontSize);
+  const [uiFontSize, setUiFontSize, uiFontSizeRef] = useStateAndRef(defaultChatStyles.uiFontSize);
 
   useEffect(() => {
     loadStyles().then(() => setLoading(false));

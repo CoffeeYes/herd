@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dimensions } from 'react-native';
 
 const timestampToText = (timestamp,format) => {
@@ -117,8 +117,21 @@ const useOrientationBasedStyle = (portraitStyle, landscapeStyle) => {
   return style;
 }
 
+const useStateAndRef = (initialState, initialRef) => {
+  const [state, setState] = useState(initialState);
+  const ref = useRef(initialRef);
+
+  const update = data => {
+    setState(data);
+    ref.current = data;
+  }
+
+  return [state,update,ref];
+}
+
 export {
   timestampToText,
   useScreenAdjustedSize,
-  useOrientationBasedStyle
+  useOrientationBasedStyle,
+  useStateAndRef
 }
