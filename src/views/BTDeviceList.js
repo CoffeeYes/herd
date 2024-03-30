@@ -11,21 +11,16 @@ import CustomButton from './CustomButton';
 
 import navigationRef from '../NavigationRef';
 import { palette } from '../assets/palette';
+import { useStateAndRef } from '../helper';
 
 const BTDeviceList = () => {
-  const [deviceList, _setDeviceList] = useState([]);
   const [scanning, setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
-  const deviceRef = useRef(deviceList);
-
-  const setDeviceList = data => {
-    deviceRef.current = data;
-    _setDeviceList(data);
-  }
+  const [deviceList, setDeviceList, deviceRef] = useStateAndRef([],[]);
 
   const updateDeviceList = newDevice => {
     const existingDevice = deviceRef.current.findIndex(existingDevice => existingDevice.macAddress === newDevice.macAddress);

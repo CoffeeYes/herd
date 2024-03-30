@@ -16,52 +16,24 @@ import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
+import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [name, _setName] = useState(originalContact?.name || "");
-  const [publicKey, _setPublicKey] = useState(originalContact?.key || "");
-  const [contactImage, _setContactImage] = useState(originalContact?.image || "");
-  const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
   const [errors, setErrors] = useState([]);
-  const [haveSavedContact, _setHaveSavedContact] = useState(false);
   const [saving, setSaving] = useState(false);
   const [headerIcon, setHeaderIcon] = useState("save");
 
-  const nameRef = useRef(originalContact?.name || "");
-  const keyRef = useRef(originalContact?.key || "");
-  const imageRef = useRef(originalContact?.image || "");
-  const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
   const originalContactRef = useRef(originalContact || {});
-  const haveSavedContactRef = useRef(false);
+  const editingExistingContact = route?.params?.id?.length > 0;
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 
-  //refs for accessing state in event listeners, used to prevent discarding unsaved changes
-  const setPublicKey = data => {
-    keyRef.current = data;
-    _setPublicKey(data);
-  }
-  const setName = data => {
-    nameRef.current = data;
-    _setName(data);
-  }
-  const setContactImage = data => {
-    imageRef.current = data;
-    _setContactImage(data);
-  }
-  const setEditingExistingContact = data => {
-    editingExistingContactRef.current = data;
-    _setEditingExistingContact(data);
-  }
-
-  const setHaveSavedContact = data => {
-    haveSavedContactRef.current = data;
-    _setHaveSavedContact(data);
-  }
+  const [name, setName, nameRef] = useStateAndRef(originalContact?.name || "");
+  const [publicKey, setPublicKey, keyRef] = useStateAndRef(originalContact?.key || "");
+  const [contactImage, setContactImage, imageRef] = useStateAndRef(originalContact?.image || "");
 
   const scrollViewRef = useRef();
 
@@ -173,7 +145,7 @@ const EditContact = ({ route, navigation }) => {
 
   const haveUnsavedChanges = () => {
     let unsavedChanges;
-    if(editingExistingContactRef.current) {
+    if(editingExistingContact) {
       unsavedChanges = (
         originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
         originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
@@ -184,8 +156,7 @@ const EditContact = ({ route, navigation }) => {
       unsavedChanges = (
         (nameRef?.current?.trim()?.length > 0 ||
         keyRef?.current?.trim()?.length > 0 ||
-        imageRef?.current?.trim()?.length > 0) &&
-        !haveSavedContactRef.current
+        imageRef?.current?.trim()?.length > 0)
       )
     }
     return unsavedChanges;

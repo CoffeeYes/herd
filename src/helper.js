@@ -117,9 +117,9 @@ const useOrientationBasedStyle = (portraitStyle, landscapeStyle) => {
   return style;
 }
 
-const useStateAndRef = (initialState, initialRef) => {
-  const [state, setState] = useState(initialState);
-  const ref = useRef(initialRef);
+const useStateAndRef = (initialValue) => {
+  const [state, setState] = useState(initialValue);
+  const ref = useRef(initialValue);
 
   const update = data => {
     setState(data);
