@@ -27,6 +27,7 @@ const EditContact = ({ route, navigation }) => {
   const [headerIcon, setHeaderIcon] = useState("save");
 
   const originalContactRef = useRef(originalContact || {});
+  const haveSavedContactRef = useRef(false);
   const editingExistingContact = route?.params?.id?.length > 0;
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
@@ -109,7 +110,7 @@ const EditContact = ({ route, navigation }) => {
       dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
     }
     else {
-      setHaveSavedContact(true);
+      haveSavedContactRef.current = true;
       const createdContact = createContact(newInfo);
       dispatch(addContact(createdContact));
       navigation.navigate('main');
@@ -156,7 +157,8 @@ const EditContact = ({ route, navigation }) => {
       unsavedChanges = (
         (nameRef?.current?.trim()?.length > 0 ||
         keyRef?.current?.trim()?.length > 0 ||
-        imageRef?.current?.trim()?.length > 0)
+        imageRef?.current?.trim()?.length > 0) &&
+        !haveSavedContactRef.current
       )
     }
     return unsavedChanges;
