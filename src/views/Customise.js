@@ -22,7 +22,7 @@ import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
-const FontSlider = ({title, value, customStyle, ...props}) => {
+const FontSlider = ({title, value, useValue, customStyle, ...props}) => {
   const valueRef = useRef(value)
   return (
     <>
@@ -34,7 +34,7 @@ const FontSlider = ({title, value, customStyle, ...props}) => {
         {title}
       </Text>
       <Slider
-      value={valueRef.current}
+      value={useValue ? value : valueRef.current}
       containerStyle={styles.sliderContainer}
       sliderStyle={{flex : 1}}
       minimumTrackTintColor={palette.secondary}
@@ -61,6 +61,7 @@ const Customise = ({ navigation }) => {
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(uiFontSize);
+  const [overrideSliderValue, setOverrideSliderValue] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -129,9 +130,12 @@ const Customise = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
+            setOverrideSliderValue(true);
             await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
             dispatch(setStyles(defaultChatStyles));
             loadStyles();
+            setSynchronisedFontSize(defaultChatStyles.uiFontSize);
+            setOverrideSliderValue(false);
           },
         },
       ]
@@ -301,6 +305,7 @@ const Customise = ({ navigation }) => {
             <FontSlider
             customStyle={customStyle}
             value={synchronisedFontSize}
+            useValue={overrideSliderValue}
             title={fontSizes.map(item => item.title).join(" + ")}
             onSlidingComplete={value => changeFonts(value)}
             onValueChange={value => changeFonts(value)}
@@ -316,6 +321,7 @@ const Customise = ({ navigation }) => {
                 onSlidingComplete={value => changeFonts(value,index)}
                 onValueChange={value => changeFonts(value,index)}
                 value={item.value}
+                useValue={overrideSliderValue}
                 rightTitle={item.rightTitle}
                 rightText={item.rightText}
                 />
