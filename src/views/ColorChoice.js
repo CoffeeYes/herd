@@ -6,22 +6,17 @@ import CustomSlider from './Slider'
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, onValueChange}) => {
-  const slidingRef = useRef(false);
+const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, useValue, onValueChange}) => {
+  const valueRef = useRef(value);
   return (
     <CustomSlider
     tapToSeek
-    onSlidingStart={() => {slidingRef.current = true}}
-    onSlidingComplete={val => {
-      slidingRef.current = false;
-      onValueChange(val);
-    }}
     minimumTrackTintColor={palette.secondary}
     maximumTrackTintColor={palette.primary}
     thumbTintColor={palette.primary}
     rightText={value.toFixed(2)}
     sliderStyle={styles.slider}
-    {...(!slidingRef.current && {value})}
+    value={useValue ? value : valueRef.current}
     min={0.01}
     step={0.01}
     rightTitleStyle={{fontSize : sliderTitleSize}}
@@ -32,7 +27,7 @@ const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, onValueCha
 }
 
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
-                       sliderTextSize}) => {
+                       sliderTextSize, overrideSliderValues}) => {
 
   const pickerHeight = useScreenAdjustedSize(0.6,0.6, "height");
   const pickerWidth = useScreenAdjustedSize(0.8,0.5);
@@ -43,8 +38,6 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
     sliderTitleSize,
     sliderWidth
   }
-
-
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
@@ -61,9 +54,11 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       />
       <Slider
       {...sliderProps}
+      useValue={overrideSliderValues}
       value={color.s} onValueChange={value => setColor({...color, s : value})}/>
       <Slider
       {...sliderProps}
+      useValue={overrideSliderValues}
       value={color.v} onValueChange={value => setColor({...color, v : value})}/>
     </View>
   )

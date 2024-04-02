@@ -357,6 +357,7 @@ const Customise = ({ navigation }) => {
             />
 
             <ColorChoice
+            overrideSliderValues={overrideSliderValue}
             color={toHsv(tabItems[activeItem].color)}
             setColor={tabItems[activeItem].setColor}
             oldColor={originalStyles[tabItems[activeItem].originalColor]}
