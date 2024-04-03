@@ -60,7 +60,7 @@ const Customise = ({ navigation }) => {
   const [originalStyles, setOriginalStyles] = useState({});
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
-  const [synchronisedFontSize, setSynchronisedFontSize] = useState(uiFontSize);
+  const [synchronisedFontSize, setSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [overrideSliderValue, setOverrideSliderValue] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
@@ -85,6 +85,18 @@ const Customise = ({ navigation }) => {
   useEffect(() => {
     setScaledFontSize(uiFontSize + screenFontScaler)
   },[uiFontSize, screenFontScaler])
+
+  //checks if fontsize states have been set to default values before turning overrideSliderValue off
+  //to ensure sliders return to default positions
+  useEffect(() => {
+    if(
+      uiFontSize === defaultChatStyles.uiFontSize && 
+      messageFontSize === defaultChatStyles.messageFontSize && 
+      overrideSliderValue
+    ) {
+      setOverrideSliderValue(false);
+    }
+  },[uiFontSize, messageFontSize])
 
   const loadStyles = async () => {
     const styles = JSON.parse(await AsyncStorage.getItem("styles"));
@@ -135,7 +147,6 @@ const Customise = ({ navigation }) => {
             dispatch(setStyles(defaultChatStyles));
             loadStyles();
             setSynchronisedFontSize(defaultChatStyles.uiFontSize);
-            setOverrideSliderValue(false);
           },
         },
       ]
