@@ -24,6 +24,13 @@ import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
 const FontSlider = ({title, value, useValue, customStyle, ...props}) => {
   const valueRef = useRef(value)
+ 
+  useEffect(() => {
+    if(useValue) {
+      valueRef.current = value;
+    }
+  },[value, useValue])
+
   return (
     <>
       <Text style={{
@@ -92,6 +99,7 @@ const Customise = ({ navigation }) => {
     if(
       uiFontSize === defaultChatStyles.uiFontSize && 
       messageFontSize === defaultChatStyles.messageFontSize && 
+      synchronisedFontSize === defaultChatStyles.uiFontSize && 
       overrideSliderValue
     ) {
       setOverrideSliderValue(false);
