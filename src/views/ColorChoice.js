@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View } from 'react-native';
 import { ColorPicker } from 'react-native-color-picker';
 import CustomSlider from './Slider'
@@ -8,6 +8,13 @@ import { useScreenAdjustedSize } from '../helper';
 
 const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, useValue, onValueChange}) => {
   const valueRef = useRef(value);
+
+  useEffect(() => {
+    if(useValue) {
+      valueRef.current = value;
+    }
+  },[useValue, value]);
+
   return (
     <CustomSlider
     tapToSeek

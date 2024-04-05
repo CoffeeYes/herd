@@ -100,7 +100,8 @@ const Customise = ({ navigation }) => {
       uiFontSize === defaultChatStyles.uiFontSize && 
       messageFontSize === defaultChatStyles.messageFontSize && 
       synchronisedFontSize === defaultChatStyles.uiFontSize && 
-      overrideSliderValue
+      overrideSliderValue &&
+      tabItems[activeItem].color === defaultChatStyles[tabItems[activeItem].originalColor]
     ) {
       setOverrideSliderValue(false);
     }
