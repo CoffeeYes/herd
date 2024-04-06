@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
@@ -14,51 +14,13 @@ import Dropdown from './Dropdown';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 
-import Slider from './Slider';
+import ValueSlider from './ValueSlider';
 
 import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef } from '../helper';
-
-const FontSlider = ({title, value, useValue, customStyle, ...props}) => {
-  const valueRef = useRef(value)
- 
-  useEffect(() => {
-    if(useValue) {
-      valueRef.current = value;
-    }
-  },[value, useValue])
-
-  return (
-    <>
-      <Text style={{
-        alignSelf : "center",
-        fontWeight : "bold",
-        fontSize : customStyle.scaledUIFontSize
-      }}>
-        {title}
-      </Text>
-      <Slider
-      value={useValue ? value : valueRef.current}
-      containerStyle={styles.sliderContainer}
-      sliderStyle={{flex : 1}}
-      minimumTrackTintColor={palette.secondary}
-      maximumTrackTintColor={palette.primary}
-      thumbTintColor={palette.primary}
-      tapToSeek
-      min={boundaryValues.minFontSize}
-      max={boundaryValues.maxFontSize}
-      step={1}
-      rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-      rightTitleStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
-      rightTextStyle={{fontSize : customStyle.scaledUIFontSize}}
-      {...props} 
-      />
-    </>
-  )
-}
 
 const Customise = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -71,6 +33,18 @@ const Customise = ({ navigation }) => {
   const [overrideSliderValue, setOverrideSliderValue] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
+
+  const fontSliderProps = {
+    min : boundaryValues.minFontSize,
+    max : boundaryValues.maxFontSize,
+    step : 1,
+    tapToSeek : true,
+    titleStyle : { fontSize : customStyle.scaledUIFontSize },
+    rightTextContainerStyle : {alignItems : "center", padding : 5, justifyContent : "center"},
+    rightTitleStyle : {fontWeight : "bold", fontSize : customStyle.scaledUIFontSize},
+    rightTextStyle : {fontSize : customStyle.scaledUIFontSize},
+    useValue : overrideSliderValue
+  }
 
   const iconSize = useScreenAdjustedSize(0.1,0.065);
   const cardIconSize = useScreenAdjustedSize(0.075,0.05);
@@ -322,10 +296,9 @@ const Customise = ({ navigation }) => {
             </TouchableOpacity>
 
             {synchroniseFontChanges ? 
-            <FontSlider
-            customStyle={customStyle}
+            <ValueSlider
+            {...fontSliderProps}
             value={synchronisedFontSize}
-            useValue={overrideSliderValue}
             title={fontSizes.map(item => item.title).join(" + ")}
             onSlidingComplete={value => changeFonts(value)}
             onValueChange={value => changeFonts(value)}
@@ -334,14 +307,13 @@ const Customise = ({ navigation }) => {
             :
             fontSizes.map((item,index)=> {
               return (
-                <FontSlider
-                customStyle={customStyle}
+                <ValueSlider
+                {...fontSliderProps}
                 title={item.title}
                 key={item.title}
                 onSlidingComplete={value => changeFonts(value,index)}
                 onValueChange={value => changeFonts(value,index)}
                 value={item.value}
-                useValue={overrideSliderValue}
                 rightTitle={item.rightTitle}
                 rightText={item.rightText}
                 />
@@ -437,15 +409,6 @@ const styles = {
     justifyContent : "center",
     alignItems : "center",
     marginTop : 10,
-  },
-  sliderContainer : {
-    alignItems : "center",
-    flexDirection : "row",
-    marginHorizontal : 10,
-    backgroundColor : palette.white,
-    marginBottom : 10,
-    paddingVertical : 10,
-    borderRadius : 5,
   },
   button : {
     height : "100%",

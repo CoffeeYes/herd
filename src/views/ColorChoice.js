@@ -1,37 +1,11 @@
-import React, { useEffect, useRef } from 'react';
+import React  from 'react';
 import { View } from 'react-native';
 import { ColorPicker } from 'react-native-color-picker';
-import CustomSlider from './Slider'
+
+import ValueSlider from './ValueSlider';
 
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
-
-const Slider = ({sliderTitleSize, sliderTextSize, sliderWidth, value, useValue, onValueChange}) => {
-  const valueRef = useRef(value);
-
-  useEffect(() => {
-    if(useValue) {
-      valueRef.current = value;
-    }
-  },[useValue, value]);
-
-  return (
-    <CustomSlider
-    tapToSeek
-    minimumTrackTintColor={palette.secondary}
-    maximumTrackTintColor={palette.primary}
-    thumbTintColor={palette.primary}
-    rightText={value.toFixed(2)}
-    sliderStyle={styles.slider}
-    value={useValue ? value : valueRef.current}
-    min={0.01}
-    step={0.01}
-    rightTitleStyle={{fontSize : sliderTitleSize}}
-    rightTextStyle={{fontSize : sliderTextSize}}
-    containerStyle={{...styles.sliderContainer, width : sliderWidth}}
-    onValueChange={onValueChange}/>
-  )
-}
 
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {
@@ -41,9 +15,14 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
   const sliderWidth = useScreenAdjustedSize(0.8, 0.6);
 
   const sliderProps = {
-    sliderTextSize,
-    sliderTitleSize,
-    sliderWidth
+    min : 0.01,
+    step : 0.01,
+    max : 1,
+    useValue : overrideSliderValues,
+    containerStyle : {...styles.sliderContainer, width : sliderWidth},
+    rightTitleStyle : {fontSize : sliderTitleSize},
+    rightTextStyle : {fontSize : sliderTextSize},
+    sliderStyle : styles.slider
   }
 
   return (
@@ -59,14 +38,18 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
         hideSliders
         onColorChange={color => setColor(color)}
       />
-      <Slider
+      <ValueSlider
       {...sliderProps}
-      useValue={overrideSliderValues}
-      value={color.s} onValueChange={value => setColor({...color, s : value})}/>
-      <Slider
+      rightText={color.s.toFixed(2)}
+      value={color.s} 
+      onValueChange={value => setColor({...color, s : value})}
+      />
+      <ValueSlider
       {...sliderProps}
-      useValue={overrideSliderValues}
-      value={color.v} onValueChange={value => setColor({...color, v : value})}/>
+      rightText={color.v.toFixed(2)}
+      value={color.v} 
+      onValueChange={value => setColor({...color, v : value})}
+      />
     </View>
   )
 }
