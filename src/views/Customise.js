@@ -91,6 +91,9 @@ const Customise = ({ navigation }) => {
       setMessageFontSize(styles.messageFontSize);
       setUiFontSize(styles.uiFontSize);
       setOriginalStyles(styles);
+      if(styles.uiFontSize == styles.messageFontSize) {
+        setSynchronisedFontSize(styles.uiFontSize);
+      }
     }
   }
 
@@ -190,15 +193,10 @@ const Customise = ({ navigation }) => {
     }
   ]
 
-  const changeFonts = (value,index) => {
+  const setAllFontSizes = value => {
     const roundedValue = Math.round(value)
-    if(synchroniseFontChanges) {
-      fontSizes.forEach(item => item.setValue(roundedValue))
-      setSynchronisedFontSize(roundedValue);
-    }
-    else {
-      fontSizes[index].setValue(roundedValue);
-    }
+    fontSizes.forEach(item => item.setValue(roundedValue));
+    setSynchronisedFontSize(roundedValue)
   }
 
   const getChatBubbleColor = () => {
@@ -300,19 +298,19 @@ const Customise = ({ navigation }) => {
             {...fontSliderProps}
             value={synchronisedFontSize}
             title={fontSizes.map(item => item.title).join(" + ")}
-            onSlidingComplete={value => changeFonts(value)}
-            onValueChange={value => changeFonts(value)}
+            onSlidingComplete={value => setAllFontSizes(value)}
+            onValueChange={value => setAllFontSizes(value)}
             rightText={synchronisedFontSize}
             />
             :
-            fontSizes.map((item,index)=> {
+            fontSizes.map((item)=> {
               return (
                 <ValueSlider
                 {...fontSliderProps}
                 title={item.title}
                 key={item.title}
-                onSlidingComplete={value => changeFonts(value,index)}
-                onValueChange={value => changeFonts(value,index)}
+                onSlidingComplete={value => item.setValue(Math.round(value))}
+                onValueChange={value => item.setValue(Math.round(value))}
                 value={item.value}
                 rightTitle={item.rightTitle}
                 rightText={item.rightText}
