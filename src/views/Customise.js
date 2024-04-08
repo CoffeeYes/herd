@@ -279,6 +279,8 @@ const Customise = ({ navigation }) => {
 
           <CustomButton
           text="Preview"
+          disabled 
+          useDisabledStyle={false}
           buttonStyle={{marginTop : 10}}
           textStyle={{fontSize : scaledFontSize}}
           />
@@ -300,6 +302,7 @@ const Customise = ({ navigation }) => {
             title={fontSizes.map(item => item.title).join(" + ")}
             onSlidingComplete={value => setAllFontSizes(value)}
             onValueChange={value => setAllFontSizes(value)}
+            rightTitle="font size"
             rightText={synchronisedFontSize}
             />
             :

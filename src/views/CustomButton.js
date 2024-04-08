@@ -6,7 +6,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { palette } from '../assets/palette';
 
 const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIconSize,
-                        text, buttonStyle, textStyle, disabled, disabledStyle, loading, useLoadingIndicator }) => {
+                        text, buttonStyle, textStyle, disabled, disabledStyle, useDisabledStyle = true,
+                        loading, useLoadingIndicator }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity
@@ -14,7 +15,7 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
     style={{
       ...styles.button,
       ...buttonStyle,
-      ...(disabled && {...styles.disabled,...disabledStyle})
+      ...(disabled && useDisabledStyle && {...styles.disabled,...disabledStyle})
     }}
     disabled={disabled}>
       {leftIcon &&
