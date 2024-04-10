@@ -31,7 +31,7 @@ const Customise = ({ navigation }) => {
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [overrideSliderValue, setOverrideSliderValue] = useState(false);
-  const [renderColorChoice, setRenderColorChoice] = useState(true);
+  const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -83,7 +83,7 @@ const Customise = ({ navigation }) => {
   },[uiFontSize, messageFontSize])
 
   useEffect(() => {
-    setOverrideSliderValue(false);
+    setOverrideColorChoiceSliderValue(false);
   },[activeItem])
 
   const loadStyles = async () => {
@@ -348,7 +348,7 @@ const Customise = ({ navigation }) => {
           <View style={styles.colorChoiceContainer}>
             <Dropdown
             onChangeOption={index => {
-              setOverrideSliderValue(true);
+              setOverrideColorChoiceSliderValue(true);
               setActiveItem(index);
             }}
             choices={tabItems}
@@ -356,14 +356,13 @@ const Customise = ({ navigation }) => {
             chosenStyle={{color : palette.primary}}
             dropDownBoxStyle={{borderRadius : 5}}
             />
-            {renderColorChoice &&
             <ColorChoice
-            overrideSliderValues={overrideSliderValue}
+            overrideSliderValues={overrideColorChoiceSliderValue || overrideSliderValue}
             color={toHsv(tabItems[activeItem].color)}
             setColor={tabItems[activeItem].setColor}
             oldColor={originalStyles[tabItems[activeItem].originalColor]}
             sliderTextSize={customStyle.scaledUIFontSize}
-            />}
+            />
           </View>
 
           <View style={styles.buttonRow}>
