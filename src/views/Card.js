@@ -6,14 +6,18 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { palette } from '../assets/palette';
 
 const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
-                disabled, errorText }) => {
+                disabled, disabledStyle, errorText }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   return (
     <TouchableOpacity
     disabled={disabled}
     onPress={onPress}
-    style={{...styles.card, ...cardStyle}}>
+    style={{
+        ...styles.card,
+        ...cardStyle,
+        ...(disabled && disabledStyle)
+      }}>
       {errorText?.length > 0 &&
       <Text style={styles.error}>{errorText}</Text>}
 

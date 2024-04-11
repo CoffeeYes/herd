@@ -106,11 +106,8 @@ with other phones using bluetooth.`;
           <Card
           onPress={requestBTPermissions}
           disabled={bluetoothError.length > 0}
-          cardStyle={bluetoothError.length > 0 ?
-            styles.cardDisabled
-            :
-            styles.leftCard
-          }
+          cardStyle={styles.leftCard}
+          disabledStyle={styles.cardDisabled}
           errorText={bluetoothError}
           icon="bluetooth-searching"
           iconSize={iconSize}
