@@ -14,6 +14,9 @@ const NavigationWarningWrapper = ({ children, checkForChanges, navigation,
 
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
+      if(e.data.action.type !== "GO_BACK") {
+        return;
+      }
       e.preventDefault();
 
       if(await checkForChanges()) {
