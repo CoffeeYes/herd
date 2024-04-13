@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import navigationRef from '../NavigationRef'
 
 import { palette } from '../assets/palette';
 
@@ -11,7 +10,7 @@ import { defaultChatStyles } from '../assets/styles'
 import { useIsFocused } from '@react-navigation/native';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disableRightButton, disableBackButton,
-                  preText, onTextLayout,
+                  preText, onTextLayout, navigation, 
                   onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
                   useAlternativeIcon, alternativeIcon}) => {
@@ -24,10 +23,10 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   
   const isFocused = useIsFocused();
   const navigateBack = () => {
-    isFocused && navigationRef.current.goBack();
+    isFocused && navigation.goBack();
   }
 
-  let renderLeftButton = allowGoBack && navigationRef.current.canGoBack();
+  let renderLeftButton = allowGoBack && navigation.canGoBack();
 
   return (
     <View

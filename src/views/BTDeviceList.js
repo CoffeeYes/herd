@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect,  useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, 
   NativeEventEmitter } from 'react-native';
@@ -9,11 +9,10 @@ import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
 
-import navigationRef from '../NavigationRef';
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
 
-const BTDeviceList = () => {
+const BTDeviceList = ({ navigation }) => {
   const [scanning, setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -150,7 +149,7 @@ const BTDeviceList = () => {
         onRequestClose={() => setShowModal(false)}
         onSuccess={value => {
           setShowModal(false);
-          navigationRef.current.navigate("editContact",value);
+          navigation.navigate("editContact",value);
         }}
         onCancel={() => setShowModal(false)}/>}
 
