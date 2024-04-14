@@ -90,7 +90,6 @@ const Contacts = ({ route, navigation }) => {
           <ListItem
           name={contact.name}
           key={contact._id}
-          navigation={navigation}
           image={contact.image}
           textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}

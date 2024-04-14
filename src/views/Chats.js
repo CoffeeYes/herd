@@ -100,7 +100,6 @@ const Chats = ({ navigation }) => {
         <ListItem
         name={chat.name}
         key={chat._id}
-        navigation={navigation}
         image={chat.image}
         textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
         containerStyle={index === (chats?.length -1) && ({borderBottomWidth : 0})}

@@ -1,5 +1,6 @@
 import React  from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -10,10 +11,11 @@ import { defaultChatStyles } from '../assets/styles'
 import { useIsFocused } from '@react-navigation/native';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disableRightButton, disableBackButton,
-                  preText, onTextLayout, navigation, 
+                  preText, onTextLayout, 
                   onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
                   useAlternativeIcon, alternativeIcon}) => {
+  const navigation = useNavigation();
   const customStyle = useSelector(state => state.chatReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
