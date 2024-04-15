@@ -244,7 +244,6 @@ const Customise = ({ navigation }) => {
 
   return (
     <NavigationWarningWrapper
-    navigation={navigation}
     checkForChanges={haveUnsavedChanges}>
       <Header title="Customise" allowGoBack/>
       <ScrollView contentContainerStyle={{paddingBottom : 10}}>

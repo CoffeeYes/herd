@@ -176,7 +176,6 @@ const EditContact = ({ route, navigation }) => {
 
   return (
     <NavigationWarningWrapper
-    navigation={navigation}
     checkForChanges={haveUnsavedChanges}>
 
       <Header
