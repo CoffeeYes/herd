@@ -96,10 +96,12 @@ const App = ({ }) => {
       //during transition when tabbing back in
       const lastRoutes = navigationRef?.current?.getRootState()?.routes;
       if(state === "background" && passwordSetRef.current && lockableRef.current) {
+        const routes = navigationRef.current.getState().routes;
+        routes[routes.length -1].name !== "passwordLockScreen" &&
         navigationRef.current.dispatch(
           CommonActions.reset({
             index: 1,
-            routes: [{name : "passwordLockScreen"}]
+            routes: [...navigationRef.current.getState().routes, {name : "passwordLockScreen"}]
           })
         )
         lastRoutes &&

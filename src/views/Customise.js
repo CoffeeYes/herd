@@ -22,7 +22,7 @@ import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
-const Customise = ({ navigation }) => {
+const Customise = () => {
   const dispatch = useDispatch();
   const [activeItem, setActiveItem] = useState(0);
   const [loading, setLoading] = useState(true);

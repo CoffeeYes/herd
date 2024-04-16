@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Text, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
@@ -27,6 +27,16 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const [error, setError] = useState("");
 
   const inputWidth = useOrientationBasedStyle({width : "90%"},{width : "80%"});
+
+  useEffect(() => { 
+    const beforeGoingBack = navigation.addListener("beforeRemove", e => {
+      if(e.data.action.type == "GO_BACK") {
+        e.preventDefault();
+      }
+    })
+
+    return beforeGoingBack;
+  },[])
 
   const checkPassword = async () => {
     setError("");
