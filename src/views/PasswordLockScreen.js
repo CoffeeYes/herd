@@ -30,7 +30,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   useEffect(() => { 
     const beforeGoingBack = navigation.addListener("beforeRemove", e => {
-      if(e.data.action.type == "GO_BACK") {
+      if(e.data.action.type == "GO_BACK" && route?.params?.navigationTarget !== "passwordSettings") {
         e.preventDefault();
       }
     })
