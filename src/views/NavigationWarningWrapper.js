@@ -25,7 +25,7 @@ const NavigationWarningWrapper = ({ children, checkForChanges,
       }
       e.preventDefault();
 
-      if(await checkForChanges()) {
+      if(await checkForChanges?.()) {
         Alert.alert(
           alertTitle,
           alertSubtitle,

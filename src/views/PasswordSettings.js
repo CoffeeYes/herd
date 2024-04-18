@@ -16,8 +16,11 @@ const PasswordSettings = () => {
   const [loginPasswordErrors, setLoginPasswordErrors] = useState([]);
   const [erasurePasswordErrors, setErasurePasswordErrors] = useState([]);
 
-  const hasErasurePassword = useSelector(state => state.userReducer.erasurePasswordHash)?.length > 0;
-  const hasLoginPassword = useSelector(state => state.userReducer.loginPasswordHash)?.length > 0;
+  const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
+  const erasurePasswordHash = useSelector(state => state.userReducer.erasurePasswordHash);
+
+  const hasLoginPassword = loginPasswordHash?.length > 0;
+  const hasErasurePassword = erasurePasswordHash?.length > 0;
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
@@ -130,6 +133,7 @@ meaning all contacts who have previously added you will need to add you again.`
         <PasswordCreationBox
         primaryName="Main Password"
         secondaryName="Confirm Main Password"
+        originalValue={loginPasswordHash}
         description={mainPasswordDescription}
         errors={loginPasswordErrors}
         primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
@@ -150,6 +154,7 @@ meaning all contacts who have previously added you will need to add you again.`
         mainContainerStyle={{marginTop : 10}}
         primaryName="Erasure Password"
         secondaryName="Confirm Erasure Password"
+        originalValue={erasurePasswordHash}
         description={erasurePasswordDescription}
         errors={erasurePasswordErrors}
         primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(

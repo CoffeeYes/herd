@@ -1,10 +1,13 @@
 import React, { useState, useRef, forwardRef } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { useSelector } from 'react-redux';
+import Crypto from '../nativeWrapper/Crypto';
 
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
+import NavigationWarningWrapper from './NavigationWarningWrapper'
+import { useStateAndRef } from '../helper';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -27,10 +30,12 @@ const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSub
 const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
                             secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
-                            primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle }) => {
+                            primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle,
+                            originalValue}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [primaryInputText, setPrimaryInputText] = useState("");
-  const [secondaryInputText, setSecondaryInputText] = useState("");
+
+  const [primaryInputText, setPrimaryInputText, primaryInputTextRef] = useStateAndRef("");
+  const [secondaryInputText, setSecondaryInputText, secondaryInputTextRef] = useStateAndRef("");
 
   const secondaryInputRef = useRef();
 
@@ -42,7 +47,17 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
     }
   }
 
+  const checkForChanges = async () => {
+    const primaryTextHash = await Crypto.createHash(primaryInputTextRef.current)
+    const secondaryTextHash = await Crypto.createHash(secondaryInputTextRef.current)
+    return (
+      (primaryInputTextRef.current.trim().length > 0 && (primaryTextHash !== originalValue)) ||
+      (secondaryInputTextRef.current.trim().length > 0 && (secondaryTextHash !== originalValue))
+    )
+  }
+
   return (
+      <NavigationWarningWrapper checkForChanges={checkForChanges}>
         <View style={{...styles.card,...mainContainerStyle }}>
 
           {description &&
@@ -51,7 +66,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           </Text>}
 
           <View style={styles.errorContainer}>
-            {errors.map((error,index) =>
+            {errors.map((error) =>
             <Text
             key={error?.type || error.replace(" ","_")}
             style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
@@ -78,7 +93,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             <FlashTextButton
             normalText={primaryButtonText}
             flashText={primaryButtonFlashText}
-            disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryButtonDisabled}
+            disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryInputText.trim().length !== secondaryInputText.trim().length || primaryButtonDisabled}
             onPress={submit}
             timeout={500}
             buttonStyle={{...styles.button, width : "50%"}}
@@ -93,6 +108,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             textStyle={styles.buttonText}/>
           </View>
         </View>
+      </NavigationWarningWrapper>
   )
 }
 
