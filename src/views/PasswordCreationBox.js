@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef } from 'react';
+import React, { useState, useRef, forwardRef, useEffect } from 'react';
 import { View, Text, TextInput } from 'react-native';
 import { useSelector } from 'react-redux';
 import Crypto from '../nativeWrapper/Crypto';
@@ -6,8 +6,6 @@ import Crypto from '../nativeWrapper/Crypto';
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
-import NavigationWarningWrapper from './NavigationWarningWrapper'
-import { useStateAndRef } from '../helper';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -31,11 +29,11 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
                             primaryButtonText, primaryButtonFlashText, secondaryButtonText,
                             secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
                             primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle,
-                            originalValue}) => {
+                            originalValue, changesAreAvailable}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
 
-  const [primaryInputText, setPrimaryInputText, primaryInputTextRef] = useStateAndRef("");
-  const [secondaryInputText, setSecondaryInputText, secondaryInputTextRef] = useStateAndRef("");
+  const [primaryInputText, setPrimaryInputText] = useState("");
+  const [secondaryInputText, setSecondaryInputText] = useState("");
 
   const secondaryInputRef = useRef();
 
@@ -48,16 +46,21 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   }
 
   const checkForChanges = async () => {
-    const primaryTextHash = await Crypto.createHash(primaryInputTextRef.current)
-    const secondaryTextHash = await Crypto.createHash(secondaryInputTextRef.current)
+    const primaryTextHash = await Crypto.createHash(primaryInputText)
+    const secondaryTextHash = await Crypto.createHash(secondaryInputText)
     return (
-      (primaryInputTextRef.current.trim().length > 0 && (primaryTextHash !== originalValue)) ||
-      (secondaryInputTextRef.current.trim().length > 0 && (secondaryTextHash !== originalValue))
+      (primaryInputText.trim().length > 0 && (primaryTextHash !== originalValue)) ||
+      (secondaryInputText.trim().length > 0 && (secondaryTextHash !== originalValue))
     )
   }
 
+  useEffect(() => {
+    (async () => {
+      changesAreAvailable?.(await checkForChanges());
+    })()
+  },[primaryInputText, secondaryInputText])
+
   return (
-      <NavigationWarningWrapper checkForChanges={checkForChanges}>
         <View style={{...styles.card,...mainContainerStyle }}>
 
           {description &&
@@ -108,7 +111,6 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             textStyle={styles.buttonText}/>
           </View>
         </View>
-      </NavigationWarningWrapper>
   )
 }
 

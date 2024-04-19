@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ScrollView, Alert } from 'react-native';
 
@@ -10,11 +10,15 @@ import Header from './Header';
 import PasswordCreationBox from './PasswordCreationBox';
 
 import Crypto from '../nativeWrapper/Crypto';
+import NavigationWarningWrapper from './NavigationWarningWrapper';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
   const [loginPasswordErrors, setLoginPasswordErrors] = useState([]);
   const [erasurePasswordErrors, setErasurePasswordErrors] = useState([]);
+
+  const loginPasswordHasChangesRef = useRef(false);
+  const erasurePasswordHasChangesRef = useRef(false);
 
   const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasurePasswordHash = useSelector(state => state.userReducer.erasurePasswordHash);
@@ -125,7 +129,9 @@ to be wiped from the application. Your public key will also be changed, \
 meaning all contacts who have previously added you will need to add you again.`
 
   return (
-    <>
+    <NavigationWarningWrapper checkForChanges={() => {
+      return loginPasswordHasChangesRef.current || erasurePasswordHasChangesRef.current
+    }}>
       <Header title="Password Settings" allowGoBack/>
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -134,6 +140,7 @@ meaning all contacts who have previously added you will need to add you again.`
         primaryName="Main Password"
         secondaryName="Confirm Main Password"
         originalValue={loginPasswordHash}
+        changesAreAvailable={hasChanges => {loginPasswordHasChangesRef.current = hasChanges}}
         description={mainPasswordDescription}
         errors={loginPasswordErrors}
         primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
@@ -155,6 +162,7 @@ meaning all contacts who have previously added you will need to add you again.`
         primaryName="Erasure Password"
         secondaryName="Confirm Erasure Password"
         originalValue={erasurePasswordHash}
+        changesAreAvailable={hasChanges => {erasurePasswordHasChangesRef.current = hasChanges}}
         description={erasurePasswordDescription}
         errors={erasurePasswordErrors}
         primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
@@ -172,7 +180,7 @@ meaning all contacts who have previously added you will need to add you again.`
         />
 
       </ScrollView>
-    </>
+    </NavigationWarningWrapper>
   )
 }
 
