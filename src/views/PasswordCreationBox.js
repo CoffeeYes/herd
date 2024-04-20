@@ -6,6 +6,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
+import { original } from '@reduxjs/toolkit';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -46,12 +47,19 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   }
 
   const checkForChanges = async () => {
+    const hashesMatch = await checkHashesMatch();
+    return (
+      (primaryInputText.trim().length > 0 || 
+      secondaryInputText.trim().length > 0) && !hashesMatch
+    )
+  }
+
+  const checkHashesMatch = async () => {
     const primaryTextHash = await Crypto.createHash(primaryInputText)
     const secondaryTextHash = await Crypto.createHash(secondaryInputText)
-    return (
-      (primaryInputText.trim().length > 0 && (primaryTextHash !== originalValue)) ||
-      (secondaryInputText.trim().length > 0 && (secondaryTextHash !== originalValue))
-    )
+    const primaryFieldMatches = await Crypto.compareHashes(primaryTextHash,originalValue);
+    const secondaryFieldMatches = await Crypto.compareHashes(secondaryTextHash,originalValue);
+    return primaryFieldMatches && secondaryFieldMatches;
   }
 
   useEffect(() => {
