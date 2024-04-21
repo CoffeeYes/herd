@@ -35,6 +35,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
 
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
+  const [matchesExistingValue, setMatchesExistingValue] = useState(false);
 
   const secondaryInputRef = useRef();
 
@@ -65,6 +66,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   useEffect(() => {
     (async () => {
       changesAreAvailable?.(await checkForChanges());
+      setMatchesExistingValue(await checkHashesMatch())
     })()
   },[primaryInputText, secondaryInputText])
 
@@ -104,7 +106,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             <FlashTextButton
             normalText={primaryButtonText}
             flashText={primaryButtonFlashText}
-            disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryInputText.trim().length !== secondaryInputText.trim().length || primaryButtonDisabled}
+            disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryInputText.trim().length !== secondaryInputText.trim().length || matchesExistingValue || primaryButtonDisabled}
             onPress={submit}
             timeout={500}
             buttonStyle={{...styles.button, width : "50%"}}
