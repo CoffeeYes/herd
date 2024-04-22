@@ -6,7 +6,6 @@ import Crypto from '../nativeWrapper/Crypto';
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
-import { original } from '@reduxjs/toolkit';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -35,7 +34,8 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
 
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
-  const [matchesExistingValue, setMatchesExistingValue] = useState(false);
+
+  const [saveDisabled, setSaveDisabled] = useState(false);
 
   const secondaryInputRef = useRef();
 
@@ -66,7 +66,13 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   useEffect(() => {
     (async () => {
       changesAreAvailable?.(await checkForChanges());
-      setMatchesExistingValue(await checkHashesMatch())
+      const matchesExisting = await checkHashesMatch();
+      setSaveDisabled(
+        matchesExisting ||
+        primaryInputText.trim().length == 0 ||
+        secondaryInputText.trim().length == 0 ||
+        primaryInputText.trim().length != secondaryInputText.trim().length
+      )
     })()
   },[primaryInputText, secondaryInputText])
 
@@ -106,7 +112,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             <FlashTextButton
             normalText={primaryButtonText}
             flashText={primaryButtonFlashText}
-            disabled={ primaryInputText.trim().length === 0 || secondaryInputText.trim().length === 0 || primaryInputText.trim().length !== secondaryInputText.trim().length || matchesExistingValue || primaryButtonDisabled}
+            disabled={saveDisabled || primaryButtonDisabled}
             onPress={submit}
             timeout={500}
             buttonStyle={{...styles.button, width : "50%"}}
