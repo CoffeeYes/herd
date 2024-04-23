@@ -6,7 +6,7 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const ListItem = ({ name, image, imageIconSize, deleteItem, onPress, onLongPress, containerStyle, textStyle,
-                    imageContainerStyle, imageSize, rightText, subText, subTextStyle,
+                    imageContainerStyle, rightText, subText, subTextStyle,
                     disableTouch, rightTextStyle, rightIcon, rightIconSize = 24, rightIconStyle,
                     highlighted, highlightedStyle, useSingularDeleteButton = false }) => {
 

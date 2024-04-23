@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Image, Dimensions, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+import { Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ContactImage = ({ iconSize = 24, imageURI, disableTouch = false,
