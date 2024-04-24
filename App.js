@@ -94,7 +94,6 @@ const App = ({ }) => {
     const appStateListener = AppState.addEventListener("change",async state => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
-      const lastRoutes = navigationRef?.current?.getRootState()?.routes;
       if(state === "background" && passwordSetRef.current && lockableRef.current) {
         const routes = navigationRef.current.getState().routes;
         routes[routes.length -1].name !== "passwordLockScreen" &&
@@ -104,9 +103,9 @@ const App = ({ }) => {
             routes: [...navigationRef.current.getState().routes, {name : "passwordLockScreen"}]
           })
         )
-        lastRoutes &&
-        lastRoutes[lastRoutes.length -1].name !== "passwordLockScreen" &&
-        dispatch(setLastRoutes(lastRoutes));
+        routes &&
+        routes[routes.length -1].name !== "passwordLockScreen" &&
+        dispatch(setLastRoutes(routes));
       }
     })
 

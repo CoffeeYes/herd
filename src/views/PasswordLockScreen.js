@@ -52,6 +52,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       return;
     }
     else {
+      //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
         navigation.dispatch(
           CommonActions.reset({
@@ -67,10 +68,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
         let routesToResetTo = [{ name : "main"}];
         if(lastRoutes.length > 0 && !isErasurePassword) {
-          const lastLastRoute = lastRoutes[lastRoutes.length -1].name;
-          if(lastLastRoute !== "passwordLockScreen") {
-            routesToResetTo = lastRoutes;
-          }
+          routesToResetTo = lastRoutes;
         }
 
         navigation.dispatch(
