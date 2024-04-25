@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Dimensions, FlatList, InteractionManager } from 'react-native';
+import { View, Text, Dimensions, FlatList, InteractionManager } from 'react-native';
 import Header from './Header';
 
 import Crypto from '../nativeWrapper/Crypto';
@@ -117,8 +117,13 @@ const MessageQueue = ({}) => {
       }}
       useLoadingIndicator
       loading={parsedQueue.some(item => item.loading)}
-      disabled={parsedQueue.some(item => item.loading)}
+      disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
       buttonStyle={styles.buttonStyle}/>
+
+      {messageQueue.length == 0 &&
+      <View style={{alignItems : "center"}}>
+        <Text style={{fontWeight : "bold"}}>No Messages in Queue</Text>
+      </View>}
 
       <FlatList
       contentContainerStyle={styles.listStyle}
