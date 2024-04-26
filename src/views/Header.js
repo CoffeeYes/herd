@@ -24,11 +24,8 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
   
   const isFocused = useIsFocused();
-  const navigateBack = () => {
-    isFocused && navigation.goBack();
-  }
 
-  let renderLeftButton = allowGoBack && navigation.canGoBack();
+  const renderLeftButton = allowGoBack && navigation.canGoBack() && isFocused;
 
   return (
     <View
@@ -46,7 +43,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
       </TouchableOpacity>
       <TouchableOpacity
       disabled={disableBackButton}
-      onPress={navigateBack}
+      onPress={() => navigation.goBack()}
       style={{...styles.leftButton, paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>
@@ -63,7 +60,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
         style={{...styles.title, fontSize : customStyle.scaledTitleSize,...textStyle}}>{title}</Text>
       </TouchableOpacity>
 
-      {rightButtonIcon?.length > 0 && (rightButtonOnClick || disableRightButton) &&
+      {rightButtonIcon?.length > 0 && rightButtonOnClick &&
       <TouchableOpacity
       disabled={disableRightButton}
       onPress={rightButtonOnClick}

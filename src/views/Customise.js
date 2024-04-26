@@ -257,6 +257,7 @@ const Customise = () => {
           allowGoBack
           disableBackButton
           rightButtonIcon="delete"
+          rightButtonOnClick={() => {}}
           disableRightButton
           backArrowSize={scaledHeaderIconSize}
           rightIconSize={scaledHeaderIconSize}
