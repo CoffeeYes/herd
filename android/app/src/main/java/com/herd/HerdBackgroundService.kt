@@ -228,10 +228,10 @@ class HerdBackgroundService : Service() {
       } + ", Thread : ${Thread.currentThread()}");
 
       if(newState == BluetoothProfile.STATE_CONNECTED) {
-        //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
-        //that fits in MTU
         stopLeScan();
-        gatt.requestMtu(301);
+        //we request 517 to both be conform to android 14 AND to force devices that would use
+        //an MTU of 600 to downgrade their link to the standard 512 MTU size.
+        gatt.requestMtu(517);
       }
       else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(status == 133 && clientRetryCount < 7) {
@@ -545,7 +545,14 @@ class HerdBackgroundService : Service() {
 
     override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
       Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
-      offsetSize = mtu - 1;
+      if(mtu < 512) {
+        offsetSize = mtu - 1;
+      }
+      else {
+        //maximum ATT size is 512, even if a larger mtu is requested.
+        //thus we limit the actual transfer size to 512
+        offsetSize = 512;
+      }
     }
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
