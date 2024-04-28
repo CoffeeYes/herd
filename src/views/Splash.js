@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ScrollView, Text, Platform, Dimensions } from 'react-native';
 import Crypto from '../nativeWrapper/Crypto';
@@ -11,11 +11,14 @@ import { setPublicKey } from '../redux/actions/userActions'
 import { defaultChatStyles } from '../assets/styles';
 
 import { palette } from '../assets/palette';
+import { CommonActions } from '@react-navigation/native';
 
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
 
   const setup = async () => {
+    setLoading(true);
     //generate keys
     await Crypto.generateRSAKeyPair('herdPersonal');
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
@@ -23,9 +26,14 @@ const Splash = ({ navigation }) => {
 
     //set default styling
     await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
-
-    navigation.navigate('main');
-
+    setLoading(false);
+    
+    navigation.dispatch(CommonActions.reset({
+      index : 1,
+      routes : [
+        {name : "main"}
+      ]
+    }))
   }
 
   const badVersion = Platform.OS === "android" && Platform.Version < 23;
@@ -37,10 +45,12 @@ const Splash = ({ navigation }) => {
         <Text style={{color : palette.white,marginBottom : 20}}>
           Welcome to Herd, the peer-to-peer messaging app!
         </Text>
-
+        
         <CustomButton
         text="Get Started"
-        onPress={setup}
+        onPress={async () => await setup()}
+        useLoadingIndicator
+        loading={loading}
         buttonStyle={{borderWidth : 1,borderColor : palette.white}}
         disabled={badVersion}/>
 

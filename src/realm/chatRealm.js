@@ -40,10 +40,15 @@ const decryptString = async text => {
 }
 
 const decryptMessage = async message => {
-  let parsedMessage = parseRealmObject(message);
-  const decryptedText = await decryptString(message.text);
-  parsedMessage.text = decryptedText;
-  return parsedMessage;
+  try {
+    let parsedMessage = parseRealmObject(message);
+    const decryptedText = await decryptString(message.text);
+    parsedMessage.text = decryptedText;
+    return parsedMessage;
+  }
+  catch(e) {
+    console.log("error decrypting message : ",e)
+  }
 }
 
 const getMessagesWithContact = async (key, startIndex, endIndex) => {
