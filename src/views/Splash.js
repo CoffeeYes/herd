@@ -50,9 +50,13 @@ const Splash = ({ navigation }) => {
         text="Get Started"
         onPress={async () => await setup()}
         useLoadingIndicator
+        loadingIndicatorColor={palette.white}
+        loadingIndicatorStyle={{marginLeft : "1%"}}
         loading={loading}
-        buttonStyle={{borderWidth : 1,borderColor : palette.white}}
-        disabled={badVersion}/>
+        buttonStyle={styles.button}
+        disabledStyle={styles.button}
+        textStyle={{marginLeft : "7%"}}
+        disabled={badVersion || loading}/>
 
         {badVersion &&
         <Text style={{color : palette.white, marginTop : 20, fontWeight : "bold"}}>
@@ -77,6 +81,11 @@ const styles = {
     justifyContent : "center",
     alignItems : "center",
     flex : 1,
+  },
+  button : {
+    borderWidth : 1,
+    borderColor : palette.white,
+    paddingRight : "7%"
   }
 }
 export default Splash;
