@@ -117,6 +117,8 @@ const MessageQueue = ({}) => {
       }}
       useLoadingIndicator
       loading={parsedQueue.some(item => item.loading)}
+      loadingIndicatorStyle={{marginLeft : "10%"}}
+      loadingIndicatorColor={palette.white}
       disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
       buttonStyle={styles.buttonStyle}/>
 

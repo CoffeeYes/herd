@@ -62,7 +62,7 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
-  const contentTooSmallHeight = useScreenAdjustedSize(0.8, 0.7, "height");
+  const contentTooSmallHeight = useScreenAdjustedSize(0.825, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
   const swipeSize = useScreenAdjustedSize(0.25, 0.4, "height");
