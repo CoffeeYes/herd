@@ -4,7 +4,8 @@ import { Text, View, TextInput, ActivityIndicator,
          Alert, SectionList,
          KeyboardAvoidingView, Keyboard} from 'react-native';
 import moment from 'moment';
-import { PanGestureHandler  } from 'react-native-gesture-handler'
+import { PanGestureHandler, TouchableOpacity  } from 'react-native-gesture-handler'
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import {
   getMessagesWithContact,
   sendMessageToContact,
@@ -62,6 +63,7 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
+  const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
   const contentTooSmallHeight = useScreenAdjustedSize(0.825, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
@@ -546,7 +548,7 @@ const Chat = ({ route, navigation }) => {
         </View>
       </PanGestureHandler>
 
-      <View style={{flexDirection : "row"}}>
+      <View style={{flexDirection : "row", height : inputHeight}}>
         <TextInput
         placeholder="Send a Message"
         returnKeyType='send'
@@ -563,9 +565,7 @@ const Chat = ({ route, navigation }) => {
           setChatInput(text)
           setCharacterCount(maxCharacterCount - text.length)
         }}
-        multiline={true}
-        blurOnSubmit={true}
-        onSubmitEditing={event => sendMessage(event.nativeEvent.text.trim())}/>
+        multiline={true}/>
         <View style={{
           backgroundColor : palette.white,
           justifyContent : "center"}
@@ -574,6 +574,11 @@ const Chat = ({ route, navigation }) => {
             {`${characterCount} / ${maxCharacterCount}`}
           </Text>
         </View>
+        <TouchableOpacity
+        style={{...styles.sendButton, width : twentyPercentWidth}}
+        onPress={() => sendMessage(chatInput)}>
+          <Icon name="send" size={32} color={palette.primary}/>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
     </>
@@ -614,6 +619,13 @@ const styles = {
   },
   popupText : {
     fontWeight : "bold"
+  },
+  sendButton : {
+    alignItems : "center",
+    justifyContent : "center",
+    backgroundColor : palette.white,
+    height : "100%",
+    padding : 5 
   }
 }
 
