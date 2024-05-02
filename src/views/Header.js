@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useState }  from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux'
@@ -22,21 +22,20 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   const leftButtonWidth = useScreenAdjustedSize(0.2,0.1, "width", 0.7, 0.7, 1000, 1000);
   const leftIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
-  
-  const isFocused = useIsFocused();
 
-  const renderLeftButton = allowGoBack && navigation.canGoBack() && isFocused;
+  const isFocused = useIsFocused();
+  const [showBackButton, setShowBackButton] = useState(allowGoBack && navigation.canGoBack() && isFocused)
 
   return (
     <View
     style={{
       ...styles.container,
       minHeight : minimumHeight, 
-      ...(!renderLeftButton && {paddingLeft : 10}),
+      ...(!showBackButton && {paddingLeft : 10}),
       ...containerStyle
     }}>
 
-      {renderLeftButton &&
+      {showBackButton &&
       <>
       <TouchableOpacity style={{width : 1}}>
         <Text></Text>
