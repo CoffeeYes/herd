@@ -24,7 +24,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
   const scaledIconSize = ((customStyle.uiFontSize + 16) / defaultChatStyles.uiFontSize) * leftIconSize
 
   const isFocused = useIsFocused();
-  const [showBackButton, setShowBackButton] = useState(allowGoBack && navigation.canGoBack() && isFocused)
+  const [showBackButton] = useState(allowGoBack && navigation.canGoBack())
 
   return (
     <View
@@ -42,7 +42,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
       </TouchableOpacity>
       <TouchableOpacity
       disabled={disableBackButton}
-      onPress={() => navigation.goBack()}
+      onPress={() => isFocused && navigation.goBack()}
       style={{...styles.leftButton, paddingVertical : 15, alignItems : "center",width : leftButtonWidth}}>
         <Icon name="arrow-back" size={backArrowSize || scaledIconSize} style={{...styles.backArrow,...backArrowStyle}}/>
       </TouchableOpacity>
