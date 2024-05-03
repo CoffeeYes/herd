@@ -95,6 +95,7 @@ const MessageQueue = ({}) => {
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
       loading={item.loading}
+      disablePress={item.loading}
       closedTimestamp={date}
       openTimestamp={hours}
       textFontSize={customStyle.scaledUIFontSize}
