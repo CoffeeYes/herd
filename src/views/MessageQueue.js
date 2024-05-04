@@ -106,34 +106,37 @@ const MessageQueue = ({}) => {
   },[parsedQueue,openMessages, Dimensions.get("window").width])
 
   return (
-    <View style={{flex : 1}}>
+    <>
       <Header
       allowGoBack
       title="Message Queue"/>
 
-      <CustomButton
-      text={openMessages.length > 0 ? "Close All" : "Open All"}
-      onPress={() => {
-        setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
-      }}
-      useLoadingIndicator
-      loading={parsedQueue.some(item => item.loading)}
-      loadingIndicatorStyle={{marginLeft : "10%"}}
-      loadingIndicatorColor={palette.white}
-      disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
-      buttonStyle={styles.buttonStyle}/>
+      <View style={{flex : 1}} pointerEvents={parsedQueue.some(item => item.loading) ? "none" : "auto"}>
 
-      {messageQueue.length == 0 &&
-      <View style={{alignItems : "center"}}>
-        <Text style={{fontWeight : "bold"}}>No Messages in Queue</Text>
-      </View>}
+        <CustomButton
+        text={openMessages.length > 0 ? "Close All" : "Open All"}
+        onPress={() => {
+          setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
+        }}
+        useLoadingIndicator
+        loading={parsedQueue.some(item => item.loading)}
+        loadingIndicatorStyle={{marginLeft : "10%"}}
+        loadingIndicatorColor={palette.white}
+        disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
+        buttonStyle={styles.buttonStyle}/>
 
-      <FlatList
-      contentContainerStyle={styles.listStyle}
-      data={parsedQueue}
-      keyExtractor={item => item._id}
-      renderItem={renderItem}/>
-    </View>
+        {messageQueue.length == 0 &&
+        <View style={{alignItems : "center"}}>
+          <Text style={{fontWeight : "bold"}}>No Messages in Queue</Text>
+        </View>}
+
+        <FlatList
+        contentContainerStyle={styles.listStyle}
+        data={parsedQueue}
+        keyExtractor={item => item._id}
+        renderItem={renderItem}/>
+      </View>
+    </>
   )
 }
 const styles = {
