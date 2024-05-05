@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 import { Text, ScrollView,
          View, Switch, Alert, 
          NativeEventEmitter } from 'react-native';
@@ -45,6 +46,9 @@ const Settings = ({ navigation }) => {
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
+  
+  const focused = useIsFocused();
+  const alreadyNavigating = useRef(false);
 
   useEffect(() => {
     ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
@@ -216,6 +220,19 @@ const Settings = ({ navigation }) => {
     closePasswordRealm();
   }
 
+  useEffect(() => {
+    if(focused) {
+      alreadyNavigating.current = false;
+    }
+  },[focused])
+
+  const navigate = (route, params) => {
+    if(!alreadyNavigating.current) {
+      alreadyNavigating.current = true;
+      navigation.navigate(route,params);
+    }
+  }
+
   const locationModalDescription = `In order to transfer messages in the background, herd requires \
 certain permissions to be allowed all the time.`
 
@@ -266,22 +283,22 @@ for the following permissions in order to allow Herd to function correctly.`
         text="Customise"
         rightIcon="edit"
         iconSize={cardIconSize}
-        onPress={() => navigation.navigate("customise")}/>
+        onPress={() => navigate("customise")}/>
 
         <CardButton
         text="Message Queue"
         rightIcon="message"
         iconSize={cardIconSize}
-        onPress={() => navigation.navigate("messageQueue")}/>
+        onPress={() => navigate("messageQueue")}/>
 
         <CardButton
         text="Password Protection"
         rightIcon="lock"
         iconSize={cardIconSize}
         onPress={() => userHasPassword ?
-          navigation.navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
+          navigate("passwordLockScreen",{navigationTarget : "passwordSettings"})
           :
-          navigation.navigate("passwordSettings")}
+          navigate("passwordSettings")}
         />
 
         <CardButton
