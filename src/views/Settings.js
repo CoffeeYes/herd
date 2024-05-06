@@ -271,13 +271,13 @@ for the following permissions in order to allow Herd to function correctly.`
         timeout={500}
         rightIcon="content-copy"
         iconSize={cardIconSize}
-        onPress={copyKeyToClipboard}/>
+        onPress={() => !alreadyNavigating.current && copyKeyToClipboard()}/>
 
         <CardButton
         text="Show My QR Code"
         rightIcon="qr-code-2"
         iconSize={cardIconSize}
-        onPress={() => setQRCodeVisible(true)}/>
+        onPress={() => !alreadyNavigating.current && setQRCodeVisible(true)}/>
 
         <CardButton
         text="Customise"

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 import { View, Alert } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Header from './Header';
@@ -23,6 +24,9 @@ const AddContact = ({ navigation }) => {
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const iconSize = useScreenAdjustedSize(0.35,0.075);
+
+  const isFocused = useIsFocused();
+  const navigating = useRef(false);
 
   useEffect(() => {
     initialBTCheck();
@@ -96,6 +100,19 @@ with other phones using bluetooth.`;
   const permissionModalInstructionText = `Please navigate to Herd's app settings and select \
 'allow all the time' under for the following permissions in order to use bluetooth to add a contact.`;
 
+  useEffect(() => {
+    if(isFocused) {
+      navigating.current = false;
+    }
+  },[isFocused])
+
+  const navigate = (target,params) => {
+    if(!navigating.current) {
+      navigating.current = true;
+      navigation.navigate(target,params);
+    }
+  }
+
   return (
     <>
       <Header allowGoBack title="Add Contact" />
@@ -104,7 +121,7 @@ with other phones using bluetooth.`;
         <View style={styles.row}>
 
           <Card
-          onPress={requestBTPermissions}
+          onPress={() => !navigating.current && requestBTPermissions()}
           disabled={bluetoothError.length > 0}
           cardStyle={styles.leftCard}
           disabledStyle={styles.cardDisabled}
@@ -114,7 +131,7 @@ with other phones using bluetooth.`;
           text="Start Bluetooth Scan"/>
 
           <Card
-          onPress={() => navigation.navigate("editContact")}
+          onPress={() => navigate("editContact")}
           cardStyle={styles.rightCard}
           icon="import-export"
           iconSize={iconSize}
@@ -125,14 +142,14 @@ with other phones using bluetooth.`;
         <View style={styles.row}>
 
           <Card
-          onPress={() => setShowQRCode(true)}
+          onPress={() => !navigating.current && setShowQRCode(true)}
           cardStyle={styles.leftCard}
           icon="qr-code-2"
           iconSize={iconSize}
           text="Show My QR Code"/>
 
           <Card
-          onPress={() => navigation.navigate("QRScanner")}
+          onPress={() => navigate("QRScanner")}
           cardStyle={styles.rightCard}
           icon="qr-code-scanner"
           iconSize={iconSize}
