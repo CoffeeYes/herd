@@ -107,7 +107,7 @@ with other phones using bluetooth.`;
   },[isFocused])
 
   const navigate = (target,params) => {
-    if(!navigating.current) {
+    if(!navigating.current && !showQRCode && !showPermissionModal) {
       navigating.current = true;
       navigation.navigate(target,params);
     }
