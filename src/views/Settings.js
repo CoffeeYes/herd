@@ -227,7 +227,7 @@ const Settings = ({ navigation }) => {
   },[focused])
 
   const navigate = (route, params) => {
-    if(!alreadyNavigating.current) {
+    if(!alreadyNavigating.current && !QRCodeVisible) {
       alreadyNavigating.current = true;
       navigation.navigate(route,params);
     }

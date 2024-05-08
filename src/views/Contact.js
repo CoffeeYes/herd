@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useIsFocused } from '@react-navigation/native';
 import { View, ScrollView, Share,
          Image } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -30,6 +31,9 @@ const Contact = ({route, navigation}) => {
   const [disableTextTouch, setDisableTextTouch] = useState(false);
   const [headerLineHeight, setHeaderLineHeight] = useState(1);
 
+  const isFocused = useIsFocused();
+  const performingButtonAction = useRef(false);
+
   const copyKeyToClipboard = () => {
     Clipboard.setString(contact.key)
     return true;
@@ -40,6 +44,7 @@ const Contact = ({route, navigation}) => {
       title : "I'd like to share my Herd Contact with you!",
       message : contact.key
     })
+    performingButtonAction.current = false;
   }
 
   const calculateMaxNumberOfLines = lines => {
@@ -56,6 +61,19 @@ const Contact = ({route, navigation}) => {
     }
     return maxLineCount
   }
+
+  const performButtonAction = action => {
+    if(!performingButtonAction.current) {
+      performingButtonAction.current = true;
+      action();
+    }
+  }
+
+  useEffect(() => {
+    if(isFocused) {
+      performingButtonAction.current = false;
+    }
+  },[isFocused])
 
   return (
     <>
@@ -80,7 +98,7 @@ const Contact = ({route, navigation}) => {
         disableTouch={contact?.image?.trim()?.length === 0}
         imageURI={contact.image}
         iconSize={64}
-        onPress={() => setShowLargeImage(true)}
+        onPress={() => performButtonAction(() => setShowLargeImage(true))}
         size={contactImageSize}/>
 
         <View style={{alignItems : "center"}}>
@@ -93,7 +111,7 @@ const Contact = ({route, navigation}) => {
           onPress={copyKeyToClipboard}/>
 
           <CardButton
-          onPress={() => setShowQRCode(true)}
+          onPress={() => performButtonAction(() => setShowQRCode(true))}
           rightIcon="qr-code"
           iconSize={cardIconSize}
           text="Show Contact's QR Code"/>
@@ -105,7 +123,7 @@ const Contact = ({route, navigation}) => {
           text="Share Contact"/>
 
           <CardButton
-          onPress={() => navigation.navigate("chat", {contactID : route.params.id})}
+          onPress={() => performButtonAction(() => navigation.navigate("chat", {contactID : route.params.id}))}
           rightIcon="chat"
           iconSize={cardIconSize}
           text="Go To Chat"/>
@@ -115,16 +133,16 @@ const Contact = ({route, navigation}) => {
 
       <QRCodeModal
       visible={showQRCode}
-      onPress={() => setShowQRCode(false)}
-      onRequestClose={() => setShowQRCode(false)}
+      onPress={() => {setShowQRCode(false); performingButtonAction.current = false}}
+      onRequestClose={() => {setShowQRCode(false); performingButtonAction.current = false}}
       value={{name : contact.name, key : contact.key}}
       title={contact.name}
       />
 
       <CustomModal
       visible={showLargeImage}
-      onPress={() => setShowLargeImage(false)}
-      onRequestClose={() => setShowLargeImage(false)}>
+      onPress={() => {setShowLargeImage(false); performingButtonAction.current = false}}
+      onRequestClose={() => {setShowLargeImage(false); performingButtonAction.current = false}}>
         <Image
         source={{uri : contact.image}}
         resizeMode="contain"
