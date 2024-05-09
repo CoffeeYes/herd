@@ -75,6 +75,11 @@ const Contact = ({route, navigation}) => {
     }
   },[isFocused])
 
+  const hideModal = setter => {
+    setter(false);
+    performingButtonAction.current = false;
+  }
+
   return (
     <>
       <Header
@@ -117,7 +122,7 @@ const Contact = ({route, navigation}) => {
           text="Show Contact's QR Code"/>
 
           <CardButton
-          onPress={shareContact}
+          onPress={() => performButtonAction(shareContact)}
           rightIcon="share"
           iconSize={cardIconSize}
           text="Share Contact"/>
@@ -133,16 +138,16 @@ const Contact = ({route, navigation}) => {
 
       <QRCodeModal
       visible={showQRCode}
-      onPress={() => {setShowQRCode(false); performingButtonAction.current = false}}
-      onRequestClose={() => {setShowQRCode(false); performingButtonAction.current = false}}
+      onPress={() => hideModal(setShowQRCode)}
+      onRequestClose={() => hideModal(setShowQRCode)}
       value={{name : contact.name, key : contact.key}}
       title={contact.name}
       />
 
       <CustomModal
       visible={showLargeImage}
-      onPress={() => {setShowLargeImage(false); performingButtonAction.current = false}}
-      onRequestClose={() => {setShowLargeImage(false); performingButtonAction.current = false}}>
+      onPress={() => hideModal(setShowLargeImage)}
+      onRequestClose={() => hideModal(setShowLargeImage)}>
         <Image
         source={{uri : contact.image}}
         resizeMode="contain"
