@@ -45,7 +45,7 @@ const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
           })}
 
           <CustomButton
-          buttonStyle={{...styles.button, marginTop : permissions?.length > 0 ? 10 : 0}}
+          buttonStyle={{marginTop : permissions?.length > 0 ? 10 : 0}}
           onPress={buttonOnPress}
           text="Go To Settings"/>
         </ScrollView>

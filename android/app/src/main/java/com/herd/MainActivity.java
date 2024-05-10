@@ -11,10 +11,13 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import android.util.Log;
+import com.facebook.react.modules.core.PermissionListener;
+import com.facebook.react.modules.core.PermissionAwareActivity;
 
-public class MainActivity extends ReactActivity {
+public class MainActivity extends ReactActivity implements PermissionAwareActivity {
 
   private static final String TAG = "HerdMainActivity";
+  private PermissionListener permissionListener;
 
   /**
    * Returns the name of the main component registered from JavaScript. This is used to schedule
@@ -61,5 +64,19 @@ public class MainActivity extends ReactActivity {
     super.onCreate(savedInstanceBundle);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
     WindowManager.LayoutParams.FLAG_SECURE);
+  }
+
+  @Override
+  public void requestPermissions(String[] permissions, int requestCode, PermissionListener listener) {
+    permissionListener = listener;
+    requestPermissions(permissions,requestCode);
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    if(permissionListener != null) {
+      permissionListener.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+    permissionListener = null;
   }
 }
