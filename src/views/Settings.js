@@ -163,6 +163,7 @@ const Settings = ({ navigation }) => {
       if(currentRequestedPermissions.length > 0) {
         setRequestedPermissions(currentRequestedPermissions);
         setShowPermissionModal(true);
+        dispatch(setLockable(true));
         return;
       }
 
