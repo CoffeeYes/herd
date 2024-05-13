@@ -104,6 +104,10 @@ with other phones using bluetooth.`;
     if(isFocused) {
       navigating.current = false;
     }
+    else {
+      setShowPermissionModal(false);
+      setShowQRCode(false);
+    }
   },[isFocused])
 
   const navigate = (target,params) => {
