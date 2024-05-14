@@ -1,16 +1,16 @@
+import { useIsFocused } from '@react-navigation/native';
 import React from 'react';
-import { Modal, TouchableOpacity, Dimensions, View } from 'react-native';
-
-import { palette } from '../assets/palette';
+import { Modal, TouchableOpacity } from 'react-native';
 
 const CustomModal = ({ children, visible, onPress, onRequestClose, disableOnPress,
                        animationType = "fade", transparent = true, containerStyle}) => {
+  const focused = useIsFocused();
   return (
     <Modal
     animationType={animationType}
     transparent={transparent}
     onRequestClose={onRequestClose}
-    visible={visible}>
+    visible={visible && focused}>
       <TouchableOpacity
       disabled={disableOnPress}
       style={{...styles.modalMainContainer,...containerStyle}}

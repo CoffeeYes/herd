@@ -224,8 +224,6 @@ const Settings = ({ navigation }) => {
   useEffect(() => {
     if(focused) {
       alreadyNavigating.current = false;
-      setShowPermissionModal(false);
-      setQRCodeVisible(false);
     }
   },[focused])
 
