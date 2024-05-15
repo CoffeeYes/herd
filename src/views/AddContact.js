@@ -14,6 +14,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
+import { requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -45,22 +46,11 @@ const AddContact = ({ navigation }) => {
     setRequestedPermissions([]);
     //disable lockability so that lockscreen doesn't crop up when a modal is shown
     dispatch(setLockable(false));
-    let currentRequestedPermissions = [];
-    const locationAllowed = await Bluetooth.checkLocationPermission();
-    if(!locationAllowed) {
-      const locationRequest = await Bluetooth.requestLocationPermissions();
-      if(!locationRequest) {
-        currentRequestedPermissions.push("Location")
-      }
-    }
 
-    const btPermissionsGranted = await Bluetooth.requestBTPermissions();
-    if (!btPermissionsGranted) {
-      currentRequestedPermissions.push("Nearby-devices")
-    }
-
-    if(currentRequestedPermissions.length > 0) {
-      setRequestedPermissions(currentRequestedPermissions);
+    const missingPermissions = await requestPermissionsForBluetooth();
+    
+    if(missingPermissions.length > 0) {
+      setRequestedPermissions(missingPermissions);
       setShowPermissionModal(true);
       dispatch(setLockable(true));
       return;

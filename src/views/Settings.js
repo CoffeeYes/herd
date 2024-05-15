@@ -33,6 +33,7 @@ import {
   deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
+import { requestPermissionsForBluetooth } from '../common';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -141,27 +142,11 @@ const Settings = ({ navigation }) => {
       dispatch(setLockable(false));
 
       setRequestedPermissions([]);
-      let currentRequestedPermissions = [];
 
-      let locationPermissionsGranted = await Bluetooth.checkLocationPermission();
-      if(!locationPermissionsGranted) {
-        const locationRequest = await Bluetooth.requestLocationPermissions();
-        if(!locationRequest) {
-          currentRequestedPermissions.push("Location")
-        }
-      }
+      const missingPermissions = requestPermissionsForBluetooth();
 
-      const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
-
-      if(!bluetoothScanPermissionsGranted) {
-        const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
-        if(!grantBluetoothScanPermissions) {
-          currentRequestedPermissions.push("Nearby-devices");
-        }
-      }
-
-      if(currentRequestedPermissions.length > 0) {
-        setRequestedPermissions(currentRequestedPermissions);
+      if(missingPermissions.length > 0) {
+        setRequestedPermissions(missingPermissions);
         setShowPermissionModal(true);
         dispatch(setLockable(true));
         return;
