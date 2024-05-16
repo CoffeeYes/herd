@@ -33,7 +33,7 @@ import {
   deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
-import { requestPermissionsForBluetooth } from '../common';
+import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -143,7 +143,7 @@ const Settings = ({ navigation }) => {
 
       setRequestedPermissions([]);
 
-      const missingPermissions = requestPermissionsForBluetooth();
+      const missingPermissions = await requestPermissionsForBluetooth();
 
       if(missingPermissions.length > 0) {
         setRequestedPermissions(missingPermissions);
@@ -152,30 +152,16 @@ const Settings = ({ navigation }) => {
         return;
       }
 
-      let btEnabled = await Bluetooth.checkBTEnabled();
-      let locationEnabled = await Bluetooth.checkLocationEnabled();
-
+      const btEnabled = await requestEnableBluetooth();
       if(!btEnabled) {
-        btEnabled = await Bluetooth.requestBTEnable();
-        if(!btEnabled) {
-          dispatch(setLockable(true));
-          return;
-        }
+        dispatch(setLockable(true));
+        return;
       }
 
+      const locationEnabled = await requestEnableLocation();
       if(!locationEnabled) {
-        Alert.alert(
-          "Location",
-          "Location is required to run in the background, enable it now?",
-          [
-            {text : "No"},
-            {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
-          ]
-        )
-        if(!locationEnabled) {
-          dispatch(setLockable(true));
-          return;
-        }
+        dispatch(setLockable(true));
+        return;
       }
 
       if(btEnabled && locationEnabled) {

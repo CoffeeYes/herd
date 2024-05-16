@@ -14,7 +14,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
-import { requestPermissionsForBluetooth } from '../common';
+import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -56,21 +56,14 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    const btEnabled = await Bluetooth.checkBTEnabled();
-    const locationEnabled = await Bluetooth.checkLocationEnabled();
+    const btEnabled = await requestEnableBluetooth();
     if(!btEnabled) {
-      await Bluetooth.requestBTEnable()
+      return;
     }
-
+    
+    const locationEnabled = await requestEnableLocation();
     if (!locationEnabled) {
-      Alert.alert(
-        "Location",
-        "Location is required to run in the background, enable it now?",
-        [
-          {text : "No"},
-          {text : "Yes", onPress : async () => await Bluetooth.requestLocationEnable()}
-        ]
-      )
+      return;
     }
     else {
       let discoverable = await Bluetooth.checkBTDiscoverable();

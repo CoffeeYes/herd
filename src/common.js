@@ -1,4 +1,5 @@
 import Bluetooth from './nativeWrapper/Bluetooth';
+import { Alert } from 'react-native';
 
 const requestPermissionsForBluetooth = async () => {
   let permissionsNotGranted = [];
@@ -21,6 +22,31 @@ const requestPermissionsForBluetooth = async () => {
   return permissionsNotGranted;
 }
 
+const requestEnableBluetooth = async () => {
+  let bluetoothEnabled = await Bluetooth.checkBTEnabled();
+  if(!bluetoothEnabled) {
+    bluetoothEnabled = await Bluetooth.requestBTEnable();
+  }
+  return bluetoothEnabled;
+}
+
+const requestEnableLocation = async () => {
+  let locationEnabled = await Bluetooth.checkLocationEnabled();
+  if(!locationEnabled) {
+    Alert.alert(
+      "Location",
+      "Location is required to run in the background, enable it now?",
+      [
+        {text : "No"},
+        {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
+      ]
+    )
+  }
+  return locationEnabled;
+}
+
 export {
-  requestPermissionsForBluetooth
+  requestPermissionsForBluetooth,
+  requestEnableBluetooth,
+  requestEnableLocation
 }
