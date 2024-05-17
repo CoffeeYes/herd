@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
-import { View, Alert } from 'react-native';
+import { View } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Header from './Header';
 import Card from './Card';

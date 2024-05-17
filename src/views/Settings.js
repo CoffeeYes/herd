@@ -74,64 +74,18 @@ const Settings = ({ navigation }) => {
     showPermissionModal && dispatch(setLockable(true))
   },[showPermissionModal])
 
-  const deleteAllChats = async () => {
+  const showDeletionAlert = async (text, onConfirm = async () => {}, onCancel = async () => {}) => {
     Alert.alert(
-      'Discard you sure you want to delete all chats?',
+      text,
       '',
       [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
+        { text: "Cancel", style: 'cancel', onPress: await onCancel() },
         {
           text: 'Delete',
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: () => {
-            deleteAllChatsFromRealm();
-            dispatch(setChats([]));
-          },
-        },
-      ]
-    );
-
-  }
-
-  const deleteAllContacts = async() => {
-    Alert.alert(
-      'Discard you sure you want to delete all Contacts?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            deleteAllContactsFromRealm();
-            deleteAllChatsFromRealm();
-            dispatch(resetContacts());
-          },
-        },
-      ]
-    );
-  }
-
-  const deleteAllMessages = async () => {
-    Alert.alert(
-      'Discard you sure you want to delete all Messages?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            deleteAllMessagesFromRealm();
-            dispatch(setChats([]));
-            dispatch(setMessageQueue([]));
-          },
+          onPress: await onConfirm(),
         },
       ]
     );
@@ -279,7 +233,13 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        onPress={deleteAllChats}/>
+        onPress={() => showDeletionAlert(
+          "Are you sure you want to delete all chats?",
+          () => {
+            deleteAllChatsFromRealm();
+            dispatch(setChats([]));
+          }
+        )}/>
 
         <CardButton
         text="Delete All Contacts"
@@ -287,7 +247,14 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        onPress={deleteAllContacts}/>
+        onPress={() => showDeletionAlert(
+          "Are you sure you want to delete all contacts?",
+          () => {
+            deleteAllContactsFromRealm();
+            deleteAllChatsFromRealm();
+            dispatch(resetContacts());
+          }
+        )}/>
 
         <CardButton
         text="Delete All Messages"
@@ -295,7 +262,14 @@ for the following permissions in order to allow Herd to function correctly.`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete-forever"
         iconSize={cardIconSize}
-        onPress={deleteAllMessages}/>
+        onPress={() => showDeletionAlert(
+          "Are you sure you want to delete all messages?",
+          () => {
+            deleteAllMessagesFromRealm();
+            dispatch(setChats([]));
+            dispatch(setMessageQueue([]));
+          }
+        )}/>
 
         {__DEV__ &&
           <CustomButton
