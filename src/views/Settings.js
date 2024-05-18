@@ -183,7 +183,7 @@ for the following permissions in order to allow Herd to function correctly.`
             <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
-            onValueChange={toggleBackgroundTransfer}
+            onValueChange={val => !QRCodeVisible && toggleBackgroundTransfer(val)}
             value={backgroundTransfer}
             trackColor={{ false: palette.grey, true: palette.primary }}
             thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
@@ -203,7 +203,7 @@ for the following permissions in order to allow Herd to function correctly.`
         text="Show My QR Code"
         rightIcon="qr-code-2"
         iconSize={cardIconSize}
-        onPress={() => !alreadyNavigating.current && setQRCodeVisible(true)}/>
+        onPress={() => !alreadyNavigating.current && !showPermissionModal && setQRCodeVisible(true)}/>
 
         <CardButton
         text="Customise"

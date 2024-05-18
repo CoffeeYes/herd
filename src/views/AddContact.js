@@ -104,7 +104,7 @@ with other phones using bluetooth.`;
         <View style={styles.row}>
 
           <Card
-          onPress={() => !navigating.current && requestBTPermissions()}
+          onPress={() => !navigating.current && !showQRCode && requestBTPermissions()}
           disabled={bluetoothError.length > 0}
           cardStyle={styles.leftCard}
           disabledStyle={styles.cardDisabled}
@@ -125,7 +125,7 @@ with other phones using bluetooth.`;
         <View style={styles.row}>
 
           <Card
-          onPress={() => !navigating.current && setShowQRCode(true)}
+          onPress={() => !navigating.current && !showPermissionModal && setShowQRCode(true)}
           cardStyle={styles.leftCard}
           icon="qr-code-2"
           iconSize={iconSize}
