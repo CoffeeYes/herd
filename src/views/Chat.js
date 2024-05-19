@@ -60,6 +60,8 @@ const Chat = ({ route, navigation }) => {
   const [initialLoad, setInitialLoad] = useState(true);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
 
+  const disableInputChange = useRef(false);
+
   const messageLoadingSize = 5;
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
@@ -214,6 +216,7 @@ const Chat = ({ route, navigation }) => {
     if(message.trim() === "") {
       return;
     }
+    disableInputChange.current = true;
 
     const timestamp = Date.now();
 
@@ -275,6 +278,8 @@ const Chat = ({ route, navigation }) => {
 
     await ServiceInterface.isRunning() &&
     ServiceInterface.addMessageToService(selfEncryptedCopy);
+    
+    disableInputChange.current = false;
   }
 
   const deleteMessages = () => {
@@ -562,8 +567,10 @@ const Chat = ({ route, navigation }) => {
         value={chatInput}
         maxLength={maxCharacterCount}
         onChangeText={text => {
-          setChatInput(text)
-          setCharacterCount(maxCharacterCount - text.length)
+          if(!disableInputChange.current) {
+            setChatInput(text)
+            setCharacterCount(maxCharacterCount - text.length)
+          }
         }}
         multiline={true}/>
         <View style={{
@@ -576,7 +583,7 @@ const Chat = ({ route, navigation }) => {
         </View>
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
-        onPress={() => sendMessage(chatInput)}>
+        onPress={async () => await sendMessage(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
       </View>
