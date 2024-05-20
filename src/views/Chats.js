@@ -122,7 +122,7 @@ const Chats = ({ navigation }) => {
         onLongPress={() => handleLongPress(chat)}
         highlighted={highlightedChats.includes(chat)}
         rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
-        subText={chat.lastText}/>
+        subText={chat.lastText.trim()}/>
       )}
       </ScrollView>
     </>

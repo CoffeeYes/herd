@@ -211,12 +211,12 @@ const Chat = ({ route, navigation }) => {
   }
 
   const sendMessage = async message => {
-    setChatInput("");
-    setCharacterCount(maxCharacterCount);
     if(message.trim() === "") {
       return;
     }
     disableInputChange.current = true;
+    setChatInput("");
+    setCharacterCount(maxCharacterCount);
 
     const timestamp = Date.now();
 
