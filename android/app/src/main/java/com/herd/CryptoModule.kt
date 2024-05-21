@@ -4,6 +4,9 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.Arguments;
 
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -24,6 +27,8 @@ import android.security.keystore.KeyGenParameterSpec
 import javax.crypto.spec.OAEPParameterSpec
 import java.security.spec.MGF1ParameterSpec
 import javax.crypto.spec.PSource
+
+import kotlinx.coroutines.*;
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
@@ -259,6 +264,52 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
     catch(e : GeneralSecurityException) {
       return promise.reject("Decrypt string error",e)
+    }
+  }
+
+  @ReactMethod
+  fun decryptStrings(
+  alias : String,
+  algorithm : String,
+  blockMode : String,
+  padding : String,
+  strings: ReadableArray,
+  promise : Promise) {
+    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    //retrieve key from keystore
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+    var results : Array<String> = Array<String>(strings.size()) { "" };
+    val boxedResults: WritableArray = Arguments.createArray();
+    var inputStrings : Array<String> = arrayOf();
+
+    for(i in 0 until strings.size()) {
+      inputStrings += strings.getString(i);
+    }
+
+    if(privateKey === null) {
+      return promise.resolve("Private key does not exist")
+    }
+
+    //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
+    
+    runBlocking {
+      val decryptionRoutines = launch { 
+        inputStrings.mapIndexed{ index, it -> 
+          try {
+            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+            val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
+            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
+            results[index] = String(decryptedString);
+            Log.i(TAG,String(decryptedString))
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error decrypting string in coroutine",e)
+          }
+        }
+      }
+      decryptionRoutines.join();
+      results.map({ boxedResults.pushString(it)})
+      promise.resolve(boxedResults)
     }
   }
 
