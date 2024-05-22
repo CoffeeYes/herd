@@ -266,6 +266,50 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return promise.reject("Decrypt string error",e)
     }
   }
+  
+  private var stringsToDecrypt : Array<String> = arrayOf();
+  private var stringDecryptionPromises : Array<Promise> = arrayOf();
+  @ReactMethod
+  fun registerStringForBatchDecryption( stringToDecrypt : String, promise : Promise) {
+    stringsToDecrypt += stringToDecrypt;
+    stringDecryptionPromises += promise;
+  }
+
+  @ReactMethod
+  fun batchDecryptStrings(
+  alias : String,
+  algorithm : String,
+  blockMode : String,
+  padding : String) {
+    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    //retrieve key from keystore
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+
+    if(privateKey == null) {
+      Log.e(TAG,"private key is null")
+      return;
+    }
+    
+    runBlocking {
+      val decryptionRoutines = launch { 
+        stringsToDecrypt.mapIndexed{ index, it -> 
+          try {
+            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+            val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
+            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
+            stringDecryptionPromises[index].resolve(String(decryptedString));
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error decrypting string in coroutine",e)
+          }
+          finally {
+            stringsToDecrypt = arrayOf();
+            stringDecryptionPromises = arrayOf();
+          }
+        }
+      }
+    }
+  }
 
   @ReactMethod
   fun decryptStrings(
@@ -279,7 +323,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
     var results : Array<String> = Array<String>(strings.size()) { "" };
-    val boxedResults: WritableArray = Arguments.createArray();
+    val marshalledResults: WritableArray = Arguments.createArray();
     var inputStrings : Array<String> = arrayOf();
 
     for(i in 0 until strings.size()) {
@@ -290,8 +334,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return promise.resolve("Private key does not exist")
     }
 
-    //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    
     runBlocking {
       val decryptionRoutines = launch { 
         inputStrings.mapIndexed{ index, it -> 
@@ -300,7 +342,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
             val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
             val decryptedString = cipher.doFinal(encryptedStringAsBytes);
             results[index] = String(decryptedString);
-            Log.i(TAG,String(decryptedString))
           }
           catch(e : Exception) {
             Log.e(TAG, "error decrypting string in coroutine",e)
@@ -308,8 +349,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       decryptionRoutines.join();
-      results.map({ boxedResults.pushString(it)})
-      promise.resolve(boxedResults)
+      results.map({ marshalledResults.pushString(it)})
+      promise.resolve(marshalledResults)
     }
   }
 
