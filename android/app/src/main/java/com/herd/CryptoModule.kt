@@ -267,12 +267,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
   }
   
-  private var stringsToDecrypt : Array<String> = arrayOf();
-  private var stringDecryptionPromises : Array<Promise> = arrayOf();
+  private var stringsToDecrypt : Array<Map<String,Any>> = arrayOf();
   @ReactMethod
   fun registerStringForBatchDecryption( stringToDecrypt : String, promise : Promise) {
-    stringsToDecrypt += stringToDecrypt;
-    stringDecryptionPromises += promise;
+    stringsToDecrypt += mapOf(
+      "text" to stringToDecrypt,
+      "promise" to promise
+    )
   }
 
   @ReactMethod
@@ -289,22 +290,23 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       Log.e(TAG,"private key is null")
       return;
     }
-    
+
     runBlocking {
       val decryptionRoutines = launch { 
         stringsToDecrypt.mapIndexed{ index, it -> 
           try {
+            val currentPromise : Promise = it["promise"] as Promise;
+            val currentText : String = it["text"] as String;
             val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-            val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
+            val encryptedStringAsBytes = Base64.decode(currentText,Base64.DEFAULT);
             val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-            stringDecryptionPromises[index].resolve(String(decryptedString));
+            currentPromise.resolve(String(decryptedString));
           }
           catch(e : Exception) {
-            Log.e(TAG, "error decrypting string in coroutine",e)
+            Log.e(TAG, "error decrypting string in coroutine, index : ${index}",e)
           }
           finally {
             stringsToDecrypt = arrayOf();
-            stringDecryptionPromises = arrayOf();
           }
         }
       }
