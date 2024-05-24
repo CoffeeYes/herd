@@ -45,31 +45,23 @@ const MessageQueue = ({}) => {
   }
 
   const decryptMessages = queue => {
-    queue.forEach( async (message,index) => {
-
+    queue.map((message,index) => {
       let [newMessage, textToDecrypt] = assignParticipantsToMessage({...message})
-
-      if(textToDecrypt) {
-        newMessage.text = await Crypto.decryptString(
-          "herdPersonal",
-          Crypto.algorithm.RSA,
-          Crypto.blockMode.ECB,
-          Crypto.padding.OAEP_SHA256_MGF1Padding,
-          message.text
-        )
-      }
-      else {
-        newMessage.text = "Encrypted message for other user"
-        newMessage.toContactName = "N/A";
-        newMessage.fromContactName = "N/A";
-      }
-      newMessage.loading = false;
-      setParsedQueue(oldQueue => {
-        let updatedQueue = [...oldQueue];
-        updatedQueue[index] = newMessage;
-        return updatedQueue
+      textToDecrypt &&
+      Crypto.registerStringForBatchDecryption(newMessage.text).then(result => {
+        setParsedQueue(oldQueue => {
+          let updatedQueue = [...oldQueue];
+          updatedQueue[index] = {...newMessage, text : result, loading : false};
+          return updatedQueue
+        })
       })
     })
+    Crypto.batchDecryptStrings(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding
+    )
   }
 
   useEffect(() => {

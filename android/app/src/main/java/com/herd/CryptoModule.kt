@@ -291,23 +291,21 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return;
     }
 
-    runBlocking {
-      val decryptionRoutines = launch { 
-        stringsToDecrypt.mapIndexed{ index, it -> 
-          try {
-            val currentPromise : Promise = it["promise"] as Promise;
-            val currentText : String = it["text"] as String;
-            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-            val encryptedStringAsBytes = Base64.decode(currentText,Base64.DEFAULT);
-            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-            currentPromise.resolve(String(decryptedString));
-          }
-          catch(e : Exception) {
-            Log.e(TAG, "error decrypting string in coroutine, index : ${index}",e)
-          }
-          finally {
-            stringsToDecrypt = arrayOf();
-          }
+    stringsToDecrypt.mapIndexed{ index, it -> 
+      GlobalScope.launch {
+        try {
+          val currentPromise : Promise = it["promise"] as Promise;
+          val currentText : String = it["text"] as String;
+          val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+          val encryptedStringAsBytes = Base64.decode(currentText,Base64.DEFAULT);
+          val decryptedString = cipher.doFinal(encryptedStringAsBytes);
+          currentPromise.resolve(String(decryptedString));
+        }
+        catch(e : Exception) {
+          Log.e(TAG, "error decrypting string in coroutine, index : ${index}",e)
+        }
+        finally {
+          stringsToDecrypt = arrayOf();
         }
       }
     }
