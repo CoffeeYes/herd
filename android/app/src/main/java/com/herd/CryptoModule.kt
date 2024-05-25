@@ -291,8 +291,10 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return;
     }
 
+    val decryptionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     stringsToDecrypt.mapIndexed{ index, it -> 
-      GlobalScope.launch {
+      decryptionScope.launch {
         try {
           val currentPromise : Promise = it["promise"] as Promise;
           val currentText : String = it["text"] as String;
