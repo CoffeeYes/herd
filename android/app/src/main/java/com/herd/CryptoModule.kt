@@ -32,6 +32,7 @@ import kotlinx.coroutines.*;
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
+  val decryptionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
   override fun getName(): String {
       return "CryptoModule"
@@ -291,7 +292,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return;
     }
 
-    val decryptionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     stringsToDecrypt.mapIndexed{ index, it -> 
       decryptionScope.launch {
@@ -337,8 +337,9 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     runBlocking {
-      val decryptionRoutines = launch { 
+      val decryptionRoutines =  
         inputStrings.mapIndexed{ index, it -> 
+          decryptionScope.launch {
           try {
             val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
             val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
@@ -350,7 +351,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
           }
         }
       }
-      decryptionRoutines.join();
+      decryptionRoutines.joinAll();
       results.map({ marshalledResults.pushString(it)})
       promise.resolve(marshalledResults)
     }

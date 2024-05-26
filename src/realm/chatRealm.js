@@ -349,15 +349,22 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
 
-  const newTexts = await Promise.all(sentMessagesCopy.map(async message => {
-    const decryptedText = await decryptString(parseRealmObject(message).text);
+  const decryptedStrings = await Crypto.decryptStrings(
+    "herdPersonal",
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    sentMessagesCopy.map(message => parseRealmObject(message).text)
+  )
+
+  const newTexts = await Promise.all(decryptedStrings.map(async text => {
     const newEncryptedString = await Crypto.encryptString(
       newKey,
       false,
       Crypto.algorithm.RSA,
       Crypto.blockMode.ECB,
       Crypto.padding.OAEP_SHA256_MGF1Padding,
-      decryptedText
+      text
     )
     return newEncryptedString;
   }));
