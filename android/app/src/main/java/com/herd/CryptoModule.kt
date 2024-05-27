@@ -238,6 +238,68 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   }
 
   @ReactMethod
+  fun encryptStrings(
+  keyOrAlias : String,
+  loadKeyFromStore : Boolean,
+  algorithm : String,
+  blockMode : String,
+  padding : String,
+  strings : ReadableArray,
+  promise : Promise) {
+    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    //retrieve key from keystore
+    var publicKey : PublicKey? = null;
+    if(loadKeyFromStore) {
+      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
+    }
+    else {
+      try {
+        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
+      }
+      catch(e : Exception) {
+        val errorMessage = "Error initialising public key passed in as parameter"
+        Log.i(TAG,errorMessage,e)
+        return promise.reject(errorMessage,e)
+      }
+    }
+    if(publicKey === null) {
+      val errorMessage = "error loading or initialising publicKey in encryptStrings function, publicKey was null";
+      Log.i(TAG,errorMessage)
+      return promise.reject(errorMessage)
+    }
+
+    var results : Array<String> = Array<String>(strings.size()) { "" };
+    val marshalledResults: WritableArray = Arguments.createArray();
+    var inputStrings : Array<String> = arrayOf();
+
+    for(i in 0 until strings.size()) {
+      inputStrings += strings.getString(i);
+    }
+
+    runBlocking {
+      val encryptionRoutines =  
+        inputStrings.mapIndexed{ index, it -> 
+          decryptionScope.launch {
+          try {
+            val stringAsBytes : ByteArray = it.toByteArray();
+            val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
+            val encryptedBytes = cipher.doFinal(stringAsBytes)
+            val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
+            results[index] = encryptedStringBASE64;
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error encrypting string in coroutine",e)
+          }
+        }
+      }
+      encryptionRoutines.joinAll();
+      results.map({ marshalledResults.pushString(it)})
+      promise.resolve(marshalledResults)
+    }
+  }
+
+  @ReactMethod
   fun decryptString(
   alias : String,
   algorithm : String,
