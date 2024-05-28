@@ -357,17 +357,14 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
     sentMessagesCopy.map(message => parseRealmObject(message).text)
   )
 
-  const newTexts = await Promise.all(decryptedStrings.map(async text => {
-    const newEncryptedString = await Crypto.encryptString(
-      newKey,
-      false,
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      text
-    )
-    return newEncryptedString;
-  }));
+  const newTexts = await Crypto.encryptStrings(
+    newKey,
+    false,
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    decryptedStrings 
+  )
 
   messageSentRealm.write(() => {
     for(const [index,message] of sentMessages.entries()) {
