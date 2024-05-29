@@ -140,6 +140,24 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return cipher;
   }
 
+  private fun initialisePublicKey(keyOrAlias : String, loadKeyFromStore: Boolean) : PublicKey? {
+    var publicKey : PublicKey? = null;
+    if(loadKeyFromStore) {
+      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
+    }
+    else {
+      try {
+        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
+      }
+      catch(e : Exception) {
+        val errorMessage = "Error initialising public key passed in as parameter"
+        Log.i(TAG,errorMessage,e)
+      }
+    }
+    return publicKey;
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -197,22 +215,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   stringToEncrypt : String,
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    //retrieve key from keystore
-    var publicKey : PublicKey? = null;
-    if(loadKeyFromStore) {
-      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
-    }
-    else {
-      try {
-        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
-        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
-      }
-      catch(e : Exception) {
-        val errorMessage = "Error initialising public key passed in as parameter"
-        Log.i(TAG,errorMessage,e)
-        return promise.reject(errorMessage,e)
-      }
-    }
+    var publicKey : PublicKey? = initialisePublicKey(keyOrAlias,loadKeyFromStore);
     if(publicKey === null) {
       val errorMessage = "error loading or initialising publicKey in encryptString function, publicKey was null";
       Log.i(TAG,errorMessage)
@@ -247,26 +250,12 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   strings : ReadableArray,
   promise : Promise) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    //retrieve key from keystore
-    var publicKey : PublicKey? = null;
-    if(loadKeyFromStore) {
-      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
-    }
-    else {
-      try {
-        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
-        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
-      }
-      catch(e : Exception) {
-        val errorMessage = "Error initialising public key passed in as parameter"
-        Log.i(TAG,errorMessage,e)
-        return promise.reject(errorMessage,e)
-      }
-    }
+    var publicKey : PublicKey? = initialisePublicKey(keyOrAlias,loadKeyFromStore);
+
     if(publicKey === null) {
       val errorMessage = "error loading or initialising publicKey in encryptStrings function, publicKey was null";
       Log.i(TAG,errorMessage)
-      return promise.reject(errorMessage)
+      return promise.reject("could not make load or use public key")
     }
 
     var results : Array<String> = Array<String>(strings.size()) { "" };
