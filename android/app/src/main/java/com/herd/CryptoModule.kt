@@ -206,41 +206,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   }
 
   @ReactMethod
-  fun encryptString(
-  keyOrAlias : String,
-  loadKeyFromStore : Boolean,
-  algorithm : String,
-  blockMode : String,
-  padding : String,
-  stringToEncrypt : String,
-  promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    var publicKey : PublicKey? = initialisePublicKey(keyOrAlias,loadKeyFromStore);
-    if(publicKey === null) {
-      val errorMessage = "error loading or initialising publicKey in encryptString function, publicKey was null";
-      Log.i(TAG,errorMessage)
-      return promise.reject(errorMessage)
-    }
-
-    //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher = initialiseCipher(encryptionType, publicKey);
-
-    //cast string to bytes
-    val stringAsBytes : ByteArray = stringToEncrypt.toByteArray();
-    try {
-      //encrypt bytes
-      val encryptedBytes = cipher.doFinal(stringAsBytes);
-      //encode encrypted string to base64 for javascript and pass upwards
-      val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
-      Log.i(TAG,"encrypted string : $encryptedStringBASE64")
-      return promise.resolve(encryptedStringBASE64);
-    }
-    catch(e : GeneralSecurityException) {
-      return promise.reject("Encrypt string error",e)
-    }
-  }
-
-  @ReactMethod
   fun encryptStrings(
   keyOrAlias : String,
   loadKeyFromStore : Boolean,
@@ -285,37 +250,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       encryptionRoutines.joinAll();
       results.map({ marshalledResults.pushString(it)})
       promise.resolve(marshalledResults)
-    }
-  }
-
-  @ReactMethod
-  fun decryptString(
-  alias : String,
-  algorithm : String,
-  blockMode : String,
-  padding : String,
-  stringToDecrypt : String,
-  promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    //retrieve key from keystore
-    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
-
-    if(privateKey === null) {
-      return promise.resolve("Private key does not exist")
-    }
-
-    //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-
-    //decode base64 string passed in from javscript
-    val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
-    //try to decrypt bytes and resolve promise accordingly
-    try {
-      val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-      return promise.resolve(String(decryptedString))
-    }
-    catch(e : GeneralSecurityException) {
-      return promise.reject("Decrypt string error",e)
     }
   }
   
@@ -404,6 +338,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       }
       decryptionRoutines.joinAll();
       results.map({ marshalledResults.pushString(it)})
+      Log.i(TAG,"marshalledResults length $marshalledResults.size")
+      Log.i(TAG,marshalledResults.getString(0));
       promise.resolve(marshalledResults)
     }
   }

@@ -29,14 +29,14 @@ const deletedReceivedRealm = new Realm({
 })
 
 const decryptString = async text => {
-  const decrypted = await Crypto.decryptString(
+  const decrypted = await Crypto.decryptStrings(
     "herdPersonal",
     Crypto.algorithm.RSA,
     Crypto.blockMode.ECB,
     Crypto.padding.OAEP_SHA256_MGF1Padding,
-    text
+    [text]
   );
-  return decrypted;
+  return decrypted[0];
 }
 
 const decryptMessage = async message => {
@@ -163,7 +163,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
       let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
       if(message.to.trim() === ownPublicKey.trim()) {
         if(contact) {
-          const decryptedText = decryptString(message.text)
+          const decryptedText = await decryptString(message.text)
           dispatch(addMessage(contact._id,{
             ...message,
             text : decryptedText 

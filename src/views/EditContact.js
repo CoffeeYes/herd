@@ -54,13 +54,13 @@ const EditContact = ({ route, navigation }) => {
     setSaving(true);
     let errorSaving = []
     try {
-      await Crypto.encryptString(
+      await Crypto.encryptStrings(
         publicKey.trim(),
         false,
         Crypto.algorithm.RSA,
         Crypto.blockMode.ECB,
         Crypto.padding.OAEP_SHA256_MGF1Padding,
-        "test"
+        ["test"]
       )
     }
     catch(e) {
