@@ -39,15 +39,26 @@ const decryptString = async text => {
   return decrypted[0];
 }
 
-const decryptMessage = async message => {
+const decryptMessages = async messages => {
+  if(messages.length == 0) {
+    return [];
+  }
   try {
-    let parsedMessage = parseRealmObject(message);
-    const decryptedText = await decryptString(message.text);
-    parsedMessage.text = decryptedText;
-    return parsedMessage;
+    const decryptedMessages = await Crypto.decryptStrings(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      messages.map(message => message.text)
+    )
+    let parsedMessages = parseRealmObjects(messages);
+    parsedMessages.forEach((message,index) => {
+      message.text = decryptedMessages[index]
+    })
+    return parsedMessages;
   }
   catch(e) {
-    console.log("error decrypting message : ",e)
+    console.log("error decrypting messages : ",e)
   }
 }
 
@@ -76,13 +87,9 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
     }
   }
 
-  const initialReceivedMessages = await Promise.all(
-    receivedMessages.map(message => decryptMessage(message))
-  )
+  const initialReceivedMessages = await decryptMessages(receivedMessages) 
 
-  const initialSentMessages = await Promise.all(
-    sentMessagesCopy.map(message => decryptMessage(message))
-  )
+  const initialSentMessages = await decryptMessages(sentMessagesCopy)
 
   let payload = {
     messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp - b.timestamp)
