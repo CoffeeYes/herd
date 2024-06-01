@@ -162,31 +162,36 @@ const addNewReceivedMessages = async (messages,dispatch) => {
   if(dispatch) {
     //add messages to queue
     dispatch(addMessagesToQueue(newMessages));
-    //pull unique keys from messages
-    const keys = getUniqueKeysFromMessages(newMessages,"from");
 
+    //pull unique keys from messages to retreive existing contacts with matching keys
+    const keys = getUniqueKeysFromMessages(newMessages,"from");
     const contacts = getContactsByKey(keys);
-    newMessages.forEach(async message => {
+
+    let messagesForSelf = newMessages.filter(message => message.to.trim() !== ownPublicKey.trim())
+
+    const decryptedMessages = Crypto.decryptStrings(
+      "herdPersonal",
+      Crypto.algorithm.RSA,
+      Crypto.blockMode.ECB,
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      messagesForSelf.map(message => message.text)
+    )
+
+    messagesForSelf.forEach((message,index) => {
+      message.text = decryptedMessages[index]
       let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
-      if(message.to.trim() === ownPublicKey.trim()) {
-        if(contact) {
-          const decryptedText = await decryptString(message.text)
-          dispatch(addMessage(contact._id,{
-            ...message,
-            text : decryptedText 
-          }))
-        }
-        //if the message is for this user, but no contact exists create the contact
-        else {
-          contact = createContact({
-            name : "Unknown User",
-            key : message.from.trim(),
-            image : ""
-          });
-          contacts.push(contact);
-          dispatch(addContact(contact));
-        }
+      //if message for user has been received but the sender isn't in their address book, add an unkown contact
+      //to file the message under
+      if(!contact) {
+        contact = createContact({
+          name : "Unknown User",
+          key : message.from.trim(),
+          image : ""
+        });
+        contacts.push(contact);
+        dispatch(addContact(contact));
       }
+      dispatch(addMessage(contact._id,message))
     })
     const chats = await getContactsWithChats();
     dispatch(setChats(chats))
