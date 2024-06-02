@@ -1,4 +1,5 @@
 import Bluetooth from './nativeWrapper/Bluetooth';
+import Crypto from './nativeWrapper/Crypto';
 import { Alert } from 'react-native';
 
 const requestPermissionsForBluetooth = async () => {
@@ -45,8 +46,33 @@ const requestEnableLocation = async () => {
   return locationEnabled;
 }
 
+const decryptStrings = async strings => {
+  const decryptedStrings = await Crypto.decryptStrings(
+    "herdPersonal",
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    strings
+  )
+  return decryptedStrings;
+}
+
+const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
+  const encryptedStrings = await Crypto.encryptStrings(
+    keyOrAlias,
+    loadKeyFromStore,
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    strings
+  )
+  return encryptedStrings
+}
+
 export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
-  requestEnableLocation
+  requestEnableLocation,
+  decryptStrings,
+  encryptStrings
 }

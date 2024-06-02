@@ -11,6 +11,7 @@ import {
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
+import { encryptStrings } from '../common';
 
 import { useScreenAdjustedSize } from '../helper';
 
@@ -199,12 +200,9 @@ const Chat = ({ route, navigation }) => {
     //use key to encrypt when it is passed, otherwise load key from store using alias
     const loadKeyFromStore = !keyToEncryptWith;
     const keyToUse = loadKeyFromStore ? "herdPersonal" : keyToEncryptWith;
-    const encryptedString = (await Crypto.encryptStrings(
+    const encryptedString = (await encryptStrings(
       keyToUse,
       loadKeyFromStore,
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
       [string]
     ))[0]
     return encryptedString;

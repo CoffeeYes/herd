@@ -10,13 +10,13 @@ import NavigationWarningWrapper from './NavigationWarningWrapper';
 
 import { editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
-import Crypto from '../nativeWrapper/Crypto';
 
 import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef } from '../helper';
+import { encryptStrings } from '../common';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -54,12 +54,9 @@ const EditContact = ({ route, navigation }) => {
     setSaving(true);
     let errorSaving = []
     try {
-      await Crypto.encryptStrings(
+      await encryptStrings(
         publicKey.trim(),
         false,
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
         ["test"]
       )
     }

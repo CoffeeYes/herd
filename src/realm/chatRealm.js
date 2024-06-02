@@ -4,6 +4,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey, createContact } from './contactRealm';
 import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from './helper';
+import { decryptStrings, encryptStrings } from '../common';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
@@ -28,29 +29,14 @@ const deletedReceivedRealm = new Realm({
   schema : [Schemas.MessageSchema]
 })
 
-const decryptString = async text => {
-  const decrypted = await Crypto.decryptStrings(
-    "herdPersonal",
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
-    [text]
-  );
-  return decrypted[0];
-}
-
 const decryptMessages = async messages => {
   if(messages.length == 0) {
     return [];
   }
   try {
-    const decryptedMessages = await Crypto.decryptStrings(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
+    const decryptedMessages = await decryptStrings(
       messages.map(message => message.text)
-    )
+    );
     let parsedMessages = parseRealmObjects(messages);
     parsedMessages.forEach((message,index) => {
       message.text = decryptedMessages[index]
@@ -169,11 +155,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
 
     let messagesForSelf = newMessages.filter(message => message.to.trim() !== ownPublicKey.trim())
 
-    const decryptedMessages = Crypto.decryptStrings(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
+    const decryptedMessages = await decryptStrings(
       messagesForSelf.map(message => message.text)
     )
 
@@ -361,20 +343,13 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
 
-  const decryptedStrings = await Crypto.decryptStrings(
-    "herdPersonal",
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
+  const decryptedStrings = await decryptStrings(
     sentMessagesCopy.map(message => parseRealmObject(message).text)
   )
 
-  const newTexts = await Crypto.encryptStrings(
+  const newTexts = await encryptStrings(
     newKey,
     false,
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
     decryptedStrings 
   )
 
