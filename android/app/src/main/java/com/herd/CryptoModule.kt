@@ -32,7 +32,7 @@ import kotlinx.coroutines.*;
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
-  val decryptionScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  val cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
   override fun getName(): String {
       return "CryptoModule"
@@ -224,17 +224,12 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
 
     var results : Array<String> = Array<String>(strings.size()) { "" };
-    val marshalledResults: WritableArray = Arguments.createArray();
-    var inputStrings : Array<String> = arrayOf();
-
-    for(i in 0 until strings.size()) {
-      inputStrings += strings.getString(i);
-    }
+    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
 
     runBlocking {
       val encryptionRoutines =  
-        inputStrings.mapIndexed{ index, it -> 
-          decryptionScope.launch {
+        nativeInputStrings.mapIndexed{ index, it -> 
+          cryptographyScope.launch {
           try {
             val stringAsBytes : ByteArray = it.toByteArray();
             val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
@@ -248,8 +243,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       encryptionRoutines.joinAll();
-      results.map({ marshalledResults.pushString(it)})
-      promise.resolve(marshalledResults)
+      promise.resolve(Arguments.fromArray(results))
     }
   }
   
@@ -277,9 +271,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return;
     }
 
-
     stringsToDecrypt.mapIndexed{ index, it -> 
-      decryptionScope.launch {
+      cryptographyScope.launch {
         try {
           val currentPromise : Promise = it["promise"] as Promise;
           val currentText : String = it["text"] as String;
@@ -310,12 +303,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
     var results : Array<String> = Array<String>(strings.size()) { "" };
-    val marshalledResults: WritableArray = Arguments.createArray();
-    var inputStrings : Array<String> = arrayOf();
-
-    for(i in 0 until strings.size()) {
-      inputStrings += strings.getString(i);
-    }
+    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
 
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
@@ -323,8 +311,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
     runBlocking {
       val decryptionRoutines =  
-        inputStrings.mapIndexed{ index, it -> 
-          decryptionScope.launch {
+        nativeInputStrings.mapIndexed{ index, it -> 
+          cryptographyScope.launch {
           try {
             val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
             val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
@@ -337,10 +325,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       decryptionRoutines.joinAll();
-      results.map({ marshalledResults.pushString(it)})
-      Log.i(TAG,"marshalledResults length $marshalledResults.size")
-      Log.i(TAG,marshalledResults.getString(0));
-      promise.resolve(marshalledResults)
+      promise.resolve(Arguments.fromArray(results))
     }
   }
 
