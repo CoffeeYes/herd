@@ -98,7 +98,7 @@ with other phones using bluetooth.`;
 
   return (
     <>
-      <Header allowGoBack title="Add Contact" />
+      <Header allowGoBack disableBackButton={navigating.current || showQRCode || showPermissionModal} title="Add Contact" />
 
       <View style={styles.mainContainer}>
         <View style={styles.row}>
