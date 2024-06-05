@@ -6,7 +6,9 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -33,6 +35,7 @@ import kotlinx.coroutines.*;
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
   val cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  val context = reactContext;
 
   override fun getName(): String {
       return "CryptoModule"
@@ -286,6 +289,44 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
         finally {
           stringsToDecrypt = arrayOf();
+        }
+      }
+    }
+  }
+
+  @ReactMethod
+  fun batchDecryptStringsEmitResult(
+  alias : String,
+  algorithm : String,
+  blockMode : String,
+  padding : String,
+  strings: ReadableArray) {
+    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    //retrieve key from keystore
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+    var results : Array<String> = Array<String>(strings.size()) { "" };
+    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
+
+    if(privateKey === null) {
+      return;
+    }
+
+    nativeInputStrings.mapIndexed{ index, it -> 
+      cryptographyScope.launch {
+        try {
+          val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+          val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
+          val decryptedString = cipher.doFinal(encryptedStringAsBytes);
+
+          val resultObject : WritableMap = Arguments.createMap();
+          resultObject.putInt("index",index);
+          resultObject.putString("text",String(decryptedString));
+
+          context.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("messageDecrypted",resultObject)
+        }
+        catch(e : Exception) {
+          Log.e(TAG, "error decrypting string in coroutine",e)
         }
       }
     }
