@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Dimensions, FlatList, InteractionManager } from 'react-native';
+import { View, Text, Dimensions, FlatList, InteractionManager, NativeEventEmitter } from 'react-native';
 import Header from './Header';
 
 import Crypto from '../nativeWrapper/Crypto';
@@ -45,27 +45,32 @@ const MessageQueue = ({}) => {
   }
 
   const decryptMessages = queue => {
-    queue.map((message,index) => {
-      let [newMessage, textToDecrypt] = assignParticipantsToMessage({...message})
-      textToDecrypt &&
-      Crypto.registerStringForBatchDecryption(newMessage.text).then(result => {
-        setParsedQueue(oldQueue => {
-          let updatedQueue = [...oldQueue];
-          updatedQueue[index] = {...newMessage, text : result, loading : false};
-          return updatedQueue
-        })
-      })
-    })
-    Crypto.batchDecryptStrings(
+    const messagesAssignedToContact = queue.map(message => assignParticipantsToMessage(message))
+    const messagesToDecrypt = messagesAssignedToContact.map(([message, textToDecrypt]) => textToDecrypt && message.text)
+    Crypto.decryptStringsEmitResult(
       "herdPersonal",
       Crypto.algorithm.RSA,
       Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding
+      Crypto.padding.OAEP_SHA256_MGF1Padding,
+      messagesToDecrypt
     )
   }
 
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => decryptMessages(parsedQueue));
+
+    const eventEmitter = new NativeEventEmitter(Crypto);
+    const decryptedMessageListener = eventEmitter.addListener("messageDecrypted", message => {
+      setParsedQueue(oldQueue => {
+        let updatedQueue = [...oldQueue];
+        updatedQueue[message.index] = {...oldQueue[message.index], text : message.text, loading : false};
+        return updatedQueue
+      })
+    })
+
+    return () => {
+      decryptedMessageListener.remove();
+    }
   },[])
 
   const onMessagePress = useCallback(id => {

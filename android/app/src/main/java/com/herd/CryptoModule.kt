@@ -295,7 +295,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   }
 
   @ReactMethod
-  fun batchDecryptStringsEmitResult(
+  fun decryptStringsEmitResult(
   alias : String,
   algorithm : String,
   blockMode : String,
