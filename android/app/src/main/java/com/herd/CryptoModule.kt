@@ -300,22 +300,25 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   algorithm : String,
   blockMode : String,
   padding : String,
-  strings: ReadableArray) {
+  stringsWithIndex: ReadableArray) {
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
-    var results : Array<String> = Array<String>(strings.size()) { "" };
-    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
+    var results : Array<String> = Array<String>(stringsWithIndex.size()) { "" };
+    var nativeInputStrings : ArrayList<Map<String,Any>> = stringsWithIndex.toArrayList() as ArrayList<Map<String,Any>>;
 
     if(privateKey === null) {
       return;
     }
 
-    nativeInputStrings.mapIndexed{ index, it -> 
+    nativeInputStrings.map{ it -> 
       cryptographyScope.launch {
         try {
+          val text : String = it["text"] as String;
+          //index gets passed as double through bridge, using 'as Int' doesn't work here
+          val index : Int = (it["index"] as Double).toInt();
           val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-          val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
+          val encryptedStringAsBytes = Base64.decode(text,Base64.DEFAULT);
           val decryptedString = cipher.doFinal(encryptedStringAsBytes);
 
           val resultObject : WritableMap = Arguments.createMap();
