@@ -45,8 +45,11 @@ const MessageQueue = ({}) => {
   }
 
   const decryptMessages = queue => {
-    const messagesAssignedToContact = queue.map(message => assignParticipantsToMessage(message))
-    const messagesToDecrypt = messagesAssignedToContact.map(([message, textToDecrypt],index) => textToDecrypt && ({text: message.text, index}))
+    const messagesAssignedToContact = queue.map(message => {
+      let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
+      return ({...messageWithContact, loading : canBeDecrypted})
+    })
+    const messagesToDecrypt = messagesAssignedToContact.map((message,index) => message.loading && ({text: message.text, index}))
     Crypto.decryptStringsEmitResult(
       "herdPersonal",
       Crypto.algorithm.RSA,
