@@ -41,6 +41,16 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return "CryptoModule"
   }
 
+  @ReactMethod
+  fun addListener(listenerName: String) {
+      Log.i(TAG,"addListener called, eventName : $listenerName")
+  }
+
+  @ReactMethod
+  fun removeListeners(listenerCount: Int) {
+      Log.i(TAG,"removeListeners called, count : $listenerCount")
+  }
+
   override fun getConstants(): Map<String, Any>? {
       // Export any constants to be used in your native module
       // https://facebook.github.io/react-native/docs/native-modules-android.html#the-toast-module
@@ -247,50 +257,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       }
       encryptionRoutines.joinAll();
       promise.resolve(Arguments.fromArray(results))
-    }
-  }
-  
-  private var stringsToDecrypt : Array<Map<String,Any>> = arrayOf();
-  @ReactMethod
-  fun registerStringForBatchDecryption( stringToDecrypt : String, promise : Promise) {
-    stringsToDecrypt += mapOf(
-      "text" to stringToDecrypt,
-      "promise" to promise
-    )
-  }
-
-  @ReactMethod
-  fun batchDecryptStrings(
-  alias : String,
-  algorithm : String,
-  blockMode : String,
-  padding : String) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    //retrieve key from keystore
-    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
-
-    if(privateKey == null) {
-      Log.e(TAG,"private key is null")
-      return;
-    }
-
-    stringsToDecrypt.mapIndexed{ index, it -> 
-      cryptographyScope.launch {
-        try {
-          val currentPromise : Promise = it["promise"] as Promise;
-          val currentText : String = it["text"] as String;
-          val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-          val encryptedStringAsBytes = Base64.decode(currentText,Base64.DEFAULT);
-          val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-          currentPromise.resolve(String(decryptedString));
-        }
-        catch(e : Exception) {
-          Log.e(TAG, "error decrypting string in coroutine, index : ${index}",e)
-        }
-        finally {
-          stringsToDecrypt = arrayOf();
-        }
-      }
     }
   }
 

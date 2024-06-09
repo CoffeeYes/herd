@@ -76,13 +76,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun addListener(eventName: String) {
-        Log.i(TAG,"addListener called, eventName : $eventName")
+    fun addListener(listenerName: String) {
+        Log.i(TAG,"addListener called, eventName : $listenerName")
     }
 
     @ReactMethod
-    fun removeListeners(count: Int) {
-        Log.i(TAG,"removeListeners called, count : $count")
+    fun removeListeners(listenerCount: Int) {
+        Log.i(TAG,"removeListeners called, count : $listenerCount")
     }
 
     //anonymous inner function to override class functions

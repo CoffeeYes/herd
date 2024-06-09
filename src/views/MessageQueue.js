@@ -60,8 +60,6 @@ const MessageQueue = ({}) => {
   }
 
   useEffect(() => {
-    InteractionManager.runAfterInteractions(() => decryptMessages(parsedQueue));
-
     const eventEmitter = new NativeEventEmitter(Crypto);
     const decryptedMessageListener = eventEmitter.addListener("messageDecrypted", message => {
       setParsedQueue(oldQueue => {
@@ -70,6 +68,8 @@ const MessageQueue = ({}) => {
         return updatedQueue
       })
     })
+
+    InteractionManager.runAfterInteractions(() => decryptMessages(parsedQueue));
 
     return () => {
       decryptedMessageListener.remove();
