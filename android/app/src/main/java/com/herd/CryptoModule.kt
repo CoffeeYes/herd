@@ -282,13 +282,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         try {
           val text : String = it["text"] as String;
           //index gets passed as double through bridge, using 'as Int' doesn't work here
-          val index : Int = (it["index"] as Double).toInt();
+          val identifier : String = it["identifier"] as String;
           val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
           val encryptedStringAsBytes = Base64.decode(text,Base64.DEFAULT);
           val decryptedString = cipher.doFinal(encryptedStringAsBytes);
 
           val resultObject : WritableMap = Arguments.createMap();
-          resultObject.putInt("index",index);
+          resultObject.putString("identifier",identifier);
           resultObject.putString("text",String(decryptedString));
 
           context.getJSModule(RCTDeviceEventEmitter::class.java)

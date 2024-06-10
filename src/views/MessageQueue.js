@@ -49,7 +49,7 @@ const MessageQueue = ({}) => {
       let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
       return ({...messageWithContact, loading : canBeDecrypted})
     })
-    const messagesToDecrypt = messagesAssignedToContact.map((message,index) => message.loading && ({text: message.text, index}))
+    const messagesToDecrypt = messagesAssignedToContact.map((message,index) => message.loading && ({text: message.text, identifier : index.toString()}))
     Crypto.decryptStringsEmitResult(
       "herdPersonal",
       Crypto.algorithm.RSA,
@@ -64,7 +64,8 @@ const MessageQueue = ({}) => {
     const decryptedMessageListener = eventEmitter.addListener("messageDecrypted", message => {
       setParsedQueue(oldQueue => {
         let updatedQueue = [...oldQueue];
-        updatedQueue[message.index] = {...oldQueue[message.index], text : message.text, loading : false};
+        let index = parseInt(message.identifier)
+        updatedQueue[index] = {...oldQueue[index], text : message.text, loading : false};
         return updatedQueue
       })
     })
