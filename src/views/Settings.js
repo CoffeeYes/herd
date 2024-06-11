@@ -79,13 +79,13 @@ const Settings = ({ navigation }) => {
       text,
       '',
       [
-        { text: "Cancel", style: 'cancel', onPress: await onCancel() },
+        { text: "Cancel", style: 'cancel', onPress: async () => await onCancel() },
         {
           text: 'Delete',
           style: 'destructive',
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
-          onPress: await onConfirm(),
+          onPress: async () => await onConfirm(),
         },
       ]
     );
