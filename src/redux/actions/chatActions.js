@@ -7,10 +7,11 @@ const setChats = chats => {
 
 const deleteChats = chats => {
   return (dispatch,getState) => {
-    dispatch({type : "DELETE_CHATS",payload : chats});
-    dispatch(filterMessageQueueByKeys(chats.map(chat => chat.key)));
+    const chatsToDelete = chats == "all" ? getState().chatReducer.chats : chats;
+    dispatch({type : "DELETE_CHATS",payload : chatsToDelete});
+    dispatch(filterMessageQueueByKeys(chatsToDelete.map(chat => chat.key)));
     dispatch(setMessagesForContacts(
-      chats.map(chat => ({id : chat._id,messages : []})
+      chatsToDelete.map(chat => ({id : chat._id,messages : []})
     )))
   }
 }

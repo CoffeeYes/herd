@@ -18,7 +18,7 @@ import { closeContactRealm } from '../realm/contactRealm';
 import { closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 
-import { setChats, setMessageQueue } from '../redux/actions/chatActions';
+import { setChats, setMessageQueue, deleteChats } from '../redux/actions/chatActions';
 import { resetContacts } from '../redux/actions/contactActions';
 import { setLockable } from '../redux/actions/appStateActions';
 
@@ -237,7 +237,7 @@ for the following permissions in order to allow Herd to function correctly.`
           "Are you sure you want to delete all chats?",
           () => {
             deleteAllChatsFromRealm();
-            dispatch(setChats([]));
+            dispatch(deleteChats("all"));
           }
         )}/>
 
