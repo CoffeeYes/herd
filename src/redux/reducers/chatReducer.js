@@ -170,7 +170,8 @@ const chatReducer = (state = initialState,action) => {
     case "RESET_MESSAGES": {
       return {...state,
         messages : {},
-        chats : []
+        chats : [],
+        messageQueue : []
       };
     }
     case "SET_LAST_TEXT": {

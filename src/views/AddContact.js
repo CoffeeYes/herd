@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import { View } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Header from './Header';
@@ -83,11 +83,9 @@ with other phones using bluetooth.`;
   const permissionModalInstructionText = `Please navigate to Herd's app settings and select \
 'allow all the time' under for the following permissions in order to use bluetooth to add a contact.`;
 
-  useEffect(() => {
-    if(isFocused) {
-      navigating.current = false;
-    }
-  },[isFocused])
+  useFocusEffect(() => {
+    navigating.current = false;
+  })
 
   const navigate = (target,params) => {
     if(!navigating.current && !showQRCode && !showPermissionModal) {

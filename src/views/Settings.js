@@ -252,6 +252,7 @@ for the following permissions in order to allow Herd to function correctly.`
           () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
+            dispatch(deleteChats("all"))
             dispatch(resetContacts());
           }
         )}/>
