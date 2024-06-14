@@ -26,7 +26,6 @@ import {
 
 import { palette } from '../assets/palette';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
-import Crypto from '../nativeWrapper/Crypto';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
@@ -212,7 +211,6 @@ const Chat = ({ route, navigation }) => {
     if(message.trim() === "") {
       return;
     }
-    disableInputChange.current = true;
     setChatInput("");
     setCharacterCount(maxCharacterCount);
 
@@ -276,8 +274,6 @@ const Chat = ({ route, navigation }) => {
 
     await ServiceInterface.isRunning() &&
     ServiceInterface.addMessageToService(selfEncryptedCopy);
-    
-    disableInputChange.current = false;
   }
 
   const deleteMessages = () => {
@@ -411,6 +407,7 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
+  const chatInputRef = useRef();
   const momentumEndFiredCount = useRef(0);
 
   const scrollToBottom = (animated = true) => {
@@ -570,6 +567,7 @@ const Chat = ({ route, navigation }) => {
             setCharacterCount(maxCharacterCount - text.length)
           }
         }}
+        ref={chatInputRef}
         multiline={true}/>
         <View style={{
           backgroundColor : palette.white,
@@ -581,7 +579,11 @@ const Chat = ({ route, navigation }) => {
         </View>
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
-        onPress={async () => await sendMessage(chatInput)}>
+        onPress={async () => {
+          disableInputChange.current = true;
+          await sendMessage(chatInput)
+          disableInputChange.current = false;
+        }}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
       </View>
