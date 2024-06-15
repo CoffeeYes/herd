@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import Header from './Header';
@@ -26,7 +26,6 @@ const AddContact = ({ navigation }) => {
 
   const iconSize = useScreenAdjustedSize(0.35,0.075);
 
-  const isFocused = useIsFocused();
   const navigating = useRef(false);
 
   useEffect(() => {

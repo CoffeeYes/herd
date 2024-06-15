@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Text, ScrollView,
          View, Switch, Alert, 
          NativeEventEmitter } from 'react-native';
@@ -48,7 +48,6 @@ const Settings = ({ navigation }) => {
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
   
-  const focused = useIsFocused();
   const alreadyNavigating = useRef(false);
 
   useEffect(() => {
@@ -146,11 +145,9 @@ const Settings = ({ navigation }) => {
     closePasswordRealm();
   }
 
-  useEffect(() => {
-    if(focused) {
-      alreadyNavigating.current = false;
-    }
-  },[focused])
+  useFocusEffect(() => {
+    alreadyNavigating.current = false;
+  })
 
   const navigate = (route, params) => {
     if(!alreadyNavigating.current && !QRCodeVisible) {

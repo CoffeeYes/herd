@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, ScrollView, Share,
          Image } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -31,7 +31,6 @@ const Contact = ({route, navigation}) => {
   const [disableTextTouch, setDisableTextTouch] = useState(false);
   const [headerLineHeight, setHeaderLineHeight] = useState(1);
 
-  const isFocused = useIsFocused();
   const performingButtonAction = useRef(false);
 
   const copyKeyToClipboard = () => {
@@ -69,11 +68,9 @@ const Contact = ({route, navigation}) => {
     }
   }
 
-  useEffect(() => {
-    if(isFocused) {
-      performingButtonAction.current = false;
-    }
-  },[isFocused])
+  useFocusEffect(() => {
+    performingButtonAction.current = false;
+  })
 
   const hideModal = setter => {
     setter(false);
