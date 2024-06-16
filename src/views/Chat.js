@@ -580,9 +580,11 @@ const Chat = ({ route, navigation }) => {
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
         onPress={async () => {
-          disableInputChange.current = true;
-          await sendMessage(chatInput)
-          disableInputChange.current = false;
+          if(!disableInputChange.current) {
+            disableInputChange.current = true;
+            await sendMessage(chatInput);
+            disableInputChange.current = false;
+          }
         }}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
