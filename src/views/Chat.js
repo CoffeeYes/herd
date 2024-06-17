@@ -407,7 +407,6 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
-  const chatInputRef = useRef();
   const momentumEndFiredCount = useRef(0);
 
   const scrollToBottom = (animated = true) => {
@@ -562,12 +561,22 @@ const Chat = ({ route, navigation }) => {
         value={chatInput}
         maxLength={maxCharacterCount}
         onChangeText={text => {
-          if(!disableInputChange.current) {
-            setChatInput(text)
+          if(disableInputChange.current) {
+            //internal text value has been successfully reset, allow new updates through
+            if(text.length == chatInput.length + 1) {
+              disableInputChange.current = false;
+              setChatInput(text);
+            }
+            //internal text value has not been reset, continue to reset it
+            else {
+              setChatInput("");
+            }
+          }
+          else {
+            setChatInput(disableInputChange.current ? "" : text)
             setCharacterCount(maxCharacterCount - text.length)
           }
         }}
-        ref={chatInputRef}
         multiline={true}/>
         <View style={{
           backgroundColor : palette.white,
@@ -583,7 +592,6 @@ const Chat = ({ route, navigation }) => {
           if(!disableInputChange.current) {
             disableInputChange.current = true;
             await sendMessage(chatInput);
-            disableInputChange.current = false;
           }
         }}>
           <Icon name="send" size={32} color={palette.primary}/>
