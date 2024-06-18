@@ -5,18 +5,10 @@ import { palette } from '../assets/palette';
 
 const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
                      barColor = palette.grey, sliderColor = palette.black,
-                     animationDuration = 500}) => {
+                     animationDuration = 500, paused = false}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
 
-  const runAnimation = () => {
-    return Animated.loop(
-      Animated.sequence([
-        moveToEnd,
-        moveToBeginning
-      ])
-    ).start()
-  }
-
+  let animationLoop;
   const moveToEnd = Animated.timing(loadingViewPosition, {
     toValue: 100,
     duration: animationDuration,
@@ -32,8 +24,26 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
   })
 
   useEffect(() => {
-    runAnimation();
-  },[])
+    if(paused) {
+      if(animationLoop) {
+        animationLoop.stop();
+      }
+    }
+    else {
+      //restart existing animation, otherwise create animation if it's the first time
+      if(animationLoop) {
+        animationLoop.start();
+      }
+      else {
+        animationLoop = Animated.loop(
+          Animated.sequence([
+            moveToEnd,
+            moveToBeginning
+          ])
+        ).start();
+      }
+    }
+  },[paused])
 
   return (
     [...Array(numBars).keys()].map(num => {

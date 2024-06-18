@@ -25,6 +25,8 @@ const MessageQueue = ({}) => {
     .map(message => ({...message, loading : true}))
   );
 
+  const initialNumToRender = 10;
+
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
 
@@ -84,7 +86,7 @@ const MessageQueue = ({}) => {
     [...oldOpenMessages,id])
   },[])
 
-  const renderItem = useCallback(({ item }) => {
+  const renderItem = useCallback(({ item,index }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
@@ -96,6 +98,7 @@ const MessageQueue = ({}) => {
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
       loading={item.loading}
+      pauseLoadingIndicator={index > (initialNumToRender -1)} 
       disablePress={item.loading}
       closedTimestamp={date}
       openTimestamp={hours}
@@ -132,6 +135,7 @@ const MessageQueue = ({}) => {
         </View>}
 
         <FlatList
+        initialNumToRender={initialNumToRender}
         contentContainerStyle={styles.listStyle}
         data={parsedQueue}
         keyExtractor={item => item._id}

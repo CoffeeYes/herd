@@ -27,12 +27,12 @@ const HeaderItem = ({title, text, numberOfLines, containerStyle, titleStyle, tex
 }
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, onPress, loading,
-                          openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1, openTimestampStyle, disablePress}) => {
+                          openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1, openTimestampStyle, disablePress, pauseLoadingIndicator}) => {
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress} disabled={disablePress}>
       <View style={{width : "100%"}}>
         {loading ?
-        <LoadingBar numBars={2} barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
+        <LoadingBar paused={pauseLoadingIndicator} numBars={2} barColor="rgba(0,0,0,0.1)" sliderColor="rgba(0,0,0,0.1)"/>
         :
         <>
           <View style={styles.messageHeader}>
