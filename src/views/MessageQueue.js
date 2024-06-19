@@ -12,6 +12,9 @@ import { palette } from '../assets/palette';
 
 import { timestampToText } from '../helper.js';
 
+import { decryptStrings } from '../common.js';
+
+
 import moment from 'moment';
 
 const MessageQueue = ({}) => {
@@ -46,37 +49,20 @@ const MessageQueue = ({}) => {
     return [message,textToDecrypt];
   }
 
-  const decryptMessages = queue => {
+  const decryptMessages = async queue => {
     const messagesAssignedToContact = queue.map(message => {
       let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
       return ({...messageWithContact, loading : canBeDecrypted})
     })
-    const messagesToDecrypt = messagesAssignedToContact.map((message,index) => message.loading && ({text: message.text, identifier : index.toString()}))
-    Crypto.decryptStringsEmitResult(
-      "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
+    const messagesToDecrypt = messagesAssignedToContact.map(message => message.loading && message.text)
+    const result = await decryptStrings(
       messagesToDecrypt
     )
+    setParsedQueue([...parsedQueue].map((item,index) => ({...item, text : result[index], loading : false})))
   }
 
   useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(Crypto);
-    const decryptedMessageListener = eventEmitter.addListener("messageDecrypted", message => {
-      setParsedQueue(oldQueue => {
-        let updatedQueue = [...oldQueue];
-        let index = parseInt(message.identifier)
-        updatedQueue[index] = {...oldQueue[index], text : message.text, loading : false};
-        return updatedQueue
-      })
-    })
-
-    InteractionManager.runAfterInteractions(() => decryptMessages(parsedQueue));
-
-    return () => {
-      decryptedMessageListener.remove();
-    }
+    InteractionManager.runAfterInteractions(async () => await decryptMessages(parsedQueue));
   },[])
 
   const onMessagePress = useCallback(id => {
