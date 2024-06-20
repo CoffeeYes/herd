@@ -238,8 +238,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
     var results : Array<String> = Array<String>(strings.size()) { "" };
     var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
-
-    runBlocking {
+    
+    cryptographyScope.launch {
       val encryptionRoutines =  
         nativeInputStrings.mapIndexed{ index, it -> 
           cryptographyScope.launch {
@@ -318,11 +318,12 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
     }
-
-    runBlocking {
+    
+    cryptographyScope.launch {
       val decryptionRoutines =  
         nativeInputStrings.mapIndexed{ index, it -> 
           cryptographyScope.launch {
+          Log.i(TAG,"running on Thread : ${Thread.currentThread()}")
           try {
             val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
             val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
