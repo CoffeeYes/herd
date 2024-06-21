@@ -61,10 +61,6 @@ const MessageQueue = ({}) => {
     setParsedQueue([...parsedQueue].map((item,index) => ({...item, text : result[index], loading : false})))
   }
 
-  useEffect(() => {
-    InteractionManager.runAfterInteractions(async () => await decryptMessages(parsedQueue));
-  },[])
-
   const onMessagePress = useCallback(id => {
     setOpenMessages(oldOpenMessages => oldOpenMessages.includes(id) ?
     oldOpenMessages.filter(item => item != id)
@@ -72,7 +68,11 @@ const MessageQueue = ({}) => {
     [...oldOpenMessages,id])
   },[])
 
-  const renderItem = useCallback(({ item,index }) => {
+  useEffect(() => {
+    decryptMessages(parsedQueue)
+  },[])
+
+  const renderItem = useCallback(({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
@@ -84,7 +84,6 @@ const MessageQueue = ({}) => {
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
       loading={item.loading}
-      pauseLoadingIndicator={index > (initialNumToRender -1)} 
       disablePress={item.loading}
       closedTimestamp={date}
       openTimestamp={hours}
@@ -101,8 +100,7 @@ const MessageQueue = ({}) => {
       allowGoBack
       title="Message Queue"/>
 
-      <View style={{flex : 1}} pointerEvents={parsedQueue.some(item => item.loading) ? "none" : "auto"}>
-
+      <View style={{flex : 1}}>
         <CustomButton
         text={openMessages.length > 0 ? "Close All" : "Open All"}
         onPress={() => {
