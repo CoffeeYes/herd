@@ -340,6 +340,52 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
   }
 
+  @ReactMethod
+  fun decryptStringsWithIdentifier(
+  alias : String,
+  algorithm : String,
+  blockMode : String,
+  padding : String,
+  stringsWithIndex: ReadableArray,
+  promise : Promise) {
+    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    //retrieve key from keystore
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+    var results : WritableArray = Arguments.createArray();
+    var nativeInputStrings : ArrayList<Map<String,Any>> = stringsWithIndex.toArrayList() as ArrayList<Map<String,Any>>;
+
+    if(privateKey === null) {
+      return promise.resolve("Private key does not exist")
+    }
+    
+    cryptographyScope.launch {
+      val decryptionRoutines =  
+        nativeInputStrings.mapIndexed{ index, it -> 
+          cryptographyScope.launch {
+          Log.i(TAG,"running on Thread : ${Thread.currentThread()}")
+          try {
+            val text : String = it["text"] as String;
+            //index gets passed as double through bridge, using 'as Int' doesn't work here
+            val identifier : String = it["identifier"] as String;
+            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+            val encryptedStringAsBytes = Base64.decode(text,Base64.DEFAULT);
+            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
+
+            val resultObject : WritableMap = Arguments.createMap();
+            resultObject.putString("identifier",identifier);
+            resultObject.putString("text",String(decryptedString));
+            results.pushMap(resultObject);
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error decrypting string in coroutine",e)
+          }
+        }
+      }
+      decryptionRoutines.joinAll();
+      promise.resolve(results)
+    }
+  }
+
   private fun generateMessageDigest(message : String, algorithm : String) : ByteArray {
     val messageBytes : ByteArray = message.toByteArray();
     val messageDigest = MessageDigest.getInstance(algorithm);

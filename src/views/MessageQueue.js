@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Dimensions, FlatList, InteractionManager, NativeEventEmitter } from 'react-native';
+import { View, Text, Dimensions, FlatList } from 'react-native';
 import Header from './Header';
-
-import Crypto from '../nativeWrapper/Crypto';
 
 import FoldableMessage from './FoldableMessage';
 import CustomButton from './CustomButton';
@@ -12,8 +10,7 @@ import { palette } from '../assets/palette';
 
 import { timestampToText } from '../helper.js';
 
-import { decryptStrings } from '../common.js';
-
+import { decryptStringsWithIdentifier } from '../common.js';
 
 import moment from 'moment';
 
@@ -54,11 +51,16 @@ const MessageQueue = ({}) => {
       let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
       return ({...messageWithContact, loading : canBeDecrypted})
     })
-    const messagesToDecrypt = messagesAssignedToContact.map(message => message.loading && message.text)
-    const result = await decryptStrings(
+    const messagesToDecrypt = messagesAssignedToContact.map((message, index) => message.loading && ({text : message.text, identifier : index.toString()}))
+    const result = await decryptStringsWithIdentifier(
       messagesToDecrypt
     )
-    setParsedQueue([...parsedQueue].map((item,index) => ({...item, text : result[index], loading : false})))
+    let updatedQueue = [...parsedQueue];
+    for(const decryptedMessage of result) {
+      const index = parseInt(decryptedMessage.identifier);
+      updatedQueue[index] = {...updatedQueue[index], text : decryptedMessage.text, loading : false}
+    }
+    setParsedQueue(updatedQueue);
   }
 
   const onMessagePress = useCallback(id => {

@@ -57,6 +57,17 @@ const decryptStrings = async strings => {
   return decryptedStrings;
 }
 
+const decryptStringsWithIdentifier = async strings => {
+  const decryptedStrings = await Crypto.decryptStringsWithIdentifier(
+    "herdPersonal",
+    Crypto.algorithm.RSA,
+    Crypto.blockMode.ECB,
+    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    strings
+  )
+  return decryptedStrings;
+}
+
 const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
   const encryptedStrings = await Crypto.encryptStrings(
     keyOrAlias,
@@ -74,5 +85,6 @@ export {
   requestEnableBluetooth,
   requestEnableLocation,
   decryptStrings,
+  decryptStringsWithIdentifier,
   encryptStrings
 }
