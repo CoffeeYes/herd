@@ -260,6 +260,34 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     }
   }
 
+  fun decryptString(
+    encryptionType : String,
+    privateKey : PrivateKey,
+    stringToDecrypt : String
+  ) : String {
+    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+    val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
+    val decryptedBytes = cipher.doFinal(encryptedStringAsBytes);
+    val decryptedString = String(decryptedBytes);
+    return decryptedString; 
+  }
+
+  fun decryptWithIdentifier(
+    encryptionType : String,
+    privateKey : PrivateKey,
+    decryptionObject : Map<String,Any>
+  ) : WritableMap{
+    val text : String = decryptionObject["text"] as String;
+    val identifier : String = decryptionObject["identifier"] as String;
+    val decryptedString = decryptString(encryptionType,privateKey,text);
+
+    val resultObject : WritableMap = Arguments.createMap();
+    resultObject.putString("identifier",identifier);
+    resultObject.putString("text",decryptedString);
+
+    return resultObject;
+  }
+
   @ReactMethod
   fun decryptStringsEmitResult(
   alias : String,
@@ -280,16 +308,11 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     nativeInputStrings.map{ it -> 
       cryptographyScope.launch {
         try {
-          val text : String = it["text"] as String;
-          //index gets passed as double through bridge, using 'as Int' doesn't work here
-          val identifier : String = it["identifier"] as String;
-          val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-          val encryptedStringAsBytes = Base64.decode(text,Base64.DEFAULT);
-          val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-
-          val resultObject : WritableMap = Arguments.createMap();
-          resultObject.putString("identifier",identifier);
-          resultObject.putString("text",String(decryptedString));
+          val resultObject = decryptWithIdentifier(
+            encryptionType,
+            privateKey,
+            it
+          );
 
           context.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit("messageDecrypted",resultObject)
@@ -323,12 +346,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       val decryptionRoutines =  
         nativeInputStrings.mapIndexed{ index, it -> 
           cryptographyScope.launch {
-          Log.i(TAG,"running on Thread : ${Thread.currentThread()}")
           try {
-            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-            val encryptedStringAsBytes = Base64.decode(it,Base64.DEFAULT);
-            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-            results[index] = String(decryptedString);
+            results[index] = decryptString(encryptionType,privateKey,it);
           }
           catch(e : Exception) {
             Log.e(TAG, "error decrypting string in coroutine",e)
@@ -360,20 +379,14 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     
     cryptographyScope.launch {
       val decryptionRoutines =  
-        nativeInputStrings.mapIndexed{ index, it -> 
+        nativeInputStrings.map{ it -> 
           cryptographyScope.launch {
-          Log.i(TAG,"running on Thread : ${Thread.currentThread()}")
           try {
-            val text : String = it["text"] as String;
-            //index gets passed as double through bridge, using 'as Int' doesn't work here
-            val identifier : String = it["identifier"] as String;
-            val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
-            val encryptedStringAsBytes = Base64.decode(text,Base64.DEFAULT);
-            val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-
-            val resultObject : WritableMap = Arguments.createMap();
-            resultObject.putString("identifier",identifier);
-            resultObject.putString("text",String(decryptedString));
+            val resultObject = decryptWithIdentifier(
+              encryptionType,
+              privateKey,
+              it
+            )
             results.pushMap(resultObject);
           }
           catch(e : Exception) {
