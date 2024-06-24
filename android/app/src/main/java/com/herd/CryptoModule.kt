@@ -34,7 +34,7 @@ import kotlinx.coroutines.*;
 
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
-  val cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  var cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
   val context = reactContext;
 
   override fun getName(): String {
@@ -397,6 +397,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       decryptionRoutines.joinAll();
       promise.resolve(results)
     }
+  }
+
+  @ReactMethod
+  fun cancelCoroutineWork(promise : Promise) {
+    cryptographyScope.cancel();
+    cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    promise.resolve(true);
   }
 
   private fun generateMessageDigest(message : String, algorithm : String) : ByteArray {
