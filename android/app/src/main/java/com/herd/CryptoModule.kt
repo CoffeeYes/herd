@@ -276,16 +276,15 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     encryptionType : String,
     privateKey : PrivateKey,
     decryptionObject : Map<String,Any>
-  ) : WritableMap{
+  ) : Map<String,Any>{
     val text : String = decryptionObject["text"] as String;
     val identifier : String = decryptionObject["identifier"] as String;
     val decryptedString = decryptString(encryptionType,privateKey,text);
 
-    val resultObject : WritableMap = Arguments.createMap();
-    resultObject.putString("identifier",identifier);
-    resultObject.putString("text",decryptedString);
-
-    return resultObject;
+    return mapOf(
+      "text" to decryptedString,
+      "identifier" to identifier
+    )
   }
 
   @ReactMethod
@@ -370,7 +369,9 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
-    var results : WritableArray = Arguments.createArray();
+    //var results : WritableArray = Arguments.createArray();
+    var results : ArrayList<Map<String,Any>> = ArrayList<Map<String,Any>>();
+    var jsResults : WritableArray = Arguments.createArray();
     var nativeInputStrings : ArrayList<Map<String,Any>> = stringsWithIndex.toArrayList() as ArrayList<Map<String,Any>>;
 
     if(privateKey === null) {
@@ -387,7 +388,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
               privateKey,
               it
             )
-            results.pushMap(resultObject);
+            results.add(resultObject);
           }
           catch(e : Exception) {
             Log.e(TAG, "error decrypting string in coroutine",e)
@@ -395,7 +396,18 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       decryptionRoutines.joinAll();
-      promise.resolve(results)
+      for(result in results) {
+        if(result != null) {
+          var jsResult : WritableMap = Arguments.createMap();
+          jsResult.putString("text",result["text"] as String);
+          jsResult.putString("identifier",result["identifier"] as String);
+          jsResults.pushMap(jsResult);
+        }
+        else {
+          Log.i(TAG, "result was null")
+        }
+      }
+      promise.resolve(jsResults)
     }
   }
 
