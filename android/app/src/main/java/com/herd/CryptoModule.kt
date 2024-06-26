@@ -35,6 +35,7 @@ import kotlinx.coroutines.*;
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
   var cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  val coroutineResultContext = newSingleThreadContext("coroutineResultContext");
   val context = reactContext;
 
   override fun getName(): String {
@@ -388,7 +389,9 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
               privateKey,
               it
             )
-            results.add(resultObject);
+            withContext(coroutineResultContext) {
+              results.add(resultObject);
+            }
           }
           catch(e : Exception) {
             Log.e(TAG, "error decrypting string in coroutine",e)
@@ -397,15 +400,10 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       }
       decryptionRoutines.joinAll();
       for(result in results) {
-        if(result != null) {
-          var jsResult : WritableMap = Arguments.createMap();
-          jsResult.putString("text",result["text"] as String);
-          jsResult.putString("identifier",result["identifier"] as String);
-          jsResults.pushMap(jsResult);
-        }
-        else {
-          Log.i(TAG, "result was null")
-        }
+        var jsResult : WritableMap = Arguments.createMap();
+        jsResult.putString("text",result["text"] as String);
+        jsResult.putString("identifier",result["identifier"] as String);
+        jsResults.pushMap(jsResult);
       }
       promise.resolve(jsResults)
     }
