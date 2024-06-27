@@ -8,6 +8,8 @@ import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 
+import Crypto from '../nativeWrapper/Crypto';
+
 import { editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 
@@ -47,6 +49,10 @@ const EditContact = ({ route, navigation }) => {
       setContactImage("")
       setPublicKey(route?.params?.publicKey || "");
       setName(route?.params?.name || "");
+    }
+
+    return () => {
+      Crypto.cancelCoroutineWork();
     }
   },[])
 

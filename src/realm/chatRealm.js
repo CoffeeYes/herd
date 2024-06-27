@@ -73,12 +73,10 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
     }
   }
 
-  const initialReceivedMessages = await decryptMessages(receivedMessages) 
-
-  const initialSentMessages = await decryptMessages(sentMessagesCopy)
+  const decryptedMessages = await decryptMessages([...sentMessagesCopy,...receivedMessages]);
 
   let payload = {
-    messages : [...initialSentMessages,...initialReceivedMessages].sort( (a,b) => a.timestamp - b.timestamp)
+    messages : decryptedMessages.sort( (a,b) => a.timestamp - b.timestamp)
   }
 
   //calculate new indices to send to frontend based on the sizes of the received/sent message arrays
