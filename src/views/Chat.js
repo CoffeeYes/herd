@@ -195,18 +195,6 @@ const Chat = ({ route, navigation }) => {
     return newMessagesToAdd;
   }
 
-  const encryptString = async (string, keyToEncryptWith) => {
-    //use key to encrypt when it is passed, otherwise load key from store using alias
-    const loadKeyFromStore = !keyToEncryptWith;
-    const keyToUse = loadKeyFromStore ? "herdPersonal" : keyToEncryptWith;
-    const encryptedString = (await encryptStrings(
-      keyToUse,
-      loadKeyFromStore,
-      [string]
-    ))[0]
-    return encryptedString;
-  }
-
   const sendMessage = async message => {
     if(message.trim() === "") {
       return;
@@ -230,10 +218,18 @@ const Chat = ({ route, navigation }) => {
     }
 
     //encrypt the message to be sent using the other users public key
-    const newMessageEncrypted = await encryptString(message,contactInfo.key);
+    const newMessageEncrypted = (await encryptStrings(
+      contactInfo.key,
+      false,
+      [message]
+    ))[0];
 
     //encrypt the passed in message using the users own public key
-    const newMessageEncryptedCopy = await encryptString(message);
+    const newMessageEncryptedCopy = (await encryptStrings(
+      "herdPersonal",
+      true,
+      [message]
+    ))[0];
 
     //add message to UI
     const messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
