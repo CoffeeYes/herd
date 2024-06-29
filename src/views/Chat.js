@@ -59,8 +59,9 @@ const Chat = ({ route, navigation }) => {
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
-
-  const disableInputChange = useRef(false);
+  
+  const disableChatInputRef = useRef(false);
+  const previousTextValueRef = useRef("");
 
   const messageLoadingSize = 5;
 
@@ -555,23 +556,20 @@ const Chat = ({ route, navigation }) => {
           height : inputHeight
         }}
         value={chatInput}
-        maxLength={maxCharacterCount}
+        maxLength={disableChatInputRef.current ? 1 : maxCharacterCount}
         onChangeText={text => {
-          if(disableInputChange.current) {
-            //internal text value has been successfully reset, allow new updates through
-            if(text.length == chatInput.length + 1) {
-              disableInputChange.current = false;
-              setChatInput(text);
+          setChatInput(previousText => {
+            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 && previousTextValueRef.current.length != text.length) {
+              disableChatInputRef.current=true;
+              return ""  
             }
-            //internal text value has not been reset, continue to reset it
             else {
-              setChatInput("");
+              disableChatInputRef.current = false;
+              return text
             }
-          }
-          else {
-            setChatInput(disableInputChange.current ? "" : text)
-            setCharacterCount(maxCharacterCount - text.length)
-          }
+          })
+          setCharacterCount(maxCharacterCount - text.length)
+          previousTextValueRef.current = text
         }}
         multiline={true}/>
         <View style={{
@@ -585,10 +583,7 @@ const Chat = ({ route, navigation }) => {
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
         onPress={async () => {
-          if(!disableInputChange.current) {
-            disableInputChange.current = true;
             await sendMessage(chatInput);
-          }
         }}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
