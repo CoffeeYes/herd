@@ -561,6 +561,7 @@ const Chat = ({ route, navigation }) => {
           setChatInput(previousText => {
             if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 && previousTextValueRef.current.length != text.length) {
               disableChatInputRef.current=true;
+              setCharacterCount(maxCharacterCount)
               return ""  
             }
             else {
@@ -568,7 +569,9 @@ const Chat = ({ route, navigation }) => {
               return text
             }
           })
-          setCharacterCount(maxCharacterCount - text.length)
+          !disableChatInputRef.current && 
+          setCharacterCount(maxCharacterCount - text.length);
+
           previousTextValueRef.current = text
         }}
         multiline={true}/>
