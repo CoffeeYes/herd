@@ -54,7 +54,6 @@ const Chat = ({ route, navigation }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [chatWindowSize, setChatWindowSize] = useState(1);
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -64,6 +63,7 @@ const Chat = ({ route, navigation }) => {
   const previousTextValueRef = useRef("");
 
   const messageLoadingSize = 5;
+  const chatWindowSize = 16;
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
@@ -501,8 +501,7 @@ const Chat = ({ route, navigation }) => {
       <PanGestureHandler
       enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
       onGestureEvent={handleGesture}>
-        <View style={{flex : 1}}
-        onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}>
+        <View style={{flex : 1}}>
           {((loading || loadingMoreMessages) && !showPopup) &&
           <ActivityIndicator
           size="large"
