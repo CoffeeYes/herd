@@ -416,20 +416,41 @@ const Chat = ({ route, navigation }) => {
       viewOffset : 6 
     });
   }
-
-  const scrollToTop = (animated = true, optionalTargetIndex) => {
+  
+  let scrollRetryCount = 0;
+  const scrollToTop = (animated = true, isFailureRetry) => {
     const lastSectionIndex = messages?.length -1;
     const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
+    const targetIndexAfterFailure = lastMessageIndex - scrollRetryCount;
 
-    messages.length > 0 &&
-    lastSectionIndex >= 0 &&
-    lastMessageIndex >= 0 &&
-    scrollRef.current.scrollToLocation({
+    const scrollOptions = {
       animated : animated,
       sectionIndex : lastSectionIndex,
-      itemIndex : optionalTargetIndex ? optionalTargetIndex : lastMessageIndex,
       viewPosition : 1
-    })
+    }
+
+    if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
+      if(isFailureRetry) {
+        scrollRetryCount += 1;
+        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 3) {
+          scrollRef.current.scrollToLocation({
+            ...scrollOptions,
+            itemIndex : targetIndexAfterFailure
+          })
+        }
+        else {
+          scrollRetryCount = 0;
+          console.log("retrying scrollToTop failed 3 times, not attempting more")
+        }
+      }
+      else {
+        scrollRetryCount = 0;
+        scrollRef.current.scrollToLocation({
+          ...scrollOptions,
+          itemIndex : lastMessageIndex 
+        })
+      }
+    }
   }
 
   const longPressMessage = id => {
@@ -521,9 +542,11 @@ const Chat = ({ route, navigation }) => {
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
           onScrollToIndexFailed={e => {
-            e.index > 0 &&
-            scrollToTop(true,e.highestMeasuredFrameIndex);
-            console.log("scroll failed", e)
+            console.log("scrollToIndexFailed");
+            console.log(e)
+            if(e.index > 0) {
+              scrollToTop(true,true)
+            }
           }}
           onMomentumScrollBegin={() => {
             setMomentumScrolling(true);
