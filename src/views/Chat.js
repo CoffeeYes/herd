@@ -432,7 +432,7 @@ const Chat = ({ route, navigation }) => {
     if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
       if(isFailureRetry) {
         scrollRetryCount += 1;
-        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 3) {
+        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 5) {
           scrollRef.current.scrollToLocation({
             ...scrollOptions,
             itemIndex : targetIndexAfterFailure
@@ -440,7 +440,7 @@ const Chat = ({ route, navigation }) => {
         }
         else {
           scrollRetryCount = 0;
-          console.log("retrying scrollToTop failed 3 times, not attempting more")
+          console.log("retrying scrollToTop failed 5 times or hit 0, not attempting more")
         }
       }
       else {
@@ -542,8 +542,6 @@ const Chat = ({ route, navigation }) => {
           onScrollBeginDrag={() => setScrolling(true)}
           onScrollEndDrag={() => setScrolling(false)}
           onScrollToIndexFailed={e => {
-            console.log("scrollToIndexFailed");
-            console.log(e)
             if(e.index > 0) {
               scrollToTop(true,true)
             }
