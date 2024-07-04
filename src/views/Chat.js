@@ -579,8 +579,7 @@ const Chat = ({ route, navigation }) => {
         maxLength={disableChatInputRef.current ? 1 : maxCharacterCount}
         onChangeText={text => {
           setChatInput(previousText => {
-            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 && previousTextValueRef.current.length != text.length) {
-              disableChatInputRef.current=true;
+            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 ) {
               setCharacterCount(maxCharacterCount)
               return ""  
             }
@@ -606,6 +605,7 @@ const Chat = ({ route, navigation }) => {
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
         onPress={async () => {
+            disableChatInputRef.current=true;
             await sendMessage(chatInput);
         }}>
           <Icon name="send" size={32} color={palette.primary}/>
