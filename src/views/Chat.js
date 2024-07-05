@@ -6,6 +6,7 @@ import { Text, View, TextInput, ActivityIndicator,
 import moment from 'moment';
 import { PanGestureHandler, TouchableOpacity  } from 'react-native-gesture-handler'
 import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import {
   getMessagesWithContact,
   sendMessageToContact,
@@ -576,7 +577,12 @@ const Chat = ({ route, navigation }) => {
           height : inputHeight
         }}
         value={chatInput}
-        maxLength={disableChatInputRef.current ? 1 : maxCharacterCount}
+        onTextInput={({nativeEvent : {text}})=> {
+          if(text.length > 1) {
+            disableChatInputRef.current = false;
+            setChatInput(text)
+          }
+        }}
         onChangeText={text => {
           setChatInput(previousText => {
             if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 ) {
