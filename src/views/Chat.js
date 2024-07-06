@@ -577,6 +577,7 @@ const Chat = ({ route, navigation }) => {
           height : inputHeight
         }}
         value={chatInput}
+        maxLength={maxCharacterCount}
         onTextInput={({nativeEvent : {text}})=> {
           if(text.length > 1) {
             disableChatInputRef.current = false;
@@ -585,7 +586,7 @@ const Chat = ({ route, navigation }) => {
         }}
         onChangeText={text => {
           setChatInput(previousText => {
-            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 0 ) {
+            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 ) {
               setCharacterCount(maxCharacterCount)
               return ""  
             }
