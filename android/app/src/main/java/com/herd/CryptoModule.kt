@@ -395,6 +395,10 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
           }
           catch(e : Exception) {
             Log.e(TAG, "error decrypting string in coroutine",e)
+            results.add(mapOf(
+              "identifier" to it["identifier"] as String,
+              "text" to "An error occurred attemping to decrypt this message"
+            ))
           }
         }
       }
