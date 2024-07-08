@@ -23,7 +23,6 @@ const MessageQueue = ({}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [parsedQueue, setParsedQueue] = useState(
     messageQueue.sort( (a,b) => a.timestamp - b.timestamp)
-    .map(message => ({...message, loading : true}))
   );
 
   const initialNumToRender = 10;
@@ -52,7 +51,8 @@ const MessageQueue = ({}) => {
       let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
       return ({...messageWithContact, loading : canBeDecrypted})
     })
-    const messagesToDecrypt = messagesAssignedToContact.map((message, index) => message.loading && ({text : message.text, identifier : index.toString()}))
+    setParsedQueue(messagesAssignedToContact);
+    const messagesToDecrypt = messagesAssignedToContact.filter(message => message.loading).map((message, index) => ({text : message.text, identifier : index.toString()}))
     const result = await decryptStringsWithIdentifier(
       messagesToDecrypt
     )
