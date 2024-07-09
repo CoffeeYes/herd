@@ -21,9 +21,7 @@ const MessageQueue = ({}) => {
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
   const customStyle = useSelector(state => state.chatReducer.styles);
-  const [parsedQueue, setParsedQueue] = useState(
-    messageQueue.sort( (a,b) => a.timestamp - b.timestamp)
-  );
+  const [parsedQueue, setParsedQueue] = useState(messageQueue);
 
   const initialNumToRender = 10;
 
@@ -46,22 +44,20 @@ const MessageQueue = ({}) => {
     return [message,textToDecrypt];
   }
 
-  const decryptMessages = async queue => {
-    const messagesAssignedToContact = queue.map(message => {
+  const createInitialMessageState = messages => {
+    return messages.sort((a,b) => a.timestamp - b.timestamp)
+    .map(message => {
       let [messageWithContact,canBeDecrypted] = assignParticipantsToMessage(message)
       return ({...messageWithContact, loading : canBeDecrypted})
     })
-    setParsedQueue(messagesAssignedToContact);
-    const messagesToDecrypt = messagesAssignedToContact.filter(message => message.loading).map((message, index) => ({text : message.text, identifier : index.toString()}))
-    const result = await decryptStringsWithIdentifier(
-      messagesToDecrypt
-    )
-    let updatedQueue = [...parsedQueue];
-    for(const decryptedMessage of result) {
+  }
+
+  const assignResultsToTargets = (decryptedMessages, targets) => {
+    for(const decryptedMessage of decryptedMessages) {
       const index = parseInt(decryptedMessage.identifier);
-      updatedQueue[index] = {...updatedQueue[index], text : decryptedMessage.text, loading : false}
+      targets[index] = {...targets[index], text : decryptedMessage.text, loading : false}
     }
-    setParsedQueue(updatedQueue);
+    return targets;
   }
 
   const onMessagePress = useCallback(id => {
@@ -72,7 +68,14 @@ const MessageQueue = ({}) => {
   },[])
 
   useEffect(() => {
-    decryptMessages(parsedQueue)
+    (async () => {
+      const initialMessages = createInitialMessageState(messageQueue);
+      setParsedQueue(initialMessages);
+      const messagesToDecrypt = initialMessages.filter(message => message.loading).map((message, index) => ({text : message.text, identifier : index.toString()}))
+      const results = await decryptStringsWithIdentifier(messagesToDecrypt)
+      const final = assignResultsToTargets(results,[...parsedQueue]);
+      setParsedQueue(final);
+    })()
 
     return () => {
       Crypto.cancelCoroutineWork();
