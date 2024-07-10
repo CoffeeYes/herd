@@ -82,6 +82,7 @@ const Contact = ({route, navigation}) => {
       <Header
       title={contact.name}
       allowGoBack
+      disableBackButton={showQRCode}
       containerStyle={{maxHeight : halfHeight}}
       onTextLayout={e => {
         setHeaderLineHeight(calculateMaxNumberOfLines(e.nativeEvent.lines))
@@ -91,7 +92,7 @@ const Contact = ({route, navigation}) => {
       titleNumberOfLines={expandName ? headerLineHeight : 1}
       rightButtonIcon="edit"
       onTextTouch={() => setExpandName(!expandName)}
-      rightButtonOnClick={() => navigation.navigate("editContact", {id : route.params.id})}/>
+      rightButtonOnClick={() => !showQRCode && navigation.navigate("editContact", {id : route.params.id})}/>
 
       <ScrollView contentContainerStyle={{paddingVertical : 20}}>
 
