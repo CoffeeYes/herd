@@ -38,6 +38,10 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   val coroutineResultContext = newSingleThreadContext("coroutineResultContext");
   val context = reactContext;
 
+  var encryptionPromise : Promise? = null;
+  var decryptionPromise : Promise? = null;
+  var decryptionWithIdentifierPromise : Promise? = null;
+
   override fun getName(): String {
       return "CryptoModule"
   }
@@ -236,7 +240,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       Log.i(TAG,errorMessage)
       return promise.reject("could not make load or use public key")
     }
-
+    
+    encryptionPromise = promise;
     var results : Array<String> = Array<String>(strings.size()) { "" };
     var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
     
@@ -257,7 +262,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       encryptionRoutines.joinAll();
-      promise.resolve(Arguments.fromArray(results))
+      encryptionPromise?.resolve(Arguments.fromArray(results));
+      encryptionPromise = null;
     }
   }
 
@@ -338,6 +344,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     var results : Array<String> = Array<String>(strings.size()) { "" };
     var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
 
+    decryptionPromise = promise;
+
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
     }
@@ -355,7 +363,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       decryptionRoutines.joinAll();
-      promise.resolve(Arguments.fromArray(results))
+      decryptionPromise?.resolve(Arguments.fromArray(results))
+      decryptionPromise = null;
     }
   }
 
@@ -378,6 +387,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
     }
+
+    decryptionWithIdentifierPromise = promise;
     
     cryptographyScope.launch {
       val decryptionRoutines =  
@@ -409,14 +420,18 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         jsResult.putString("identifier",result["identifier"] as String);
         jsResults.pushMap(jsResult);
       }
-      promise.resolve(jsResults)
+      decryptionWithIdentifierPromise?.resolve(jsResults)
+      decryptionWithIdentifierPromise = null;
     }
   }
 
   @ReactMethod
   fun cancelCoroutineWork(promise : Promise) {
     cryptographyScope.cancel();
-    cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default);
+    decryptionPromise?.resolve(null);
+    decryptionWithIdentifierPromise?.resolve(null);
+    encryptionPromise?.resolve(null);
     promise.resolve(true);
   }
 
