@@ -40,7 +40,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
 
   var encryptionPromise : Promise? = null;
   var decryptionPromise : Promise? = null;
-  var decryptionWithIdentifierPromise : Promise? = null;
 
   override fun getName(): String {
       return "CryptoModule"
@@ -388,7 +387,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       return promise.resolve("Private key does not exist")
     }
 
-    decryptionWithIdentifierPromise = promise;
+    decryptionPromise = promise;
     
     cryptographyScope.launch {
       val decryptionRoutines =  
@@ -420,8 +419,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         jsResult.putString("identifier",result["identifier"] as String);
         jsResults.pushMap(jsResult);
       }
-      decryptionWithIdentifierPromise?.resolve(jsResults)
-      decryptionWithIdentifierPromise = null;
+      decryptionPromise?.resolve(jsResults)
+      decryptionPromise = null;
     }
   }
 
@@ -429,9 +428,8 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   fun cancelCoroutineWork(promise : Promise) {
     cryptographyScope.cancel();
     cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default);
-    decryptionPromise?.resolve(null);
-    decryptionWithIdentifierPromise?.resolve(null);
-    encryptionPromise?.resolve(null);
+    decryptionPromise?.resolve(Arguments.createArray());
+    encryptionPromise?.resolve(Arguments.createArray());
     promise.resolve(true);
   }
 
