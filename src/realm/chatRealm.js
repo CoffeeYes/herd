@@ -351,24 +351,27 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
     decryptedStrings 
   )
 
-  messageSentRealm.write(() => {
-    for(const [index,message] of sentMessages.entries()) {
-      message.to = newKey;
-      message.text = newTexts[index];
-    }
-  })
+  if(newTexts.length > 0) {
+    messageSentRealm.write(() => {
+      for(const [index,message] of sentMessages.entries()) {
+        console.log(message)
+        message.to = newKey;
+        message.text = newTexts[index];
+      }
+    })
 
-  messageCopyRealm.write(() => {
-    for (const message of sentMessagesCopy) {
-      message.to = newKey;
-    }
-  })
+    messageCopyRealm.write(() => {
+      for (const message of sentMessagesCopy) {
+        message.to = newKey;
+      }
+    })
 
-  messageReceivedRealm.write(() => {
-    for (const message of receivedMessages) {
-      message.from = newKey
-    }
-  })
+    messageReceivedRealm.write(() => {
+      for (const message of receivedMessages) {
+        message.from = newKey
+      }
+    })
+  }
 }
 
 const deleteAllMessages = () => {
