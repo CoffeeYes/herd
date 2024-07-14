@@ -62,9 +62,10 @@ const getContactByName = name => {
 const editContact = async (id, values) => {
   const contact = getContactById(Realm.BSON.ObjectId(id));
   const oldKey = contact.key;
+  let messagesUpdated = false;
 
   if(values.key !== oldKey) {
-    await updateMessagesWithContact(oldKey,values.key);
+    messagesUpdated = await updateMessagesWithContact(oldKey,values.key);
   }
 
   const validKeys = Object.keys(Schemas.ContactSchema.properties)
@@ -73,13 +74,21 @@ const editContact = async (id, values) => {
   contactsRealm.write(() => {
     for(const key of  Object.keys(values)) {
       if (validKeys.includes(key)) {
-        contact[key] = values[key]
+        if(key == "key") {
+          if(messagesUpdated) {
+            contact[key] = values[key];
+          }
+        }
+        else {
+          contact[key] = values[key]
+        }
       }
       else {
         throw new Error(`invalid key ${key} passed in value object when attempting to update contact`)
       }
     }
   })
+  return messagesUpdated;
 }
 
 const deleteAllContacts = () => {

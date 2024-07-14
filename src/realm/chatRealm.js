@@ -354,7 +354,6 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   if(newTexts.length > 0) {
     messageSentRealm.write(() => {
       for(const [index,message] of sentMessages.entries()) {
-        console.log(message)
         message.to = newKey;
         message.text = newTexts[index];
       }
@@ -371,6 +370,10 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
         message.from = newKey
       }
     })
+    return true;
+  }
+  else {
+    return false;
   }
 }
 
