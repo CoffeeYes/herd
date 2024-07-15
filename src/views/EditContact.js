@@ -107,13 +107,13 @@ const EditContact = ({ route, navigation }) => {
     }
 
     setErrors([]);
-    let newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
+    let newInfo = {_id : route.params.id, name : name.trim(), key : publicKey.trim(), image : contactImage};
     if(editingExistingContact) {
-      const messagesUpdated = await editContact(route.params.id, newInfo);
+      const messagesUpdated = await editContact(newInfo);
       if(!messagesUpdated) {
         delete newInfo.key;
       }
-      dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
+      dispatch(updateContactAndReferences(newInfo));
     }
     else {
       haveSavedContactRef.current = true;

@@ -59,8 +59,8 @@ const getContactByName = name => {
   false
 }
 
-const editContact = async (id, values) => {
-  const contact = getContactById(Realm.BSON.ObjectId(id));
+const editContact = async (values) => {
+  const contact = getContactById(Realm.BSON.ObjectId(values._id));
   const oldKey = contact.key;
   let messagesUpdated = false;
 
@@ -72,7 +72,7 @@ const editContact = async (id, values) => {
   .filter(key => key !== "_id");
 
   contactsRealm.write(() => {
-    for(const key of  Object.keys(values)) {
+    for(const key of  Object.keys(values).filter(key => key !== "_id")) {
       if (validKeys.includes(key)) {
         if(key == "key") {
           if(messagesUpdated) {
