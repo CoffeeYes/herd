@@ -261,7 +261,7 @@ const Customise = () => {
           disableRightButton
           backArrowSize={scaledHeaderIconSize}
           rightIconSize={scaledHeaderIconSize}
-          textStyle={{fontSize : scaledFontSize * 1.5}}
+          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
           <CardButton
@@ -269,16 +269,16 @@ const Customise = () => {
           iconSize={cardIconSize + (scaledFontSize*0.2)}
           disableTouch
           text="Preview"
-          textStyle={{fontSize : scaledFontSize}}
+          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
           rightIcon="preview"/>
 
           <ListItem
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : (scaledFontSize * 0.8) + screenFontScaler}}
-          subTextStyle={{fontSize : (scaledFontSize * 0.8) + screenFontScaler}}
-          textStyle={{fontSize : scaledFontSize}}
+          rightTextStyle={{fontSize : ((synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
+          subTextStyle={{fontSize : ((synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
+          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
           disableTouch
           />
 
@@ -287,7 +287,7 @@ const Customise = () => {
           disabled 
           useDisabledStyle={false}
           buttonStyle={{marginTop : 10}}
-          textStyle={{fontSize : scaledFontSize}}
+          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
           />
 
           <View style={styles.fontSlidersContainer}>
@@ -331,7 +331,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample sent message"
-            textFontSize={messageFontSize + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? synchronisedFontSize : messageFontSize) + screenFontScaler}
             timestamp="12 : 20"
             customStyle={getChatBubbleColor()}
             messageFrom={true}/>
@@ -339,7 +339,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample response message"
-            textFontSize={messageFontSize + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? synchronisedFontSize : messageFontSize) + screenFontScaler}
             timestamp="12 : 21"
             customStyle={getChatBubbleColor()}
             messageFrom={false}/>
