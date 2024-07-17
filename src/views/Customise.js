@@ -28,6 +28,7 @@ const Customise = () => {
   const [loading, setLoading] = useState(true);
   const [originalStyles, setOriginalStyles] = useState({});
   const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
+  const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [overrideSliderValue, setOverrideSliderValue] = useState(false);
@@ -67,6 +68,10 @@ const Customise = () => {
   useEffect(() => {
     setScaledFontSize(uiFontSize + screenFontScaler)
   },[uiFontSize, screenFontScaler])
+
+  useEffect(() => {
+    setScaledSynchronisedFontSize(synchronisedFontSize + screenFontScaler)
+  },[synchronisedFontSize])
 
   //checks if fontsize states have been set to default values before turning overrideSliderValue off
   //to ensure sliders return to default positions
@@ -261,7 +266,7 @@ const Customise = () => {
           disableRightButton
           backArrowSize={scaledHeaderIconSize}
           rightIconSize={scaledHeaderIconSize}
-          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 1.5}}
+          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 1.5}}
           containerStyle={{marginTop : 10}}/>
 
           <CardButton
@@ -269,16 +274,16 @@ const Customise = () => {
           iconSize={cardIconSize + (scaledFontSize*0.2)}
           disableTouch
           text="Preview"
-          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
+          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
           rightIcon="preview"/>
 
           <ListItem
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : ((synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
-          subTextStyle={{fontSize : ((synchroniseFontChanges ? synchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
-          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
+          rightTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
+          subTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
+          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
           disableTouch
           />
 
@@ -287,7 +292,7 @@ const Customise = () => {
           disabled 
           useDisabledStyle={false}
           buttonStyle={{marginTop : 10}}
-          textStyle={{fontSize : (synchroniseFontChanges ? synchronisedFontSize : scaledFontSize)}}
+          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
           />
 
           <View style={styles.fontSlidersContainer}>
@@ -331,7 +336,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample sent message"
-            textFontSize={(synchroniseFontChanges ? synchronisedFontSize : messageFontSize) + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize) + screenFontScaler}
             timestamp="12 : 20"
             customStyle={getChatBubbleColor()}
             messageFrom={true}/>
@@ -339,7 +344,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample response message"
-            textFontSize={(synchroniseFontChanges ? synchronisedFontSize : messageFontSize) + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize) + screenFontScaler}
             timestamp="12 : 21"
             customStyle={getChatBubbleColor()}
             messageFrom={false}/>
