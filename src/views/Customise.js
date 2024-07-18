@@ -336,7 +336,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample sent message"
-            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize) + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize + screenFontScaler)}
             timestamp="12 : 20"
             customStyle={getChatBubbleColor()}
             messageFrom={true}/>
@@ -344,7 +344,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample response message"
-            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize) + screenFontScaler}
+            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize + screenFontScaler)}
             timestamp="12 : 21"
             customStyle={getChatBubbleColor()}
             messageFrom={false}/>
