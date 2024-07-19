@@ -22,6 +22,10 @@ import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 
+const titleFontMultiplier = 1.5;
+const subtextFontMultiplier = 0.8;
+const buttonIconSizeMultiplier = 0.2;
+
 const Customise = () => {
   const dispatch = useDispatch();
   const [activeItem, setActiveItem] = useState(0);
@@ -116,8 +120,8 @@ const Customise = () => {
       receivedTextColor : fromHsv(receivedTextColor),
       messageFontSize : messageFontSize,
       uiFontSize : uiFontSize,
-      titleSize : uiFontSize * 1.5,
-      subTextSize : uiFontSize * 0.8,
+      titleSize : uiFontSize * titleFontMultiplier,
+      subTextSize : uiFontSize * subtextFontMultiplier,
     }
 
     setOriginalStyles(style);
@@ -266,12 +270,12 @@ const Customise = () => {
           disableRightButton
           backArrowSize={scaledHeaderIconSize}
           rightIconSize={scaledHeaderIconSize}
-          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 1.5}}
-          containerStyle={{marginTop : 10}}/>
+          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * titleFontMultiplier}}
+          containerStyle={styles.topSpacer}/>
 
           <CardButton
           containerStyle={{alignSelf : "center"}}
-          iconSize={cardIconSize + (scaledFontSize*0.2)}
+          iconSize={cardIconSize + (scaledFontSize * buttonIconSizeMultiplier)}
           disableTouch
           text="Preview"
           textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
@@ -281,8 +285,8 @@ const Customise = () => {
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
-          subTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * 0.8) + screenFontScaler}}
+          rightTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
+          subTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
           textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
           disableTouch
           />
@@ -291,13 +295,13 @@ const Customise = () => {
           text="Preview"
           disabled 
           useDisabledStyle={false}
-          buttonStyle={{marginTop : 10}}
+          buttonStyle={styles.topSpacer}
           textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
           />
 
           <View style={styles.fontSlidersContainer}>
             <TouchableOpacity
-            style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
+            style={{...styles.topSpacer, marginLeft : 20, alignSelf : "flex-start"}}
             onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
               <Icon
               size={iconSize}
@@ -435,6 +439,9 @@ const styles = {
     marginVertical : 10,
     borderRadius : 5,
     paddingVertical : 10,
+  },
+  topSpacer : {
+    marginTop : 10
   }
 }
 export default Customise;
