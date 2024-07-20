@@ -150,9 +150,7 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  // track previous length of messages for logic, used throughout other logic
-  // because it is already available, not because a ref is necessary
-  const messageLengthRef = useRef(0);
+  const firstMessageRef = useRef(messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]);
 
   const flattenMessages = (messages, includeDays = false) => {
     let extractedArray = [];
@@ -359,13 +357,13 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleContentSizeChange = (contentHeight) => {
-    //compare old message length against new message length
-    //scroll to bottom on initial load and to top when new messages are added
-    const messageLength = getMessageLength();
-    if(messageLengthRef.current === 0 && messages.length > 0) {
+    //compare old message first against new first message 
+    //scroll to bottom on initial load (firstMessageRef undefined) and to top when new messages are added
+    const firstMessage = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1] 
+    if(!firstMessageRef.current && messages.length > 0) {
       scrollToBottom(false);
     }
-    else if((messageLength - messageLengthRef.current > 1) && messageLength > 0){
+    else if(firstMessageRef.current?._id !== firstMessage?._id && messages.length > 0) {
       scrollToTop();
     }
 
@@ -378,7 +376,7 @@ const Chat = ({ route, navigation }) => {
       setEnableGestureHandler(false)
     }
 
-    messageLengthRef.current = messageLength;
+    firstMessageRef.current = firstMessage;
   }
 
   const handleGesture = event => {
