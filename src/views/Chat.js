@@ -150,7 +150,7 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const firstMessageRef = useRef(messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]);
+  const firstMessageIDRef = useRef("");
 
   const flattenMessages = (messages, includeDays = false) => {
     let extractedArray = [];
@@ -357,13 +357,13 @@ const Chat = ({ route, navigation }) => {
   }
 
   const handleContentSizeChange = (contentHeight) => {
-    //compare old message first against new first message 
-    //scroll to bottom on initial load (firstMessageRef undefined) and to top when new messages are added
-    const firstMessage = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1] 
-    if(!firstMessageRef.current && messages.length > 0) {
+    // compare IDs of old first message to new first message to determine if messages have been prepended
+    // and a scroll to top is necessary.
+    const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
+    if(firstMessageIDRef.current.length == 0 && messages.length > 0) {
       scrollToBottom(false);
     }
-    else if(firstMessageRef.current?._id !== firstMessage?._id && messages.length > 0) {
+    else if(firstMessageIDRef.current !== firstMessageID && messages.length > 0) {
       scrollToTop();
     }
 
@@ -375,8 +375,8 @@ const Chat = ({ route, navigation }) => {
       !showedPopup && setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
     }
-
-    firstMessageRef.current = firstMessage;
+    
+    firstMessageIDRef.current = firstMessageID;
   }
 
   const handleGesture = event => {
