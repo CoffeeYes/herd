@@ -525,6 +525,7 @@ const Chat = ({ route, navigation }) => {
           {((loading || loadingMoreMessages) && !showPopup) &&
           <ActivityIndicator
           size="large"
+          style={styles.loadingIndicator}
           color={palette.primary}/>}
 
           <SectionList
@@ -662,6 +663,11 @@ const styles = {
     backgroundColor : palette.white,
     height : "100%",
     padding : 5 
+  },
+  loadingIndicator : {
+    position : "absolute",
+    alignSelf : "center",
+    marginTop : 20
   }
 }
 
