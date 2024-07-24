@@ -81,7 +81,6 @@ const Chat = ({ route, navigation }) => {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
         setLoading(false);
-        scrollToBottom(false);
       }
       else {
         const [sentLength,receivedLength] = getMessageLength(true);
@@ -360,13 +359,8 @@ const Chat = ({ route, navigation }) => {
     // compare IDs of old first message to new first message to determine if messages have been prepended
     // and a scroll to top is necessary.
     const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
-    if(messages.length > 0) {
-      if(firstMessageIDRef.current.length == 0) {
-        scrollToBottom(false);
-      }
-      else if (firstMessageIDRef.current !== firstMessageID){
-        scrollToTop();
-      }
+    if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
+      scrollToTop();
     }
 
     if(contentHeight < contentTooSmallHeight) {
@@ -378,10 +372,9 @@ const Chat = ({ route, navigation }) => {
       setEnableGestureHandler(false)
     }
     
-    // set ID ref to a random value if firstMessageID is not present
-    // this occurs when there is a race and messages comes back as [] on initial load
-    // this prevents scrollToBottom from firing on second load in such a case
-    firstMessageIDRef.current = firstMessageID || "a";
+    if(firstMessageID) {
+      firstMessageIDRef.current = firstMessageID;
+    }
   }
 
   const handleGesture = event => {
@@ -672,7 +665,8 @@ const styles = {
   loadingIndicator : {
     position : "absolute",
     alignSelf : "center",
-    marginTop : 20
+    marginTop : 20,
+    zIndex : 999
   }
 }
 
