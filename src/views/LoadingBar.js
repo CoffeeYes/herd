@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
@@ -7,19 +7,21 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
                      barColor = palette.grey, sliderColor = palette.black,
                      animationDuration = 500, paused = false}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
+  const [outerWidth , setOuterWidth] = useState(0);
+  const [innerWidth, setInnerWidth] = useState(0);
 
   let animationLoop;
   const moveToEnd = Animated.timing(loadingViewPosition, {
-    toValue: 100,
+    toValue: outerWidth - innerWidth,
     duration: animationDuration,
-    useNativeDriver : false,
+    useNativeDriver : true,
     isInteraction : false //https://github.com/facebook/react-native/issues/8624
   })
 
   const moveToBeginning = Animated.timing(loadingViewPosition, {
     toValue: 0,
     duration: animationDuration,
-    useNativeDriver : false,
+    useNativeDriver : true,
     isInteraction : false
   })
 
@@ -34,16 +36,19 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
       if(animationLoop) {
         animationLoop.start();
       }
-      else {
-        animationLoop = Animated.loop(
-          Animated.sequence([
-            moveToEnd,
-            moveToBeginning
-          ])
-        ).start();
-      }
     }
   },[paused])
+
+  useEffect(() => {
+    if(outerWidth > 0 && innerWidth > 0 && !paused) {
+      animationLoop = Animated.loop(
+        Animated.sequence([
+          moveToEnd,
+          moveToBeginning
+        ])
+      ).start();
+    }
+  },[outerWidth, innerWidth, paused])
 
   return (
     [...Array(numBars).keys()].map(num => {
@@ -53,15 +58,14 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
         ...containerStyle,
         backgroundColor : barColor,
         marginTop : (numBars > 1 && num > 0) ? 10: 0
-      }}>
+      }}
+      onLayout={e => setOuterWidth(e.nativeEvent.layout.width)}>
         <Animated.View
+        onLayout={e => setInnerWidth(e.nativeEvent.layout.width)}
         style={{
           ...styles.loadingView,
           ...loadingBarStyle,
-          marginLeft : loadingViewPosition.interpolate({
-            inputRange : [0,100],
-            outputRange : ["0%","80%"]
-          }),
+          transform : [{translateX : loadingViewPosition}],
           backgroundColor : sliderColor
         }}/>
       </View>
