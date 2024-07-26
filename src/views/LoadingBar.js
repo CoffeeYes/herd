@@ -27,26 +27,18 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
 
   useEffect(() => {
     if(paused) {
-      if(animationLoop) {
-        animationLoop.stop();
-      }
+      animationLoop?.stop();
     }
     else {
-      //restart existing animation, otherwise create animation if it's the first time
-      if(animationLoop) {
-        animationLoop.start();
+      if(outerWidth > 0 && innerWidth > 0) {
+        animationLoop?.reset();
+        animationLoop = Animated.loop(
+          Animated.sequence([
+            moveToEnd,
+            moveToBeginning
+          ])
+        ).start();
       }
-    }
-  },[paused])
-
-  useEffect(() => {
-    if(outerWidth > 0 && innerWidth > 0 && !paused) {
-      animationLoop = Animated.loop(
-        Animated.sequence([
-          moveToEnd,
-          moveToBeginning
-        ])
-      ).start();
     }
   },[outerWidth, innerWidth, paused])
 
