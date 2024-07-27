@@ -190,6 +190,9 @@ const Chat = ({ route, navigation }) => {
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
+      if(newMessages.length > 0) {
+        firstMessageIDRef.current = newMessages[newMessages.length -1]._id
+      }
     }
     return newMessagesToAdd;
   }
@@ -429,7 +432,7 @@ const Chat = ({ route, navigation }) => {
     if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
       if(isFailureRetry) {
         scrollRetryCount += 1;
-        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 5) {
+        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 4) {
           scrollRef.current.scrollToLocation({
             ...scrollOptions,
             itemIndex : targetIndexAfterFailure
@@ -437,7 +440,7 @@ const Chat = ({ route, navigation }) => {
         }
         else {
           scrollRetryCount = 0;
-          console.log("retrying scrollToTop failed 5 times or hit 0, not attempting more")
+          console.log("retrying scrollToTop failed 4 times or hit 0, not attempting more")
         }
       }
       else {
