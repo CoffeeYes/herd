@@ -107,7 +107,7 @@ const EditContact = ({ route, navigation }) => {
     }
 
     setErrors([]);
-    let newInfo = {_id : route.params.id, name : name.trim(), key : publicKey.trim(), image : contactImage};
+    let newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage, ...(route?.params?.id && {_id : route.params.id})};
     if(editingExistingContact) {
       const messagesUpdated = await editContact(newInfo);
       if(!messagesUpdated) {
