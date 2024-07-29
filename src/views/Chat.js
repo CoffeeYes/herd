@@ -419,9 +419,14 @@ const Chat = ({ route, navigation }) => {
   
   let scrollRetryCount = 0;
   const scrollToTop = (animated = true, isFailureRetry) => {
-    const lastSectionIndex = messages?.length -1;
-    const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-    const targetIndexAfterFailure = lastMessageIndex - scrollRetryCount;
+    let lastSectionIndex = messages?.length -1;
+    let lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
+    let targetIndexAfterFailure = lastMessageIndex - scrollRetryCount;
+    if(targetIndexAfterFailure < 0) {
+      lastSectionIndex = messages?.length - 2;
+      const differenceFromPreviousSection = scrollRetryCount - lastMessageIndex;
+      targetIndexAfterFailure = messages?.[lastSectionIndex]?.data?.length - 1 - differenceFromPreviousSection;
+    }
 
     const scrollOptions = {
       animated : animated,
