@@ -11,7 +11,7 @@ import { defaultChatStyles } from '../assets/styles'
 import { useIsFocused } from '@react-navigation/native';
 
 const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disableRightButton, disableBackButton,
-                  preText, onTextLayout, 
+                  preText, onTextLayout, onLayout,
                   onTextTouch, disableTextTouch = false, touchStyle, containerStyle, textStyle, backArrowSize,
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
                   useAlternativeIcon, alternativeIcon}) => {
@@ -28,11 +28,13 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
 
   return (
     <View
+    onLayout={onLayout}
     style={{
       ...styles.container,
       minHeight : minimumHeight, 
       ...(!showBackButton && {paddingLeft : 10}),
-      ...containerStyle
+      ...containerStyle,
+      height : 76,
     }}>
 
       {showBackButton &&

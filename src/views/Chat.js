@@ -58,6 +58,7 @@ const Chat = ({ route, navigation }) => {
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [sectionListHeight, setSectionListHeight] = useState(0);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
   const disableChatInputRef = useRef(false);
@@ -429,9 +430,10 @@ const Chat = ({ route, navigation }) => {
     }
 
     const scrollOptions = {
-      animated : animated,
+      animated,
       sectionIndex : lastSectionIndex,
-      viewPosition : 1
+      viewPosition : 0,
+      viewOffset : isFailureRetry ? 0 : sectionListHeight - 22
     }
 
     if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
@@ -542,6 +544,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           keyExtractor={item => item._id}
           renderItem={renderItem}
+          onLayout={e => setSectionListHeight(e.nativeEvent.layout.height)}
           onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
           inverted
           onEndReached={() => allowScrollToLoadMessages && (scrolling || momentumScrolling) && handleScroll()}
