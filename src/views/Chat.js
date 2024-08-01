@@ -192,7 +192,7 @@ const Chat = ({ route, navigation }) => {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
       if(newMessages.length > 0) {
-        firstMessageIDRef.current = newMessages[newMessages.length -1]._id
+        firstMessageIDRef.current = newMessages[0]._id
       }
     }
     return newMessagesToAdd;
