@@ -22,6 +22,7 @@ const MessageQueue = ({}) => {
   const contacts = useSelector(state => state.contactReducer.contacts);
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
+  const [sorting, setSorting] = useState("Oldest")
 
   const initialNumToRender = 10;
 
@@ -120,6 +121,22 @@ const MessageQueue = ({}) => {
         loading={parsedQueue.some(item => item.loading)}
         loadingIndicatorStyle={{marginLeft : "10%"}}
         loadingIndicatorColor={palette.white}
+        disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
+        buttonStyle={styles.buttonStyle}/>
+
+        <CustomButton
+        text={`Sort : ${sorting}`}
+        onPress={() => {
+            if(sorting == "Oldest") {
+              setSorting("Newest");
+              setParsedQueue([...parsedQueue].sort((a,b) => b.timestamp - a.timestamp))
+            }
+            else {
+              setSorting("Oldest");
+              setParsedQueue([...parsedQueue].sort((a,b) => a.timestamp - b.timestamp))
+            }
+          }}
+        loading={parsedQueue.some(item => item.loading)}
         disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
         buttonStyle={styles.buttonStyle}/>
 
