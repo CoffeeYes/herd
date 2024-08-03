@@ -111,34 +111,37 @@ const MessageQueue = ({}) => {
       allowGoBack
       title="Message Queue"/>
 
-      <View style={{flex : 1}}>
-        <CustomButton
-        text={openMessages.length > 0 ? "Close All" : "Open All"}
-        onPress={() => {
-          setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
-        }}
-        useLoadingIndicator
-        loading={parsedQueue.some(item => item.loading)}
-        loadingIndicatorStyle={{marginLeft : "10%"}}
-        loadingIndicatorColor={palette.white}
-        disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
-        buttonStyle={styles.buttonStyle}/>
+      <View style={styles.mainContainer}>
 
-        <CustomButton
-        text={`Sort : ${sorting}`}
-        onPress={() => {
-            if(sorting == "Oldest") {
-              setSorting("Newest");
-              setParsedQueue([...parsedQueue].sort((a,b) => b.timestamp - a.timestamp))
-            }
-            else {
-              setSorting("Oldest");
-              setParsedQueue([...parsedQueue].sort((a,b) => a.timestamp - b.timestamp))
-            }
+        <View style={styles.buttonContainer}>
+          <CustomButton
+          text={openMessages.length > 0 ? "Close All" : "Open All"}
+          onPress={() => {
+            setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
           }}
-        loading={parsedQueue.some(item => item.loading)}
-        disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
-        buttonStyle={styles.buttonStyle}/>
+          useLoadingIndicator
+          loading={parsedQueue.some(item => item.loading)}
+          loadingIndicatorStyle={{marginLeft : "10%"}}
+          loadingIndicatorColor={palette.white}
+          disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
+          buttonStyle={styles.buttonStyle}/>
+
+          <CustomButton
+          text={`Sort : ${sorting}`}
+          onPress={() => {
+              if(sorting == "Oldest") {
+                setSorting("Newest");
+                setParsedQueue([...parsedQueue].sort((a,b) => b.timestamp - a.timestamp))
+              }
+              else {
+                setSorting("Oldest");
+                setParsedQueue([...parsedQueue].sort((a,b) => a.timestamp - b.timestamp))
+              }
+            }}
+          loading={parsedQueue.some(item => item.loading)}
+          disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
+          buttonStyle={{...styles.buttonStyle, marginLeft : 10}}/>
+        </View>
 
         {messageQueue.length == 0 &&
         <View style={{alignItems : "center"}}>
@@ -156,16 +159,25 @@ const MessageQueue = ({}) => {
   )
 }
 const styles = {
+  mainContainer : {
+    flex : 1,
+  },
   buttonStyle : {
-    marginTop : 10,
     elevation : 2,
     borderColor : palette.offprimary,
-    marginBottom : 10,
-    width : "50%"
+    flex : 1
   },
   listStyle : {
     alignItems : "center",
     paddingVertical : 10,
+  },
+  buttonContainer : {
+    flexDirection : "row",
+    alignItems : "center",
+    justifyContent : "center",
+    marginVertical : 10,
+    width : "80%",
+    alignSelf : "center"
   }
 }
 export default MessageQueue;
