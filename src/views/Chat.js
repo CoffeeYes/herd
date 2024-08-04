@@ -507,6 +507,11 @@ const Chat = ({ route, navigation }) => {
     )
   },[messages, highlightedMessages])
 
+  const handleSubmit = async text => {
+    disableChatInputRef.current = true;
+    await sendMessage(text);
+  }
+
   return (
     <>
     <Header
@@ -616,6 +621,7 @@ const Chat = ({ route, navigation }) => {
 
           previousTextValueRef.current = text
         }}
+        onSubmitEditing={async () => await handleSubmit(chatInput)}
         multiline={true}/>
         <View style={{
           backgroundColor : palette.white,
@@ -627,10 +633,7 @@ const Chat = ({ route, navigation }) => {
         </View>
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
-        onPress={async () => {
-            disableChatInputRef.current=true;
-            await sendMessage(chatInput);
-        }}>
+        onPress={async () => await handleSubmit(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
       </View>
