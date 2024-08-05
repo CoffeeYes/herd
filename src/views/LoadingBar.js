@@ -26,12 +26,9 @@ const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
   })
 
   useEffect(() => {
-    if(paused) {
-      animationLoop?.stop();
-    }
-    else {
+    animationLoop?.stop();
+    if(!paused) {
       if(outerWidth > 0 && innerWidth > 0) {
-        animationLoop?.reset();
         animationLoop = Animated.loop(
           Animated.sequence([
             moveToEnd,
