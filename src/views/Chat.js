@@ -59,6 +59,8 @@ const Chat = ({ route, navigation }) => {
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [sectionListHeight, setSectionListHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const [sectionFooterHeight, setSectionFooterHeight] = useState(0);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
   const disableChatInputRef = useRef(false);
@@ -441,7 +443,7 @@ const Chat = ({ route, navigation }) => {
       animated,
       sectionIndex : lastSectionIndex,
       viewPosition : 0,
-      viewOffset : isFailureRetry ? 0 : sectionListHeight - 22
+      viewOffset : isFailureRetry ? 0 : sectionListHeight - headerHeight - sectionFooterHeight
     }
 
     if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
@@ -507,6 +509,16 @@ const Chat = ({ route, navigation }) => {
     )
   },[messages, highlightedMessages])
 
+  const renderSectionFooter = ({ section: { day } }) => {
+    return (
+      <Text 
+      onLayout={e => setSectionFooterHeight(e.nativeEvent.layout.height)}
+      style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
+        {day === moment().format("DD/MM") ? "Today" : day}
+      </Text>
+    )
+  }
+
   const handleSubmit = async text => {
     disableChatInputRef.current = true;
     await sendMessage(text);
@@ -515,6 +527,7 @@ const Chat = ({ route, navigation }) => {
   return (
     <>
     <Header
+    onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
     title={contactInfo.name}
     touchStyle={{backgroundColor : palette.offprimary, paddingVertical : 10}}
     textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
@@ -578,11 +591,7 @@ const Chat = ({ route, navigation }) => {
               momentumEndFiredCount.current = 0;
             }
           }}
-          renderSectionFooter={({ section: { day } }) => (
-            <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
-              {day === moment().format("DD/MM") ? "Today" : day}
-            </Text>
-          )}/>
+          renderSectionFooter={renderSectionFooter}/>
         </View>
       </PanGestureHandler>
 
