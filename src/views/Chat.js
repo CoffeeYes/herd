@@ -59,6 +59,7 @@ const Chat = ({ route, navigation }) => {
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [sectionListHeight, setSectionListHeight] = useState(0);
+  const [sectionContentHeight, setSectionContentHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [sectionFooterHeight, setSectionFooterHeight] = useState(0);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
@@ -71,7 +72,6 @@ const Chat = ({ route, navigation }) => {
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
-  const contentTooSmallHeight = useScreenAdjustedSize(0.825, 0.7, "height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
   const swipeSize = useScreenAdjustedSize(0.25, 0.4, "height");
@@ -361,21 +361,24 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  const handleContentSizeChange = (contentHeight) => {
-    // compare IDs of old first message to new first message to determine if messages have been prepended
-    // and a scroll to top is necessary.
-    const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
-    if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
-      scrollToTop();
-    }
-
-    if(contentHeight < contentTooSmallHeight) {
+  useEffect(() => {
+    if(sectionContentHeight <= sectionListHeight) {
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
     }
     else {
       !showedPopup && setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
+    }
+  },[sectionListHeight,sectionContentHeight])
+
+  const handleContentSizeChange = (contentHeight) => {
+    setSectionContentHeight(contentHeight);
+    // compare IDs of old first message to new first message to determine if messages have been prepended
+    // and a scroll to top is necessary.
+    const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
+    if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
+      scrollToTop();
     }
     
     if(firstMessageID) {
