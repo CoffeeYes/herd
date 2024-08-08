@@ -38,6 +38,7 @@ const EditContact = ({ route, navigation }) => {
   const [publicKey, setPublicKey, keyRef] = useStateAndRef(originalContact?.key || "");
   const [contactImage, setContactImage, imageRef] = useStateAndRef(originalContact?.image || "");
 
+  const publicKeyInputRef = useRef();
   const scrollViewRef = useRef();
 
   useEffect(() => {
@@ -222,15 +223,18 @@ const EditContact = ({ route, navigation }) => {
             <TextInput
             style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setName(text)}
+            onSubmitEditing={() => publicKeyInputRef.current.focus()}
             value={name}/>
           </View>
 
           <View style={{width : "100%"}}>
             <Text style={{...styles.inputTitle,fontSize : customStyle.scaledUIFontSize}}>Public Key</Text>
             <TextInput
+            ref={publicKeyInputRef}
             multiline={editingExistingContact}
             style={{...styles.input,fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setPublicKey(text)}
+            onSubmitEditing={() => save()}
             value={publicKey}/>
           </View>
         </View>
