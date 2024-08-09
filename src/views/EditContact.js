@@ -173,11 +173,8 @@ const EditContact = ({ route, navigation }) => {
 
   const hideSaveButton = () => {
     return (
-      (name.trim().length === 0 || publicKey.trim().length === 0) ||
-      (name.trim() === originalContact?.name?.trim() &&
-      publicKey.trim() === originalContact?.key?.trim() &&
-      headerIcon !== "check" &&
-      contactImage === originalContact?.image)
+      !haveUnsavedChanges() &&
+      headerIcon !== "check"
     )
   }
 
@@ -232,9 +229,10 @@ const EditContact = ({ route, navigation }) => {
             <TextInput
             ref={publicKeyInputRef}
             multiline={editingExistingContact}
+            blurOnSubmit
             style={{...styles.input,fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setPublicKey(text)}
-            onSubmitEditing={() => save()}
+            onSubmitEditing={() => !hideSaveButton() && save()}
             value={publicKey}/>
           </View>
         </View>
