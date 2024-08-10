@@ -227,7 +227,7 @@ const Customise = () => {
     const colorKeys = ["sentBoxColor","sentTextColor","receivedBoxColor","receivedTextColor"];
     const fontKeys = ["uiFontSize","messageFontSize"];
     for(const key of colorKeys) {
-      if(fromHsv(original[key]).toLowerCase() !== updated[key].toLowerCase()) {
+      if(fromHsv(original[key]).toLowerCase() !== fromHsv(updated[key]).toLowerCase()) {
         return false;
       }
     }
@@ -381,10 +381,10 @@ const Customise = () => {
             onPress={saveStyles}
             timeout={500}
             buttonStyle={{...styles.button, flexDirection : "row", width : "45%"}}
-            disabled={checkStylesAreEqual({
+            disabled={checkStylesAreEqual(originalStyles,{
               sentBoxColor,sentTextColor,receivedBoxColor,
               receivedTextColor,messageFontSize,uiFontSize
-            },originalStyles)}/>
+            })}/>
 
             <CustomButton
             text={"Restore Default"}

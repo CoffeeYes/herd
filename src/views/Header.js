@@ -34,7 +34,6 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
       minHeight : minimumHeight, 
       ...(!showBackButton && {paddingLeft : 10}),
       ...containerStyle,
-      height : 76,
     }}>
 
       {showBackButton &&
