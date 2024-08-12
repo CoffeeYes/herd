@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
@@ -29,10 +29,7 @@ const buttonIconSizeMultiplier = 0.2;
 const Customise = () => {
   const dispatch = useDispatch();
   const [activeItem, setActiveItem] = useState(0);
-  const [scaledFontSize, setScaledFontSize] = useState(defaultChatStyles.uiFontSize);
-  const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
-  const [synchronisedFontSize, setSynchronisedFontSize] = useState(defaultChatStyles.uiFontSize);
   const [overrideSliderValue, setOverrideSliderValue] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
 
@@ -62,6 +59,9 @@ const Customise = () => {
   const [receivedTextColor, setReceivedTextColor, receivedTextColorRef] = useStateAndRef(toHsv(customStyle.receivedTextColor));
   const [messageFontSize, setMessageFontSize, messageFontSizeRef] = useStateAndRef(customStyle.messageFontSize);
   const [uiFontSize, setUiFontSize, uiFontSizeRef] = useStateAndRef(customStyle.uiFontSize);
+  const [scaledFontSize, setScaledFontSize] = useState(customStyle.uiFontSize);
+  const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(customStyle.uiFontSize);
+  const [synchronisedFontSize, setSynchronisedFontSize] = useState(customStyle.uiFontSize);
 
   useEffect(() => {
     setScaledFontSize(uiFontSize + screenFontScaler)
@@ -69,7 +69,7 @@ const Customise = () => {
 
   useEffect(() => {
     setScaledSynchronisedFontSize(synchronisedFontSize + screenFontScaler)
-  },[synchronisedFontSize])
+  },[synchronisedFontSize,screenFontScaler])
 
   //checks if fontsize states have been set to default values before turning overrideSliderValue off
   //to ensure sliders return to default positions
@@ -78,12 +78,11 @@ const Customise = () => {
       uiFontSize === defaultChatStyles.uiFontSize && 
       messageFontSize === defaultChatStyles.messageFontSize && 
       synchronisedFontSize === defaultChatStyles.uiFontSize && 
-      overrideSliderValue &&
       tabItems[activeItem].color === defaultChatStyles[tabItems[activeItem].originalColor]
     ) {
       setOverrideSliderValue(false);
     }
-  },[uiFontSize, messageFontSize])
+  },[uiFontSize, messageFontSize, synchronisedFontSize, activeItem])
 
   useEffect(() => {
     setOverrideColorChoiceSliderValue(false);
