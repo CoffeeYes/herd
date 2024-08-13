@@ -20,11 +20,29 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize, useStateAndRef } from '../helper';
+import { useScreenAdjustedSize, useStateAndRef, clamp } from '../helper';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
 const buttonIconSizeMultiplier = 0.2;
+
+const clampHsv = (hsv, min, max = 1) => {
+  return ({
+    ...hsv,
+    s : clamp(hsv.s, min, max),
+    v : clamp(hsv.v, min, max)
+  })
+}
+
+const clampRgb = (rgb, min, max = 1) => {
+  let hsv = toHsv(rgb);
+  hsv = clampHsv(hsv,min,max);
+  return fromHsv(hsv);
+}
+
+const rgbToHsv = rgb => {
+  return clampHsv(toHsv(rgb), 0.01,1);
+}
 
 const Customise = () => {
   const dispatch = useDispatch();
@@ -53,10 +71,10 @@ const Customise = () => {
   const headerIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledHeaderIconSize = ((uiFontSize + 16) / defaultChatStyles.uiFontSize) * headerIconSize
 
-  const [sentBoxColor, setSentBoxColor, sentBoxColorRef] = useStateAndRef(toHsv(customStyle.sentBoxColor));
-  const [sentTextColor, setSentTextColor, sentTextColorRef] = useStateAndRef(toHsv(customStyle.sentTextColor));
-  const [receivedBoxColor, setReceivedBoxColor, receivedBoxColorRef] = useStateAndRef(toHsv(customStyle.receivedBoxColor));
-  const [receivedTextColor, setReceivedTextColor, receivedTextColorRef] = useStateAndRef(toHsv(customStyle.receivedTextColor));
+  const [sentBoxColor, setSentBoxColor, sentBoxColorRef] = useStateAndRef(rgbToHsv(customStyle.sentBoxColor));
+  const [sentTextColor, setSentTextColor, sentTextColorRef] = useStateAndRef(rgbToHsv(customStyle.sentTextColor));
+  const [receivedBoxColor, setReceivedBoxColor, receivedBoxColorRef] = useStateAndRef(rgbToHsv(customStyle.receivedBoxColor));
+  const [receivedTextColor, setReceivedTextColor, receivedTextColorRef] = useStateAndRef(rgbToHsv(customStyle.receivedTextColor));
   const [messageFontSize, setMessageFontSize, messageFontSizeRef] = useStateAndRef(customStyle.messageFontSize);
   const [uiFontSize, setUiFontSize, uiFontSizeRef] = useStateAndRef(customStyle.uiFontSize);
   const [scaledFontSize, setScaledFontSize] = useState(customStyle.uiFontSize);
@@ -208,7 +226,9 @@ const Customise = () => {
     const colorKeys = ["sentBoxColor","sentTextColor","receivedBoxColor","receivedTextColor"];
     const fontKeys = ["uiFontSize","messageFontSize"];
     for(const key of colorKeys) {
-      if(fromHsv(original[key]).toLowerCase() !== fromHsv(updated[key]).toLowerCase()) {
+      const clampedOriginal = original[key]?.v ? fromHsv(clampHsv(original[key]),0.01,1) : clampRgb(original[key], 0.01, 1);
+      const clampedUpdated = updated[key]?.v ? fromHsv(clampHsv(updated[key]),0.01,1) : clampRgb(updated[key],0.01,1);
+      if(clampedOriginal !== clampedUpdated) {
         return false;
       }
     }

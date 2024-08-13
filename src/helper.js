@@ -129,9 +129,21 @@ const useStateAndRef = (initialValue) => {
   return [state,update,ref];
 }
 
+const clamp = (val, min, max) => {
+  let clamped = val;
+  if(clamped < min) {
+    clamped = min;
+  }
+  else if (clamped > max) {
+    clamped = max;
+  }
+  return clamped;
+}
+
 export {
   timestampToText,
   useScreenAdjustedSize,
   useOrientationBasedStyle,
-  useStateAndRef
+  useStateAndRef,
+  clamp
 }
