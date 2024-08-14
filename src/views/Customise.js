@@ -26,7 +26,7 @@ const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
 const buttonIconSizeMultiplier = 0.2;
 
-const clampHsv = (hsv, min, max = 1) => {
+const clampHsv = (hsv, min = 0.01, max = 1) => {
   return ({
     ...hsv,
     s : clamp(hsv.s, min, max),
@@ -37,18 +37,22 @@ const clampHsv = (hsv, min, max = 1) => {
 const clampRgb = (rgb, min, max = 1) => {
   let hsv = toHsv(rgb);
   hsv = clampHsv(hsv,min,max);
-  return fromHsv(hsv);
+  return fromHsv(hsv).toLowerCase();
 }
 
 const rgbToHsv = rgb => {
-  return clampHsv(toHsv(rgb), 0.01,1);
+  return clampHsv(toHsv(rgb));
+}
+
+const hsvToRgb = hsv => {
+  return fromHsv(clampHsv(hsv)).toLowerCase();
 }
 
 const Customise = () => {
   const dispatch = useDispatch();
   const [activeItem, setActiveItem] = useState(0);
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
-  const [overrideSliderValue, setOverrideSliderValue] = useState(false);
+  const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
@@ -62,7 +66,7 @@ const Customise = () => {
     rightTextContainerStyle : {alignItems : "center", padding : 5, justifyContent : "center"},
     rightTitleStyle : {fontWeight : "bold", fontSize : customStyle.scaledUIFontSize},
     rightTextStyle : {fontSize : customStyle.scaledUIFontSize},
-    useValue : overrideSliderValue
+    useValue : overrideFontSliderValues
   }
 
   const iconSize = useScreenAdjustedSize(0.1,0.065);
@@ -89,22 +93,28 @@ const Customise = () => {
     setScaledSynchronisedFontSize(synchronisedFontSize + screenFontScaler)
   },[synchronisedFontSize,screenFontScaler])
 
-  //checks if fontsize states have been set to default values before turning overrideSliderValue off
+  //checks if fontsize states have been set to default values before turning overrideFontSliderValues off
   //to ensure sliders return to default positions
   useEffect(() => {
     if(
       uiFontSize === defaultChatStyles.uiFontSize && 
       messageFontSize === defaultChatStyles.messageFontSize && 
-      synchronisedFontSize === defaultChatStyles.uiFontSize && 
-      tabItems[activeItem].color === defaultChatStyles[tabItems[activeItem].originalColor]
+      synchronisedFontSize === defaultChatStyles.uiFontSize
     ) {
-      setOverrideSliderValue(false);
+      setOverrideFontSliderValues(false);
     }
   },[uiFontSize, messageFontSize, synchronisedFontSize, activeItem])
 
   useEffect(() => {
-    setOverrideColorChoiceSliderValue(false);
-  },[activeItem])
+    if(
+      hsvToRgb(receivedTextColor) === clampRgb(defaultChatStyles.receivedTextColor) &&
+      hsvToRgb(receivedBoxColor) === clampRgb(defaultChatStyles.receivedBoxColor) &&
+      hsvToRgb(sentTextColor) === clampRgb(defaultChatStyles.sentTextColor) &&
+      hsvToRgb(sentBoxColor) === clampRgb(defaultChatStyles.sentBoxColor)
+    ) {
+      setOverrideColorChoiceSliderValue(false);
+    }
+  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor])
 
   const saveStyles = async () => {
     const style = {
@@ -136,13 +146,14 @@ const Customise = () => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
-            setOverrideSliderValue(true);
+            setOverrideFontSliderValues(true);
+            setOverrideColorChoiceSliderValue(true);
             await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
             dispatch(setStyles(defaultChatStyles));
-            setSentBoxColor(defaultChatStyles.sentBoxColor);
-            setSentTextColor(defaultChatStyles.sentTextColor);
-            setReceivedBoxColor(defaultChatStyles.receivedBoxColor);
-            setReceivedTextColor(defaultChatStyles.receivedTextColor);
+            setSentBoxColor(rgbToHsv(defaultChatStyles.sentBoxColor));
+            setSentTextColor(rgbToHsv(defaultChatStyles.sentTextColor));
+            setReceivedBoxColor(rgbToHsv(defaultChatStyles.receivedBoxColor));
+            setReceivedTextColor(rgbToHsv(defaultChatStyles.receivedTextColor));
             setUiFontSize(defaultChatStyles.uiFontSize);
             setMessageFontSize(defaultChatStyles.messageFontSize);
             setSynchronisedFontSize(defaultChatStyles.uiFontSize);
@@ -362,7 +373,7 @@ const Customise = () => {
             dropDownBoxStyle={{borderRadius : 5}}
             />
             <ColorChoice
-            overrideSliderValues={overrideColorChoiceSliderValue || overrideSliderValue}
+            overrideSliderValues={overrideColorChoiceSliderValue}
             color={toHsv(tabItems[activeItem].color)}
             setColor={tabItems[activeItem].setColor}
             oldColor={customStyle[tabItems[activeItem].originalColor]}
