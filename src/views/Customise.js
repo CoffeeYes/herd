@@ -34,7 +34,7 @@ const clampHsv = (hsv, min = 0.01, max = 1) => {
   })
 }
 
-const clampRgb = (rgb, min, max = 1) => {
+const clampRgb = (rgb, min = 0.01, max = 1) => {
   let hsv = toHsv(rgb);
   hsv = clampHsv(hsv,min,max);
   return fromHsv(hsv).toLowerCase();
@@ -103,7 +103,7 @@ const Customise = () => {
     ) {
       setOverrideFontSliderValues(false);
     }
-  },[uiFontSize, messageFontSize, synchronisedFontSize, activeItem])
+  },[uiFontSize, messageFontSize, synchronisedFontSize])
 
   useEffect(() => {
     if(
@@ -115,6 +115,10 @@ const Customise = () => {
       setOverrideColorChoiceSliderValue(false);
     }
   },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor])
+
+  useEffect(() => {
+    setOverrideColorChoiceSliderValue(false);
+  },[activeItem])
 
   const saveStyles = async () => {
     const style = {
@@ -165,32 +169,32 @@ const Customise = () => {
 
   const tabItems = [
     {
-    	name : "sentBox",
-    	text : "Sent Box",
+      name : "sentBox",
+      text : "Sent Box",
       title : "Sent Box Color",
       color : sentBoxColor,
       originalColor : "sentBoxColor",
       setColor : setSentBoxColor
     },
     {
-    	name : "sentText",
-    	text : "Sent Text",
+      name : "sentText",
+      text : "Sent Text",
       title : "Sent Text Color",
       color : sentTextColor,
       originalColor : "sentTextColor",
       setColor : setSentTextColor
     },
     {
-    	name : "receivedBox",
-    	text : "Received Box",
+      name : "receivedBox",
+      text : "Received Box",
       title : "Received Box Color",
       color : receivedBoxColor,
       originalColor : "receivedBoxColor",
       setColor : setReceivedBoxColor
     },
     {
-    	name : "receivedText",
-    	text : "Received Text",
+      name : "receivedText",
+      text : "Received Text",
       title : "Received Text Color",
       color : receivedTextColor,
       originalColor : "receivedTextColor",
@@ -237,8 +241,8 @@ const Customise = () => {
     const colorKeys = ["sentBoxColor","sentTextColor","receivedBoxColor","receivedTextColor"];
     const fontKeys = ["uiFontSize","messageFontSize"];
     for(const key of colorKeys) {
-      const clampedOriginal = original[key]?.v ? fromHsv(clampHsv(original[key]),0.01,1) : clampRgb(original[key], 0.01, 1);
-      const clampedUpdated = updated[key]?.v ? fromHsv(clampHsv(updated[key]),0.01,1) : clampRgb(updated[key],0.01,1);
+      const clampedOriginal = original[key]?.v ? hsvToRgb(original[key]) : clampRgb(original[key]);
+      const clampedUpdated = updated[key]?.v ? hsvToRgb(updated[key]) : clampRgb(updated[key]);
       if(clampedOriginal !== clampedUpdated) {
         return false;
       }
