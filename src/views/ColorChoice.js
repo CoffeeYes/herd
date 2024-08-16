@@ -20,7 +20,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
     max : 1,
     useValue : overrideSliderValues,
     containerStyle : {...styles.sliderContainer, width : sliderWidth},
-    rightTitleStyle : {fontSize : sliderTitleSize},
+    rightTitleStyle : {fontWeight : "bold", fontSize : sliderTitleSize},
     rightTextStyle : {fontSize : sliderTextSize},
     sliderStyle : styles.slider
   }
@@ -40,12 +40,14 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       />
       <ValueSlider
       {...sliderProps}
+      rightTitle="Sat."
       rightText={color.s.toFixed(2)}
       value={color.s} 
       onValueChange={value => setColor({...color, s : value})}
       />
       <ValueSlider
       {...sliderProps}
+      rightTitle="Val."
       rightText={color.v.toFixed(2)}
       value={color.v} 
       onValueChange={value => setColor({...color, v : value})}

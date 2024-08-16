@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
@@ -21,6 +21,7 @@ import { setStyles } from '../redux/actions/chatActions';
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef, clamp } from '../helper';
+import { enableScreens } from 'react-native-screens';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
@@ -54,6 +55,7 @@ const Customise = () => {
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
+  const [enableScrolling, setEnableScrolling] = useState(true);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -271,7 +273,7 @@ const Customise = () => {
     <NavigationWarningWrapper
     checkForChanges={haveUnsavedChanges}>
       <Header title="Customise" allowGoBack/>
-      <ScrollView contentContainerStyle={{paddingBottom : 10}}>
+      <ScrollView contentContainerStyle={{paddingBottom : 10}} scrollEnabled={enableScrolling}>
          <Header
           title="Preview"
           allowGoBack
@@ -365,7 +367,10 @@ const Customise = () => {
             messageFrom={false}/>
           </View>
 
-          <View style={styles.colorChoiceContainer}>
+          <Pressable 
+          style={styles.colorChoiceContainer}
+          onPressIn={() => setEnableScrolling(false)}
+          onPressOut={() => setEnableScrolling(true)}>
             <Dropdown
             onChangeOption={index => {
               setOverrideColorChoiceSliderValue(true);
@@ -382,8 +387,9 @@ const Customise = () => {
             setColor={tabItems[activeItem].setColor}
             oldColor={customStyle[tabItems[activeItem].originalColor]}
             sliderTextSize={customStyle.scaledUIFontSize}
+            sliderTitleSize={customStyle.scaledUIFontSize}
             />
-          </View>
+          </Pressable>
 
           <View style={styles.buttonRow}>
             <FlashTextButton
