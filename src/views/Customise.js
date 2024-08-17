@@ -21,7 +21,6 @@ import { setStyles } from '../redux/actions/chatActions';
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, useStateAndRef, clamp } from '../helper';
-import { enableScreens } from 'react-native-screens';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
@@ -224,9 +223,8 @@ const Customise = () => {
   ]
 
   const setAllFontSizes = value => {
-    const roundedValue = Math.round(value)
-    fontSizes.forEach(item => item.setValue(roundedValue));
-    setSynchronisedFontSize(roundedValue)
+    fontSizes.forEach(item => item.setValue(value));
+    setSynchronisedFontSize(value)
   }
 
   const getChatBubbleColor = () => {
@@ -339,8 +337,8 @@ const Customise = () => {
                 {...fontSliderProps}
                 title={item.title}
                 key={item.title}
-                onSlidingComplete={value => item.setValue(Math.round(value))}
-                onValueChange={value => item.setValue(Math.round(value))}
+                onSlidingComplete={value => item.setValue(value)}
+                onValueChange={value => item.setValue(value)}
                 value={item.value}
                 rightTitle={item.rightTitle}
                 rightText={item.rightText}
@@ -383,7 +381,7 @@ const Customise = () => {
             />
             <ColorChoice
             overrideSliderValues={overrideColorChoiceSliderValue}
-            color={toHsv(tabItems[activeItem].color)}
+            color={tabItems[activeItem].color}
             setColor={tabItems[activeItem].setColor}
             oldColor={customStyle[tabItems[activeItem].originalColor]}
             sliderTextSize={customStyle.scaledUIFontSize}
