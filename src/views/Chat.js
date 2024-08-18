@@ -74,7 +74,6 @@ const Chat = ({ route, navigation }) => {
   const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
   const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
-  const swipeSize = useScreenAdjustedSize(0.25, 0.4, "height");
 
   useEffect(() => {
     (async () => {
@@ -388,8 +387,8 @@ const Chat = ({ route, navigation }) => {
 
   const handleGesture = event => {
     const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
-    const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
-    allow && !showedPopup && messages.length > 0 &&
+    const swipeLargeEnough = event.nativeEvent.translationY > (sectionListHeight * 0.4);
+    swipeLargeEnough && !showedPopup && messages.length > 0 &&
     loadMoreMessages(overrideLoadInitial);
   }
 
