@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, TouchableOpacity, Alert, Pressable } from 'react-native';
+import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
 import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
@@ -54,7 +54,6 @@ const Customise = () => {
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
-  const [enableScrolling, setEnableScrolling] = useState(true);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -271,7 +270,7 @@ const Customise = () => {
     <NavigationWarningWrapper
     checkForChanges={haveUnsavedChanges}>
       <Header title="Customise" allowGoBack/>
-      <ScrollView contentContainerStyle={{paddingBottom : 10}} scrollEnabled={enableScrolling}>
+      <ScrollView contentContainerStyle={{paddingBottom : 10}}>
          <Header
           title="Preview"
           allowGoBack
@@ -365,10 +364,7 @@ const Customise = () => {
             messageFrom={false}/>
           </View>
 
-          <Pressable 
-          style={styles.colorChoiceContainer}
-          onPressIn={() => setEnableScrolling(false)}
-          onPressOut={() => setEnableScrolling(true)}>
+          <View style={styles.colorChoiceContainer}>
             <Dropdown
             onChangeOption={index => {
               setOverrideColorChoiceSliderValue(true);
@@ -387,7 +383,7 @@ const Customise = () => {
             sliderTextSize={customStyle.scaledUIFontSize}
             sliderTitleSize={customStyle.scaledUIFontSize}
             />
-          </Pressable>
+          </View>
 
           <View style={styles.buttonRow}>
             <FlashTextButton

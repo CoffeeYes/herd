@@ -36,7 +36,16 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
           ...style
         }}
         hideSliders
-        onColorChange={color => setColor(color)}
+      />
+      <ValueSlider
+      {...sliderProps}
+      min={0}
+      max={360}
+      step={1}
+      rightTitle={"Hue"}
+      rightText={color.h}
+      value={color.h}
+      onValueChange={value => setColor({...color, h : value})}
       />
       <ValueSlider
       {...sliderProps}
