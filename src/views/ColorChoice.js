@@ -1,6 +1,6 @@
 import React  from 'react';
 import { View } from 'react-native';
-import { ColorPicker } from 'react-native-color-picker';
+import { ColorPicker, fromHsv } from 'react-native-color-picker';
 
 import ValueSlider from './ValueSlider';
 
@@ -51,6 +51,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       {...sliderProps}
       rightTitle="Sat."
       rightText={color.s.toFixed(2)}
+      minimumTrackTintColor={fromHsv({...color,s : 0})}
+      maximumTrackTintColor={fromHsv({...color,s : 1})}
       value={color.s} 
       onValueChange={value => setColor({...color, s : value})}
       />
@@ -58,6 +60,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       {...sliderProps}
       rightTitle="Val."
       rightText={color.v.toFixed(2)}
+      minimumTrackTintColor={fromHsv({...color,v : 0})}
+      maximumTrackTintColor={fromHsv({...color,v : 1})}
       value={color.v} 
       onValueChange={value => setColor({...color, v : value})}
       />
@@ -74,7 +78,7 @@ const styles = {
     paddingBottom : 10,
   },
   slider : {
-      flex : 1,
+    flex : 1,
   },
   sliderContainer : {
     alignItems : "center",

@@ -7,15 +7,16 @@ import { palette } from '../assets/palette';
 const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
-                        min, max,...props}) => {
+                        min, max, thumbTintColor, 
+                        minimumTrackTintColor, maximumTrackTintColor, ...props}) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
       <Slider
       minimumValue={min}
       maximumValue={max}
-      minimumTrackTintColor={palette.secondary}
-      maximumTrackTintColor={palette.primary}
-      thumbTintColor={palette.primary}
+      minimumTrackTintColor={minimumTrackTintColor || palette.secondary}
+      maximumTrackTintColor={maximumTrackTintColor || palette.primary}
+      thumbTintColor={thumbTintColor || palette.primary}
       style={{...styles.slider, ...sliderStyle}}
       {...props}/>
       <View style={rightTextContainerStyle}>
@@ -37,7 +38,9 @@ const styles = {
     backgroundColor : palette.white
   },
   slider : {
-    flex : 1
+    flex : 1,
+    borderWidth : 1,
+    borderColor : "black"
   }
 }
 
