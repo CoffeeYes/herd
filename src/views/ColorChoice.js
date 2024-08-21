@@ -1,6 +1,7 @@
 import React  from 'react';
 import { View } from 'react-native';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
+import GradientLine from './GradientLine';
 
 import ValueSlider from './ValueSlider';
 
@@ -21,8 +22,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
     useValue : overrideSliderValues,
     containerStyle : {...styles.sliderContainer, width : sliderWidth},
     rightTitleStyle : {fontWeight : "bold", fontSize : sliderTitleSize},
-    rightTextStyle : {fontSize : sliderTextSize},
-    sliderStyle : styles.slider
+    rightTextStyle : {fontSize : sliderTextSize}
   }
 
   return (
@@ -49,6 +49,10 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       />
       <ValueSlider
       {...sliderProps}
+      sliderStyle={{marginTop : 10}}
+      showColorPreview
+      previewGradientStart={fromHsv({...color, s : 0})}
+      previewGradientEnd={fromHsv({...color, s : 1})}
       rightTitle="Sat."
       rightText={color.s.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,s : 0})}
@@ -58,6 +62,10 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       />
       <ValueSlider
       {...sliderProps}
+      sliderStyle={{marginTop : 10}}
+      showColorPreview
+      previewGradientStart={fromHsv({...color, v : 0})}
+      previewGradientEnd={fromHsv({...color, v : 1})}
       rightTitle="Val."
       rightText={color.v.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,v : 0})}
@@ -76,9 +84,6 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     paddingBottom : 10,
-  },
-  slider : {
-    flex : 1,
   },
   sliderContainer : {
     alignItems : "center",

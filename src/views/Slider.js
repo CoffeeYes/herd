@@ -3,14 +3,21 @@ import { View, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
 
 import { palette } from '../assets/palette';
+import GradientLine from './GradientLine';
 
 const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
-                        min, max, thumbTintColor, 
+                        min, max, thumbTintColor,
+                        showColorPreview, previewGradientStart, previewGradientEnd,
                         minimumTrackTintColor, maximumTrackTintColor, ...props}) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
+      <View style={styles.sliderContainer}>
+      {showColorPreview &&
+      <GradientLine
+      gradientStart={previewGradientStart}
+      gradientEnd={previewGradientEnd}/>}
       <Slider
       minimumValue={min}
       maximumValue={max}
@@ -19,6 +26,7 @@ const CustomSlider = ({
       thumbTintColor={thumbTintColor || palette.primary}
       style={{...styles.slider, ...sliderStyle}}
       {...props}/>
+      </View>
       <View style={rightTextContainerStyle}>
         {rightTitle?.toString().length > 0 &&
         <Text style={rightTitleStyle}>{rightTitle.toString()}</Text>}
@@ -35,13 +43,11 @@ const styles = {
     alignSelf : "center",
     flexDirection : "row",
     margin : 10,
-    backgroundColor : palette.white
+    backgroundColor : palette.white,
   },
-  slider : {
+  sliderContainer : {
     flex : 1,
-    borderWidth : 1,
-    borderColor : "black"
-  }
+  },
 }
 
 export default CustomSlider;
