@@ -1,7 +1,6 @@
 import React  from 'react';
 import { View } from 'react-native';
 import { ColorPicker, fromHsv } from 'react-native-color-picker';
-import GradientLine from './GradientLine';
 
 import ValueSlider from './ValueSlider';
 
@@ -43,7 +42,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       max={360}
       step={1}
       rightTitle={"Hue"}
-      rightText={color.h}
+      rightText={color.h.toFixed(0)}
       value={color.h}
       onValueChange={value => setColor({...color, h : value})}
       />

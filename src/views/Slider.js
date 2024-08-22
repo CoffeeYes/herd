@@ -16,6 +16,7 @@ const CustomSlider = ({
       <View style={styles.sliderContainer}>
       {showColorPreview &&
       <GradientLine
+      style={styles.gradientLine}
       gradientStart={previewGradientStart}
       gradientEnd={previewGradientEnd}/>}
       <Slider
@@ -48,6 +49,10 @@ const styles = {
   sliderContainer : {
     flex : 1,
   },
+  gradientLine : {
+    paddingHorizontal : 15,
+    flex : 1
+  }
 }
 
 export default CustomSlider;
