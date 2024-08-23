@@ -9,7 +9,7 @@ const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
                         min, max, thumbTintColor,
-                        showColorPreview, previewGradientStart, previewGradientEnd,
+                        showColorPreview, previewGradientPoints,
                         minimumTrackTintColor, maximumTrackTintColor, ...props}) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
@@ -17,8 +17,7 @@ const CustomSlider = ({
       {showColorPreview &&
       <GradientLine
       style={styles.gradientLine}
-      gradientStart={previewGradientStart}
-      gradientEnd={previewGradientEnd}/>}
+      gradientPoints={previewGradientPoints}/>}
       <Slider
       minimumValue={min}
       maximumValue={max}

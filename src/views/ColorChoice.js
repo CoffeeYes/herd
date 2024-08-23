@@ -50,8 +50,16 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       {...sliderProps}
       sliderStyle={{marginTop : 10}}
       showColorPreview
-      previewGradientStart={fromHsv({...color, s : 0})}
-      previewGradientEnd={fromHsv({...color, s : 1})}
+      previewGradientPoints={[
+        {
+          color : fromHsv({...color, s : 0}),
+          opacity : 1
+        },
+        {
+          color : fromHsv({...color, s : 1}),
+          opacity : 1
+        },
+      ]}
       rightTitle="Sat."
       rightText={color.s.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,s : 0})}
@@ -63,8 +71,16 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       {...sliderProps}
       sliderStyle={{marginTop : 10}}
       showColorPreview
-      previewGradientStart={fromHsv({...color, v : 0})}
-      previewGradientEnd={fromHsv({...color, v : 1})}
+      previewGradientPoints={[
+        {
+          color : fromHsv({...color, v : 0}),
+          opacity : 1
+        },
+        {
+          color : fromHsv({...color, v : 1}),
+          opacity : 1
+        },
+      ]}
       rightTitle="Val."
       rightText={color.v.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,v : 0})}
