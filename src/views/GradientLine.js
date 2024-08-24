@@ -8,10 +8,10 @@ const GradientLine = ({ gradientPoints = [], lineWidth = 10, style }) => {
     <View style={style} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
       <Svg viewBox={`0 0 ${containerWidth} ${lineWidth}`}>
         <Defs>  
-          <LinearGradient id="gradient" x1="0" x2="1" y1="0" y2="0">
-            {gradientPoints.map((point,index) => {
+          <LinearGradient id="gradient" x1="0%" x2="100%" y1="0" y2="0">
+            {gradientPoints.length > 1 && gradientPoints.map((point,index) => {
               return (
-                <Stop offset={index.toString()} stopColor={point.color} stopOpacity={point.opacity} key={`${point.color}-${index}`}/>
+                <Stop offset={`${(index / (gradientPoints.length -1)) * 100}%`} stopColor={point.color} stopOpacity={point.opacity} key={`${point.color}-${index}`}/>
               )
             })}
           </LinearGradient>

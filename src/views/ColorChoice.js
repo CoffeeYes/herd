@@ -24,6 +24,11 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
     rightTextStyle : {fontSize : sliderTextSize}
   }
 
+  const rainbowGradientPoints = Array.from(Array(36).keys()).map(value => ({
+    color : fromHsv({h : value * 10, s : 1, v : 1}),
+    opacity : 1
+  }))
+
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
       <ColorPicker
@@ -43,6 +48,8 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       step={1}
       rightTitle={"Hue"}
       rightText={color.h.toFixed(0)}
+      showColorPreview
+      previewGradientPoints={rainbowGradientPoints}
       value={color.h}
       onValueChange={value => setColor({...color, h : value})}
       />
