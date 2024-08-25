@@ -1,6 +1,6 @@
 import React  from 'react';
 import { View } from 'react-native';
-import { ColorPicker, fromHsv } from 'react-native-color-picker';
+import { fromHsv } from 'react-native-color-picker';
 
 import ValueSlider from './ValueSlider';
 
@@ -9,9 +9,8 @@ import { useScreenAdjustedSize } from '../helper';
 
 const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {
-
-  const pickerHeight = useScreenAdjustedSize(0.6,0.6, "height");
-  const pickerWidth = useScreenAdjustedSize(0.8,0.5);
+  
+  const circleWidth = useScreenAdjustedSize(0.4,0.2,"width")
   const sliderWidth = useScreenAdjustedSize(0.8, 0.6);
 
   const sliderProps = {
@@ -31,16 +30,22 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
-      <ColorPicker
-        color={color}
-        oldColor={oldColor}
-        style={{
-          height : pickerHeight,
-          width : pickerWidth,
-          ...style
-        }}
-        hideSliders
-      />
+      <View style={{...styles.circleContainer,...style}}>
+        <View style={{...styles.semiCircle, 
+          width : circleWidth / 2, 
+          height : circleWidth, 
+          borderTopLeftRadius : circleWidth / 2, 
+          borderBottomLeftRadius: circleWidth / 2, 
+          backgroundColor : fromHsv(oldColor)}
+        }/>
+        <View style={{...styles.semiCircle, 
+          width : circleWidth / 2, 
+          height : circleWidth, 
+          borderTopRightRadius : circleWidth / 2, 
+          borderBottomRightRadius : circleWidth / 2, 
+          backgroundColor : fromHsv(color)}
+        }/>
+      </View>
       <ValueSlider
       {...sliderProps}
       min={0}
@@ -105,7 +110,7 @@ const styles = {
   colorPickerContainer : {
     alignItems : "center",
     justifyContent : "center",
-    paddingBottom : 10,
+    paddingVertical : 10,
   },
   sliderContainer : {
     alignItems : "center",
@@ -114,5 +119,9 @@ const styles = {
     marginHorizontal : 10,
     backgroundColor : palette.white,
     marginVertical : 10,
-  }
+  },
+  circleContainer : {
+    flexDirection : "row",
+    alignSelf : "center",
+  },
 }
