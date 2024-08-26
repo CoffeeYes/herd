@@ -378,8 +378,8 @@ const Customise = () => {
             <ColorChoice
             overrideSliderValues={overrideColorChoiceSliderValue}
             color={tabItems[activeItem].color}
-            setColor={tabItems[activeItem].setColor}
-            oldColor={customStyle[tabItems[activeItem].originalColor]}
+            onColorChange={color => tabItems[activeItem].setColor(color)}
+            oldColor={clampRgb(customStyle[tabItems[activeItem].originalColor])}
             sliderTextSize={customStyle.scaledUIFontSize}
             sliderTitleSize={customStyle.scaledUIFontSize}
             />

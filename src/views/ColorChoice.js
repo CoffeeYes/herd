@@ -7,7 +7,7 @@ import ValueSlider from './ValueSlider';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
-const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderTitleSize,
+const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {
   
   const circleWidth = useScreenAdjustedSize(0.4,0.2,"width")
@@ -36,7 +36,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
           height : circleWidth, 
           borderTopLeftRadius : circleWidth / 2, 
           borderBottomLeftRadius: circleWidth / 2, 
-          backgroundColor : fromHsv(oldColor)}
+          backgroundColor : oldColor}
         }/>
         <View style={{...styles.semiCircle, 
           width : circleWidth / 2, 
@@ -56,7 +56,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       showColorPreview
       previewGradientPoints={rainbowGradientPoints}
       value={color.h}
-      onValueChange={value => setColor({...color, h : value})}
+      onValueChange={value => onColorChange({...color, h : value})}
       />
       <ValueSlider
       {...sliderProps}
@@ -77,7 +77,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       minimumTrackTintColor={fromHsv({...color,s : 0})}
       maximumTrackTintColor={fromHsv({...color,s : 1})}
       value={color.s} 
-      onValueChange={value => setColor({...color, s : value})}
+      onValueChange={value => onColorChange({...color, s : value})}
       />
       <ValueSlider
       {...sliderProps}
@@ -98,7 +98,7 @@ const ColorChoice = ({ style, setColor, color, oldColor, containerStyle, sliderT
       minimumTrackTintColor={fromHsv({...color,v : 0})}
       maximumTrackTintColor={fromHsv({...color,v : 1})}
       value={color.v} 
-      onValueChange={value => setColor({...color, v : value})}
+      onValueChange={value => onColorChange({...color, v : value})}
       />
     </View>
   )
