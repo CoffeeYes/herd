@@ -5,13 +5,12 @@ import Header from './Header';
 import ListItem from './ListItem';
 import { deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
-import { toHsv } from 'react-native-color-picker';
 
 import { deleteChats as deleteChatsFromState } from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
 
-import { timestampToText } from '../helper';
+import { timestampToText, toHsv } from '../helper';
 
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();

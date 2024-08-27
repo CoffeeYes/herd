@@ -1,11 +1,10 @@
 import React  from 'react';
 import { View } from 'react-native';
-import { fromHsv } from 'react-native-color-picker';
 
 import ValueSlider from './ValueSlider';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
+import { useScreenAdjustedSize, fromHsv } from '../helper';
 
 const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {

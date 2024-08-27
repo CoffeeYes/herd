@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
-import { fromHsv, toHsv } from 'react-native-color-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
@@ -20,7 +19,7 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize, useStateAndRef, clamp } from '../helper';
+import { useScreenAdjustedSize, useStateAndRef, clamp, fromHsv, toHsv } from '../helper';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
