@@ -55,6 +55,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       showColorPreview
       previewGradientPoints={rainbowGradientPoints}
       value={color.h}
+      minimumTrackTintColor={fromHsv({...color, s : 1, v : 1})}
+      maximumTrackTintColor={fromHsv({...color, s : 1, v : 1})}
       onValueChange={value => onColorChange({...color, h : value})}
       />
       <ValueSlider
@@ -73,7 +75,7 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       ]}
       rightTitle="Sat."
       rightText={color.s.toFixed(2)}
-      minimumTrackTintColor={fromHsv({...color,s : 0})}
+      minimumTrackTintColor={fromHsv({...color,s : 1})}
       maximumTrackTintColor={fromHsv({...color,s : 1})}
       value={color.s} 
       onValueChange={value => onColorChange({...color, s : value})}
@@ -94,8 +96,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       ]}
       rightTitle="Val."
       rightText={color.v.toFixed(2)}
-      minimumTrackTintColor={fromHsv({...color,v : 0})}
-      maximumTrackTintColor={fromHsv({...color,v : 1})}
+      minimumTrackTintColor={fromHsv({...color,v : 0.5})}
+      maximumTrackTintColor={fromHsv({...color,v : 0.5})}
       value={color.v} 
       onValueChange={value => onColorChange({...color, v : value})}
       />
