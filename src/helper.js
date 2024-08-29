@@ -177,6 +177,9 @@ const toHsv = rgb => {
   const max = Math.max(r,g,b);
   const min = Math.min(r,g,b);
   const delta = max - min;
+  if(delta == 0) {
+    return ({h : 0, s : 0.0, v : max})
+  }
 
   let h;
   
