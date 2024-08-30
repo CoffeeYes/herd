@@ -165,7 +165,7 @@ const toHsv = rgb => {
   if(integerMax == g) {
     hueTarget = "g";
   }
-  else if(integerMax == "b") {
+  else if(integerMax == b) {
     hueTarget = "b";
   }
 
