@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useMemo }  from 'react';
 import { View } from 'react-native';
 
 import ValueSlider from './ValueSlider';
@@ -22,10 +22,36 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
     rightTextStyle : {fontSize : sliderTextSize}
   }
 
-  const rainbowGradientPoints = Array.from(Array(36).keys()).map(value => ({
+  const rainbowGradientPoints = useMemo(() => Array.from(Array(36).keys()).map(value => ({
     color : fromHsv({h : value * 10, s : 1, v : 1}),
     opacity : 1
-  }))
+  })),[]);
+
+  const saturationGradientPoints = useMemo(() => {
+    return [
+        {
+          color : fromHsv({...color, s : 0}),
+          opacity : 1
+        },
+        {
+          color : fromHsv({...color, s : 1}),
+          opacity : 1
+        },
+      ]
+  },[color.v,color.h])
+  
+  const valueGradientPoints = useMemo(() => {
+    return [
+        {
+          color : fromHsv({...color, v : 0}),
+          opacity : 1
+        },
+        {
+          color : fromHsv({...color, v : 1}),
+          opacity : 1
+        },
+      ]
+  },[color.s,color.h])
 
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
@@ -63,16 +89,7 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       {...sliderProps}
       sliderStyle={{marginTop : 10}}
       showColorPreview
-      previewGradientPoints={[
-        {
-          color : fromHsv({...color, s : 0}),
-          opacity : 1
-        },
-        {
-          color : fromHsv({...color, s : 1}),
-          opacity : 1
-        },
-      ]}
+      previewGradientPoints={saturationGradientPoints}
       rightTitle="Sat."
       rightText={color.s.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,s : 1})}
@@ -84,16 +101,7 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       {...sliderProps}
       sliderStyle={{marginTop : 10}}
       showColorPreview
-      previewGradientPoints={[
-        {
-          color : fromHsv({...color, v : 0}),
-          opacity : 1
-        },
-        {
-          color : fromHsv({...color, v : 1}),
-          opacity : 1
-        },
-      ]}
+      previewGradientPoints={valueGradientPoints}
       rightTitle="Val."
       rightText={color.v.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,v : 0.5})}
