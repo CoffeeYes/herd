@@ -22,7 +22,19 @@ const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
         {title}
       </Text>}
       <Slider
-      value={useValue ? value : valueRef.current}
+      value={(() => {
+        if(useValue) {
+          if(value == props.min) {
+            return value + props.step;
+          }
+          else {
+            return value;
+          }
+        }
+        else {
+          return valueRef.current;
+        }
+      })()}
       {...props} 
       />
     </>
