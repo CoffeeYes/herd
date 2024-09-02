@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Text } from 'react-native';
 
+import { clamp } from '../helper';
+
 import Slider from './Slider'
 
 const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
@@ -8,7 +10,7 @@ const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
  
   useEffect(() => {
     if(useValue) {
-      valueRef.current = value;
+      valueRef.current = clamp(value,props.min,props.max);
     }
   },[value, useValue])
 
@@ -28,7 +30,7 @@ const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
             return value + props.step;
           }
           else {
-            return value;
+            return clamp(value,props.min,props.max);
           }
         }
         else {

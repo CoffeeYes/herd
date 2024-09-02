@@ -94,8 +94,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       rightText={color.s.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,s : 1})}
       maximumTrackTintColor={fromHsv({...color,s : 1})}
-      value={color.s} 
-      onValueChange={value => onColorChange({...color, s : value})}
+      value={parseFloat(color.s.toFixed(2))} 
+      onValueChange={value => onColorChange({...color, s : parseFloat(value.toFixed(2))})}
       />
       <ValueSlider
       {...sliderProps}
@@ -106,8 +106,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       rightText={color.v.toFixed(2)}
       minimumTrackTintColor={fromHsv({...color,v : 0.5})}
       maximumTrackTintColor={fromHsv({...color,v : 0.5})}
-      value={color.v} 
-      onValueChange={value => onColorChange({...color, v : value})}
+      value={parseFloat(color.v.toFixed(2))} 
+      onValueChange={value => onColorChange({...color, v : parseFloat(value.toFixed(2))})}
       />
     </View>
   )
