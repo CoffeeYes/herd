@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, 
          Alert, SectionList,
-         KeyboardAvoidingView, Keyboard} from 'react-native';
+         KeyboardAvoidingView } from 'react-native';
 import moment from 'moment';
 import { PanGestureHandler, TouchableOpacity  } from 'react-native-gesture-handler'
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -54,7 +54,6 @@ const Chat = ({ route, navigation }) => {
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [scrolling, setScrolling] = useState(false);
   const [momentumScrolling, setMomentumScrolling] = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
@@ -99,25 +98,6 @@ const Chat = ({ route, navigation }) => {
       }
       setInitialLoad(false);
     })()
-
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true);
-        setAllowScrollToLoadMessages(true);
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false);
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
   },[]);
 
   //calculate actual number of messages by extracting them from sections
@@ -555,7 +535,7 @@ const Chat = ({ route, navigation }) => {
       </View>}
 
       <PanGestureHandler
-      enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
+      enabled={enableGestureHandler && !loadingMoreMessages}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
           {((loading || loadingMoreMessages) && !showPopup) &&
