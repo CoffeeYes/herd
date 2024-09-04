@@ -24,8 +24,8 @@ const Chats = ({ navigation }) => {
   .length > 0;
 
   const checkStyleReadable = style => {
-      const hsv = toHsv(style);
-      if(hsv.h < 10 && hsv.s < 10 && hsv.v > 0.95) {
+      const {s,v} = toHsv(style);
+      if(s < 0.1 && v > 0.95) {
         return palette.grey
       }
       else {
@@ -83,6 +83,9 @@ const Chats = ({ navigation }) => {
     }
   }
 
+  const displayedSentTextColor = checkStyleReadable(customStyle.sentTextColor);
+  const displayedReceivedTextColor = checkStyleReadable(customStyle.receivedTextColor);
+
   return (
     <>
       <Header
@@ -105,13 +108,13 @@ const Chats = ({ navigation }) => {
         highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
         subTextStyle={{
           fontSize : customStyle.scaledSubTextSize,
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
+          color : chat.lastMessageSentBySelf ? displayedSentTextColor : displayedReceivedTextColor,
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightTextStyle={{
           marginRight : 10,
           fontSize : customStyle.scaledSubTextSize,
-          color : chat.lastMessageSentBySelf ? checkStyleReadable(customStyle.sentTextColor) : checkStyleReadable(customStyle.receivedTextColor),
+          color : chat.lastMessageSentBySelf ? displayedSentTextColor : displayedReceivedTextColor,
           ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
         }}
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
