@@ -98,11 +98,12 @@ const Customise = () => {
     if(
       uiFontSize === defaultChatStyles.uiFontSize && 
       messageFontSize === defaultChatStyles.messageFontSize && 
-      synchronisedFontSize === defaultChatStyles.uiFontSize
+      synchronisedFontSize === defaultChatStyles.uiFontSize &&
+      overrideFontSliderValues
     ) {
       setOverrideFontSliderValues(false);
     }
-  },[uiFontSize, messageFontSize, synchronisedFontSize])
+  },[uiFontSize, messageFontSize, synchronisedFontSize, overrideFontSliderValues])
 
   useEffect(() => {
     if(
@@ -321,7 +322,7 @@ const Customise = () => {
             {synchroniseFontChanges ? 
             <ValueSlider
             {...fontSliderProps}
-            value={synchronisedFontSize}
+            value={Math.round(synchronisedFontSize)}
             title={fontSizes.map(item => item.title).join(" + ")}
             onSlidingComplete={value => setAllFontSizes(value)}
             onValueChange={value => setAllFontSizes(value)}
@@ -337,7 +338,7 @@ const Customise = () => {
                 key={item.title}
                 onSlidingComplete={value => item.setValue(value)}
                 onValueChange={value => item.setValue(value)}
-                value={item.value}
+                value={Math.round(item.value)}
                 rightTitle={item.rightTitle}
                 rightText={item.rightText}
                 />
