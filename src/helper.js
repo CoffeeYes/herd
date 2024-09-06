@@ -193,6 +193,9 @@ const toHsv = rgb => {
     h = ((r - g)/delta) + 4;
   }
   h = 60 * h;
+  if (h < 0) {
+    h = 360 + h;
+  }
 
   let s = 0;
   if(max > 0) {
