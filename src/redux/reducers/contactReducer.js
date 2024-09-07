@@ -17,15 +17,20 @@ const contactReducer = (state = initialState,action) => {
           )
         }
     case "UPDATE_CONTACT": {
-      const { _id, name, key, image } = action.payload;
+      const { _id, ...payload} = action.payload;
+
+      for(const key of Object.keys(payload)) {
+        if(!["name","key","image"].includes(key)){
+          delete payload[key];
+        }
+      }
+
       let contact = state.contacts.find(contact => contact._id == _id);
       if(contact) {
-  	    let contactsCopy = [...state.contacts];
+          let contactsCopy = [...state.contacts];
     	  let newContact  = {
-    	      ...contact,
-    	      ...(name && {name : name}),
-    	      ...(image?.length >= 0 && {image : image}),
-    	      ...(key && {key : key}),
+            ...contact,
+            ...payload
     	  };
         const contactIndex = state.contacts.indexOf(contact);
         contactsCopy[contactIndex] = newContact;
