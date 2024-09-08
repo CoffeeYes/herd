@@ -55,25 +55,30 @@ const Contacts = ({ route, navigation }) => {
   }
 
   const handleLongPress = contact => {
-    if(!highlightedContacts.includes(contact)) {
+    if(route.params.type === "newChat") {
+      navigateToNewChat(parseRealmID(contact))
+    }
+    else if(!highlightedContacts.includes(contact)) {
       setHighlightedContacts([...highlightedContacts,contact]);
     }
   }
 
   const handlePress = contact => {
-    if(highlightedContacts.length > 0) {
-      if(!highlightedContacts.includes(contact)) {
-        setHighlightedContacts([...highlightedContacts,contact]);
-      }
-      else {
-        setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contact));
-      }
+    if(route.params.type === "newChat") {
+      navigateToNewChat(parseRealmID(contact))
     }
     else {
-      route.params.type === "newChat" ?
-      navigateToNewChat(parseRealmID(contact))
-      :
-      navigation.navigate("contact", {id : parseRealmID(contact)})
+      if(highlightedContacts.length > 0) {
+        if(!highlightedContacts.includes(contact)) {
+          setHighlightedContacts([...highlightedContacts,contact]);
+        }
+        else {
+          setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contact));
+        }
+      }
+      else {
+        navigation.navigate("contact", {id : parseRealmID(contact)})
+      }
     }
   }
 
