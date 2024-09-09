@@ -54,30 +54,30 @@ const Contacts = ({ route, navigation }) => {
     );
   }
 
-  const handleLongPress = contact => {
+  const handleLongPress = contactID => {
     if(route.params.type === "newChat") {
-      navigateToNewChat(parseRealmID(contact))
+      navigateToNewChat(parseRealmID(contactID))
     }
-    else if(!highlightedContacts.includes(contact)) {
-      setHighlightedContacts([...highlightedContacts,contact]);
+    else if(!highlightedContacts.includes(contactID)) {
+      setHighlightedContacts([...highlightedContacts,contactID]);
     }
   }
 
-  const handlePress = contact => {
+  const handlePress = contactID => {
     if(route.params.type === "newChat") {
-      navigateToNewChat(parseRealmID(contact))
+      navigateToNewChat(parseRealmID(contactID))
     }
     else {
       if(highlightedContacts.length > 0) {
-        if(!highlightedContacts.includes(contact)) {
-          setHighlightedContacts([...highlightedContacts,contact]);
+        if(!highlightedContacts.includes(contactID)) {
+          setHighlightedContacts([...highlightedContacts,contactID]);
         }
         else {
-          setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contact));
+          setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contactID));
         }
       }
       else {
-        navigation.navigate("contact", {id : parseRealmID(contact)})
+        navigation.navigate("contact", {id : contactID})
       }
     }
   }
@@ -98,9 +98,9 @@ const Contacts = ({ route, navigation }) => {
           image={contact.image}
           textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
-          onPress={() => handlePress(contact)}
-          onLongPress={() => handleLongPress(contact)}
-          highlighted={highlightedContacts.includes(contact)}
+          onPress={() => handlePress(contact._id)}
+          onLongPress={() => handleLongPress(contact._id)}
+          highlighted={highlightedContacts.includes(contact._id)}
           highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
           />
         )}
