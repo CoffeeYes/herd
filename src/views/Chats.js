@@ -45,8 +45,9 @@ const Chats = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            dispatch(deleteChatsFromState(highlightedChats))
-            deleteChatsFromRealm(highlightedChats.map(chat => chat.key))
+            const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id));
+            dispatch(deleteChatsFromState(chatsToDelete));
+            deleteChatsFromRealm(chatsToDelete.map(chat => chat.key));
             setHighlightedChats([]);
           },
         },
@@ -54,23 +55,23 @@ const Chats = ({ navigation }) => {
     );
   }
 
-  const handleLongPress = chat => {
-    if(!highlightedChats.includes(chat)) {
-      setHighlightedChats([...highlightedChats,chat]);
+  const handleLongPress = id => {
+    if(!highlightedChats.includes(id)) {
+      setHighlightedChats([...highlightedChats,id]);
     }
   }
 
-  const handlePress = chat => {
+  const handlePress = id => {
     if(highlightedChats.length > 0) {
-      if(!highlightedChats.includes(chat)) {
-        setHighlightedChats([...highlightedChats,chat]);
+      if(!highlightedChats.includes(id)) {
+        setHighlightedChats([...highlightedChats,id]);
       }
       else {
-        setHighlightedChats(highlightedChats.filter(highlightedChat => highlightedChat !== chat));
+        setHighlightedChats(highlightedChats.filter(highlightedChat => highlightedChat !== id));
       }
     }
     else {
-      navigation.navigate("chat", {contactID : parseRealmID(chat)})
+      navigation.navigate("chat", {contactID : id})
     }
   }
 
@@ -120,9 +121,9 @@ const Chats = ({ navigation }) => {
         rightIcon={!chat.lastMessageSentBySelf && "circle"}
         rightIconSize={18}
         rightIconStyle={{color : palette.primary}}
-        onPress={() => handlePress(chat)}
-        onLongPress={() => handleLongPress(chat)}
-        highlighted={highlightedChats.includes(chat)}
+        onPress={() => handlePress(chat._id)}
+        onLongPress={() => handleLongPress(chat._id)}
+        highlighted={highlightedChats.includes(chat._id)}
         rightText={chat.timestamp && timestampToText(chat.timestamp,"DD/MM")}
         subText={chat.lastText.trim()}/>
       )}
