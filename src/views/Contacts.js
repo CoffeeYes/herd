@@ -56,7 +56,7 @@ const Contacts = ({ route, navigation }) => {
 
   const handleLongPress = contactID => {
     if(route.params.type === "newChat") {
-      navigateToNewChat(parseRealmID(contactID))
+      navigateToNewChat(contactID);
     }
     else if(!highlightedContacts.includes(contactID)) {
       setHighlightedContacts([...highlightedContacts,contactID]);
@@ -65,7 +65,7 @@ const Contacts = ({ route, navigation }) => {
 
   const handlePress = contactID => {
     if(route.params.type === "newChat") {
-      navigateToNewChat(parseRealmID(contactID))
+      navigateToNewChat(contactID);
     }
     else {
       if(highlightedContacts.length > 0) {
