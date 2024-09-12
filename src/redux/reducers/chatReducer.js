@@ -88,11 +88,20 @@ const chatReducer = (state = initialState,action) => {
       }
     }
     case "DELETE_CHATS": {
-      return {...state,
-        chats : [...state.chats].filter(
+      let newChats = [...state.chats];
+      //chat object with multiple keys was passed
+      if(action.payload[0]?._id) {
+        newChats = newChats.filter(
           chat => action.payload.find(
           chatToDelete => chatToDelete._id == chat._id) === undefined
         )
+      }
+      //only ID was passed
+      else {
+        newChats = newChats.filter(chat => action.payload.includes(chat._id))
+      }
+      return {...state,
+        chats : newChats
       };
     }
     case "ADD_CHAT": {

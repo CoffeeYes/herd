@@ -4,7 +4,6 @@ import { ScrollView, Alert } from 'react-native';
 import Header from './Header';
 import ListItem from './ListItem';
 import { deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
-import { parseRealmID } from '../realm/helper';
 
 import { deleteChats as deleteChatsFromState } from '../redux/actions/chatActions';
 
@@ -46,7 +45,7 @@ const Chats = ({ navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id));
-            dispatch(deleteChatsFromState(chatsToDelete));
+            dispatch(deleteChatsFromState(highlightedChats));
             deleteChatsFromRealm(chatsToDelete.map(chat => chat.key));
             setHighlightedChats([]);
           },
