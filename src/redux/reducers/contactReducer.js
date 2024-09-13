@@ -9,13 +9,20 @@ const contactReducer = (state = initialState,action) => {
     case "ADD_CONTACT":
       return {...state, contacts : [...state.contacts,action.payload]};
     case "DELETE_CONTACTS":
-      return {
-        ...state,
-        contacts : [...state.contacts].filter(
+      let newContacts = [...state.contacts];
+      if(action.payload[0]?._id) {
+        newContacts = newContacts.filter(
           contact => action.payload.find(
             contactToDelete => contactToDelete._id == contact._id) === undefined
-          )
-        }
+        )
+      }
+      else {
+        newContacts = newContacts.filter(contact => action.payload.includes(contact._id))
+      }
+      return {
+        ...state,
+        contacts : newContacts
+      }
     case "UPDATE_CONTACT": {
       const { _id, ...payload} = action.payload;
 
