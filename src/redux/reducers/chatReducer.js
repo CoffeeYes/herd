@@ -98,7 +98,7 @@ const chatReducer = (state = initialState,action) => {
       }
       //only ID was passed
       else {
-        newChats = newChats.filter(chat => action.payload.includes(chat._id))
+        newChats = newChats.filter(chat => !action.payload.includes(chat._id))
       }
       return {...state,
         chats : newChats

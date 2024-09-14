@@ -223,12 +223,9 @@ const Chat = ({ route, navigation }) => {
     //add new chat to chats state in redux store if it isnt in chats state
     if(!chat) {
       const newChat = {
-        _id : contactInfo._id,
-        image : contactInfo.image,
-        key : contactInfo.key,
+        ...contactInfo,
         lastMessageSentBySelf : true,
         lastText : message,
-        name : contactInfo.name,
         timestamp : timestamp,
         doneLoading : true
       }

@@ -44,9 +44,9 @@ const Chats = ({ navigation }) => {
           // If the user confirmed, then we dispatch the action we blocked earlier
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
-            const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id));
+            const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id)?.key);
             dispatch(deleteChatsFromState(highlightedChats));
-            deleteChatsFromRealm(chatsToDelete.map(chat => chat.key));
+            deleteChatsFromRealm(chatsToDelete);
             setHighlightedChats([]);
           },
         },

@@ -17,7 +17,7 @@ const contactReducer = (state = initialState,action) => {
         )
       }
       else {
-        newContacts = newContacts.filter(contact => action.payload.includes(contact._id))
+        newContacts = newContacts.filter(contact => !action.payload.includes(contact._id))
       }
       return {
         ...state,
