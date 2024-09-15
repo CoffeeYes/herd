@@ -8,16 +8,19 @@ const setChats = chats => {
 const deleteChats = chats => {
   return (dispatch,getState) => {
     const chatsToDelete = chats == "all" ? getState().chatReducer.chats : chats;
-    dispatch({type : "DELETE_CHATS",payload : chatsToDelete});
-    dispatch(filterMessageQueueByKeys(chatsToDelete.map(chat => chat.key)));
     let messagesForContacts = [];
+    let contactKeys = [];
     if(chatsToDelete[0]?._id) {
       messagesForContacts = chatsToDelete.map(chat => ({id : chat._id, messages : []}))
+      contactKeys = chatsToDelete.map(chat => chat.key);
     }
     else {
       messagesForContacts = chatsToDelete.map(id => ({id, messages : []}))
+      contactKeys = getState().chatReducer.chats.map(chat => chats.includes(chat._id) && chat.key);
     }
+    dispatch(filterMessageQueueByKeys(contactKeys));
     dispatch(setMessagesForContacts(messagesForContacts))
+    dispatch({type : "DELETE_CHATS",payload : chatsToDelete});
   }
 }
 
