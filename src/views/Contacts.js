@@ -4,7 +4,6 @@ import { ScrollView, Alert} from 'react-native';
 import Header from './Header';
 import ListItem from './ListItem';
 import { deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
-import { parseRealmID } from '../realm/helper';
 import { CommonActions } from '@react-navigation/native';
 
 import { deleteContacts } from '../redux/actions/contactActions';
@@ -34,7 +33,7 @@ const Contacts = ({ route, navigation }) => {
           // This will continue the action that had triggered the removal of the screen
           onPress: () => {
             dispatch(deleteContacts(highlightedContacts));
-            deleteContactsFromRealm(highlightedContacts);
+            deleteContactsFromRealm(contacts.filter(contact => highlightedContacts.includes(contact._id)));
             setHighlightedContacts([]);
           },
         },
