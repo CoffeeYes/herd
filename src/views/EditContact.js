@@ -60,25 +60,33 @@ const EditContact = ({ route, navigation }) => {
   const save = async () => {
     setSaving(true);
     let errorSaving = []
-    try {
-      await encryptStrings(
-        publicKey.trim(),
-        false,
-        ["test"]
-      )
-    }
-    catch(e) {
-      errorSaving.push({
-        type : "invalid_key",
-        message : "Invalid Public Key"
-      })
-    }
-
     if(name.trim().length === 0) {
       errorSaving.push({
-        type : "empty_fields",
+        type : "empty_name",
         message : "Username can not be empty"
       });
+    }
+
+    if(publicKey.trim().length === 0) {
+      errorSaving.push({
+        type : "empty_key",
+        message : "Key field can not be empty"
+      })
+    }
+    else {
+      try {
+        await encryptStrings(
+          publicKey.trim(),
+          false,
+          ["test"]
+        )
+      }
+      catch(e) {
+        errorSaving.push({
+          type : "invalid_key",
+          message : "Invalid Public Key"
+        })
+      }
     }
 
     const keyExists = getContactsByKey([publicKey.trim()]);
