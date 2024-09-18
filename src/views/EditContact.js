@@ -29,7 +29,6 @@ const EditContact = ({ route, navigation }) => {
   const [headerIcon, setHeaderIcon] = useState("save");
 
   const originalContactRef = useRef(originalContact || {});
-  const haveSavedContactRef = useRef(false);
   const editingExistingContact = route?.params?.id?.length > 0;
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
@@ -123,18 +122,16 @@ const EditContact = ({ route, navigation }) => {
         delete newInfo.key;
       }
       dispatch(updateContactAndReferences(newInfo));
-    }
-    else {
-      haveSavedContactRef.current = true;
-      const createdContact = createContact(newInfo);
-      dispatch(addContact(createdContact));
-      navigation.navigate('main');
-    }
-    if(editingExistingContact) {
+
       setHeaderIcon("check");
       setTimeout(() => {
         setHeaderIcon("save");
       },500)
+    }
+    else {
+      const createdContact = createContact(newInfo);
+      dispatch(addContact(createdContact));
+      navigation.navigate('main');
     }
     setSaving(false);
     return true;
@@ -172,8 +169,7 @@ const EditContact = ({ route, navigation }) => {
       unsavedChanges = (
         (nameRef?.current?.trim()?.length > 0 ||
         keyRef?.current?.trim()?.length > 0 ||
-        imageRef?.current?.trim()?.length > 0) &&
-        !haveSavedContactRef.current
+        imageRef?.current?.trim()?.length > 0)
       )
     }
     return unsavedChanges;
