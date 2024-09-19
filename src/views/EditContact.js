@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, TextInput, Text, 
          ActivityIndicator, ScrollView } from 'react-native';
@@ -27,6 +27,7 @@ const EditContact = ({ route, navigation }) => {
   const [errors, setErrors] = useState([]);
   const [saving, setSaving] = useState(false);
   const [headerIcon, setHeaderIcon] = useState("save");
+  const [unsavedChanges, setUnsavedChanges] = useState(false);
 
   const originalContactRef = useRef(originalContact || {});
   const editingExistingContact = route?.params?.id?.length > 0;
@@ -137,26 +138,36 @@ const EditContact = ({ route, navigation }) => {
     return true;
   }
 
+  const handleImageResponse = response => {
+    if(response.errorCode) {
+      setErrors([{
+        type : "image_error",
+        message : response.errorMessage
+      }])
+    }
+    else if(!response.didCancel) {
+      const {base64, type} = response?.assets?.[0];
+      if(base64 && type){
+        setContactImage("data:" + type + ";base64," + base64);
+      }
+    }
+  }
+
   const editImage = async () => {
     setErrors([]);
     const options = {
       mediaType : 'photo',
       includeBase64 : true
     }
-    launchImageLibrary(options,response => {
-      if(response.errorCode) {
-        setErrors([{
-          type : "image_error",
-          message : response.errorMessage
-        }])
-      }
-      else if(!response.didCancel) {
-        setContactImage("data:" + response.type + ";base64," + response.base64);
-      }
-    });
+    const response = await launchImageLibrary(options);
+    handleImageResponse(response)
   }
 
-  const haveUnsavedChanges = () => {
+  useEffect(() => {
+    setUnsavedChanges(haveUnsavedChanges());
+  },[contactImage,name,publicKey,originalContact])
+
+  const haveUnsavedChanges = useCallback(() => {
     let unsavedChanges;
     if(editingExistingContact) {
       unsavedChanges = (
@@ -173,11 +184,11 @@ const EditContact = ({ route, navigation }) => {
       )
     }
     return unsavedChanges;
-  }
+  },[name,publicKey,contactImage])
 
   const hideSaveButton = () => {
     return (
-      !haveUnsavedChanges() &&
+      !unsavedChanges &&
       headerIcon !== "check"
     )
   }
