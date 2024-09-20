@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { View, TextInput, Text, 
          ActivityIndicator, ScrollView } from 'react-native';
@@ -17,7 +17,7 @@ import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize, useStateAndRef } from '../helper';
+import { useScreenAdjustedSize } from '../helper';
 import { encryptStrings } from '../common';
 
 const EditContact = ({ route, navigation }) => {
@@ -29,21 +29,18 @@ const EditContact = ({ route, navigation }) => {
   const [headerIcon, setHeaderIcon] = useState("save");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
 
-  const originalContactRef = useRef(originalContact || {});
   const editingExistingContact = route?.params?.id?.length > 0;
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 
-  const [name, setName, nameRef] = useStateAndRef(originalContact?.name || "");
-  const [publicKey, setPublicKey, keyRef] = useStateAndRef(originalContact?.key || "");
-  const [contactImage, setContactImage, imageRef] = useStateAndRef(originalContact?.image || "");
+  const [name, setName] = useState(originalContact?.name || "");
+  const [publicKey, setPublicKey] = useState(originalContact?.key || "");
+  const [contactImage, setContactImage] = useState(originalContact?.image || "");
 
   const publicKeyInputRef = useRef();
   const scrollViewRef = useRef();
 
-  useEffect(() => {
-    originalContactRef.current = originalContact
-  },[originalContact])
+  const unsavedChangesRef = useRef(false);
 
   useEffect(() => {
     if(!editingExistingContact) {
@@ -164,27 +161,20 @@ const EditContact = ({ route, navigation }) => {
   }
 
   useEffect(() => {
-    setUnsavedChanges(haveUnsavedChanges());
+    const unsavedChanges = editingExistingContact ? (
+      originalContact.name.trim() != name.trim() ||
+      originalContact.key.trim() != publicKey.trim() ||
+      originalContact.image != contactImage
+    ) 
+    :
+    (
+      name.trim().length > 0 ||
+      publicKey.trim().length > 0 ||
+      contactImage.trim().length > 0
+    )
+    setUnsavedChanges(unsavedChanges);
+    unsavedChangesRef.current = unsavedChanges;
   },[contactImage,name,publicKey,originalContact])
-
-  const haveUnsavedChanges = useCallback(() => {
-    let unsavedChanges;
-    if(editingExistingContact) {
-      unsavedChanges = (
-        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
-        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
-        originalContactRef?.current?.image != imageRef?.current
-      )
-    }
-    else {
-      unsavedChanges = (
-        (nameRef?.current?.trim()?.length > 0 ||
-        keyRef?.current?.trim()?.length > 0 ||
-        imageRef?.current?.trim()?.length > 0)
-      )
-    }
-    return unsavedChanges;
-  },[name,publicKey,contactImage])
 
   const hideSaveButton = () => {
     return (
@@ -195,7 +185,7 @@ const EditContact = ({ route, navigation }) => {
 
   return (
     <NavigationWarningWrapper
-    checkForChanges={haveUnsavedChanges}>
+    checkForChanges={() => unsavedChangesRef.current}>
 
       <Header
       title={editingExistingContact ? "Edit Contact" : "Add Contact"}
@@ -235,7 +225,7 @@ const EditContact = ({ route, navigation }) => {
             <TextInput
             style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setName(text)}
-            onSubmitEditing={() => publicKeyInputRef.current.focus()}
+            onSubmitEditing={() => publicKey.length == 0 ? publicKeyInputRef.current.focus() : !hideSaveButton() && save()}
             value={name}/>
           </View>
 
