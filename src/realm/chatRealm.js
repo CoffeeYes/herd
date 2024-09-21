@@ -341,6 +341,10 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
 
+  if(sentMessagesCopy.length == 0) {
+    return true;
+  }
+
   const decryptedStrings = await decryptStrings(
     sentMessagesCopy.map(message => parseRealmObject(message).text)
   )
