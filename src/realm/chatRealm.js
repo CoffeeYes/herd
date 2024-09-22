@@ -341,6 +341,12 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
   const sentMessagesCopy = messageCopyRealm.objects('Message').filtered(`to == '${oldKey}'`);
   const receivedMessages = messageReceivedRealm.objects('Message').filtered(`from == '${oldKey}'`);
 
+  messageReceivedRealm.write(() => {
+    for (const message of receivedMessages) {
+      message.from = newKey
+    }
+  })
+
   if(sentMessagesCopy.length == 0) {
     return true;
   }
@@ -369,11 +375,6 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
       }
     })
 
-    messageReceivedRealm.write(() => {
-      for (const message of receivedMessages) {
-        message.from = newKey
-      }
-    })
     return true;
   }
   else {
