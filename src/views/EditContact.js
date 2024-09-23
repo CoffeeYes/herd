@@ -172,10 +172,6 @@ const EditContact = ({ route, navigation }) => {
       publicKey.trim().length > 0 ||
       contactImage.trim().length > 0
     )
-    console.log({
-      original : originalContact.key,
-      current : publicKey
-    })
     setUnsavedChanges(unsavedChanges);
     unsavedChangesRef.current = unsavedChanges;
   },[contactImage,name,publicKey,originalContact])

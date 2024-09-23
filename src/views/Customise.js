@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,7 +19,7 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize, useStateAndRef, clamp, fromHsv, toHsv } from '../helper';
+import { useScreenAdjustedSize, clamp, fromHsv, toHsv } from '../helper';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
@@ -74,15 +74,17 @@ const Customise = () => {
   const headerIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
   const scaledHeaderIconSize = ((uiFontSize + 16) / defaultChatStyles.uiFontSize) * headerIconSize
 
-  const [sentBoxColor, setSentBoxColor, sentBoxColorRef] = useStateAndRef(rgbToHsv(customStyle.sentBoxColor));
-  const [sentTextColor, setSentTextColor, sentTextColorRef] = useStateAndRef(rgbToHsv(customStyle.sentTextColor));
-  const [receivedBoxColor, setReceivedBoxColor, receivedBoxColorRef] = useStateAndRef(rgbToHsv(customStyle.receivedBoxColor));
-  const [receivedTextColor, setReceivedTextColor, receivedTextColorRef] = useStateAndRef(rgbToHsv(customStyle.receivedTextColor));
-  const [messageFontSize, setMessageFontSize, messageFontSizeRef] = useStateAndRef(customStyle.messageFontSize);
-  const [uiFontSize, setUiFontSize, uiFontSizeRef] = useStateAndRef(customStyle.uiFontSize);
+  const [sentBoxColor, setSentBoxColor] = useState(rgbToHsv(customStyle.sentBoxColor));
+  const [sentTextColor, setSentTextColor] = useState(rgbToHsv(customStyle.sentTextColor));
+  const [receivedBoxColor, setReceivedBoxColor] = useState(rgbToHsv(customStyle.receivedBoxColor));
+  const [receivedTextColor, setReceivedTextColor] = useState(rgbToHsv(customStyle.receivedTextColor));
+  const [messageFontSize, setMessageFontSize] = useState(customStyle.messageFontSize);
+  const [uiFontSize, setUiFontSize] = useState(customStyle.uiFontSize);
   const [scaledFontSize, setScaledFontSize] = useState(customStyle.uiFontSize);
   const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(customStyle.uiFontSize);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(customStyle.uiFontSize);
+
+  const unsavedChangesRef = useRef(false);
 
   useEffect(() => {
     setScaledFontSize(uiFontSize + screenFontScaler)
@@ -119,6 +121,17 @@ const Customise = () => {
   useEffect(() => {
     setOverrideColorChoiceSliderValue(false);
   },[activeItem])
+
+  useEffect(() => {
+    unsavedChangesRef.current = !checkStylesAreEqual(customStyle,{
+      sentTextColor,
+      sentBoxColor,
+      receivedBoxColor,
+      receivedTextColor,
+      messageFontSize,
+      uiFontSize
+    })
+  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor,messageFontSize,uiFontSize])
 
   const saveStyles = async () => {
     const style = {
@@ -254,21 +267,9 @@ const Customise = () => {
     return true;
   }
 
-  const haveUnsavedChanges = async () => {
-    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-    return !checkStylesAreEqual(styles,{
-      sentBoxColor : sentBoxColorRef.current,
-      sentTextColor : sentTextColorRef.current,
-      receivedBoxColor : receivedBoxColorRef.current,
-      receivedTextColor : receivedTextColorRef.current,
-      messageFontSize : messageFontSizeRef.current,
-      uiFontSize : uiFontSizeRef.current,
-    });
-  }
-
   return (
     <NavigationWarningWrapper
-    checkForChanges={haveUnsavedChanges}>
+    checkForChanges={() => unsavedChangesRef.current}>
       <Header title="Customise" allowGoBack/>
       <ScrollView contentContainerStyle={{paddingBottom : 10}}>
          <Header
