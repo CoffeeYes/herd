@@ -131,7 +131,7 @@ const Customise = () => {
       messageFontSize,
       uiFontSize
     })
-  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor,messageFontSize,uiFontSize])
+  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor,messageFontSize,uiFontSize, customStyle])
 
   const saveStyles = async () => {
     const style = {
