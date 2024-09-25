@@ -143,18 +143,14 @@ meaning all contacts who have previously added you will need to add you again.`
         changesAreAvailable={hasChanges => {loginPasswordHasChangesRef.current = hasChanges}}
         description={mainPasswordDescription}
         errors={loginPasswordErrors}
-        primaryButtonOnPress={(loginPassword,confirmLoginPassword) => savePassword(
+        save={(loginPassword,confirmLoginPassword) => savePassword(
           "loginPassword",
           loginPassword,
           confirmLoginPassword,
           setLoginPasswordErrors
         )}
-        primaryButtonText="Save"
-        primaryButtonFlashText="Saved!"
-        secondaryButtonOnPress={() => resetPassword("loginPassword")}
-        secondaryButtonDisabled={!hasLoginPassword}
-        secondaryButtonText="Reset"
-        secondaryButtonFlashText="Reset"
+        reset={() => resetPassword("loginPassword")}
+        disableReset={!hasLoginPassword}
         />
 
         <PasswordCreationBox
@@ -165,18 +161,14 @@ meaning all contacts who have previously added you will need to add you again.`
         changesAreAvailable={hasChanges => {erasurePasswordHasChangesRef.current = hasChanges}}
         description={erasurePasswordDescription}
         errors={erasurePasswordErrors}
-        primaryButtonOnPress={(erasurePassword,confirmErasurePassword) => savePassword(
+        save={(erasurePassword,confirmErasurePassword) => savePassword(
           "erasurePassword",
           erasurePassword,
           confirmErasurePassword,
           setErasurePasswordErrors
         )}
-        primaryButtonText="Save"
-        primaryButtonFlashText="Saved!"
-        secondaryButtonOnPress={() => resetPassword("erasurePassword")}
-        secondaryButtonDisabled={!hasErasurePassword}
-        secondaryButtonText="Reset"
-        secondaryButtonFlashText="Reset"
+        reset={() => resetPassword("erasurePassword")}
+        disableReset={!hasErasurePassword}
         />
 
       </ScrollView>

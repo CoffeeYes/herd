@@ -26,9 +26,7 @@ const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSub
 })
 
 const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
-                            primaryButtonText, primaryButtonFlashText, secondaryButtonText,
-                            secondaryButtonFlashText, primaryButtonOnPress, secondaryButtonOnPress,
-                            primaryButtonDisabled, secondaryButtonDisabled, mainContainerStyle,
+                            disableSave, disableReset, mainContainerStyle, save, reset,
                             originalValue, changesAreAvailable}) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -40,7 +38,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   const secondaryInputRef = useRef();
 
   const submit = async () => {
-    const result = await primaryButtonOnPress(primaryInputText,secondaryInputText);
+    const result = await save(primaryInputText,secondaryInputText);
     if(result) {
       setPrimaryInputText("");
       setSecondaryInputText("");
@@ -76,6 +74,12 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
     })()
   },[primaryInputText, secondaryInputText])
 
+  const handleReset = () => {
+    reset?.();
+    setPrimaryInputText("");
+    setSecondaryInputText("");
+  }
+
   return (
         <View style={{...styles.card,...mainContainerStyle }}>
 
@@ -110,19 +114,18 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
 
           <View style={{flexDirection : "row"}}>
             <FlashTextButton
-            normalText={primaryButtonText}
-            flashText={primaryButtonFlashText}
-            disabled={saveDisabled || primaryButtonDisabled}
+            normalText="Save"
+            flashText="Saved!"
+            disabled={saveDisabled || disableSave}
             onPress={submit}
             timeout={500}
             buttonStyle={{...styles.button, width : "50%"}}
             textStyle={styles.buttonText}/>
 
             <FlashTextButton
-            normalText={secondaryButtonText}
-            flashText={secondaryButtonFlashText}
-            disabled={secondaryButtonDisabled}
-            onPress={secondaryButtonOnPress}
+            normalText="Reset"
+            disabled={disableReset}
+            onPress={handleReset}
             buttonStyle={{...styles.button, marginLeft : 10,width : "50%"}}
             textStyle={styles.buttonText}/>
           </View>
