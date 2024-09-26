@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ScrollView, Alert } from 'react-native';
 
-import { createNewPassword, getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
+import { getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
 import { setPassword } from '../redux/actions/userActions';
 
@@ -51,18 +51,12 @@ const PasswordSettings = () => {
     const loginHash = getPasswordHash("loginPassword");
     const erasureHash = getPasswordHash("erasurePassword");
 
-    let originalHash = "";
     let oppositeHash = "";
-    let shortName = "";
-    if (name === "loginPassword") {
-      originalHash = loginHash;
+    if (name === "login") {
       oppositeHash = erasureHash
-      shortName = "login";
     }
-    else if(name === "erasurePassword") {
-      originalHash = erasureHash;
+    else if(name === "erasure") {
       oppositeHash = loginHash;
-      shortName = "erasure"
     }
     else {
       throw new error("invalid password name used when attempting to save password");
@@ -75,7 +69,7 @@ const PasswordSettings = () => {
       return false;
     }
 
-    if(!hasLoginPassword && name === "erasurePassword") {
+    if(!hasLoginPassword && name === "erasure") {
       setErasurePasswordErrors([{
         type : "eraure_before_login",
         text : "You must set up a normal password before an erasure password can be used"}
@@ -86,13 +80,8 @@ const PasswordSettings = () => {
     //reset error after validation so that error text does not "flash" when re-submitting after error
     setErrors([]);
 
-    if(originalHash.length > 0) {
-      updatePassword(name,hash);
-    }
-    else {
-      createNewPassword(name,hash);
-    }
-    dispatch(setPassword(shortName,hash));
+    updatePassword(name + "Password",hash);
+    dispatch(setPassword(name,hash));
 
     return true;
   }
@@ -144,7 +133,7 @@ meaning all contacts who have previously added you will need to add you again.`
         description={mainPasswordDescription}
         errors={loginPasswordErrors}
         save={(loginPassword,confirmLoginPassword) => savePassword(
-          "loginPassword",
+          "login",
           loginPassword,
           confirmLoginPassword,
           setLoginPasswordErrors
@@ -162,7 +151,7 @@ meaning all contacts who have previously added you will need to add you again.`
         description={erasurePasswordDescription}
         errors={erasurePasswordErrors}
         save={(erasurePassword,confirmErasurePassword) => savePassword(
-          "erasurePassword",
+          "erasure",
           erasurePassword,
           confirmErasurePassword,
           setErasurePasswordErrors

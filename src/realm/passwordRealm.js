@@ -6,27 +6,27 @@ const passwordRealm = new Realm({
   schema : [Schemas.PasswordSchema]
 })
 
-const createNewPassword = (passwordName,passwordHash) => {
-  passwordRealm.write(() => {
-    passwordRealm.create('Password',{
-      _id : Realm.BSON.ObjectId(),
-      name : passwordName,
-      hash : passwordHash
-    })
-  })
-}
-
 const updatePassword = (passwordName,passwordHash) => {
   const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0];
 
-  password &&
-  passwordRealm.write(() => {
-    passwordRealm.create('Password',{
-      ...password,
-      hash : passwordHash,
-      _id : Realm.BSON.ObjectId(password._id)},
-    true);
-  })
+  if(password) {
+    passwordRealm.write(() => {
+      passwordRealm.create('Password',{
+        ...password,
+        hash : passwordHash,
+        _id : Realm.BSON.ObjectId(password._id)},
+      true);
+    })
+  }
+  else {
+    passwordRealm.write(() => {
+      passwordRealm.create('Password',{
+        _id : Realm.BSON.ObjectId(),
+        name : passwordName,
+        hash : passwordHash
+      })
+    })
+  }
 }
 
 const getPasswordHash = name => {
@@ -47,7 +47,6 @@ const closePasswordRealm = () => {
 }
 
 export {
-  createNewPassword,
   updatePassword,
   getPasswordHash,
   deletePassword,
