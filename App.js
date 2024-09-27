@@ -161,8 +161,8 @@ const App = ({ }) => {
   const loadInitialState = async () => {
     //get stored data
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-    const loginPassword = getPasswordHash("loginPassword");
-    const erasurePassword = getPasswordHash("erasurePassword");
+    const loginPassword = getPasswordHash("login");
+    const erasurePassword = getPasswordHash("erasure");
 
     //determine the entry screen
     if(key?.length > 0) {

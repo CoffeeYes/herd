@@ -48,8 +48,8 @@ const PasswordSettings = () => {
       return false;
     }
     const hash = await Crypto.createHash(password);
-    const loginHash = getPasswordHash("loginPassword");
-    const erasureHash = getPasswordHash("erasurePassword");
+    const loginHash = getPasswordHash("login");
+    const erasureHash = getPasswordHash("erasure");
 
     let oppositeHash = "";
     if (name === "login") {
@@ -80,7 +80,7 @@ const PasswordSettings = () => {
     //reset error after validation so that error text does not "flash" when re-submitting after error
     setErrors([]);
 
-    updatePassword(name + "Password",hash);
+    updatePassword(name,hash);
     dispatch(setPassword(name,hash));
 
     return true;
@@ -99,10 +99,10 @@ const PasswordSettings = () => {
           // This will continue the action that had triggered the removal of the screen
           onPress: async () => {
             deletePassword(passwordName);
-            dispatch(setPassword("erasure",""));
-            if(passwordName === "loginPassword") {
-              deletePassword("erasurePassword");
-              dispatch(setPassword("login",""));
+            dispatch(setPassword(passwordName,""))
+            if(passwordName == "login") {
+              deletePassword("erasure")
+              dispatch(setPassword("erasure",""));
             }
           },
         },
@@ -138,7 +138,7 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmLoginPassword,
           setLoginPasswordErrors
         )}
-        reset={() => resetPassword("loginPassword")}
+        reset={() => resetPassword("login")}
         disableReset={!hasLoginPassword}
         />
 
@@ -156,7 +156,7 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmErasurePassword,
           setErasurePasswordErrors
         )}
-        reset={() => resetPassword("erasurePassword")}
+        reset={() => resetPassword("erasure")}
         disableReset={!hasErasurePassword}
         />
 
