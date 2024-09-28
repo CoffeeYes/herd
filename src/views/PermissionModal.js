@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
+import CloseButton from '../../CloseButton';
 
 import { palette } from '../assets/palette';
 
@@ -51,11 +52,7 @@ const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose,
         </ScrollView>
 
         {useCloseButton &&
-        <TouchableOpacity
-        onPress={onRequestClose}
-        style={styles.xButton}>
-          <Text style={{fontWeight : "bold"}}>X</Text>
-        </TouchableOpacity>}
+        <CloseButton onPress={onRequestClose}/>}
 
       </View>
     </CustomModal>

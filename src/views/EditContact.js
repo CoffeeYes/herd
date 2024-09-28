@@ -7,6 +7,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
 import FlashTextButton from './FlashTextButton';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -19,6 +20,8 @@ import { updateContactAndReferences } from '../redux/actions/combinedActions';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { encryptStrings } from '../common';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import CloseButton from '../../CloseButton';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -199,19 +202,20 @@ const EditContact = ({ route, navigation }) => {
       ref={scrollViewRef}
       contentContainerStyle={styles.container}
       keyboardShouldPersistTaps='handled'>
+        
+        <View style={styles.imageContainer}>
 
-        <ContactImage
-        containerStyle={largeImageContainerStyle}
-        imageURI={contactImage}
-        iconSize={64}
-        onPress={editImage}
-        size={contactImageSize}/>
+          <ContactImage
+          containerStyle={largeImageContainerStyle}
+          imageURI={contactImage}
+          iconSize={64}
+          onPress={editImage}
+          size={contactImageSize}/>
 
-        {contactImage.length > 0 &&
-        <FlashTextButton
-        normalText="Delete Image"
-        flashText="Delete Image"
-        onPress={() => setContactImage("")}/>}
+          {contactImage.length > 0 &&
+          <CloseButton onPress={() => setContactImage("")}/>}
+
+        </View>
 
         {errors.map(error => {
           return (
@@ -272,6 +276,10 @@ const styles = {
     color : palette.red,
     fontWeight : "bold",
     alignSelf : "center"
+  },
+  imageContainer : {
+    alignSelf : "center",
+    flexDirection : "row"
   }
 }
 
