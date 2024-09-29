@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Text, TextInput, Dimensions } from 'react-native';
-import { CommonActions } from '@react-navigation/native';
+import { Text, TextInput, Dimensions, View } from 'react-native';
+import { CommonActions, useIsFocused } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
 import FullScreenSplash from './FullScreenSplash';
@@ -27,6 +27,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const [error, setError] = useState("");
 
   const inputWidth = useOrientationBasedStyle({width : "90%"},{width : "80%"});
+
+  const isFocused = useIsFocused();
 
   useEffect(() => { 
     const beforeGoingBack = navigation.addListener("beforeRemove", e => {
@@ -102,11 +104,22 @@ const PasswordLockScreen = ({ navigation, route }) => {
       onChangeText={setPassword}
       value={password}/>
 
-      <CustomButton
-      text="Submit"
-      buttonStyle={{backgroundColor : palette.offprimary, elevation : 2}}
-      disabled={password.trim().length == 0}
-      onPress={checkPassword}/>
+      <View style={styles.buttonContainer}>
+        
+        {route?.params?.navigationTarget === "passwordSettings" &&
+        <CustomButton
+        text="Cancel"
+        style={styles.button}
+        onPress={() => isFocused && navigation.goBack()}
+        />}
+
+        <CustomButton
+        text="Submit"
+        buttonStyle={{...styles.button, marginLeft : 10}}
+        disabled={password.trim().length == 0}
+        onPress={checkPassword}/>
+
+      </View>
     </FullScreenSplash>
   )
 }
@@ -136,6 +149,13 @@ const styles = {
   error : {
     fontWeight : "bold",
     color : palette.red
+  },
+  buttonContainer : {
+    flexDirection : "row"
+  },
+  button : {
+    backgroundColor : palette.offprimary, 
+    elevation : 2
   }
 }
 
