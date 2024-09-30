@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Text, TextInput, Dimensions, View } from 'react-native';
+import { Text, TextInput, Dimensions, View, BackHandler } from 'react-native';
 import { CommonActions, useIsFocused } from '@react-navigation/native';
 
 import CustomButton from './CustomButton';
@@ -31,13 +31,17 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const isFocused = useIsFocused();
 
   useEffect(() => { 
-    const beforeGoingBack = navigation.addListener("beforeRemove", e => {
-      if(e.data.action.type == "GO_BACK" && route?.params?.navigationTarget !== "passwordSettings") {
-        e.preventDefault();
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
+      if(route?.params?.navigationTarget !== "passwordSettings") {
+        BackHandler.exitApp();
+        return true;
       }
+      return false;
     })
 
-    return beforeGoingBack;
+    return () => {
+      backHandler.remove();
+    }
   },[])
 
   const checkPassword = async () => {
