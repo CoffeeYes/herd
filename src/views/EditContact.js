@@ -5,9 +5,7 @@ import { View, TextInput, Text,
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
-import FlashTextButton from './FlashTextButton';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -20,7 +18,6 @@ import { updateContactAndReferences } from '../redux/actions/combinedActions';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { encryptStrings } from '../common';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import CloseButton from '../../CloseButton';
 
 const EditContact = ({ route, navigation }) => {
@@ -47,9 +44,11 @@ const EditContact = ({ route, navigation }) => {
 
   useEffect(() => {
     if(!editingExistingContact) {
-      setContactImage("")
-      setPublicKey(route?.params?.publicKey || "");
-      setName(route?.params?.name || "");
+      route?.params?.publicKey &&
+      setPublicKey(route.params.publicKey);
+
+      route?.params?.name &&
+      setName(route.params.name);
     }
 
     return () => {
@@ -89,16 +88,16 @@ const EditContact = ({ route, navigation }) => {
       }
     }
 
-    const keyExists = getContactsByKey([publicKey.trim()]);
-    const nameExists = getContactByName(name.trim());
+    const existingContactWithKey = getContactsByKey([publicKey.trim()])[0];
+    const existingContactWithName = getContactByName(name.trim());
 
-    if(keyExists != "" && keyExists[0].key != originalContact?.key) {
+    if(existingContactWithKey && existingContactWithKey.key != originalContact?.key) {
       errorSaving.push({
         type : "key_exists",
         message : "A user with this key already exists"
       });
     }
-    if(nameExists && nameExists.name != originalContact?.name) {
+    if(existingContactWithName && existingContactWithName.name != originalContact?.name) {
       errorSaving.push({
         type : "name_exists",
         message : "A user with this name already exists"
