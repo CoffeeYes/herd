@@ -577,7 +577,7 @@ const Chat = ({ route, navigation }) => {
       <View style={{flexDirection : "row", height : inputHeight}}>
         <TextInput
         placeholder="Send a Message"
-        returnKeyType='send'
+        returnKeyType='done'
         style={{
           ...styles.chatInput,
           backgroundColor : palette.white,
@@ -609,7 +609,6 @@ const Chat = ({ route, navigation }) => {
 
           previousTextValueRef.current = text
         }}
-        onSubmitEditing={async () => await handleSubmit(chatInput)}
         multiline={true}/>
         <View style={{
           backgroundColor : palette.white,
