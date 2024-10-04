@@ -84,6 +84,9 @@ const Customise = () => {
   const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(customStyle.uiFontSize);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(customStyle.uiFontSize);
 
+  const activeScaledFontSize = synchroniseFontChanges ? synchronisedFontSize : scaledFontSize;
+  const activeMessageFontSize = synchroniseFontChanges ? synchronisedFontSize : messageFontSize + screenFontScaler;
+
   const unsavedChangesRef = useRef(false);
 
   useEffect(() => {
@@ -281,7 +284,7 @@ const Customise = () => {
           disableRightButton
           backArrowSize={scaledHeaderIconSize}
           rightIconSize={scaledHeaderIconSize}
-          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * titleFontMultiplier}}
+          textStyle={{fontSize : (activeScaledFontSize) * titleFontMultiplier}}
           containerStyle={styles.topSpacer}/>
 
           <CardButton
@@ -289,16 +292,16 @@ const Customise = () => {
           iconSize={cardIconSize + (scaledFontSize * buttonIconSizeMultiplier)}
           disableTouch
           text="Preview"
-          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
+          textStyle={{fontSize : (activeScaledFontSize)}}
           rightIcon="preview"/>
 
           <ListItem
           name="Preview"
           rightText="Preview"
           subText="Preview"
-          rightTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
-          subTextStyle={{fontSize : ((synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
-          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
+          rightTextStyle={{fontSize : ((activeScaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
+          subTextStyle={{fontSize : ((activeScaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
+          textStyle={{fontSize : (activeScaledFontSize)}}
           disableTouch
           />
 
@@ -307,7 +310,7 @@ const Customise = () => {
           disabled 
           useDisabledStyle={false}
           buttonStyle={styles.topSpacer}
-          textStyle={{fontSize : (synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize)}}
+          textStyle={{fontSize : (activeScaledFontSize)}}
           />
 
           <View style={styles.fontSlidersContainer}>
@@ -351,7 +354,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample sent message"
-            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize + screenFontScaler)}
+            textFontSize={(activeMessageFontSize)}
             timestamp="12 : 20"
             customStyle={getChatBubbleColor()}
             messageFrom={true}/>
@@ -359,7 +362,7 @@ const Customise = () => {
             <ChatBubble
             disableTouch
             text="This is a sample response message"
-            textFontSize={(synchroniseFontChanges ? scaledSynchronisedFontSize : messageFontSize + screenFontScaler)}
+            textFontSize={(activeMessageFontSize)}
             timestamp="12 : 21"
             customStyle={getChatBubbleColor()}
             messageFrom={false}/>

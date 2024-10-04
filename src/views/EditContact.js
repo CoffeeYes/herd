@@ -181,7 +181,9 @@ const EditContact = ({ route, navigation }) => {
   const hideSaveButton = () => {
     return (
       !unsavedChanges &&
-      headerIcon !== "check"
+      headerIcon !== "check" ||
+      publicKey.trim().length == 0 ||
+      name.trim().length == 0
     )
   }
 
