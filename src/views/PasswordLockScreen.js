@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Text, TextInput, Dimensions, View, BackHandler } from 'react-native';
 import { CommonActions, useIsFocused } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomButton from './CustomButton';
 import FullScreenSplash from './FullScreenSplash';
@@ -16,6 +17,8 @@ import { eraseState } from '../redux/actions/combinedActions';
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 
+const defaultAttempts = 3;
+
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -25,12 +28,23 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [passwordAttemptCount, setPasswordAttemptCount] = useState(0);
 
   const inputWidth = useOrientationBasedStyle({width : "90%"},{width : "80%"});
 
   const isFocused = useIsFocused();
 
   useEffect(() => { 
+    (async () => {
+      const passwordCount = Number(await AsyncStorage.getItem("passwordAttemptCount"));
+      if(passwordCount) {
+        setPasswordAttemptCount(passwordCount)
+      }
+      else {
+        setPasswordAttemptCount(defaultAttempts)
+      }
+    })()
+
     const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
       if(route?.params?.navigationTarget !== "passwordSettings") {
         BackHandler.exitApp();
@@ -44,6 +58,15 @@ const PasswordLockScreen = ({ navigation, route }) => {
     }
   },[])
 
+  const eraseData = async () => {
+    deleteAllMessages();
+    deleteAllContacts();
+    await Crypto.generateRSAKeyPair('herdPersonal');
+    const key = await Crypto.loadKeyFromKeystore("herdPersonal");
+    dispatch(setPublicKey(key));
+    dispatch(eraseState());
+  }
+
   const checkPassword = async () => {
     setError("");
     if(password.trim().length !== password.length) {
@@ -55,9 +78,18 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
     if(!isLoginPassword && !isErasurePassword) {
       setError("Incorrect Password");
+      if(passwordAttemptCount == 1) {
+        eraseData();
+      }
+      else {
+        let newCount = passwordAttemptCount - 1;
+        setPasswordAttemptCount(newCount);
+        AsyncStorage.setItem("passwordAttemptCount",newCount.toString())
+      }
       return;
     }
     else {
+      AsyncStorage.setItem("passwordAttemptCount",defaultAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
         navigation.dispatch(
@@ -85,12 +117,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         )
 
         if(isErasurePassword) {
-          deleteAllMessages();
-          deleteAllContacts();
-          await Crypto.generateRSAKeyPair('herdPersonal');
-          const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-          dispatch(setPublicKey(key));
-          dispatch(eraseState());
+          eraseData();
         }
       }
     }
@@ -100,7 +127,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
   return (
     <FullScreenSplash containerStyle={styles.container}>
       <Text style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error}</Text>
+      
+
       <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Enter Your Password : </Text>
+
+      {passwordAttemptCount < defaultAttempts &&
+      <Text style={{color : palette.white, marginBottom : 10}}>{`Remaining Attempts : ${passwordAttemptCount}`}</Text>}
 
       <TextInput
       secureTextEntry
