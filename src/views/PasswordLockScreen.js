@@ -16,6 +16,8 @@ import { eraseState } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
+import { deletePassword } from '../realm/passwordRealm';
+import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
 
 const defaultAttempts = 3;
 
@@ -65,6 +67,10 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
     dispatch(setPublicKey(key));
     dispatch(eraseState());
+    deletePassword("login");
+    deletePassword("erasure");
+    dispatch(setPasswordRedux("erasure",""));
+    dispatch(setPasswordRedux("login",""));
   }
 
   const checkPassword = async () => {
@@ -80,6 +86,14 @@ const PasswordLockScreen = ({ navigation, route }) => {
       setError("Incorrect Password");
       if(passwordAttemptCount == 1) {
         eraseData();
+        await AsyncStorage.setItem("passwordAttemptCount", defaultAttempts.toString())
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name : "main"}]
+          })
+        )
+        return;
       }
       else {
         let newCount = passwordAttemptCount - 1;
