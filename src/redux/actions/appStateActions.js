@@ -26,9 +26,17 @@ const setLastRoutes = routes => {
   }
 }
 
+const setMaxPasswordAttempts = maxAttempts => {
+  return {
+    type : "SET_MAX_PASSWORD_ATTEMPTS",
+    payload : maxAttempts
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
   setLockable,
-  setLastRoutes
+  setLastRoutes,
+  setMaxPasswordAttempts
 }

@@ -19,14 +19,13 @@ import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
 
-const defaultAttempts = 3;
-
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasureHash = useSelector(state => state.userReducer.erasurePasswordHash);
   const lastRoutes = useSelector(state => state.appStateReducer.lastRoutes);
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
 
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -43,7 +42,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         setPasswordAttemptCount(passwordCount)
       }
       else {
-        setPasswordAttemptCount(defaultAttempts)
+        setPasswordAttemptCount(maxPasswordAttempts)
       }
     })()
 
@@ -86,7 +85,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       setError("Incorrect Password");
       if(passwordAttemptCount == 1) {
         eraseData();
-        await AsyncStorage.setItem("passwordAttemptCount", defaultAttempts.toString())
+        await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -103,7 +102,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       return;
     }
     else {
-      AsyncStorage.setItem("passwordAttemptCount",defaultAttempts.toString())
+      AsyncStorage.setItem("passwordAttemptCount",maxPasswordAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
         navigation.dispatch(
@@ -145,7 +144,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
       <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Enter Your Password : </Text>
 
-      {passwordAttemptCount < defaultAttempts &&
+      {passwordAttemptCount < maxPasswordAttempts &&
       <Text style={{color : palette.white, marginBottom : 10}}>{`Remaining Attempts : ${passwordAttemptCount}`}</Text>}
 
       <TextInput

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollView, Alert } from 'react-native';
+import { ScrollView, Alert, TextInput, Text, View } from 'react-native';
+import { palette } from '../assets/palette';
 
 import { getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
 
@@ -8,14 +9,21 @@ import { setPassword } from '../redux/actions/userActions';
 
 import Header from './Header';
 import PasswordCreationBox from './PasswordCreationBox';
+import FlashTextButton from './FlashTextButton';
 
 import Crypto from '../nativeWrapper/Crypto';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
+import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
   const [loginPasswordErrors, setLoginPasswordErrors] = useState([]);
   const [erasurePasswordErrors, setErasurePasswordErrors] = useState([]);
+
+  const customStyle = useSelector(state => state.chatReducer.styles);
+  const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
+  const [chosenMaxPasswordAttempts, setChosenMaxPasswordAttempts] = useState(maxPasswordAttempts);
 
   const loginPasswordHasChangesRef = useRef(false);
   const erasurePasswordHasChangesRef = useRef(false);
@@ -78,12 +86,18 @@ const PasswordSettings = () => {
     }
 
     //reset error after validation so that error text does not "flash" when re-submitting after error
+
     setErrors([]);
 
     updatePassword(name,hash);
     dispatch(setPassword(name,hash));
 
     return true;
+  }
+
+  const saveMaxAttempts = () => {
+    dispatch(setMaxPasswordAttempts(chosenMaxPasswordAttempts));
+    AsyncStorage.setItem("passwordAttemptCount",chosenMaxPasswordAttempts.toString())
   }
 
   const resetPassword = passwordName => {
@@ -142,6 +156,25 @@ meaning all contacts who have previously added you will need to add you again.`
         disableReset={!hasLoginPassword}
         />
 
+        <View style={{...styles.card, ...styles.container, marginTop : 10}}>
+          <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Max Attempts</Text>
+          <TextInput 
+          value={chosenMaxPasswordAttempts.toString()}
+          onChangeText={value => setChosenMaxPasswordAttempts(Number(value))}
+          keyboardType="number-pad"
+          style={styles.input}/>
+          <View style={{flexDirection : "row"}}>
+            <FlashTextButton
+            normalText="Save"
+            flashText="Saved!"
+            disabled={chosenMaxPasswordAttempts == maxPasswordAttempts}
+            onPress={saveMaxAttempts}
+            timeout={500}
+            buttonStyle={{...styles.button, width : "100%"}}
+            textStyle={styles.buttonText}/>
+          </View>
+        </View>
+
         <PasswordCreationBox
         mainContainerStyle={{marginTop : 10}}
         primaryName="Erasure Password"
@@ -169,7 +202,28 @@ const styles = {
   container : {
     padding : 20,
     alignItems : "center",
-  }
+  },
+  input : {
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom : 10,
+    alignSelf : "stretch",
+    padding : 10,
+    backgroundColor : palette.white,
+    borderRadius : 5,
+  },
+  inputTitle : {
+    fontWeight : "bold",
+    marginBottom : 5
+  },
+  card : {
+    backgroundColor : palette.white,
+    padding : 20,
+    borderRadius : 5,
+    alignItems : "center",
+    justifyContent : "center",
+    elevation : 2
+  },
 }
 
 export default PasswordSettings;

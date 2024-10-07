@@ -1,7 +1,8 @@
 const initialState = {
   locked : false,
   lockable : true,
-  lastRoutes : []
+  lastRoutes : [],
+  maxPasswordAttempts: 3
 }
 
 const appStateReducer = (state=initialState, action) => {
@@ -14,6 +15,9 @@ const appStateReducer = (state=initialState, action) => {
     }
     case "SET_LAST_ROUTES" : {
       return {...state, lastRoutes : action.payload};
+    }
+    case "SET_MAX_PASSWORD_ATTEMPTS": {
+      return {...state, maxPasswordAttempts : action.payload};
     }
     default:
       return state;
