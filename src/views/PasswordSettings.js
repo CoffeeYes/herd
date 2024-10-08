@@ -23,7 +23,7 @@ const PasswordSettings = () => {
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
-  const [chosenMaxPasswordAttempts, setChosenMaxPasswordAttempts] = useState(maxPasswordAttempts);
+  const [chosenMaxPasswordAttempts, setChosenMaxPasswordAttempts] = useState(maxPasswordAttempts.toString());
 
   const loginPasswordHasChangesRef = useRef(false);
   const erasurePasswordHasChangesRef = useRef(false);
@@ -96,8 +96,8 @@ const PasswordSettings = () => {
   }
 
   const saveMaxAttempts = () => {
-    dispatch(setMaxPasswordAttempts(chosenMaxPasswordAttempts));
-    AsyncStorage.setItem("passwordAttemptCount",chosenMaxPasswordAttempts.toString())
+    dispatch(setMaxPasswordAttempts(parseInt(chosenMaxPasswordAttempts)));
+    AsyncStorage.setItem("passwordAttemptCount",chosenMaxPasswordAttempts);
   }
 
   const resetPassword = passwordName => {
@@ -158,9 +158,10 @@ meaning all contacts who have previously added you will need to add you again.`
 
         <View style={{...styles.card, ...styles.container, marginTop : 10}}>
           <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Max Attempts</Text>
+          <Text>A value of 0 allows for unlimited attempts</Text>
           <TextInput 
-          value={chosenMaxPasswordAttempts.toString()}
-          onChangeText={value => setChosenMaxPasswordAttempts(Number(value))}
+          value={chosenMaxPasswordAttempts}
+          onChangeText={value => setChosenMaxPasswordAttempts(value)}
           keyboardType="number-pad"
           style={styles.input}/>
           <View style={{flexDirection : "row"}}>

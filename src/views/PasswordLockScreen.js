@@ -83,21 +83,23 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
     if(!isLoginPassword && !isErasurePassword) {
       setError("Incorrect Password");
-      if(passwordAttemptCount == 1) {
-        eraseData();
-        await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name : "main"}]
-          })
-        )
-        return;
-      }
-      else {
-        let newCount = passwordAttemptCount - 1;
-        setPasswordAttemptCount(newCount);
-        AsyncStorage.setItem("passwordAttemptCount",newCount.toString())
+      if(maxPasswordAttempts > 0) {
+        if(passwordAttemptCount == 1) {
+          eraseData();
+          await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{name : "main"}]
+            })
+          )
+          return;
+        }
+        else {
+          let newCount = passwordAttemptCount - 1;
+          setPasswordAttemptCount(newCount);
+          AsyncStorage.setItem("passwordAttemptCount",newCount.toString())
+        }
       }
       return;
     }
