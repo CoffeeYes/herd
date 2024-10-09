@@ -161,14 +161,14 @@ meaning all contacts who have previously added you will need to add you again.`
           <Text>A value of 0 allows for unlimited attempts</Text>
           <TextInput 
           value={chosenMaxPasswordAttempts}
-          onChangeText={value => setChosenMaxPasswordAttempts(value)}
+          onChangeText={value => ![",","."].some(substr => value.includes(substr)) && !isNaN(Number(value)) && setChosenMaxPasswordAttempts(value)}
           keyboardType="number-pad"
           style={styles.input}/>
           <View style={{flexDirection : "row"}}>
             <FlashTextButton
             normalText="Save"
             flashText="Saved!"
-            disabled={chosenMaxPasswordAttempts == maxPasswordAttempts}
+            disabled={chosenMaxPasswordAttempts == maxPasswordAttempts || chosenMaxPasswordAttempts.trim().length == 0}
             onPress={saveMaxAttempts}
             timeout={500}
             buttonStyle={{...styles.button, width : "100%"}}
