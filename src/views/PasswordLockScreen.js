@@ -18,6 +18,7 @@ import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
+import { clear } from 'react-native/Libraries/LogBox/Data/LogBoxData';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -59,21 +60,22 @@ const PasswordLockScreen = ({ navigation, route }) => {
     }
   },[])
 
-  const eraseData = async () => {
+  const eraseData = async (clearPasswords = false) => {
     deleteAllMessages();
     deleteAllContacts();
     await Crypto.generateRSAKeyPair('herdPersonal');
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
     dispatch(setPublicKey(key));
     dispatch(eraseState());
-    deletePassword("login");
-    deletePassword("erasure");
-    dispatch(setPasswordRedux("erasure",""));
-    dispatch(setPasswordRedux("login",""));
+    if(clearPasswords) {
+      deletePassword("login");
+      deletePassword("erasure");
+      dispatch(setPasswordRedux("erasure",""));
+      dispatch(setPasswordRedux("login",""));
+    }
   }
 
   const checkPassword = async () => {
-    setError("");
     if(password.trim().length !== password.length) {
       return setError("Your password cannot include leading or trailing spaces.")
     }
@@ -85,7 +87,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       setError("Incorrect Password");
       if(maxPasswordAttempts > 0) {
         if(passwordAttemptCount == 1) {
-          eraseData();
+          eraseData(true);
           await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
           navigation.dispatch(
             CommonActions.reset({
@@ -104,6 +106,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       return;
     }
     else {
+      setError("");
       AsyncStorage.setItem("passwordAttemptCount",maxPasswordAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
