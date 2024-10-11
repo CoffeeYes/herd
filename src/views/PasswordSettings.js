@@ -97,7 +97,8 @@ const PasswordSettings = () => {
 
   const saveMaxAttempts = () => {
     dispatch(setMaxPasswordAttempts(parseInt(chosenMaxPasswordAttempts)));
-    AsyncStorage.setItem("passwordAttemptCount",chosenMaxPasswordAttempts);
+    AsyncStorage.setItem("passwordAttemptCount", chosenMaxPasswordAttempts);
+    AsyncStorage.setItem("maxPasswordAttempts", chosenMaxPasswordAttempts);
   }
 
   const resetPassword = passwordName => {

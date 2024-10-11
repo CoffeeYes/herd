@@ -18,7 +18,6 @@ import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
-import { clear } from 'react-native/Libraries/LogBox/Data/LogBoxData';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   useEffect(() => { 
     (async () => {
-      const passwordCount = Number(await AsyncStorage.getItem("passwordAttemptCount"));
+      const passwordCount = parseInt(await AsyncStorage.getItem("passwordAttemptCount"));
       if(passwordCount) {
         setPasswordAttemptCount(passwordCount)
       }

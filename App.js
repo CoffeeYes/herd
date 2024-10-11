@@ -74,7 +74,7 @@ const App = ({ }) => {
       }
       await loadInitialState();
 
-      const maxPasswordAttempts = Number(await AsyncStorage.getItem("passwordAttemptCount"));
+      const maxPasswordAttempts = parseInt(await AsyncStorage.getItem("maxPasswordAttempts"));
       dispatch(setMaxPasswordAttempts(maxPasswordAttempts))
       setLoading(false);
     })()
