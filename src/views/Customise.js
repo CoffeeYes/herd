@@ -84,7 +84,7 @@ const Customise = () => {
   const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(customStyle.uiFontSize);
   const [synchronisedFontSize, setSynchronisedFontSize] = useState(customStyle.uiFontSize);
 
-  const activeScaledFontSize = synchroniseFontChanges ? synchronisedFontSize : scaledFontSize;
+  const activeScaledFontSize = synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize;
   const activeMessageFontSize = synchroniseFontChanges ? synchronisedFontSize : messageFontSize + screenFontScaler;
 
   const unsavedChangesRef = useRef(false);
@@ -371,8 +371,10 @@ const Customise = () => {
           <View style={styles.colorChoiceContainer}>
             <Dropdown
             onChangeOption={index => {
-              setOverrideColorChoiceSliderValue(true);
-              setActiveItem(index);
+              if(index != activeItem) {
+                setOverrideColorChoiceSliderValue(true);
+                setActiveItem(index);
+              }
             }}
             choices={tabItems}
             textStyle={{fontSize : customStyle.scaledUIFontSize}}

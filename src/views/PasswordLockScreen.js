@@ -94,7 +94,6 @@ const PasswordLockScreen = ({ navigation, route }) => {
               routes: [{name : "main"}]
             })
           )
-          return;
         }
         else {
           let newCount = passwordAttemptCount - 1;
