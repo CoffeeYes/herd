@@ -12,6 +12,9 @@ import { defaultChatStyles } from '../assets/styles';
 
 import { palette } from '../assets/palette';
 import { CommonActions } from '@react-navigation/native';
+import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
+
+const defaultMaxPasswordAttempts = 3;
 
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -26,6 +29,8 @@ const Splash = ({ navigation }) => {
 
     //set default styling
     await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
+    await AsyncStorage.setItem("maxPasswordAttempts",defaultMaxPasswordAttempts.toString());
+    dispatch(setMaxPasswordAttempts(defaultMaxPasswordAttempts));
     setLoading(false);
     
     navigation.dispatch(CommonActions.reset({
