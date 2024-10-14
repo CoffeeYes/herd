@@ -82,62 +82,51 @@ const PasswordLockScreen = ({ navigation, route }) => {
     const isLoginPassword = await Crypto.compareHashes(passwordHash,loginHash);
     const isErasurePassword = await Crypto.compareHashes(passwordHash,erasureHash);
 
+    let navigationIndex = 0;
+    let navigationRoutes = [{name : "main"}];
+
     if(!isLoginPassword && !isErasurePassword) {
-      setError("Incorrect Password");
       if(maxPasswordAttempts > 0) {
         if(passwordAttemptCount == 1) {
           eraseData(true);
           await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{name : "main"}]
-            })
-          )
         }
         else {
+          setError("Incorrect Password");
           let newCount = passwordAttemptCount - 1;
           setPasswordAttemptCount(newCount);
           AsyncStorage.setItem("passwordAttemptCount",newCount.toString())
+          return;
         }
       }
-      return;
     }
     else {
       setError("");
       AsyncStorage.setItem("passwordAttemptCount",maxPasswordAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 1,
-            routes: [
-              { name: 'main', params : {initialRoute : "settings"}},
-              { name: 'passwordSettings'}
-            ]
-          })
-        )
+        navigationIndex = 1;
+        navigationRoutes = [
+          { name: 'main', params : {initialRoute : "settings"}},
+          { name: 'passwordSettings'}
+        ]
       }
       else {
-
-        let routesToResetTo = [{ name : "main"}];
-        if(lastRoutes.length > 0 && !isErasurePassword) {
-          routesToResetTo = lastRoutes;
-        }
-
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: routesToResetTo
-          })
-        )
-
         if(isErasurePassword) {
           eraseData();
         }
+        else if(lastRoutes.length > 0) {
+          navigationRoutes = lastRoutes;
+        }
       }
     }
-
+    
+    navigation.dispatch(
+      CommonActions.reset({
+        index: navigationIndex,
+        routes: navigationRoutes 
+      })
+    )
   }
 
   return (
@@ -147,7 +136,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
       <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Enter Your Password : </Text>
 
-      {passwordAttemptCount < maxPasswordAttempts &&
+      {(passwordAttemptCount < maxPasswordAttempts || maxPasswordAttempts == 1) &&
       <Text style={{color : palette.white, marginBottom : 10}}>{`Remaining Attempts : ${passwordAttemptCount}`}</Text>}
 
       <TextInput
