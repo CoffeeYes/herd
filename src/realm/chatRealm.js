@@ -83,12 +83,12 @@ const getMessagesWithContact = async (key, startIndex, endIndex) => {
   if(initialLoad) {
     let highestMessageIndex, lowestMessageIndex;
     if(firstReceived.timestamp < firstSent.timestamp) {
-      highestMessageIndex = -initialSentMessages.length;
-      lowestMessageIndex = -initialReceivedMessages.length;
+      highestMessageIndex = -sentMessagesCopy.length;
+      lowestMessageIndex = -receivedMessages.length;
     }
     else {
-      highestMessageIndex = -initialReceivedMessages.length;
-      lowestMessageIndex = -initialSentMessages.length;
+      highestMessageIndex = -receivedMessages.length;
+      lowestMessageIndex = -sentMessagesCopy.length;
     }
 
     payload = {
@@ -150,8 +150,8 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     //pull unique keys from messages to retreive existing contacts with matching keys
     const keys = getUniqueKeysFromMessages(newMessages,"from");
     const contacts = getContactsByKey(keys);
-
-    let messagesForSelf = newMessages.filter(message => message.to.trim() !== ownPublicKey.trim())
+    
+    let messagesForSelf = newMessages.filter(message => message.to.trim() == ownPublicKey.trim())
 
     const decryptedMessages = await decryptStrings(
       messagesForSelf.map(message => message.text)

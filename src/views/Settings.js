@@ -264,7 +264,7 @@ for the following permissions in order to allow Herd to function correctly.`
           "Are you sure you want to delete all messages?",
           () => {
             deleteAllMessagesFromRealm();
-            dispatch(setChats([]));
+            dispatch(deleteChats("all"));
             dispatch(setMessageQueue([]));
           }
         )}/>
