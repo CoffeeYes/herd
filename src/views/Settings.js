@@ -18,7 +18,7 @@ import { closeContactRealm } from '../realm/contactRealm';
 import { closePasswordRealm } from '../realm/passwordRealm';
 import { parseRealmID } from '../realm/helper';
 
-import { setChats, setMessageQueue, deleteChats } from '../redux/actions/chatActions';
+import { setMessageQueue, deleteChats } from '../redux/actions/chatActions';
 import { resetContacts } from '../redux/actions/contactActions';
 import { setLockable } from '../redux/actions/appStateActions';
 

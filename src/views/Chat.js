@@ -250,7 +250,7 @@ const Chat = ({ route, navigation }) => {
     setMessageStart(messageStart - 1);
 
     await ServiceInterface.isRunning() &&
-    ServiceInterface.addMessageToService(selfEncryptedCopy);
+    ServiceInterface.addMessageToService({...newMessage, text : newMessageEncrypted});
   }
 
   const deleteMessages = () => {
