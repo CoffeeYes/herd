@@ -41,7 +41,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats, setStyles, setMessageQueue } from './src/redux/actions/chatActions';
+import { setChats, setStyles, setMessageQueue, updateChat } from './src/redux/actions/chatActions';
 import { setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
@@ -58,6 +58,12 @@ const App = ({ }) => {
   const passwordSetRef = useRef();
   const lockableRef = useRef();
   const customStyleRef = useRef(customStyle);
+
+  const ownPublicKeyRef = useRef(ownPublicKey);
+
+  useEffect(() => {
+    ownPublicKeyRef.current = ownPublicKey;
+  },[ownPublicKey])
 
   useEffect(() => {
     (async () => {
@@ -84,14 +90,16 @@ const App = ({ }) => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
       let uniqueKeys = [];
       for(const message of messages) {
-        if(message.to == ownPublicKey && !uniqueKeys.includes(message.from)) {
-          uniqueKeys.push(message.from);
+        if(message.to.trim() == ownPublicKeyRef.current.trim() && !uniqueKeys.includes(message.from)) {
+          uniqueKeys.push(message.from.trim());
         }
       }
       const contacts = getContactsByKey(uniqueKeys);
       for(const contact of contacts) {
         dispatch(updateChat({...contact, doneLoading : false}))
       }
+      const contactNames = contacts.map(contact => contact.name).join(",");
+      ServiceInterface.sendNotification("You have new messages",`from ${contactNames}`);
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {

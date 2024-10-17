@@ -307,6 +307,17 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun sendNotification(title : String, text : String, promise : Promise) {
+    if(HerdBackgroundService.running) {
+      service.sendNotification(title,text);
+      promise.resolve(true);
+    }
+    else {
+      promise.resolve(false);
+    }
+  }
+
+  @ReactMethod
   fun isRunning(promise : Promise) {
     promise.resolve(HerdBackgroundService.running);
   }
