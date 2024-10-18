@@ -202,7 +202,6 @@ class HerdBackgroundService : Service() {
     .build()
 
     val notificationID : Int = SystemClock.uptimeMillis().toInt();
-    Log.i(TAG,"Sending Notification for new messages");
     val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.notify("com.herd.herd",notificationID,notification);
   }
@@ -364,7 +363,6 @@ class HerdBackgroundService : Service() {
              //send a notificaiton if messages destined for this user were received
              //also emit messages to receiver in case they are already in the app
              if(receivedMessagesForUser) {
-               sendNotification("You have messages waiting for you","You have received new messages");
                sendMessagesToReceiver(receivedMessages);
              }
              //reset flag

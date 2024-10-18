@@ -36,9 +36,15 @@ const MessageQueue = ({}) => {
         message[longKey] = "You";
         textToDecrypt = true;
       }
-      //find the matching contacts name, if no contact for that message is saved mark it as unknown
-      else {
-        message[longKey] = contacts.find(contact => message[key].trim() === contact.key)?.name || "Unknown"
+    }
+    
+    if(!(message.toContactName === "You" && message.fromContactName === "You")) {
+      if(message.toContactName === "You") {
+        message.fromContactName = contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown";
+      }
+      else if(message.fromContactName === "You") {
+        
+        message.toContactName= contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown";
       }
     }
 
@@ -95,7 +101,7 @@ const MessageQueue = ({}) => {
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
       loading={item.loading}
-      disablePress={item.loading}
+      disablePress={item.loading || item.toContactName !== "You" || item.fromContactName !== "You"}
       closedTimestamp={date}
       openTimestamp={hours}
       textFontSize={customStyle.scaledUIFontSize}
