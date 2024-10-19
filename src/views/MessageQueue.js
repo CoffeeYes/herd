@@ -6,6 +6,7 @@ import Crypto from '../nativeWrapper/Crypto';
 
 import FoldableMessage from './FoldableMessage';
 import CustomButton from './CustomButton';
+import Card from './Card';
 
 import { palette } from '../assets/palette';
 
@@ -93,7 +94,10 @@ const MessageQueue = ({}) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
+    const messageIsForUser = item.toContactName == "You" || item.fromContactName == "You";
+
     return (
+      messageIsForUser ?
       <FoldableMessage
       containerStyle={{width : "80%"}}
       to={item.toContactName}
@@ -101,13 +105,21 @@ const MessageQueue = ({}) => {
       open={openMessages.includes(item._id)}
       onPress={() => onMessagePress(item._id)}
       loading={item.loading}
-      disablePress={item.loading || item.toContactName !== "You" || item.fromContactName !== "You"}
+      disablePress={item.loading || !messageIsForUser}
       closedTimestamp={date}
       openTimestamp={hours}
       textFontSize={customStyle.scaledUIFontSize}
       headerTitleStyle={{fontSize : customStyle.scaledUIFontSize}}
       headerTextStyle={{fontSize : customStyle.scaledUIFontSize}}
       text={item.text}/>
+      :
+      <Card
+      cardStyle={{flex : 0, marginVertical : 10, minWidth : "80%"}}
+      disabled
+      disabledStyle={{backgroundColor : palette.offgrey}}
+      text="Message in transit for another user"
+      textStyle={{marginTop : 0}}
+      />
     )
   },[parsedQueue,openMessages, Dimensions.get("window").width])
 
