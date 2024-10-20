@@ -79,8 +79,14 @@ const MessageQueue = ({}) => {
     (async () => {
       const initialMessages = createInitialMessageState(messageQueue);
       setParsedQueue(initialMessages);
-      const messagesToDecrypt = initialMessages.filter(message => message.loading).map((message, index) => ({text : message.text, identifier : index.toString()}))
+      const messagesToDecrypt = initialMessages.reduce((result, message, index) => {
+        if(message.loading) {
+          result.push(({text : message.text, identifier : index.toString()}))
+        }
+        return result;
+      },[]);
       const results = await decryptStringsWithIdentifier(messagesToDecrypt)
+      console.log({parsedQueue})
       const final = assignResultsToTargets(results,[...parsedQueue]);
       setParsedQueue(final);
     })()
