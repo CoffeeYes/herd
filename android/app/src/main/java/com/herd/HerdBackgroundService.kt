@@ -285,7 +285,6 @@ class HerdBackgroundService : Service() {
 
     var totalBytes : ByteArray = byteArrayOf();
     var totalMessagesRead : Int = 0;
-    var receivedMessagesForUser : Boolean = false;
     var messageReadTimeout : Boolean = false;
     var messageTimeoutRegistered : Boolean = false;
     val handler : Handler = Handler(Looper.getMainLooper());
@@ -330,7 +329,6 @@ class HerdBackgroundService : Service() {
            //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
-               receivedMessagesForUser = true;
                receivedMessagesForSelf?.add(message);
              }
            }
@@ -348,7 +346,10 @@ class HerdBackgroundService : Service() {
              }
            }
            //add custom parcelable to received array
-           if(!messageAlreadyReceived && !messagePreviouslyDeleted) {
+           if(
+           !messageAlreadyReceived && 
+           !messagePreviouslyDeleted && 
+           !(message.from.trim().equals(publicKey?.trim()))) {
              receivedMessages.add(message)
            }
            //reset array for total bytes
@@ -360,13 +361,8 @@ class HerdBackgroundService : Service() {
              gatt.readCharacteristic(characteristic);
            }
            else {
-             //send a notificaiton if messages destined for this user were received
-             //also emit messages to receiver in case they are already in the app
-             if(receivedMessagesForUser) {
-               sendMessagesToReceiver(receivedMessages);
-             }
-             //reset flag
-             receivedMessagesForUser = false;
+             //emit messages to JS receiver 
+             sendMessagesToReceiver(receivedMessages);
 
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(

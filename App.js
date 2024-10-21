@@ -98,8 +98,10 @@ const App = ({ }) => {
       for(const contact of contacts) {
         dispatch(updateChat({...contact, doneLoading : false}))
       }
-      const contactNames = contacts.map(contact => contact.name).join(",");
-      ServiceInterface.sendNotification("You have new messages",`from ${contactNames}`);
+      if(contacts.length > 0) {
+        const contactNames = contacts.map(contact => contact.name).join(",");
+        ServiceInterface.sendNotification("You have new messages",`from ${contactNames}`);
+      }
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {

@@ -86,7 +86,6 @@ const MessageQueue = ({}) => {
         return result;
       },[]);
       const results = await decryptStringsWithIdentifier(messagesToDecrypt)
-      console.log({parsedQueue})
       const final = assignResultsToTargets(results,[...parsedQueue]);
       setParsedQueue(final);
     })()
