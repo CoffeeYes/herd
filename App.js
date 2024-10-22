@@ -96,7 +96,7 @@ const App = ({ }) => {
       }
       const contacts = getContactsByKey(uniqueKeys);
       for(const contact of contacts) {
-        dispatch(updateChat({...contact, doneLoading : false}))
+        dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : true}))
       }
       if(contacts.length > 0) {
         const contactNames = contacts.map(contact => contact.name).join(",");

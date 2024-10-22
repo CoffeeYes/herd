@@ -49,7 +49,7 @@ const setLastText = (state, id, message) => {
 
 const updateChat = (originalChat, newValues) => {
   let updatedChat = {...originalChat};
-  const updateableValues = ["name","key","image", "doneLoading"];
+  const updateableValues = ["name","key","image", "doneLoading","hasNewMessages"];
 
   for(const [key,value] of Object.entries(newValues)) {
     if(typeof value === "undefined" || value === null) {

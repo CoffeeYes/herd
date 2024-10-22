@@ -98,6 +98,8 @@ const Chat = ({ route, navigation }) => {
       }
       setInitialLoad(false);
     })()
+
+    dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
   },[]);
 
   //calculate actual number of messages by extracting them from sections

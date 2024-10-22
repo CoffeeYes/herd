@@ -115,9 +115,9 @@ const Chats = ({ navigation }) => {
           marginRight : 10,
           fontSize : customStyle.scaledSubTextSize,
           color : chat.lastMessageSentBySelf ? displayedSentTextColor : displayedReceivedTextColor,
-          ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
+          ...(chat.hasNewMessages && {fontWeight : "bold"})
         }}
-        rightIcon={!chat.lastMessageSentBySelf && "circle"}
+        rightIcon={chat.hasNewMessages && "circle"}
         rightIconSize={18}
         rightIconStyle={{color : palette.primary}}
         onPress={() => handlePress(chat._id)}
