@@ -109,7 +109,7 @@ const Chats = ({ navigation }) => {
         subTextStyle={{
           fontSize : customStyle.scaledSubTextSize,
           color : chat.lastMessageSentBySelf ? displayedSentTextColor : displayedReceivedTextColor,
-          ...(!chat.lastMessageSentBySelf && {fontWeight : "bold"})
+          ...(!chat.lastMessageSentBySelf && chat.hasNewMessages && {fontWeight : "bold"})
         }}
         rightTextStyle={{
           marginRight : 10,

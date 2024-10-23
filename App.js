@@ -95,8 +95,13 @@ const App = ({ }) => {
         }
       }
       const contacts = getContactsByKey(uniqueKeys);
+      const routes = navigationRef.current.getState().routes;
+      const lastRoute = routes[routes.length - 1];
+      const checkIfUserIsInChat = lastRoute.name == "chat";
       for(const contact of contacts) {
-        dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : true}))
+        //do not set "hasNewMessages" if user is already sitting in the chat with new messages
+        const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
+        dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
       }
       if(contacts.length > 0) {
         const contactNames = contacts.map(contact => contact.name).join(",");
