@@ -54,16 +54,22 @@ const App = ({ }) => {
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const lockable = useSelector(state => state.appStateReducer.lockable);
   const customStyle = useSelector(state => state.chatReducer.styles)
+  const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
 
   const passwordSetRef = useRef();
   const lockableRef = useRef();
   const customStyleRef = useRef(customStyle);
 
   const ownPublicKeyRef = useRef(ownPublicKey);
+  const enableNotificationsRef = useRef(enableNotifications);
 
   useEffect(() => {
     ownPublicKeyRef.current = ownPublicKey;
   },[ownPublicKey])
+
+  useEffect(() => {
+    enableNotificationsRef.current = enableNotifications
+  },[enableNotifications])
 
   useEffect(() => {
     (async () => {
@@ -103,7 +109,7 @@ const App = ({ }) => {
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
         dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
       }
-      if(contacts.length > 0) {
+      if(contacts.length > 0 && enableNotificationsRef.current) {
         const contactNames = contacts.map(contact => contact.name).join(",");
         ServiceInterface.sendNotification("You have new messages",`from ${contactNames}`);
       }

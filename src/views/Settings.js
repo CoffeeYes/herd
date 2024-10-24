@@ -20,7 +20,7 @@ import { parseRealmID } from '../realm/helper';
 
 import { setMessageQueue, deleteChats } from '../redux/actions/chatActions';
 import { resetContacts } from '../redux/actions/contactActions';
-import { setLockable } from '../redux/actions/appStateActions';
+import { setEnableNotifications, setLockable } from '../redux/actions/appStateActions';
 
 import { palette } from '../assets/palette';
 
@@ -45,6 +45,7 @@ const Settings = ({ navigation }) => {
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
+  const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
   
@@ -168,7 +169,7 @@ for the following permissions in order to allow Herd to function correctly.`
 
       <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={styles.backgroundTransferCard}>
+        <View style={styles.card}>
 
           {!backgroundTransfer &&
           <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
@@ -186,6 +187,17 @@ for the following permissions in order to allow Herd to function correctly.`
             thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
             ios_backgroundColor={palette.primary}/>
           </View>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}> Send me a notification when new messages are received</Text>
+          <Switch
+          style={{marginTop: 10}}
+          onValueChange={val => dispatch(setEnableNotifications(val))}
+          value={enableNotifications}
+          trackColor={{ false: palette.grey, true: palette.primary }}
+          thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}
+          ios_backgroundColor={palette.primary}/>
         </View>
 
         <CardButton
@@ -310,7 +322,7 @@ const styles = {
   buttonMargin : {
     marginTop : 10
   },
-  backgroundTransferCard : {
+  card : {
     alignSelf : "center",
     alignItems : "center",
     backgroundColor : palette.white,

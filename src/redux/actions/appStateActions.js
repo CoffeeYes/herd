@@ -33,10 +33,18 @@ const setMaxPasswordAttempts = maxAttempts => {
   }
 }
 
+const setEnableNotifications = enable => {
+  return {
+    type : "SET_ENABLE_NOTIF",
+    payload : enable
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
   setLockable,
   setLastRoutes,
-  setMaxPasswordAttempts
+  setMaxPasswordAttempts,
+  setEnableNotifications
 }

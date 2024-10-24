@@ -2,7 +2,8 @@ const initialState = {
   locked : false,
   lockable : true,
   lastRoutes : [],
-  maxPasswordAttempts: 3
+  maxPasswordAttempts: 3,
+  sendNotificationForNewMessages : true
 }
 
 const appStateReducer = (state=initialState, action) => {
@@ -18,6 +19,9 @@ const appStateReducer = (state=initialState, action) => {
     }
     case "SET_MAX_PASSWORD_ATTEMPTS": {
       return {...state, maxPasswordAttempts : action.payload};
+    }
+    case "SET_ENABLE_NOTIF" : {
+      return {...state, sendNotificationForNewMessages : action.payload}
     }
     default:
       return state;
