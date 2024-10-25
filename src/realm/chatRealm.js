@@ -145,7 +145,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
   })
   if(dispatch) {
     //add messages to queue
-    dispatch(addMessagesToQueue(newMessages));
+    dispatch(addMessagesToQueue(newMessages.filter(message => message.to.trim() !== ownPublicKey.trim())));
 
     //pull unique keys from messages to retreive existing contacts with matching keys
     const keys = getUniqueKeysFromMessages(newMessages,"from");

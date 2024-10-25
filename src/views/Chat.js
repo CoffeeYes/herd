@@ -98,7 +98,8 @@ const Chat = ({ route, navigation }) => {
       }
       setInitialLoad(false);
     })()
-
+    
+    chat?._id &&
     dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
   },[]);
 
