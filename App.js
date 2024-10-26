@@ -42,7 +42,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat } from './src/redux/actions/chatActions';
-import { setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
+import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
 
@@ -232,6 +232,9 @@ const App = ({ }) => {
 
     const messageQueue = await getMessageQueue(true);
     dispatch(setMessageQueue(messageQueue))
+
+    const enableNotifications = await AsyncStorage.getItem("enableNotifications");
+    dispatch(setEnableNotifications(enableNotifications === "true"));
   }
 
   const loadStoredMessages = async () => {

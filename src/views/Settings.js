@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Text, ScrollView,
          View, Switch, Alert, 
          NativeEventEmitter } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -193,7 +194,10 @@ for the following permissions in order to allow Herd to function correctly.`
           <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}> Send me a notification when new messages are received</Text>
           <Switch
           style={{marginTop: 10}}
-          onValueChange={val => dispatch(setEnableNotifications(val))}
+          onValueChange={async val => {
+            dispatch(setEnableNotifications(val))
+            await AsyncStorage.setItem("enableNotifications",val.toString())
+          }}
           value={enableNotifications}
           trackColor={{ false: palette.grey, true: palette.primary }}
           thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}
