@@ -261,7 +261,12 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       encryptionRoutines.joinAll();
-      encryptionPromise?.resolve(Arguments.fromArray(results));
+      if(results.any{it -> it.length === 0}) {
+        encryptionPromise?.reject("failed to encrypt a string");
+      }
+      else {
+        encryptionPromise?.resolve(Arguments.fromArray(results));
+      }
       encryptionPromise = null;
     }
   }
