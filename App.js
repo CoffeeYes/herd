@@ -104,14 +104,21 @@ const App = ({ }) => {
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
       const checkIfUserIsInChat = lastRoute.name == "chat";
+      let notificationContacts = [];
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
+        if(!userInChat) {
+          notificationContacts.push(contact.name);
+        }
         dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
       }
-      if(contacts.length > 0 && enableNotificationsRef.current) {
-        const contactNames = contacts.map(contact => contact.name).join(",");
-        ServiceInterface.sendNotification("You have new messages",`from ${contactNames}`);
+      if(notificationContacts.length > 0 && enableNotificationsRef.current) {
+        let notificationText = notificationContacts.slice(0,2).join(",");
+        if (notificationContacts.length > 2) {
+          notificationText += ` and ${notificationContacts.length - 2} more.`
+        }
+        ServiceInterface.sendNotification("You have new messages",`from ${notificationText}`);
       }
     })
 
