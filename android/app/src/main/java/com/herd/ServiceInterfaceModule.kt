@@ -33,6 +33,7 @@ import android.content.IntentFilter
 
 import android.bluetooth.BluetoothAdapter
 import android.location.LocationManager
+import android.app.NotificationManager
 
 /* @Parcelize */
 class HerdMessage(
@@ -309,12 +310,28 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun sendNotification(title : String, text : String, promise : Promise) {
     if(HerdBackgroundService.running) {
-      service.sendNotification(title,text);
-      promise.resolve(true);
+      val notificationID = service.sendNotification(title,text);
+      promise.resolve(notificationID);
     }
     else {
-      promise.resolve(false);
+      promise.resolve(null);
     }
+  }
+
+  @ReactMethod
+  fun notificationIsPending(notificationID : Int, promise : Promise) {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    for(notification in notificationManager.activeNotifications) {
+        if (notification.id == notificationID) {
+          promise.resolve(true);
+        }
+     }
+     promise.resolve(false);
+  }
+
+  @ReactMethod
+  fun updateNotification(title : String, text : String, notificationID : Int) {
+    service.sendNotification(title,text,notificationID);
   }
 
   @ReactMethod

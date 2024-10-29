@@ -62,6 +62,8 @@ const App = ({ }) => {
 
   const ownPublicKeyRef = useRef(ownPublicKey);
   const enableNotificationsRef = useRef(enableNotifications);
+  const notificationIDRef = useRef();
+  const notificationContactsRef = useRef([]);
 
   useEffect(() => {
     ownPublicKeyRef.current = ownPublicKey;
@@ -104,21 +106,32 @@ const App = ({ }) => {
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
       const checkIfUserIsInChat = lastRoute.name == "chat";
-      let notificationContacts = [];
+      let notificationPending = false;
+      if(notificationIDRef.current) {
+        notificationPending = await ServiceInterface.notificationIsPending(notificationIDRef.current);
+      }
+      if(!notificationPending) {
+        notificationContactsRef.current = [];
+      }
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
-        if(!userInChat) {
-          notificationContacts.push(contact.name);
+        if(!userInChat && !notificationContactsRef.current.includes(contact.name)) {
+          notificationContactsRef.current.push(contact.name);
         }
         dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
       }
-      if(notificationContacts.length > 0 && enableNotificationsRef.current) {
-        let notificationText = notificationContacts.slice(0,2).join(",");
-        if (notificationContacts.length > 2) {
-          notificationText += ` and ${notificationContacts.length - 2} more.`
+      if(notificationContactsRef.current.length > 0 && enableNotificationsRef.current) {
+        let notificationText = notificationContactsRef.current.slice(0,2).join(",");
+        if (notificationContactsRef.current.length > 2) {
+          notificationText += ` and ${notificationContactsRef.current.length - 2} more.`
         }
-        ServiceInterface.sendNotification("You have new messages",`from ${notificationText}`);
+        if(notificationPending) {
+          ServiceInterface.updateNotification("You have new messages",`from ${notificationText}`,notificationIDRef.current);
+        }
+        else {
+          notificationIDRef.current = await ServiceInterface.sendNotification("You have new messages",`from ${notificationText}`);
+        }
       }
     })
 
