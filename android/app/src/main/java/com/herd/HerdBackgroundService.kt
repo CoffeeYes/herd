@@ -929,7 +929,13 @@ class HerdBackgroundService : Service() {
   }
 
   public fun addMessageToQueue(message : HerdMessage) : Boolean {
-    return addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
+    val emptyBefore = messageQueue?.size as Int == 0;
+    val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
+    //edge case where Queue was empty on start
+    if(emptyBefore) {
+      currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
+    }
+    return added;
   }
 
   public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
