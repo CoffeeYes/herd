@@ -223,7 +223,7 @@ const deleteChats = keys => {
   const sentMessagesToDeleteCopy = messageCopyRealm.objects('Message').filter(message => keys.includes(message.to));
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filter(message => keys.includes(message.from));
 
-  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessagesToDelete))
+  ServiceInterface.removeMessagesFromService(sentMessagesToDelete.map(message => message._id));
 
   messageSentRealm.write(() => {
     messageSentRealm.delete(sentMessagesToDelete)
@@ -241,7 +241,7 @@ const deleteAllChats = async () => {
   const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered(`to = '${ownKey}'`);
   const sentMessages = messageSentRealm.objects('Message');
 
-  ServiceInterface.removeMessagesFromService(parseRealmObjects(sentMessages))
+  ServiceInterface.removeMessagesFromService(sentMessages.map(message => message._id));
 
   messageSentRealm.write(() => {
     messageSentRealm.deleteAll();
@@ -383,10 +383,12 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
 }
 
 const deleteAllMessages = () => {
-  const sentMessages = parseRealmObjects(messageSentRealm.objects('Message'));
-  const receivedMessages = parseRealmObjects(messageReceivedRealm.objects('Message'));
+  const sentMessages = messageSentRealm.objects('Message');
+  const receivedMessages = messageReceivedRealm.objects('Message');
 
-  ServiceInterface.removeMessagesFromService([...sentMessages,...receivedMessages]);
+  const allMessages = [...sentMessages,...receivedMessages];
+  
+  ServiceInterface.removeMessagesFromService(allMessages.map(message => message._id));
 
   [messageSentRealm,messageCopyRealm,messageReceivedRealm,deletedReceivedRealm]
   .map(realm => {
