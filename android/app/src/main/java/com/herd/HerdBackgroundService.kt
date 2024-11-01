@@ -940,7 +940,7 @@ class HerdBackgroundService : Service() {
 
   public fun removeMessage(messageIDs: ArrayList<String>) : Boolean {
     val lengthBefore : Int = messageQueue?.size as Int;
-    messageQueue = messageQueue?.filter{message -> message._id in messageIDs} as ArrayList<HerdMessage>;
+    messageQueue = messageQueue?.filter{message -> !(message._id in messageIDs)} as ArrayList<HerdMessage>;
     val lengthAfter : Int = messageQueue?.size as Int;
 
     //check if deletion was successful
