@@ -383,12 +383,10 @@ const updateMessagesWithContact = async (oldKey, newKey) => {
 }
 
 const deleteAllMessages = () => {
-  const sentMessages = messageSentRealm.objects('Message');
-  const receivedMessages = messageReceivedRealm.objects('Message');
-
-  const allMessages = [...sentMessages,...receivedMessages];
+  const sentMessages = parseRealmObjects(messageSentRealm.objects('Message'));
+  const receivedMessages = parseRealmObjects(messageReceivedRealm.objects('Message'));
   
-  ServiceInterface.removeMessagesFromService(allMessages.map(message => message._id));
+  ServiceInterface.removeMessagesFromService([...sentMessages,...receivedMessages].map(message => message._id));
 
   [messageSentRealm,messageCopyRealm,messageReceivedRealm,deletedReceivedRealm]
   .map(realm => {

@@ -911,8 +911,11 @@ class HerdBackgroundService : Service() {
   }
 
   fun addMessagesToList(messages : ArrayList<HerdMessage>, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.addAll(messages);
-    logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
+    var added : Boolean = true;
+    if(messages.size > 0) {
+      added = listToAddTo.addAll(messages);
+      logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
+    }
     return added;
   }
 
