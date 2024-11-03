@@ -107,10 +107,15 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       }
     }
   }
-
+    
+  private val errorNotificationTitle = "Herd has stopped sending messages in the background";
+  private var errorNotificationText = "";
+  private var errorNotificationType = "";
+  private var errorNotificationID : Int = 0;
   private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
+      var errorOccurred : Boolean = false;
       when(action) {
         BluetoothAdapter.ACTION_STATE_CHANGED -> {
           val state = intent.getIntExtra(
@@ -118,28 +123,38 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
             BluetoothAdapter.ERROR
           );
           if (state == BluetoothAdapter.STATE_OFF) {
-            service.sendNotification(
-              "Herd has stopped sending messages in the background",
-              "because bluetooth was turned off"
-            )
-            service.stopRunning();
-            Log.i(TAG,"service running : ${HerdBackgroundService.running}")
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("bluetoothOrLocationStateChange","ADAPTER_TURNED_OFF");
+            errorOccurred = true;
+            errorNotificationText = "because bluetooth was turned off";
+            errorNotificationType = "ADAPTER_TURNED_OFF";
           }
         }
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
-            service.sendNotification(
-              "Herd has stopped sending messages in the background",
-              "because location was turned off"
-            )
-            service.stopRunning();
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("bluetoothOrLocationStateChange","LOCATION_DISABLED");
+            errorOccurred = true;
+            errorNotificationText = "because location was turned off" 
+            errorNotificationType = "LOCATION_DISABLED";
           }
         }
+      }
+      if(errorOccurred) {
+        if(notificationIsPending(errorNotificationID)) {
+          service.sendNotification(
+            errorNotificationTitle,
+            errorNotificationText,
+            errorNotificationID
+          )
+        }
+        else {
+          errorNotificationID = service.sendNotification(
+            errorNotificationTitle,
+            errorNotificationText
+          )
+        }
+        service.stopRunning();
+        Log.i(TAG,"service running : ${HerdBackgroundService.running}")
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit("bluetoothOrLocationStateChange",errorNotificationType);
       }
     }
   }
@@ -319,14 +334,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun notificationIsPending(notificationID : Int, promise : Promise) {
+  fun notificationIsPending(notificationID : Int, promise : Promise ?= null) : Boolean {
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     for(notification in notificationManager.activeNotifications) {
         if (notification.id == notificationID) {
-          promise.resolve(true);
+          promise?.resolve(true);
+          return true;
         }
      }
-     promise.resolve(false);
+     promise?.resolve(false);
+     return false;
   }
 
   @ReactMethod
