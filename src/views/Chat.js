@@ -298,8 +298,8 @@ const Chat = ({ route, navigation }) => {
               }
             }
 
-            const deletedReceivedMessages = highlightedMessages.filter(message =>
-              message.to === ownPublicKey
+            const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
+              message.to.trim() === ownPublicKey.trim()
             )
             .map(message => ({...message,_id : parseRealmID(message)}));
 
