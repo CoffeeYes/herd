@@ -94,16 +94,22 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   private final val messageReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
+      val bundle : Bundle? = intent.getExtras();
+      val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
+      Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
+      var emitterString : String = "";
       if(action == "com.herd.NEW_HERD_MESSAGE_RECEIVED") {
-        val bundle : Bundle? = intent.getExtras();
-        val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
-        Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
-        if(messages != null && messages.size > 0) {
-          val messageArray = createArrayFromMessages(messages);
-          //pass object to JS through event emitter
-          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("newHerdMessagesReceived",messageArray);
-        }
+        emitterString = "newHerdMessagesReceived";
+      }
+      else if(action == "com.herd.REMOVE_MESSAGES_FROM_QUEUE") {
+        emitterString = "removeMessagesFromQueue"
+      }
+      if(messages != null && messages.size > 0 && emitterString.length > 0) {
+        Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
+        val messageArray = createArrayFromMessages(messages);
+        //pass object to JS through event emitter
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterString,messageArray);
       }
     }
   }
@@ -234,7 +240,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("publicKey",publicKey);
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
-      context.registerReceiver(messageReceiver,IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED"));
+      val messageIntentFilter = IntentFilter();
+      messageIntentFilter.addAction("com.herd.NEW_HERD_MESSAGE_RECEIVED");
+      messageIntentFilter.addAction("com.herd.REMOVE_MESSAGES_FROM_QUEUE");
+      context.registerReceiver(messageReceiver,messageIntentFilter);
       context.registerReceiver(locationAndBTStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
       context.registerReceiver(locationAndBTStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
       context.startService(serviceIntent);

@@ -206,8 +206,8 @@ class HerdBackgroundService : Service() {
     return notificationID;
   }
 
-  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?) {
-    val intent : Intent = Intent("com.herd.NEW_HERD_MESSAGE_RECEIVED");
+  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?, intentString : String) {
+    val intent : Intent = Intent(intentString);
     intent.putParcelableArrayListExtra("messages",messages);
     sendBroadcast(intent);
   }
@@ -362,7 +362,7 @@ class HerdBackgroundService : Service() {
            }
            else {
              //emit messages to JS receiver 
-             sendMessagesToReceiver(receivedMessages);
+             sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
 
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
@@ -603,12 +603,15 @@ class HerdBackgroundService : Service() {
          }
          else {
            Log.i(TAG,"Server message writeback complete");
-           //store deleted messages in case service is cancelled before app is opened
-           StorageInterface(context).writeMessagesToStorage(
-             messagesToRemoveFromQueue,
-             "messagesToRemove",
-             "messagesToRemoveSizes"
-           );
+           if(messagesToRemoveFromQueue.size > 0) {
+             //store deleted messages in case service is cancelled before app is opened
+             StorageInterface(context).writeMessagesToStorage(
+               messagesToRemoveFromQueue,
+               "messagesToRemove",
+               "messagesToRemoveSizes"
+             );
+             sendMessagesToReceiver(messagesToRemoveFromQueue,"com.herd.REMOVE_MESSAGES_FROM_QUEUE")
+           }
 
            device.connectGatt(
               context,

@@ -41,7 +41,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats, setStyles, setMessageQueue, updateChat } from './src/redux/actions/chatActions';
+import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
@@ -135,6 +135,10 @@ const App = ({ }) => {
       }
     })
 
+    const removeFromQueueListener = eventEmitter.addListener("removeMessagesFromQueue", messages => {
+      removeMessagesFromQueue(messages);
+    })
+
     const appStateListener = AppState.addEventListener("change",async state => {
       //switch to lock screen when backgrounded to prevent render from leaking
       //during transition when tabbing back in
@@ -168,6 +172,7 @@ const App = ({ }) => {
 
     return () => {
       messagesListener.remove();
+      removeFromQueueListener.remove();
       appStateListener.remove();
       orientationListener.remove();
     }
