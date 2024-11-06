@@ -136,7 +136,7 @@ const App = ({ }) => {
     })
 
     const removeFromQueueListener = eventEmitter.addListener("removeMessagesFromQueue", messages => {
-      removeMessagesFromQueue(messages);
+      dispatch(removeMessagesFromQueue(messages.map(message => message._id)));
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
