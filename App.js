@@ -256,7 +256,8 @@ const App = ({ }) => {
     dispatch(setPassword("erasure",erasurePassword));
 
     const messageQueue = await getMessageQueue(true);
-    dispatch(setMessageQueue(messageQueue))
+    const sentMessageQueue = await getMessageQueue(false);
+    dispatch(setMessageQueue(messageQueue.filter(message => sentMessageQueue.find(sentMessage => sentMessage._id == message._id) || message.to == key)))
 
     const enableNotifications = await AsyncStorage.getItem("enableNotifications");
     dispatch(setEnableNotifications(enableNotifications === "true"));
