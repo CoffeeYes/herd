@@ -356,6 +356,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun notificationsAreEnabled(promise : Promise) {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    promise.resolve(notificationManager.areNotificationsEnabled());
+  }
+
+  @ReactMethod
   fun updateNotification(title : String, text : String, notificationID : Int) {
     service.sendNotification(title,text,notificationID);
   }

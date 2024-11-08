@@ -10,9 +10,11 @@ import { setPublicKey } from '../redux/actions/userActions'
 
 import { defaultChatStyles } from '../assets/styles';
 
+import ServiceInterface from '../nativeWrapper/ServiceInterface.js'
+
 import { palette } from '../assets/palette';
 import { CommonActions } from '@react-navigation/native';
-import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
+import { setEnableNotifications, setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 
 const defaultMaxPasswordAttempts = 3;
 
@@ -27,10 +29,15 @@ const Splash = ({ navigation }) => {
     const key = await Crypto.loadKeyFromKeystore("herdPersonal");
     dispatch(setPublicKey(key));
 
+    //check that notification perms are enabled on native side
+    const nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+
     //set default styling
     await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
     await AsyncStorage.setItem("maxPasswordAttempts",defaultMaxPasswordAttempts.toString());
+    await AsyncStorage.setItem("enableNotifications",nativeNotificationsEnabled.toString());
     dispatch(setMaxPasswordAttempts(defaultMaxPasswordAttempts));
+    dispatch(setEnableNotifications(nativeNotificationsEnabled));
     setLoading(false);
     
     navigation.dispatch(CommonActions.reset({

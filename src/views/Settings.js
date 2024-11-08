@@ -158,6 +158,13 @@ const Settings = ({ navigation }) => {
     }
   }
 
+  const toggleNotifications = async enable => {
+    const nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+    const enableNotifications = enable && nativeNotificationsEnabled;
+    dispatch(setEnableNotifications(enableNotifications))
+    await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
+  }
+
   const locationModalDescription = `In order to transfer messages in the background, herd requires \
 certain permissions to be allowed all the time.`
 
@@ -194,10 +201,7 @@ for the following permissions in order to allow Herd to function correctly.`
           <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}> Send me a notification when new messages are received</Text>
           <Switch
           style={{marginTop: 10}}
-          onValueChange={async val => {
-            dispatch(setEnableNotifications(val))
-            await AsyncStorage.setItem("enableNotifications",val.toString())
-          }}
+          onValueChange={async val => toggleNotifications(val)}
           value={enableNotifications}
           trackColor={{ false: palette.grey, true: palette.primary }}
           thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}
