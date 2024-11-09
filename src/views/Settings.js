@@ -160,6 +160,11 @@ const Settings = ({ navigation }) => {
 
   const toggleNotifications = async enable => {
     const nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+    if(!nativeNotificationsEnabled) {
+      setShowPermissionModal(true);
+      setRequestedPermissions(["Notifications"]);
+      return;
+    }
     const enableNotifications = enable && nativeNotificationsEnabled;
     dispatch(setEnableNotifications(enableNotifications))
     await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
@@ -170,6 +175,9 @@ certain permissions to be allowed all the time.`
 
   const locationModalInstructionText = `Please go into the permission settings for Herd and select 'Allow all the time' \
 for the following permissions in order to allow Herd to function correctly.`
+
+  const notificationModalDescription = `In order to send you notifications when new messages are received, Herd requires \
+certain permissions to be allowed all the time`
 
   return (
     <>
@@ -314,7 +322,7 @@ for the following permissions in order to allow Herd to function correctly.`
         }}
         disableOnPress
         useCloseButton
-        description={locationModalDescription}
+        description={requestedPermissions.includes("Notifications") ? notificationModalDescription : locationModalDescription}
         instructionText={locationModalInstructionText}/>
       </ScrollView>
     </>
