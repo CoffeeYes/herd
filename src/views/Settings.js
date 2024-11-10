@@ -197,7 +197,8 @@ certain permissions to be allowed all the time`
             <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
             <Switch
             style={{marginLeft : 10}}
-            onValueChange={val => !QRCodeVisible && toggleBackgroundTransfer(val)}
+            onValueChange={val => toggleBackgroundTransfer(val)}
+            disabled={QRCodeVisible}
             value={backgroundTransfer}
             trackColor={{ false: palette.grey, true: palette.primary }}
             thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
@@ -210,6 +211,7 @@ certain permissions to be allowed all the time`
           <Switch
           style={{marginTop: 10}}
           onValueChange={async val => toggleNotifications(val)}
+          disabled={QRCodeVisible}
           value={enableNotifications}
           trackColor={{ false: palette.grey, true: palette.primary }}
           thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}
@@ -315,7 +317,10 @@ certain permissions to be allowed all the time`
         icon="location-on"
         visible={showPermissionModal}
         permissions={requestedPermissions}
-        onRequestClose={() => setShowPermissionModal(false)}
+        onRequestClose={() => {
+          setRequestedPermissions([]);
+          setShowPermissionModal(false)
+        }}
         buttonOnPress={() => {
           setShowPermissionModal(false);
           Bluetooth.navigateToApplicationSettings();

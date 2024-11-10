@@ -260,7 +260,8 @@ const App = ({ }) => {
     dispatch(setMessageQueue(messageQueue.filter(message => sentMessageQueue.find(sentMessage => sentMessage._id == message._id) || message.to == key)))
 
     const enableNotifications = await AsyncStorage.getItem("enableNotifications");
-    dispatch(setEnableNotifications(enableNotifications === "true"));
+    const notificationPermissionsGranted = await ServiceInterface.notificationsAreEnabled();
+    dispatch(setEnableNotifications(enableNotifications === "true" && notificationPermissionsGranted));
   }
 
   const loadStoredMessages = async () => {
