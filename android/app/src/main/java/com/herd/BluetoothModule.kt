@@ -58,6 +58,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val LOCATION_PERMISSION_REQUEST_CODE : Int = 5;
     private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 6;
     private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
+    private val POST_NOTIFICATIONS_REQUEST_CODE : Int = 8;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
@@ -66,6 +67,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     var locationPermissionPromise : Promise? = null;
     var locationEnabledPromise : Promise? = null;
     var navigateToSettingsPromise : Promise? = null;
+    var postNotificationsPromise: Promise? = null;
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
@@ -287,6 +289,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         Log.i(TAG,"All Bluetooth Scan Permissions granted : $allBluetoothScanPermissionsGranted")
         bluetoothScanPermissionPromise?.resolve(allBluetoothScanPermissionsGranted);
       }
+
+      if(requestCode == POST_NOTIFICATIONS_REQUEST_CODE) {
+        if(grantResults.isNotEmpty()) {
+          val granted = grantResults.get(0) === PackageManager.PERMISSION_GRANTED;
+          postNotificationsPromise?.resolve(granted);
+        }
+        else {
+          postNotificationsPromise?.resolve(false);
+        }
+        postNotificationsPromise = null;
+      }
+      
       bluetoothScanPermissionPromise = null;
       return true;
     }
@@ -453,6 +467,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         activity.requestPermissions(
           arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
           BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE,
+          this
+        )
+      }
+    }
+
+    @ReactMethod
+    fun requestNotificationPermissions(promise : Promise) {
+      val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
+      if(activity !== null) {
+        postNotificationsPromise = promise;
+        activity.requestPermissions(
+          arrayOf(permission.POST_NOTIFICATIONS),
+          POST_NOTIFICATIONS_REQUEST_CODE,
           this
         )
       }

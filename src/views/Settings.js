@@ -159,7 +159,10 @@ const Settings = ({ navigation }) => {
   }
 
   const toggleNotifications = async enable => {
-    const nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+    let nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+    if(!nativeNotificationsEnabled) {
+      nativeNotificationsEnabled = await Bluetooth.requestNotificationPermissions();
+    }
     if(!nativeNotificationsEnabled) {
       setShowPermissionModal(true);
       setRequestedPermissions(["Notifications"]);
