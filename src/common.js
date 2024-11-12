@@ -1,21 +1,23 @@
 import Bluetooth from './nativeWrapper/Bluetooth';
 import Crypto from './nativeWrapper/Crypto';
+import PermissionManager from './nativeWrapper/PermissionManager';
+
 import { Alert } from 'react-native';
 
 const requestPermissionsForBluetooth = async () => {
   let permissionsNotGranted = [];
-  const locationAllowed = await Bluetooth.checkLocationPermission();
+  const locationAllowed = await PermissionManager.checkLocationPermission();
   if(!locationAllowed) {
-    const locationRequest = await Bluetooth.requestLocationPermissions();
+    const locationRequest = await PermissionManager.requestLocationPermissions();
     if(!locationRequest) {
       permissionsNotGranted.push("Location")
     }
   }
 
-  const bluetoothScanPermissionsGranted = await Bluetooth.checkBTPermissions();
+  const bluetoothScanPermissionsGranted = await PermissionManager.checkBTPermissions();
 
   if(!bluetoothScanPermissionsGranted) {
-    const grantBluetoothScanPermissions = await Bluetooth.requestBTPermissions();
+    const grantBluetoothScanPermissions = await PermissionManager.requestBTPermissions();
     if(!grantBluetoothScanPermissions) {
       permissionsNotGranted.push("Nearby-devices");
     }

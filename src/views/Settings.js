@@ -7,12 +7,14 @@ import { Text, ScrollView,
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
-import Bluetooth from '../nativeWrapper/Bluetooth';
 import QRCodeModal from './QRCodeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
 import PermissionModal from './PermissionModal';
+
+import Bluetooth from '../nativeWrapper/Bluetooth';
+import PermissionManager from '../nativeWrapper/PermissionManager';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
@@ -161,7 +163,7 @@ const Settings = ({ navigation }) => {
   const toggleNotifications = async enable => {
     let nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
     if(!nativeNotificationsEnabled) {
-      nativeNotificationsEnabled = await Bluetooth.requestNotificationPermissions();
+      nativeNotificationsEnabled = await PermissionManager.requestNotificationPermissions();
     }
     if(!nativeNotificationsEnabled) {
       setShowPermissionModal(true);
