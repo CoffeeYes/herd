@@ -37,6 +37,7 @@ import {
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
+import { request } from 'react-native-permissions';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -328,6 +329,9 @@ certain permissions to be allowed all the time`
         }}
         buttonOnPress={() => {
           setShowPermissionModal(false);
+          requestedPermissions.includes("Notifications") ?
+          PermissionManager.navigateToNotificationSettings()
+          :
           Bluetooth.navigateToApplicationSettings();
         }}
         disableOnPress

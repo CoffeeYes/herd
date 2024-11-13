@@ -4,10 +4,15 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.BaseActivityEventListener
 
 import com.facebook.react.modules.core.PermissionListener
 import com.facebook.react.modules.core.PermissionAwareActivity
+
 import android.Manifest.permission
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 
 import android.util.Log
 import android.content.pm.PackageManager
@@ -16,20 +21,44 @@ import androidx.core.content.ContextCompat
 
 import android.os.Build
 
+import android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS
+
 class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactContextBaseJavaModule(reactContext),PermissionListener {
   private final val TAG : String = "HerdPermissionManagerModule";
+  private final val context = reactContext;
 
   private val BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE : Int = 1;
   private val BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE : Int = 2;
   private val LOCATION_PERMISSION_REQUEST_CODE : Int = 3;
   private val POST_NOTIFICATIONS_REQUEST_CODE : Int = 4;
+  private val NAVIGATE_TO_NOTIFICATION_SETTINGS_REQUEST_CODE : Int = 5;
 
   var locationPermissionPromise : Promise? = null;
   var bluetoothScanPermissionPromise : Promise? = null;
   var postNotificationsPromise: Promise? = null;
+  var navigateToNotificationSettingsPromise : Promise? = null;
 
   override fun getName() : String {
     return "PermissionManagerModule"
+  }
+
+  private final val activityListener = object : BaseActivityEventListener() {
+    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
+      //request bluetooth
+      if(requestCode == NAVIGATE_TO_NOTIFICATION_SETTINGS_REQUEST_CODE) {
+        if(resultCode == Activity.RESULT_OK) {
+          navigateToNotificationSettingsPromise?.resolve(true);
+        }
+        else {
+          navigateToNotificationSettingsPromise?.resolve(false);
+        }
+        navigateToNotificationSettingsPromise = null;
+      }
+    }
+  }
+
+  init {
+    reactContext.addActivityEventListener(activityListener);
   }
 
   fun checkPermissionsGranted(permissions : List<String>) : Boolean {
@@ -170,5 +199,14 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
         this
       )
     }
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun navigateToNotificationSettings() {
+    val activity : Activity? = getReactApplicationContext().getCurrentActivity();
+    val intent = Intent(ACTION_APP_NOTIFICATION_SETTINGS);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.putExtra("android.provider.extra.APP_PACKAGE", activity?.getPackageName());
+    context.startActivity(intent);
   }
 }
