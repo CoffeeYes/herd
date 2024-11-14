@@ -354,17 +354,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    @ReactMethod
-    fun navigateToApplicationSettings(promise : Promise) {
-      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
-      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      val uri = Uri.fromParts("package", activity?.getPackageName(), null);
-      intent.setData(uri);
-      activity?.startActivityForResult(intent,NAVIGATE_TO_SETTINGS_REQUEST_CODE);
-      navigateToSettingsPromise = promise;
-    }
-
     private var connectionThread : BTConnectionThread? = null;
 
     private inner class createBTServerThread() : Thread() {

@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 
 import android.os.Build
 
-import android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS
+import android.provider.Settings
 
 class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactContextBaseJavaModule(reactContext),PermissionListener {
   private final val TAG : String = "HerdPermissionManagerModule";
@@ -36,29 +36,20 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
   var locationPermissionPromise : Promise? = null;
   var bluetoothScanPermissionPromise : Promise? = null;
   var postNotificationsPromise: Promise? = null;
-  var navigateToNotificationSettingsPromise : Promise? = null;
 
   override fun getName() : String {
     return "PermissionManagerModule"
   }
 
-  private final val activityListener = object : BaseActivityEventListener() {
-    override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
-      //request bluetooth
-      if(requestCode == NAVIGATE_TO_NOTIFICATION_SETTINGS_REQUEST_CODE) {
-        if(resultCode == Activity.RESULT_OK) {
-          navigateToNotificationSettingsPromise?.resolve(true);
-        }
-        else {
-          navigateToNotificationSettingsPromise?.resolve(false);
-        }
-        navigateToNotificationSettingsPromise = null;
-      }
-    }
-  }
+  override fun getConstants() : Map<String,Any> {
+    val constants : Map<String, Any> = mapOf(
+      "navigationTargets" to mapOf (
+        "settings" to Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        "notificationSettings" to Settings.ACTION_APP_NOTIFICATION_SETTINGS
+      )
+    )
 
-  init {
-    reactContext.addActivityEventListener(activityListener);
+    return constants
   }
 
   fun checkPermissionsGranted(permissions : List<String>) : Boolean {
@@ -202,11 +193,17 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun navigateToNotificationSettings() {
+  fun navigateToSettings(navigationTarget : String) {
     val activity : Activity? = getReactApplicationContext().getCurrentActivity();
-    val intent = Intent(ACTION_APP_NOTIFICATION_SETTINGS);
+    val intent = Intent(navigationTarget);
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    intent.putExtra("android.provider.extra.APP_PACKAGE", activity?.getPackageName());
+    if(navigationTarget == Settings.ACTION_APPLICATION_DETAILS_SETTINGS) {
+      val uri = Uri.fromParts("package", activity?.getPackageName(), null);
+      intent.setData(uri);
+    }
+    else {
+      intent.putExtra("android.provider.extra.APP_PACKAGE", activity?.getPackageName());
+    }
     context.startActivity(intent);
   }
 }

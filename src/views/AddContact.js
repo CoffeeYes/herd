@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { View } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
+import PermissionManager from '../nativeWrapper/PermissionManager';
 import Header from './Header';
 import Card from './Card';
 
@@ -153,7 +154,7 @@ with other phones using bluetooth.`;
       onRequestClose={() => setShowPermissionModal(false)}
       buttonOnPress={() => {
         setShowPermissionModal(false);
-        Bluetooth.navigateToApplicationSettings();
+        PermissionManager.navigateToSettings(PermissionManager.navigationTargets.settings);
       }}
       permissions={requestedPermissions}
       description={permissionModalDescription}

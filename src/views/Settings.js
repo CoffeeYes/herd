@@ -329,10 +329,11 @@ certain permissions to be allowed all the time`
         }}
         buttonOnPress={() => {
           setShowPermissionModal(false);
-          requestedPermissions.includes("Notifications") ?
-          PermissionManager.navigateToNotificationSettings()
+          const targetSettings = requestedPermissions.includes("Notifications") ? 
+          PermissionManager.navigationTargets.notificationSettings
           :
-          Bluetooth.navigateToApplicationSettings();
+          PermissionManager.navigationTargets.settings
+          PermissionManager.navigateToSettings(targetSettings);
         }}
         disableOnPress
         useCloseButton
