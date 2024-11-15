@@ -13,7 +13,6 @@ import CustomButton from './CustomButton';
 import CardButton from './CardButton';
 import PermissionModal from './PermissionModal';
 
-import Bluetooth from '../nativeWrapper/Bluetooth';
 import PermissionManager from '../nativeWrapper/PermissionManager';
 
 import { closeChatRealm } from '../realm/chatRealm';
@@ -37,7 +36,6 @@ import {
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
-import { request } from 'react-native-permissions';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -329,10 +327,20 @@ certain permissions to be allowed all the time`
         }}
         buttonOnPress={() => {
           setShowPermissionModal(false);
-          const targetSettings = requestedPermissions.includes("Notifications") ? 
-          PermissionManager.navigationTargets.notificationSettings
-          :
-          PermissionManager.navigationTargets.settings
+          let targetSettings = PermissionManager.navigationTargets.settings;
+          if(requestedPermissions.length == 1) {
+            const requestedPermission = requestedPermissions[0];
+            switch(requestedPermission) {
+              case "Notifications": {
+                targetSettings = PermissionManager.navigationTargets.notificationSettings
+                break;
+              }
+              case "Location": {
+                targetSettings = PermissionManager.navigationTargets.locationSettings
+                break;
+              }
+            }
+          }
           PermissionManager.navigateToSettings(targetSettings);
         }}
         disableOnPress

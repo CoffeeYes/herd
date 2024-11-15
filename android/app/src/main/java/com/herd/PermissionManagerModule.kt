@@ -45,7 +45,8 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
     val constants : Map<String, Any> = mapOf(
       "navigationTargets" to mapOf (
         "settings" to Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-        "notificationSettings" to Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        "notificationSettings" to Settings.ACTION_APP_NOTIFICATION_SETTINGS,
+        "locationSettings" to Settings.ACTION_LOCATION_SOURCE_SETTINGS
       )
     )
 
