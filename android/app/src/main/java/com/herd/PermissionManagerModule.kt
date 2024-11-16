@@ -59,7 +59,7 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
       val granted = ContextCompat.checkSelfPermission(
         context,
         permission
-      ) === PackageManager.PERMISSION_GRANTED;
+      ) == PackageManager.PERMISSION_GRANTED;
       if (!granted) return false;
     }
     return true;
@@ -112,7 +112,7 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
 
     if(requestCode == POST_NOTIFICATIONS_REQUEST_CODE) {
       if(grantResults.isNotEmpty()) {
-        val granted = grantResults.get(0) === PackageManager.PERMISSION_GRANTED;
+        val granted = grantResults.get(0) == PackageManager.PERMISSION_GRANTED;
         postNotificationsPromise?.resolve(granted);
       }
       else {
@@ -129,14 +129,12 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
   fun requestBTPermissions(promise : Promise) {
     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
       val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
-      if(activity !== null) {
-        bluetoothScanPermissionPromise = promise;
-        activity.requestPermissions(
-          arrayOf(permission.BLUETOOTH_SCAN,permission.BLUETOOTH_CONNECT,permission.BLUETOOTH_ADVERTISE),
-          BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE,
-          this
-        )
-      }
+      bluetoothScanPermissionPromise = promise;
+      activity.requestPermissions(
+        arrayOf(permission.BLUETOOTH_SCAN,permission.BLUETOOTH_CONNECT,permission.BLUETOOTH_ADVERTISE),
+        BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE,
+        this
+      )
     }
     else {
       promise.resolve(true)
@@ -170,41 +168,39 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
   @ReactMethod
   fun requestLocationPermissions(promise : Promise) {
     val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
-    if(activity !== null) {
-      locationPermissionPromise = promise;
-      activity.requestPermissions(
-        arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
-        BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE,
-        this
-      )
-    }
+    locationPermissionPromise = promise;
+    activity.requestPermissions(
+      arrayOf(permission.ACCESS_BACKGROUND_LOCATION),
+      BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE,
+      this
+    )
   }
 
   @ReactMethod
   fun requestNotificationPermissions(promise : Promise) {
     val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
-    if(activity !== null) {
-      postNotificationsPromise = promise;
-      activity.requestPermissions(
-        arrayOf(permission.POST_NOTIFICATIONS),
-        POST_NOTIFICATIONS_REQUEST_CODE,
-        this
-      )
-    }
+    postNotificationsPromise = promise;
+    activity.requestPermissions(
+      arrayOf(permission.POST_NOTIFICATIONS),
+      POST_NOTIFICATIONS_REQUEST_CODE,
+      this
+    )
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun navigateToSettings(navigationTarget : String) {
     val activity : Activity? = getReactApplicationContext().getCurrentActivity();
-    val intent = Intent(navigationTarget);
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    if(navigationTarget == Settings.ACTION_APPLICATION_DETAILS_SETTINGS) {
-      val uri = Uri.fromParts("package", activity?.getPackageName(), null);
-      intent.setData(uri);
+    if(activity !== null) {
+      val intent = Intent(navigationTarget);
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      if(navigationTarget == Settings.ACTION_APPLICATION_DETAILS_SETTINGS) {
+        val uri = Uri.fromParts("package", activity.getPackageName(), null);
+        intent.setData(uri);
+      }
+      else {
+        intent.putExtra("android.provider.extra.APP_PACKAGE", activity.getPackageName());
+      }
+      context.startActivity(intent);
     }
-    else {
-      intent.putExtra("android.provider.extra.APP_PACKAGE", activity?.getPackageName());
-    }
-    context.startActivity(intent);
   }
 }
