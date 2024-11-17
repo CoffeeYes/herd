@@ -295,6 +295,7 @@ const Chat = ({ route, navigation }) => {
               }
               if(doneLoading) {
                 dispatch(deleteChats([contactInfo]));
+                firstMessageIDRef.current = "";
               }
             }
 
