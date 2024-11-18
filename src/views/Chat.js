@@ -359,6 +359,7 @@ const Chat = ({ route, navigation }) => {
     const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
     if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
       scrollToTop();
+      console.log("scrollToTop handleContentSizeChanged")
     }
     
     if(firstMessageID) {
@@ -399,7 +400,8 @@ const Chat = ({ route, navigation }) => {
       animated : animated,
       sectionIndex : 0,
       itemIndex : 0,
-      viewOffset : 6 
+      viewOffset : 6,
+      viewPosition : 0
     });
   }
   
