@@ -298,6 +298,9 @@ const Chat = ({ route, navigation }) => {
                 firstMessageIDRef.current = "";
               }
             }
+            else {
+              firstMessageIDRef.current = updatedMessages[updatedMessages.length - 1]?.data[updatedMessages[updatedMessages.length -1 ]?.data?.length - 1]?._id;
+            }
 
             const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
               message.to.trim() === ownPublicKey.trim()
@@ -359,7 +362,6 @@ const Chat = ({ route, navigation }) => {
     const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
     if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
       scrollToTop();
-      console.log("scrollToTop handleContentSizeChanged")
     }
     
     if(firstMessageID) {

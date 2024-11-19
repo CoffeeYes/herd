@@ -318,7 +318,7 @@ certain permissions to be allowed all the time`
         onRequestClose={() => setQRCodeVisible(false)}/>
 
         <PermissionModal
-        icon="location-on"
+        icon={requestedPermissions.length == 1 && requestedPermissions[0] == "Notifications" ? "notifications-active" : "location-on"}
         visible={showPermissionModal}
         permissions={requestedPermissions}
         onRequestClose={() => {
