@@ -65,6 +65,7 @@ const Chat = ({ route, navigation }) => {
   
   const disableChatInputRef = useRef(false);
   const previousTextValueRef = useRef("");
+  const shouldScrollToBottomRef = useRef(false);
 
   const messageLoadingSize = 5;
   const chatWindowSize = 16;
@@ -247,9 +248,9 @@ const Chat = ({ route, navigation }) => {
       toContactName : contactInfo.name,
     }]));
 
-    !enableGestureHandler &&
-    scrollToBottom();
-
+    if(!enableGestureHandler) {
+      shouldScrollToBottomRef.current = true;
+    }
     setMessageStart(messageStart - 1);
 
     await ServiceInterface.isRunning() &&
@@ -363,6 +364,10 @@ const Chat = ({ route, navigation }) => {
     if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
       scrollToTop();
     }
+    else if(shouldScrollToBottomRef.current) {
+      scrollToBottom();
+      shouldScrollToBottomRef.current = false;
+    }
     
     if(firstMessageID) {
       firstMessageIDRef.current = firstMessageID;
@@ -396,10 +401,9 @@ const Chat = ({ route, navigation }) => {
   const momentumEndFiredCount = useRef(0);
 
   const scrollToBottom = (animated = true) => {
-    messages.length > 0 &&
     messages?.[0]?.data?.length > 0 &&
     scrollRef.current.scrollToLocation({
-      animated : animated,
+      animated,
       sectionIndex : 0,
       itemIndex : 0,
       viewOffset : 6,
