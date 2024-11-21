@@ -46,6 +46,9 @@ import android.os.Build
 import kotlinx.parcelize.Parcelize
 import android.os.Looper
 import android.location.LocationManager
+import androidx.core.content.ContextCompat
+import android.Manifest.permission
+import android.content.pm.PackageManager
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -989,6 +992,21 @@ class HerdBackgroundService : Service() {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
       Log.i(TAG, "Service onStartCommand " + startId)
+      var allPermissionsGranted = true;
+      for(permission in listOf(permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION, permission.ACCESS_BACKGROUND_LOCATION, permission.BLUETOOTH_SCAN,permission.BLUETOOTH_CONNECT,permission.BLUETOOTH_ADVERTISE)) {
+        allPermissionsGranted = ContextCompat.checkSelfPermission(
+          context,
+          permission
+        ) == PackageManager.PERMISSION_GRANTED;
+        if(!allPermissionsGranted) {
+          break;
+        }
+      }
+      if(!allPermissionsGranted) {
+        Log.i(TAG,"not all permissions to start service have been granted");
+        stopSelfResult(startId);
+        return Service.STOP_FOREGROUND_REMOVE;
+      }
       running = true;
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
