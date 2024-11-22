@@ -13,6 +13,7 @@ import android.Manifest.permission
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.content.Context
 
 import android.util.Log
 import android.content.pm.PackageManager
@@ -52,17 +53,18 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
 
     return constants
   }
-
-  fun checkPermissionsGranted(permissions : List<String>) : Boolean {
-    val context = getReactApplicationContext();
-    for(permission in permissions) {
-      val granted = ContextCompat.checkSelfPermission(
-        context,
-        permission
-      ) == PackageManager.PERMISSION_GRANTED;
-      if (!granted) return false;
+  
+  companion object {
+    fun checkPermissionsGranted(permissions : List<String>, context : Context) : Boolean {
+      for(permission in permissions) {
+        val granted = ContextCompat.checkSelfPermission(
+          context,
+          permission
+        ) == PackageManager.PERMISSION_GRANTED;
+        if (!granted) return false;
+      }
+      return true;
     }
-    return true;
   }
 
   override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
@@ -149,7 +151,7 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
         permission.BLUETOOTH_CONNECT,
         permission.BLUETOOTH_ADVERTISE
       );
-      promise.resolve(checkPermissionsGranted(permissions));
+      promise.resolve(checkPermissionsGranted(permissions, context as Context));
     }
     else {
       promise.resolve(true)
@@ -162,7 +164,7 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
       permission.ACCESS_BACKGROUND_LOCATION,
       permission.ACCESS_FINE_LOCATION
     )
-    promise.resolve(checkPermissionsGranted(permissions));
+    promise.resolve(checkPermissionsGranted(permissions, context as Context));
   }
 
   @ReactMethod
