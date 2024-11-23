@@ -65,6 +65,21 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
       }
       return true;
     }
+
+    fun checkPermissionsGrantedForService(context : Context) : Boolean {
+      return checkPermissionsGranted(
+        listOf(
+          permission.ACCESS_COARSE_LOCATION,
+          permission.ACCESS_FINE_LOCATION,
+          permission.ACCESS_BACKGROUND_LOCATION, 
+          permission.BLUETOOTH_SCAN,
+          permission.BLUETOOTH_CONNECT,
+          permission.BLUETOOTH_ADVERTISE
+        ),
+        context
+      )
+    }
+
   }
 
   override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {

@@ -240,12 +240,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("publicKey",publicKey);
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
-      val messageIntentFilter = IntentFilter();
-      messageIntentFilter.addAction("com.herd.NEW_HERD_MESSAGE_RECEIVED");
+      val messageIntentFilter = IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED");
       messageIntentFilter.addAction("com.herd.REMOVE_MESSAGES_FROM_QUEUE");
+      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
       context.registerReceiver(messageReceiver,messageIntentFilter);
-      context.registerReceiver(locationAndBTStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-      context.registerReceiver(locationAndBTStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
+      context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }
