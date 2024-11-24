@@ -24,6 +24,7 @@ const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
   const customStyle = useSelector(state => state.chatReducer.styles);
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const [errors, setErrors] = useState([]);
   const [saving, setSaving] = useState(false);
   const [headerIcon, setHeaderIcon] = useState("save");
@@ -70,6 +71,12 @@ const EditContact = ({ route, navigation }) => {
       errorSaving.push({
         type : "empty_key",
         message : "Key field can not be empty"
+      })
+    }
+    else if(publicKey.trim() === ownPublicKey.trim()) {
+      errorSaving.push({
+        type : "invalid_key",
+        message : "You can not add your own key"
       })
     }
     else {
