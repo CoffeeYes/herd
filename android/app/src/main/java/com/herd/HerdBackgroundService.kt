@@ -769,11 +769,11 @@ class HerdBackgroundService : Service() {
       }
   }
   private val bleScanTimeoutHandler = Handler(Looper.getMainLooper());
-  private fun stopLeScan() {
+  private fun stopLeScan(includeScanTimeout : Boolean = true) {
     Log.i(TAG,"stopLeScan() called")
     BLEScanner?.stopScan(leScanCallback);
     bleScanningThreadActive.set(false);
-    if(allowBleScan) {
+    if(allowBleScan && includeScanTimeout) {
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
       bleScanTimeoutHandler.removeCallbacksAndMessages(null);
@@ -993,7 +993,7 @@ class HerdBackgroundService : Service() {
       var allPermissionsGranted = PermissionManagerModule.checkPermissionsGrantedForService(context);
       if(!allPermissionsGranted) {
         Log.i(TAG,"not all permissions to start service have been granted");
-        stopSelfResult(startId);
+        stopSelf();
         return Service.STOP_FOREGROUND_REMOVE;
       }
       running = true;
@@ -1022,10 +1022,11 @@ class HerdBackgroundService : Service() {
   override fun onDestroy() {
       Log.i(TAG, "Service onDestroy")
       if(bluetoothAdapter?.isEnabled() as Boolean) {
-        stopLeScan()
+        stopLeScan(false)
         BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
         gattServer?.close();
       }
+      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
       running = false;
   }
 }
