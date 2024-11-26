@@ -162,16 +162,19 @@ const Settings = ({ navigation }) => {
   const toggleNotifications = async enable => {
     let nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
     if(!nativeNotificationsEnabled) {
+      dispatch(setLockable(false))
       nativeNotificationsEnabled = await PermissionManager.requestNotificationPermissions();
     }
     if(!nativeNotificationsEnabled) {
       setShowPermissionModal(true);
       setRequestedPermissions(["Notifications"]);
+      dispatch(setLockable(true));
       return;
     }
     const enableNotifications = enable && nativeNotificationsEnabled;
     dispatch(setEnableNotifications(enableNotifications))
     await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
+    dispatch(setLockable(true))
   }
 
   const locationModalDescription = `In order to transfer messages in the background, herd requires \
