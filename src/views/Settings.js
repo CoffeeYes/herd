@@ -72,10 +72,6 @@ const Settings = ({ navigation }) => {
     return true;
   }
 
-  useEffect(() => {
-    showPermissionModal && dispatch(setLockable(true))
-  },[showPermissionModal])
-
   const showDeletionAlert = async (text, onConfirm = async () => {}, onCancel = async () => {}) => {
     Alert.alert(
       text,
@@ -160,21 +156,27 @@ const Settings = ({ navigation }) => {
   }
 
   const toggleNotifications = async enable => {
-    let nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
-    if(!nativeNotificationsEnabled) {
-      dispatch(setLockable(false))
-      nativeNotificationsEnabled = await PermissionManager.requestNotificationPermissions();
+    if(enable) {
+      let nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
+      if(!nativeNotificationsEnabled) {
+        dispatch(setLockable(false))
+        nativeNotificationsEnabled = await PermissionManager.requestNotificationPermissions();
+      }
+      if(!nativeNotificationsEnabled) {
+        setShowPermissionModal(true);
+        setRequestedPermissions(["Notifications"]);
+        dispatch(setLockable(true));
+        return;
+      }
+      const enableNotifications = enable && nativeNotificationsEnabled;
+      dispatch(setEnableNotifications(enableNotifications))
+      await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
+      dispatch(setLockable(true))
     }
-    if(!nativeNotificationsEnabled) {
-      setShowPermissionModal(true);
-      setRequestedPermissions(["Notifications"]);
-      dispatch(setLockable(true));
-      return;
+    else {
+      dispatch(setEnableNotifications(false));
+      await AsyncStorage.setItem("enableNotifications",false.toString())
     }
-    const enableNotifications = enable && nativeNotificationsEnabled;
-    dispatch(setEnableNotifications(enableNotifications))
-    await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
-    dispatch(setLockable(true))
   }
 
   const locationModalDescription = `In order to transfer messages in the background, herd requires \
