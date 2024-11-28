@@ -40,11 +40,19 @@ const setEnableNotifications = enable => {
   }
 }
 
+const setBackgroundServiceRunning = running => {
+  return {
+    type : "SET_BACKGROUND_SERVICE_RUNNING",
+    payload : running
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
   setLockable,
   setLastRoutes,
   setMaxPasswordAttempts,
-  setEnableNotifications
+  setEnableNotifications,
+  setBackgroundServiceRunning
 }

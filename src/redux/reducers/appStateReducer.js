@@ -3,7 +3,8 @@ const initialState = {
   lockable : true,
   lastRoutes : [],
   maxPasswordAttempts: 3,
-  sendNotificationForNewMessages : true
+  sendNotificationForNewMessages : true,
+  backgroundServiceRunning : false
 }
 
 const appStateReducer = (state=initialState, action) => {
@@ -22,6 +23,9 @@ const appStateReducer = (state=initialState, action) => {
     }
     case "SET_ENABLE_NOTIF" : {
       return {...state, sendNotificationForNewMessages : action.payload}
+    }
+    case "SET_BACKGROUND_SERVICE_RUNNING": {
+      return {...state, backgroundServiceRunning : action.payload}
     }
     default:
       return state;

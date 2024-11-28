@@ -22,7 +22,7 @@ import { parseRealmID } from '../realm/helper';
 
 import { setMessageQueue, deleteChats } from '../redux/actions/chatActions';
 import { resetContacts } from '../redux/actions/contactActions';
-import { setEnableNotifications, setLockable } from '../redux/actions/appStateActions';
+import { setBackgroundServiceRunning, setEnableNotifications, setLockable } from '../redux/actions/appStateActions';
 
 import { palette } from '../assets/palette';
 
@@ -42,25 +42,23 @@ const Settings = ({ navigation }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
-  const [backgroundTransfer, setBackgroundTransfer] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
   const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
+  const backgroundServiceRunning = useSelector(state => state.appStateReducer.backgroundServiceRunning)
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
   
   const alreadyNavigating = useRef(false);
 
   useEffect(() => {
-    ServiceInterface.isRunning().then(running => setBackgroundTransfer(running));
-
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
 
     const bluetoothAndLocationStateListener = eventEmitter.addListener("bluetoothOrLocationStateChange", state => {
       if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
-        setBackgroundTransfer(false);
+        dispatch(setBackgroundServiceRunning(false));
       }
     })
 
@@ -117,7 +115,7 @@ const Settings = ({ navigation }) => {
       }
 
       if(btEnabled && locationEnabled) {
-        setBackgroundTransfer(true);
+        dispatch(setBackgroundServiceRunning(true));
         const messageQueue = (await getMessageQueue(false)).map(msg => ({...msg,_id : parseRealmID(msg)}));
         const deletedReceivedMessages = getDeletedReceivedMessages().map(msg => ({...msg,_id : parseRealmID(msg)}));
         const receivedMessagesForSelf = await getReceivedMessagesForSelf();
@@ -130,7 +128,7 @@ const Settings = ({ navigation }) => {
       }
     }
     else {
-      setBackgroundTransfer(false);
+      dispatch(setBackgroundServiceRunning(false));
       if(await ServiceInterface.isRunning()) {
         ServiceInterface.disableService();
       }
@@ -196,7 +194,7 @@ certain permissions to be allowed all the time`
 
         <View style={styles.card}>
 
-          {!backgroundTransfer &&
+          {!backgroundServiceRunning &&
           <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
           WARNING : if you disable background transfers your messages
           will not be transmitted
@@ -208,9 +206,9 @@ certain permissions to be allowed all the time`
             style={{marginLeft : 10}}
             onValueChange={val => toggleBackgroundTransfer(val)}
             disabled={QRCodeVisible}
-            value={backgroundTransfer}
+            value={backgroundServiceRunning}
             trackColor={{ false: palette.grey, true: palette.primary }}
-            thumbColor={backgroundTransfer ? palette.secondary : palette.lightgrey}
+            thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}
             ios_backgroundColor={palette.primary}/>
           </View>
         </View>
