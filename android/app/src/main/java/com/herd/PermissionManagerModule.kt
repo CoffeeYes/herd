@@ -67,15 +67,20 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
     }
 
     fun checkPermissionsGrantedForService(context : Context) : Boolean {
-      return checkPermissionsGranted(
-        listOf(
-          permission.ACCESS_COARSE_LOCATION,
-          permission.ACCESS_FINE_LOCATION,
-          permission.ACCESS_BACKGROUND_LOCATION, 
+      var permissions = mutableListOf(
+        permission.ACCESS_COARSE_LOCATION,
+        permission.ACCESS_FINE_LOCATION,
+        permission.ACCESS_BACKGROUND_LOCATION, 
+      )
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        permissions.addAll(listOf(
           permission.BLUETOOTH_SCAN,
           permission.BLUETOOTH_CONNECT,
           permission.BLUETOOTH_ADVERTISE
-        ),
+        ))
+      }
+      return checkPermissionsGranted(
+        permissions,
         context
       )
     }
