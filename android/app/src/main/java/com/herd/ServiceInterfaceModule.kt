@@ -122,6 +122,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
       var errorOccurred : Boolean = false;
+      if(!HerdBackgroundService.running) {
+        return;
+      }
       when(action) {
         BluetoothAdapter.ACTION_STATE_CHANGED -> {
           val state = intent.getIntExtra(
