@@ -129,7 +129,7 @@ const Settings = ({ navigation }) => {
     }
     else {
       dispatch(setBackgroundServiceRunning(false));
-      if(await ServiceInterface.isRunning()) {
+      if(backgroundServiceRunning) {
         ServiceInterface.disableService();
       }
     }

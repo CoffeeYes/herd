@@ -41,6 +41,7 @@ const Chat = ({ route, navigation }) => {
   const chat = chats.find(chat => chat._id == route.params.contactID);
 
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])
+  const backgroundServiceRunning = useSelector(state => state.appStateReducer.backgroundServiceRunning);
 
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(false);
@@ -253,7 +254,7 @@ const Chat = ({ route, navigation }) => {
     }
     setMessageStart(messageStart - 1);
 
-    await ServiceInterface.isRunning() &&
+    backgroundServiceRunning &&
     ServiceInterface.addMessageToService({...newMessage, text : newMessageEncrypted});
   }
 
@@ -308,7 +309,7 @@ const Chat = ({ route, navigation }) => {
             )
             .map(message => ({...message,_id : parseRealmID(message)}));
 
-            if(await ServiceInterface.isRunning()) {
+            if(backgroundServiceRunning) {
               await ServiceInterface.removeMessagesFromService(highlightedMessages);
               await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
             }
