@@ -11,6 +11,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
+import { requestEnableBluetooth, requestEnableLocation } from '../common';
 
 const BTDeviceList = ({ navigation }) => {
   const [scanning, setScanning] = useState(false);
@@ -79,8 +80,16 @@ const BTDeviceList = ({ navigation }) => {
 
   const restartScan = async () => {
     let restartErrors = [];
-    const btEnabled = await Bluetooth.checkBTEnabled();
-    const locationEnabled = await Bluetooth.checkLocationEnabled();
+    let btEnabled = await Bluetooth.checkBTEnabled();
+    let locationEnabled = await Bluetooth.checkLocationEnabled();
+
+    if(!btEnabled) {
+      btEnabled = await requestEnableBluetooth();
+    }
+
+    if(!locationEnabled) {
+      locationEnabled = await requestEnableLocation();
+    }
 
     !btEnabled && restartErrors.push({
       type : "bluetooth_not_enabled",
