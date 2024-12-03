@@ -182,7 +182,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
               isDiscoverable = false;
             } 
             BluetoothAdapter.SCAN_MODE_CONNECTABLE -> {
-              scanModeString = "SCAN_MDOE_CONNECTABLE";
+              scanModeString = "SCAN_MODE_CONNECTABLE";
               isDiscoverable = false;
             } 
             BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE -> {
@@ -194,6 +194,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
         else {
           Log.d(TAG,"Getting intent from scanMode action resulted in default value $scanMode");
+        }
+
+        if(!isDiscoverable) {
+          val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
+          if(adapter !== null) {
+            adapter?.setName(adapter.getName().replace("_HERD",""));
+          }
         }
       }
     }
