@@ -243,11 +243,7 @@ const Chat = ({ route, navigation }) => {
     }
     dispatch(addMessage(contactInfo._id,newMessage));
 
-    dispatch(addMessagesToQueue([{
-      ...selfEncryptedCopy,
-      fromContactName : "You",
-      toContactName : contactInfo.name,
-    }]));
+    dispatch(addMessagesToQueue([selfEncryptedCopy]));
 
     if(!enableGestureHandler) {
       shouldScrollToBottomRef.current = true;
@@ -301,7 +297,7 @@ const Chat = ({ route, navigation }) => {
               }
             }
             else {
-              firstMessageIDRef.current = updatedMessages[updatedMessages.length - 1]?.data[updatedMessages[updatedMessages.length -1 ]?.data?.length - 1]?._id;
+              firstMessageIDRef.current = getFirstMessageID(updatedMessages);
             }
 
             const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
@@ -361,7 +357,7 @@ const Chat = ({ route, navigation }) => {
     setSectionContentHeight(contentHeight);
     // compare IDs of old first message to new first message to determine if messages have been prepended
     // and a scroll to top is necessary.
-    const firstMessageID = messages[messages.length - 1]?.data[messages[messages.length -1 ]?.data?.length - 1]?._id;
+    const firstMessageID = getFirstMessageID(messages);
     if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
       scrollToTop();
     }
@@ -410,6 +406,13 @@ const Chat = ({ route, navigation }) => {
       viewOffset : 6,
       viewPosition : 0
     });
+  }
+
+  const getFirstMessageID = messages => {
+    const firstMessageSectionIndex = messages.length - 1;
+    const firstMessageIndex = messages[firstMessageSectionIndex]?.data?.length - 1;
+    const firstMessageID = messages[firstMessageSectionIndex]?.data[firstMessageIndex]?._id;
+    return firstMessageID;
   }
   
   let scrollRetryCount = 0;
