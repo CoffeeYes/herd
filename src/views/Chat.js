@@ -359,7 +359,7 @@ const Chat = ({ route, navigation }) => {
     // and a scroll to top is necessary.
     const firstMessageID = getFirstMessageID(messages);
     if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
-      scrollToTop();
+      scrollToTop(true,false,contentHeight);
     }
     else if(shouldScrollToBottomRef.current) {
       scrollToBottom();
@@ -417,7 +417,7 @@ const Chat = ({ route, navigation }) => {
   
   let scrollRetryCount = 0;
   let sectionOffset = 1
-  const scrollToTop = (animated = true, isFailureRetry) => {
+  const scrollToTop = (animated = true, isFailureRetry, newContentHeight) => {
     let lastSectionIndex = messages?.length - sectionOffset;
     let lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
     let targetIndexAfterFailure = lastMessageIndex - scrollRetryCount;
@@ -434,11 +434,13 @@ const Chat = ({ route, navigation }) => {
       targetIndexAfterFailure = messages?.[lastSectionIndex]?.data?.length - 1 - differenceFromPreviousSection;
     }
 
+    const contentHeightDifference = newContentHeight - sectionContentHeight;
+
     const scrollOptions = {
       animated,
       sectionIndex : lastSectionIndex,
       viewPosition : 0,
-      viewOffset : isFailureRetry ? 0 : sectionListHeight - headerHeight - sectionFooterHeight
+      viewOffset : isFailureRetry ? 0 : sectionListHeight - headerHeight - sectionFooterHeight - ((newContentHeight/ contentHeightDifference) * 5)
     }
 
     if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
