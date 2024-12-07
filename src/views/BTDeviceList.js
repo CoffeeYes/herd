@@ -1,5 +1,5 @@
 import React, { useState, useEffect,  useCallback } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, 
   NativeEventEmitter } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
@@ -12,8 +12,10 @@ import CustomButton from './CustomButton';
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
 import { requestEnableBluetooth, requestEnableLocation } from '../common';
+import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [scanning, setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -111,7 +113,9 @@ const BTDeviceList = ({ navigation }) => {
         await Bluetooth.scanForDevices();
       }
       else {
+        dispatch(setLockable(false));
         discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
+        dispatch(setLockable(true));
         discoverable && (await Bluetooth.scanForDevices());
       }
     }

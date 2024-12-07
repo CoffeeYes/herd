@@ -42,7 +42,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
-import { setBackgroundServiceRunning, setEnableNotifications, setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
+import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
 
