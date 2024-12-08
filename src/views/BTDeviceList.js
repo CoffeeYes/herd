@@ -81,6 +81,7 @@ const BTDeviceList = ({ navigation }) => {
   }
 
   const restartScan = async () => {
+    dispatch(setLockable(false))
     let restartErrors = [];
     let btEnabled = await Bluetooth.checkBTEnabled();
     let locationEnabled = await Bluetooth.checkLocationEnabled();
@@ -103,7 +104,9 @@ const BTDeviceList = ({ navigation }) => {
     })
 
     if (restartErrors.length > 0) {
-      return setErrors(restartErrors);
+      dispatch(setLockable(true));
+      setErrors(restartErrors);
+      return;
     }
     else {
       setErrors([]);
@@ -113,11 +116,10 @@ const BTDeviceList = ({ navigation }) => {
         await Bluetooth.scanForDevices();
       }
       else {
-        dispatch(setLockable(false));
         discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
-        dispatch(setLockable(true));
         discoverable && (await Bluetooth.scanForDevices());
       }
+      dispatch(setLockable(true));
     }
   }
 
@@ -155,7 +157,7 @@ const BTDeviceList = ({ navigation }) => {
 
         <CustomButton
         text={scanning ? "Cancel Scan" : "Re-Scan"}
-        onPress={() => scanning ? Bluetooth.cancelScanForDevices() : restartScan()}
+        onPress={async () => scanning ? await Bluetooth.cancelScanForDevices() : await restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
         {showModal && <BTExchangeModal

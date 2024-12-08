@@ -58,11 +58,13 @@ const AddContact = ({ navigation }) => {
 
     const btEnabled = await requestEnableBluetooth();
     if(!btEnabled) {
+      dispatch(setLockable(true));
       return;
     }
     
     const locationEnabled = await requestEnableLocation();
     if (!locationEnabled) {
+      dispatch(setLockable(true));
       return;
     }
     else {
