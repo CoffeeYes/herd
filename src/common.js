@@ -48,6 +48,20 @@ const requestEnableLocation = async () => {
   return locationEnabled;
 }
 
+const requestMakeDiscoverable = async () => {
+  let discoverable = await Bluetooth.checkBTDiscoverable();
+  if(!discoverable) {
+    discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
+  }
+  return discoverable;
+}
+
+const enableServicesForBluetoothScan = async () => {
+  const bluetoothEnabled = await requestEnableBluetooth();
+  const locationEnabled = await requestEnableLocation();
+  return bluetoothEnabled && locationEnabled;
+}
+
 const decryptStrings = async strings => {
   const decryptedStrings = await Crypto.decryptStrings(
     "herdPersonal",
@@ -86,6 +100,8 @@ export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
   requestEnableLocation,
+  requestMakeDiscoverable,
+  enableServicesForBluetoothScan,
   decryptStrings,
   decryptStringsWithIdentifier,
   encryptStrings

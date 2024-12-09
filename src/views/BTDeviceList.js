@@ -11,7 +11,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
-import { requestEnableBluetooth, requestEnableLocation } from '../common';
+import { enableServicesForBluetoothScan, requestEnableBluetooth, requestEnableLocation, requestMakeDiscoverable } from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
@@ -82,45 +82,17 @@ const BTDeviceList = ({ navigation }) => {
 
   const restartScan = async () => {
     dispatch(setLockable(false))
-    let restartErrors = [];
-    let btEnabled = await Bluetooth.checkBTEnabled();
-    let locationEnabled = await Bluetooth.checkLocationEnabled();
 
-    if(!btEnabled) {
-      btEnabled = await requestEnableBluetooth();
-    }
+    const servicesEnabled = await enableServicesForBluetoothScan();
 
-    if(!locationEnabled) {
-      locationEnabled = await requestEnableLocation();
-    }
-
-    !btEnabled && restartErrors.push({
-      type : "bluetooth_not_enabled",
-      text : "Please enable bluetooth"
-    })
-    !locationEnabled && restartErrors.push({
-      type : "location_not_enabled",
-      text : "Please enable location services"
-    })
-
-    if (restartErrors.length > 0) {
-      dispatch(setLockable(true));
-      setErrors(restartErrors);
-      return;
-    }
-    else {
-      setErrors([]);
-      setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
-      let discoverable = await Bluetooth.checkBTDiscoverable();
+    if(servicesEnabled) {
+      const discoverable = await requestMakeDiscoverable();
       if(discoverable) {
+        setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
         await Bluetooth.scanForDevices();
       }
-      else {
-        discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
-        discoverable && (await Bluetooth.scanForDevices());
-      }
-      dispatch(setLockable(true));
     }
+    dispatch(setLockable(true));
   }
 
   return (

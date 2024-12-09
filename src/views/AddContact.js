@@ -15,7 +15,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
-import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
+import { enableServicesForBluetoothScan, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -56,23 +56,10 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    const btEnabled = await requestEnableBluetooth();
-    if(!btEnabled) {
-      dispatch(setLockable(true));
-      return;
-    }
-    
-    const locationEnabled = await requestEnableLocation();
-    if (!locationEnabled) {
-      dispatch(setLockable(true));
-      return;
-    }
-    else {
-      let discoverable = await Bluetooth.checkBTDiscoverable();
-      if(!discoverable) {
-        discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
-      }
+    const servicesEnabled = await enableServicesForBluetoothScan();
 
+    if(servicesEnabled) {
+      let discoverable = await requestMakeDiscoverable();
       discoverable &&
       navigation.navigate("BTDeviceList");
     }
