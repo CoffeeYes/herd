@@ -122,9 +122,6 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
       var errorOccurred : Boolean = false;
-      if(!HerdBackgroundService.running) {
-        return;
-      }
       when(action) {
         BluetoothAdapter.ACTION_STATE_CHANGED -> {
           val state = intent.getIntExtra(
@@ -146,7 +143,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           }
         }
       }
-      if(errorOccurred) {
+      if(errorOccurred && HerdBackgroundService.running) {
         if(notificationIsPending(errorNotificationID)) {
           service.sendNotification(
             errorNotificationTitle,
@@ -161,10 +158,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           )
         }
         service.stopRunning();
-        Log.i(TAG,"service running : ${HerdBackgroundService.running}")
-        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit("bluetoothOrLocationStateChange",errorNotificationType);
       }
+      reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+      .emit("bluetoothOrLocationStateChange",errorNotificationType);
     }
   }
 
@@ -245,10 +241,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
       val messageIntentFilter = IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED");
       messageIntentFilter.addAction("com.herd.REMOVE_MESSAGES_FROM_QUEUE");
-      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
       context.registerReceiver(messageReceiver,messageIntentFilter);
-      context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }
@@ -372,5 +365,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun isRunning(promise : Promise) {
     promise.resolve(HerdBackgroundService.running);
+  }
+
+  init {
+    val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+    bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
+    context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
   }
 }

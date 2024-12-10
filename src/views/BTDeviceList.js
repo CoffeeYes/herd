@@ -4,6 +4,7 @@ import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity,
   NativeEventEmitter } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 
 import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
@@ -11,7 +12,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
-import { enableServicesForBluetoothScan, requestEnableBluetooth, requestEnableLocation, requestMakeDiscoverable } from '../common';
+import { enableServicesForBluetoothScan, requestMakeDiscoverable } from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
@@ -38,6 +39,7 @@ const BTDeviceList = ({ navigation }) => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
+    const serviceEventEmitter = new NativeEventEmitter(ServiceInterface);
     const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
       updateDeviceList(device);
     });
@@ -49,6 +51,14 @@ const BTDeviceList = ({ navigation }) => {
       else if (state === "DISCOVERY_FINISHED") {
         setScanning(false);
         setDeviceList(deviceRef.current.filter(device => device.foundAgain))
+      }
+    })
+
+
+    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+      if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
+        Bluetooth.cancelScanForDevices();
+        setScanning(false);
       }
     })
 
@@ -65,6 +75,7 @@ const BTDeviceList = ({ navigation }) => {
     return () => {
       bluetoothListener.remove();
       scanStateChangeListener.remove();
+      bluetoothAndLocationStateListener.remove();
     }
   },[])
 
