@@ -17,13 +17,13 @@ import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [scanning, setScanning] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
   const [deviceList, setDeviceList, deviceRef] = useStateAndRef([],[]);
+  const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
 
   const updateDeviceList = newDevice => {
     const existingDevice = deviceRef.current.findIndex(existingDevice => existingDevice.macAddress === newDevice.macAddress);
@@ -49,6 +49,7 @@ const BTDeviceList = ({ navigation }) => {
         setScanning(true);
       }
       else if (state === "DISCOVERY_FINISHED") {
+        console.log("discovery finished")
         setScanning(false);
         setDeviceList(deviceRef.current.filter(device => device.foundAgain))
       }
@@ -57,6 +58,22 @@ const BTDeviceList = ({ navigation }) => {
 
     const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
       if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
+        console.log(scanningRef.current)
+        if(scanningRef.current) {
+          if(state === "ADAPTER_TURNED_OFF") {
+            setErrors([{
+              type : "bluetooth_not_enabled",
+              text : "Bluetooth was turned off"
+            }])
+          }
+          else if(state === "LOCATION_DISABLED") {
+            setErrors([{
+              type : "location_not_enabled",
+              text : "Location was turned off"
+            }])
+          }
+        }
+
         Bluetooth.cancelScanForDevices();
         setScanning(false);
       }
@@ -92,6 +109,7 @@ const BTDeviceList = ({ navigation }) => {
   }
 
   const restartScan = async () => {
+    setErrors([]);
     dispatch(setLockable(false))
 
     const servicesEnabled = await enableServicesForBluetoothScan();

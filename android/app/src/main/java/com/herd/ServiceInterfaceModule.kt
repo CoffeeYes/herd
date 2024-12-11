@@ -143,24 +143,26 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
           }
         }
       }
-      if(errorOccurred && HerdBackgroundService.running) {
-        if(notificationIsPending(errorNotificationID)) {
-          service.sendNotification(
-            errorNotificationTitle,
-            errorNotificationText,
-            errorNotificationID
-          )
+      if(errorOccurred) {
+        if(HerdBackgroundService.running) {
+          if(notificationIsPending(errorNotificationID)) {
+            service.sendNotification(
+              errorNotificationTitle,
+              errorNotificationText,
+              errorNotificationID
+            )
+          }
+          else {
+            errorNotificationID = service.sendNotification(
+              errorNotificationTitle,
+              errorNotificationText
+            )
+          }
+          service.stopRunning();
         }
-        else {
-          errorNotificationID = service.sendNotification(
-            errorNotificationTitle,
-            errorNotificationText
-          )
-        }
-        service.stopRunning();
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit("bluetoothOrLocationStateChange",errorNotificationType);
       }
-      reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-      .emit("bluetoothOrLocationStateChange",errorNotificationType);
     }
   }
 
