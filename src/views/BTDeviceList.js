@@ -44,21 +44,22 @@ const BTDeviceList = ({ navigation }) => {
       updateDeviceList(device);
     });
 
-    const scanStateChangeListener = eventEmitter.addListener("BTStateChange", state => {
+    const scanStateChangeListener = eventEmitter.addListener("BTStateChange", async state => {
       if(state === "DISCOVERY_STARTED") {
         setScanning(true);
       }
       else if (state === "DISCOVERY_FINISHED") {
-        console.log("discovery finished")
-        setScanning(false);
-        setDeviceList(deviceRef.current.filter(device => device.foundAgain))
+        const servicesEnabled = await Bluetooth.checkBTEnabled() && await Bluetooth.checkLocationEnabled();
+        if(servicesEnabled) {
+          setScanning(false);
+          setDeviceList(deviceRef.current.filter(device => device.foundAgain))
+        }
       }
     })
 
 
     const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
       if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
-        console.log(scanningRef.current)
         if(scanningRef.current) {
           if(state === "ADAPTER_TURNED_OFF") {
             setErrors([{

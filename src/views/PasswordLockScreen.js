@@ -143,6 +143,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       secureTextEntry
       style={{...styles.input, fontSize : customStyle.scaledUIFontSize, ...inputWidth}}
       onChangeText={setPassword}
+      onSubmitEditing={checkPassword}
       value={password}/>
 
       <View style={styles.buttonContainer}>
