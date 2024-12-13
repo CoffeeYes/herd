@@ -50,13 +50,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
     private val BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE : Int = 2;
-    private val LOCATION_ENABLED_REQUEST_CODE : Int = 4;
     private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
-    var locationEnabledPromise : Promise? = null;
     var navigateToSettingsPromise : Promise? = null;
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -101,12 +99,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
         }
 
-        if(requestCode == LOCATION_ENABLED_REQUEST_CODE) {
-          val granted = resultCode === PackageManager.PERMISSION_GRANTED;
-          Log.i(TAG,"location enabled resultCode : $resultCode, granted : $granted")
-          locationEnabledPromise?.resolve(granted)
-        }
-
         if(requestCode == NAVIGATE_TO_SETTINGS_REQUEST_CODE) {
           Log.i(TAG,"Navigate to settings request code");
           navigateToSettingsPromise?.resolve(true);
@@ -114,7 +106,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         bluetoothEnabledPromise = null;
-        locationEnabledPromise = null;
       }
     }
 
@@ -346,19 +337,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun checkLocationEnabled(promise : Promise) {
       val lm = getReactApplicationContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager;
       promise.resolve(lm.isLocationEnabled())
-    }
-
-    @ReactMethod
-    fun requestLocationEnable(promise : Promise) {
-      val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
-      if(activity !== null) {
-        activity.startActivityForResult(intent,LOCATION_ENABLED_REQUEST_CODE);
-        locationEnabledPromise = promise
-      }
-      else {
-        promise.reject("Activity is NULL");
-      }
     }
 
     private var connectionThread : BTConnectionThread? = null;

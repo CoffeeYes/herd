@@ -41,7 +41,7 @@ const requestEnableLocation = async () => {
       "Location is required to run in the background, enable it now?",
       [
         {text : "No"},
-        {text : "Yes", onPress : async () => locationEnabled = await Bluetooth.requestLocationEnable()}
+        {text : "Yes", onPress : async () => PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)}
       ]
     )
   }
