@@ -160,7 +160,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         text="Submit"
         buttonStyle={{...styles.button, marginLeft : 10}}
         disabled={password.trim().length == 0}
-        onPress={checkPassword}/>
+        onPress={() => isFocused && checkPassword()}/>
 
       </View>
     </FullScreenSplash>

@@ -190,7 +190,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if(!isDiscoverable) {
           val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
           if(adapter !== null) {
-            adapter?.setName(adapter.getName().replace("_HERD",""));
+            adapter.setName(adapter.getName().replace("_HERD",""));
           }
         }
       }
@@ -234,10 +234,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             adapter.cancelDiscovery();
           }
           val originalAdapterName = bluetoothManager.getAdapter().getName();
-          adapter?.setName(originalAdapterName + "_HERD");
+          adapter.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
-            adapter?.setName(adapter.getName().replace("_HERD",""));
+            adapter.setName(adapter.getName().replace("_HERD",""));
             promise.reject("Device Discovery could not be started")
           }
           else {
