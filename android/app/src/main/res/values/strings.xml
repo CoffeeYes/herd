@@ -25,4 +25,11 @@
     <string name="BTConnectionUUID">
       acc99392-7f38-11eb-9439-0242ac130002
     </string>
+
+    <string name="serviceChannelID">
+      HerdServiceChannel
+    </string>
+    <string name="messageChannelID">
+      HerdMessageChannel
+    </string>
 </resources>

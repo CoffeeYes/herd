@@ -14,6 +14,11 @@ import android.util.Log;
 import com.facebook.react.modules.core.PermissionListener;
 import com.facebook.react.modules.core.PermissionAwareActivity;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+
+import java.util.List;
+
 public class MainActivity extends ReactActivity implements PermissionAwareActivity {
 
   private static final String TAG = "HerdMainActivity";
@@ -64,6 +69,23 @@ public class MainActivity extends ReactActivity implements PermissionAwareActivi
     super.onCreate(savedInstanceBundle);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
     WindowManager.LayoutParams.FLAG_SECURE);
+
+    NotificationChannel serviceChannel = new NotificationChannel(
+      getString(R.string.serviceChannelID),
+      "Background Service Notification",
+      NotificationManager.IMPORTANCE_DEFAULT
+    );
+    serviceChannel.setDescription("Herd Background Service");
+
+    NotificationChannel messageChannel = new NotificationChannel(
+      getString(R.string.messageChannelID),
+      "New Message Notifications",
+      NotificationManager.IMPORTANCE_DEFAULT
+    );
+    serviceChannel.setDescription("Herd Messages");
+
+    NotificationManager notificationManager = getSystemService(NotificationManager.class);
+    notificationManager.createNotificationChannels(List.of(serviceChannel,messageChannel));
   }
 
   @Override

@@ -84,8 +84,6 @@ class HerdBackgroundService : Service() {
   private lateinit var serviceUUID : UUID;
   private lateinit var parcelServiceUUID : ParcelUuid;
 
-  private final val MESSAGE_CHANNEL_ID = "HerdMessageChannel";
-
   @Volatile
   private var allowBleScan : Boolean = true;
 
@@ -106,17 +104,6 @@ class HerdBackgroundService : Service() {
       stopForeground(true);
     }
     running = false;
-  }
-
-  private fun initialiseNotificationChannel(
-    channelID : String,
-    channelName : String,
-    channelDescription : String,
-    channelImportance : Int,
-  ) : NotificationChannel {
-    val serviceChannel = NotificationChannel(channelID, channelName, channelImportance);
-    serviceChannel.description = channelDescription;
-    return serviceChannel;
   }
 
   override fun onCreate() {
@@ -143,28 +130,8 @@ class HerdBackgroundService : Service() {
             PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
-        val SERVICE_CHANNEL_ID = "HerdServiceChannel"
-        val serviceChannel = initialiseNotificationChannel(
-          SERVICE_CHANNEL_ID,
-          "Herd Service Channel",
-          "Herd Background Service",
-          NotificationManager.IMPORTANCE_DEFAULT
-        )
-
-        val msgChannel = initialiseNotificationChannel(
-          MESSAGE_CHANNEL_ID,
-          "Herd Message Channel",
-          "Herd Messages",
-          NotificationManager.IMPORTANCE_DEFAULT
-        )
-
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannels(mutableListOf(serviceChannel,msgChannel))
-
         //create ongoing notification visible as long as the service is running
-        val notification : Notification = Notification.Builder(this,SERVICE_CHANNEL_ID)
+        val notification : Notification = Notification.Builder(this,getString(R.string.serviceChannelID))
         .setOngoing(true)
         .setContentTitle("Herd Background Service")
         .setContentText("Herd is Running in the background in order to transfer messages")
@@ -192,7 +159,7 @@ class HerdBackgroundService : Service() {
     }
 
     //create notification
-    val notification : Notification = Notification.Builder(this,MESSAGE_CHANNEL_ID)
+    val notification : Notification = Notification.Builder(this,getString(R.string.messageChannelID))
     .setOngoing(false)
     .setContentTitle(title)
     .setContentText(text)
