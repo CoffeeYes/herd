@@ -159,22 +159,20 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
     
-    private var isDiscoverable = false;
     private val BTScanModeReceiver = object : BroadcastReceiver() {
       override fun onReceive(context : Context, intent : Intent) {
         val action : String? = intent.action;
         Log.d(TAG,"BTScanModeReceiver received action $action");
         val scanMode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE,0);
+        var isDiscoverable = false;
         if(scanMode != 0) {
           var scanModeString = "Unknown scan mode";
           when(scanMode) {
             BluetoothAdapter.SCAN_MODE_NONE -> {
               scanModeString = "SCAN_MODE_NONE";
-              isDiscoverable = false;
             } 
             BluetoothAdapter.SCAN_MODE_CONNECTABLE -> {
               scanModeString = "SCAN_MODE_CONNECTABLE";
-              isDiscoverable = false;
             } 
             BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE -> {
               scanModeString = "SCAN_MODE_CONNECTABLE_DISCOVERABLE";
@@ -198,7 +196,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun checkBTDiscoverable(promise : Promise) {
-      promise.resolve(isDiscoverable);
+      val bluetoothAdapter = bluetoothManager.getAdapter();
+      val scanMode = bluetoothAdapter?.getScanMode();
+      promise.resolve(scanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE);
     }
 
     private val messageHandler = object : Handler(Looper.getMainLooper()) {
