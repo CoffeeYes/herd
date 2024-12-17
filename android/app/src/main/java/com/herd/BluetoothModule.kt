@@ -49,13 +49,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val MESSAGE_TOAST: Int = 2
 
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
-    private val BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE : Int = 2;
-    private val NAVIGATE_TO_SETTINGS_REQUEST_CODE : Int = 7;
+    private val BLUETOOTH_DISCOVERABLE_REQUEST_CODE : Int = 2;
 
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
-    var navigateToSettingsPromise : Promise? = null;
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
@@ -80,32 +78,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
         //request bluetooth
         if(requestCode == BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE) {
-          if(resultCode == Activity.RESULT_OK) {
-            bluetoothEnabledPromise?.resolve(true);
-          }
-          else {
-            bluetoothEnabledPromise?.resolve(false);
-          }
+          bluetoothEnabledPromise?.resolve(resultCode == Activity.RESULT_OK);
+          bluetoothEnabledPromise = null;
         }
 
         //request make discoverable
-        if(requestCode == BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE) {
+        if(requestCode == BLUETOOTH_DISCOVERABLE_REQUEST_CODE) {
           //result code is equal to the requested duration when "yes", RESULT_CANCELLED when "no"
-          if(resultCode == bluetoothDiscoverableDuration) {
-            bluetoothDiscoverablePromise?.resolve(true);
-          }
-          else {
-            bluetoothDiscoverablePromise?.resolve(false)
-          }
+          bluetoothDiscoverablePromise?.resolve(resultCode == bluetoothDiscoverableDuration);
+          bluetoothDiscoverablePromise = null;
         }
-
-        if(requestCode == NAVIGATE_TO_SETTINGS_REQUEST_CODE) {
-          Log.i(TAG,"Navigate to settings request code");
-          navigateToSettingsPromise?.resolve(true);
-          navigateToSettingsPromise = null;
-        }
-
-        bluetoothEnabledPromise = null;
       }
     }
 
@@ -280,13 +262,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun checkForBTAdapter(promise : Promise) {
       val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-
-      if(adapter === null) {
-        promise.resolve(false);
-      }
-      else {
-        promise.resolve(true);
-      }
+      promise.resolve(adapter !== null);
     }
 
     @ReactMethod
@@ -298,12 +274,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       else {
         if(!adapter.isEnabled()) {
           val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-          val REQUEST_ENABLE_BT = 1
           val activity : Activity? = getReactApplicationContext().getCurrentActivity();
           if(activity !== null) {
             try {
               bluetoothEnabledPromise = promise;
-              activity.startActivityForResult(enableBTIntent, REQUEST_ENABLE_BT);
+              activity.startActivityForResult(enableBTIntent, BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE);
             }
             catch(e : Exception) {
               promise.reject("Error starting BT Enable Activity",e)
@@ -329,7 +304,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       else {
         bluetoothDiscoverablePromise = promise;
-        activity.startActivityForResult(discoverableIntent,BLUETOOTH_DISCOVERABLE_PERMISSION_REQUEST_CODE)
+        activity.startActivityForResult(discoverableIntent,BLUETOOTH_DISCOVERABLE_REQUEST_CODE);
       }
     }
 
