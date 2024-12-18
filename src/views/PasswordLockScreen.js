@@ -129,6 +129,10 @@ const PasswordLockScreen = ({ navigation, route }) => {
     )
   }
 
+  const handleSubmit = () => {
+    isFocused && checkPassword();
+  }
+
   return (
     <FullScreenSplash containerStyle={styles.container}>
       <Text style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error}</Text>
@@ -143,7 +147,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       secureTextEntry
       style={{...styles.input, fontSize : customStyle.scaledUIFontSize, ...inputWidth}}
       onChangeText={setPassword}
-      onSubmitEditing={checkPassword}
+      onSubmitEditing={handleSubmit}
       blurOnSubmit={false}
       value={password}/>
 
@@ -160,7 +164,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         text="Submit"
         buttonStyle={{...styles.button, marginLeft : 10}}
         disabled={password.trim().length == 0}
-        onPress={() => isFocused && checkPassword()}/>
+        onPress={handleSubmit}/>
 
       </View>
     </FullScreenSplash>

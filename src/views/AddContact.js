@@ -23,6 +23,7 @@ const AddContact = ({ navigation }) => {
   const [showQRCode, setShowQRCode] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
+  const [requestingPermissions, setRequestingPermissions] = useState(false);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const iconSize = useScreenAdjustedSize(0.35,0.075);
@@ -44,6 +45,7 @@ const AddContact = ({ navigation }) => {
   const requestBTPermissions = async () => {
     setBluetoothError("");
     setRequestedPermissions([]);
+    setRequestingPermissions(true);
     //disable lockability so that lockscreen doesn't crop up when a modal is shown
     dispatch(setLockable(false));
 
@@ -53,6 +55,7 @@ const AddContact = ({ navigation }) => {
       setRequestedPermissions(missingPermissions);
       setShowPermissionModal(true);
       dispatch(setLockable(true));
+      setRequestingPermissions(false);
       return;
     }
 
@@ -64,6 +67,7 @@ const AddContact = ({ navigation }) => {
       navigation.navigate("BTDeviceList");
     }
     dispatch(setLockable(true));
+    setRequestingPermissions(false);
   }
 
   const permissionModalDescription = `Herd requires permissions in order to connect \
@@ -102,6 +106,7 @@ with other phones using bluetooth.`;
 
           <Card
           onPress={() => navigate("editContact")}
+          disabled={requestingPermissions}
           cardStyle={styles.rightCard}
           icon="import-export"
           iconSize={iconSize}
@@ -114,6 +119,7 @@ with other phones using bluetooth.`;
           <Card
           onPress={() => !navigating.current && !showPermissionModal && setShowQRCode(true)}
           cardStyle={styles.leftCard}
+          disabled={requestingPermissions}
           icon="qr-code-2"
           iconSize={iconSize}
           text="Show My QR Code"/>
@@ -121,6 +127,7 @@ with other phones using bluetooth.`;
           <Card
           onPress={() => navigate("QRScanner")}
           cardStyle={styles.rightCard}
+          disabled={requestingPermissions}
           icon="qr-code-scanner"
           iconSize={iconSize}
           text="Scan QR Code"/>
