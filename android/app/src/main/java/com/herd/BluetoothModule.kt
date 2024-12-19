@@ -392,7 +392,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       fun cancel() {
         try {
           clientSocket?.close();
-        Log.d(TAG,"Bluetooth Client Thread was cancelled")
+          Log.d(TAG,"Bluetooth Client Thread was cancelled")
         }
         catch(e : Exception) {
           Log.e(TAG, "Could not close client socket when cancelling BT client thread")
@@ -408,9 +408,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       override fun run() {
           Log.d(TAG, "Bluetooth Connection Thread Started")
 
-          context.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTConnectionStateChange","Connected")
-
           var numBytes: Int;
           // Keep listening to the InputStream until an exception occurs.
           while (shouldRun) {
@@ -423,12 +420,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 this.cancel();
               }
               else {
+                context.getJSModule(RCTDeviceEventEmitter::class.java)
+                .emit("BTConnectionStateChange","Connected")
                 // Read from the InputStream.
                 numBytes = try {
                     inputStream.read(buffer);
                 } catch (e: Exception) {
-                    Log.d(TAG, "Input stream was disconnected", e)
-                    break
+                    Log.d(TAG, "Input stream was disconnected", e);
+
+                    context.getJSModule(RCTDeviceEventEmitter::class.java)
+                    .emit("BTConnectionStateChange","Disconnected");
+
+                    break;
                 }
 
                 //get string from byte array
@@ -463,6 +466,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
         catch(e : Exception) {
           Log.e(TAG, "could not close socket in BT connection thread",e)
+        }
+        finally {
+          context.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit("BTConnectionStateChange","Disconnected")
         }
       }
     }
