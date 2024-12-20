@@ -60,38 +60,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       // https://facebook.github.io/react-native/docs/native-modules-android.html#the-toast-module
       val constants : Map<String, Any> = mapOf(
           "algorithm" to mapOf(
-              "RSA" to "RSA",
-              "AES" to "AES",
-              "AES_128" to "AES_128",
-              "AES_256" to "AES_256",
-              "ARC4" to "ARC4",
-              "BLOWFISH" to "BLOWFISH",
-              "ChaCha20" to "ChaCha20",
-              "DES" to "DES",
-              "DESede" to "DESede"
+              "RSA" to "RSA"
           ),
           "blockMode" to mapOf(
-              "CBC" to "CBC",
-              "CFB" to "CFB",
-              "CTR" to "CTR",
-              "CTS" to "CTS",
-              "ECB" to "ECB",
-              "OFB" to "OFB",
-              "OFB" to "OFB",
-              "GCM" to "GCM",
-              "Poly1305" to "Poly1305",
-              "NONE" to "NONE"
+              "ECB" to "ECB"
           ),
           "padding" to mapOf(
-              "NO_PADDING" to "NoPadding",
-              "ISO10126Padding" to "ISO10126Padding",
-              "PKCS5Padding" to "PKCS5Padding",
-              "OAEPPadding" to "OAEPPadding",
-              "OAEP_SHA1_MGF1Padding" to "OAEPwithSHA-1andMGF1Padding",
-              "OAEP_SHA256_MGF1Padding" to "OAEPwithSHA-256andMGF1Padding",
-              "OAEP_SHA224_MGF1Padding" to "OAEPwithSHA-224andMGF1Padding",
-              "OAEP_SHA384_MGF1Padding" to "OAEPwithSHA-384andMGF1Padding",
-              "OAEP_SHA512_MGF1Padding" to "OAEPwithSHA-512andMGF1Padding"
+              "OAEP_SHA256_MGF1Padding" to "OAEPwithSHA-256andMGF1Padding"
           )
       )
 

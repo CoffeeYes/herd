@@ -130,6 +130,7 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
       }
       Log.i(TAG,"All Bluetooth Scan Permissions granted : $allBluetoothScanPermissionsGranted")
       bluetoothScanPermissionPromise?.resolve(allBluetoothScanPermissionsGranted);
+      bluetoothScanPermissionPromise = null;
     }
 
     if(requestCode == POST_NOTIFICATIONS_REQUEST_CODE) {
@@ -143,7 +144,6 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
       postNotificationsPromise = null;
     }
     
-    bluetoothScanPermissionPromise = null;
     return true;
   }
 
