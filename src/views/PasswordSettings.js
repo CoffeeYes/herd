@@ -39,6 +39,7 @@ const PasswordSettings = () => {
     let errors = [];
     if(password.trim() === "" || confirmation.trim() === "") {
       errors.push({type : "empty_field", text : "Fields cannot be empty"})
+      return errors;
     }
     if(whitespace.test(password) || whitespace.test(confirmation)) {
       errors.push({type : "contains_spaces", text : "Passwords cannot contain spaces"})

@@ -109,7 +109,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           customStyle={customStyle}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
-          onSubmitEditing={submit}
+          onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
           value={secondaryInputText}/>
 
           <View style={{flexDirection : "row"}}>
