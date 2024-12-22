@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ScrollView, Alert, TextInput, Text, View } from 'react-native';
 import { palette } from '../assets/palette';
@@ -10,16 +10,20 @@ import { setPassword } from '../redux/actions/userActions';
 import Header from './Header';
 import PasswordCreationBox from './PasswordCreationBox';
 import FlashTextButton from './FlashTextButton';
+import CustomModal from './CustomModal';
 
 import Crypto from '../nativeWrapper/Crypto';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomButton from './CustomButton';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
   const [loginPasswordErrors, setLoginPasswordErrors] = useState([]);
   const [erasurePasswordErrors, setErasurePasswordErrors] = useState([]);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [passwordToReset, setPasswordToReset] = useState("");
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
@@ -30,6 +34,7 @@ const PasswordSettings = () => {
 
   const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasurePasswordHash = useSelector(state => state.userReducer.erasurePasswordHash);
+  const locked = useSelector(state => state.appStateReducer.locked);
 
   const hasLoginPassword = loginPasswordHash?.length > 0;
   const hasErasurePassword = erasurePasswordHash?.length > 0;
@@ -103,27 +108,14 @@ const PasswordSettings = () => {
   }
 
   const resetPassword = passwordName => {
-    Alert.alert(
-      'Are you sure you want to reset this password?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Confirm',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            deletePassword(passwordName);
-            dispatch(setPassword(passwordName,""))
-            if(passwordName == "login") {
-              deletePassword("erasure")
-              dispatch(setPassword("erasure",""));
-            }
-          },
-        },
-      ]
-    );
+    deletePassword(passwordName);
+    dispatch(setPassword(passwordName,""))
+    if(passwordName == "login") {
+      deletePassword("erasure")
+      dispatch(setPassword("erasure",""));
+    }
+    setPasswordToReset("");
+    setShowResetModal(false);
   }
 
   const mainPasswordDescription = `You will be asked to enter this password when opening the app \
@@ -154,7 +146,10 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmLoginPassword,
           setLoginPasswordErrors
         )}
-        reset={() => resetPassword("login")}
+        reset={() => {
+          setPasswordToReset("login");
+          setShowResetModal(true);
+        }}
         disableReset={!hasLoginPassword}
         />
 
@@ -192,9 +187,28 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmErasurePassword,
           setErasurePasswordErrors
         )}
-        reset={() => resetPassword("erasure")}
+        reset={() => {
+          setPasswordToReset("erasure");
+          setShowResetModal(true);
+        }}
         disableReset={!hasErasurePassword}
         />
+
+        <CustomModal
+        disableOnPress
+        visible={showResetModal}>
+          <View style={styles.modalContentContainer}>
+          <Text>Are you sure you want to reset this password?</Text>
+          <View style={{flexDirection : "row", marginTop : 10}}>
+            <CustomButton
+            onPress={() => resetPassword(passwordToReset)}
+            text="Confirm"/>
+            <CustomButton
+            text="Cancel"
+            onPress={() => setShowResetModal(false)}/>
+          </View>
+          </View>
+        </CustomModal>
 
       </ScrollView>
     </NavigationWarningWrapper>
@@ -226,6 +240,12 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     elevation : 2
+  },
+  modalContentContainer : {
+    backgroundColor : palette.white,
+    borderRadius : 5,
+    padding : 20,
+    alignItems : "center"
   },
 }
 
