@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollView, Alert, TextInput, Text, View } from 'react-native';
+import { ScrollView, TextInput, Text, View } from 'react-native';
 import { palette } from '../assets/palette';
 
 import { getPasswordHash, updatePassword, deletePassword } from '../realm/passwordRealm';
@@ -17,6 +17,7 @@ import NavigationWarningWrapper from './NavigationWarningWrapper';
 import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CustomButton from './CustomButton';
+import ConfirmationModal from './ConfirmationModal';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
@@ -34,7 +35,6 @@ const PasswordSettings = () => {
 
   const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasurePasswordHash = useSelector(state => state.userReducer.erasurePasswordHash);
-  const locked = useSelector(state => state.appStateReducer.locked);
 
   const hasLoginPassword = loginPasswordHash?.length > 0;
   const hasErasurePassword = erasurePasswordHash?.length > 0;
@@ -192,6 +192,13 @@ meaning all contacts who have previously added you will need to add you again.`
           setShowResetModal(true);
         }}
         disableReset={!hasErasurePassword}
+        />
+
+        <ConfirmationModal
+        visible={showResetModal}
+        onConfirm={() => resetPassword(passwordToReset)}
+        onCancel={() => setShowResetModal(false)}
+        titleText="Are you sure you want to reset this password?"
         />
 
         <CustomModal
