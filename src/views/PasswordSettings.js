@@ -201,22 +201,6 @@ meaning all contacts who have previously added you will need to add you again.`
         titleText="Are you sure you want to reset this password?"
         />
 
-        <CustomModal
-        disableOnPress
-        visible={showResetModal}>
-          <View style={styles.modalContentContainer}>
-          <Text>Are you sure you want to reset this password?</Text>
-          <View style={{flexDirection : "row", marginTop : 10}}>
-            <CustomButton
-            onPress={() => resetPassword(passwordToReset)}
-            text="Confirm"/>
-            <CustomButton
-            text="Cancel"
-            onPress={() => setShowResetModal(false)}/>
-          </View>
-          </View>
-        </CustomModal>
-
       </ScrollView>
     </NavigationWarningWrapper>
   )
@@ -247,12 +231,6 @@ const styles = {
     alignItems : "center",
     justifyContent : "center",
     elevation : 2
-  },
-  modalContentContainer : {
-    backgroundColor : palette.white,
-    borderRadius : 5,
-    padding : 20,
-    alignItems : "center"
   },
 }
 

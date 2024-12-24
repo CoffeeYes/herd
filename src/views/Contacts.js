@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollView, Alert} from 'react-native';
-import Header from './Header';
-import ListItem from './ListItem';
+import { ScrollView } from 'react-native';
 import { deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
 import { CommonActions } from '@react-navigation/native';
 
-import { deleteContacts } from '../redux/actions/contactActions';
+import Header from './Header';
+import ListItem from './ListItem';
+import ConfirmationModal from './ConfirmationModal';
 
+import { deleteContacts } from '../redux/actions/contactActions';
 
 const Contacts = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -20,26 +21,7 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts);
   const [highlightedContacts, setHighlightedContacts ] = useState([]);
 
-  const onPressDelete = () => {
-    Alert.alert(
-      'Are you sure ?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => setHighlightedContacts([]) },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: () => {
-            dispatch(deleteContacts(highlightedContacts));
-            deleteContactsFromRealm(contacts.filter(contact => highlightedContacts.includes(contact._id)));
-            setHighlightedContacts([]);
-          },
-        },
-      ]
-    );
-  }
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const navigateToNewChat = id => {
     navigation.dispatch(
@@ -86,7 +68,7 @@ const Contacts = ({ route, navigation }) => {
       <Header
       title={route.params.type === "newChat" ? "Start a new Chat" : "Contacts"}
       {...(!route.params.disableAddNew && {rightButtonIcon : highlightedContacts.length > 0 ? "delete" : "add"})}
-      rightButtonOnClick={() => highlightedContacts.length > 0 ? onPressDelete() : navigation.navigate("addContact")}
+      rightButtonOnClick={() => highlightedContacts.length > 0 ? setShowConfirmationModal(true) : navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>
 
       <ScrollView>
@@ -104,6 +86,18 @@ const Contacts = ({ route, navigation }) => {
           />
         )}
       </ScrollView>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={() => {
+        dispatch(deleteContacts(highlightedContacts));
+        deleteContactsFromRealm(contacts.filter(contact => highlightedContacts.includes(contact._id)));
+        setHighlightedContacts([]);
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      titleText="Are you sure you want to delete these contacts?"
+      />
     </>
   )
 }

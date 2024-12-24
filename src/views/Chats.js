@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ScrollView, Alert } from 'react-native';
+import { ScrollView } from 'react-native';
 import Header from './Header';
 import ListItem from './ListItem';
 import { deleteChats as deleteChatsFromRealm } from '../realm/chatRealm';
@@ -10,6 +10,7 @@ import { deleteChats as deleteChatsFromState } from '../redux/actions/chatAction
 import { palette } from '../assets/palette';
 
 import { timestampToText, toHsv } from '../helper';
+import ConfirmationModal from './ConfirmationModal';
 
 const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -17,6 +18,7 @@ const Chats = ({ navigation }) => {
   const chats = useSelector(state => state.chatReducer.chats);
   const customStyle = useSelector(state => state.chatReducer.styles);
   const [highlightedChats, setHighlightedChats ] = useState([]);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const canStartNewChat = useSelector(state => state.contactReducer.contacts)
   .filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
@@ -30,28 +32,6 @@ const Chats = ({ navigation }) => {
       else {
         return style
       }
-  }
-
-  const deleteChats = () => {
-    Alert.alert(
-      'Are you sure ?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: () => {
-            const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id)?.key);
-            dispatch(deleteChatsFromState(highlightedChats));
-            deleteChatsFromRealm(chatsToDelete);
-            setHighlightedChats([]);
-          },
-        },
-      ]
-    );
   }
 
   const handleLongPress = id => {
@@ -93,7 +73,7 @@ const Chats = ({ navigation }) => {
       rightButtonIcon={getRightIcon()}
       rightButtonOnClick={() => {
         highlightedChats.length > 0 ?
-        deleteChats()
+        setShowConfirmationModal(true)
         :
         navigation.navigate("newChat",{type : "newChat", disableAddNew : true})
       }}/>
@@ -127,6 +107,18 @@ const Chats = ({ navigation }) => {
         subText={chat.lastText.trim()}/>
       )}
       </ScrollView>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={() => {
+        const chatsToDelete = highlightedChats.map(id => chats.find(chat => chat._id === id)?.key);
+        dispatch(deleteChatsFromState(highlightedChats));
+        deleteChatsFromRealm(chatsToDelete);
+        setHighlightedChats([]);
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      titleText="Are you sure you want to delete these chats?"/>
     </>
   )
 }
