@@ -1,18 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-import { Alert } from 'react-native';
+import ConfirmationModal from './ConfirmationModal';
 
-const defaultTitle = 'Discard Changes?'
-const defaultSubtitle = 'You have unsaved changes. Are you sure to discard them and leave the screen?';
+const defaultTitle = 'You have unsaved changes. Are you sure to discard them and leave the screen?';
 
 const NavigationWarningWrapper = ({ children, checkForChanges, 
                                     confirmationText = "Discard", cancelText = "Stay",
-                                    alertTitle = defaultTitle, alertSubtitle = defaultSubtitle, onConfirm,
+                                    alertTitle = defaultTitle, onConfirm,
                                     onCancel = () => {}
                                   }) => {
 
   const navigation = useNavigation();
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const eventRef = useRef();
 
   const defaultConfirmation = e => {
     navigation.dispatch(e.data.action)
@@ -26,20 +27,8 @@ const NavigationWarningWrapper = ({ children, checkForChanges,
       e.preventDefault();
 
       if(await checkForChanges?.()) {
-        Alert.alert(
-          alertTitle,
-          alertSubtitle,
-          [
-            {
-              text: confirmationText,
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () =>  onConfirm ? onConfirm(e) : defaultConfirmation(e),
-            },
-            { text: cancelText, style: 'cancel', onPress: () => onCancel(e) },
-          ]
-        );
+        setShowConfirmationModal(true);
+        eventRef.current = e;
       }
       else {
         navigation.dispatch(e.data.action);
@@ -52,6 +41,19 @@ const NavigationWarningWrapper = ({ children, checkForChanges,
   return (
     <>
       {children}
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={() => {
+        setShowConfirmationModal(false);
+        onConfirm ? onConfirm(eventRef.current) : defaultConfirmation(eventRef.current)
+      }}
+      onCancel={() => {
+        setShowConfirmationModal(false);
+        onCancel()
+      }}
+      confirmText={confirmationText}
+      cancelText={cancelText}
+      titleText={alertTitle}/>
     </>
   )
 }
