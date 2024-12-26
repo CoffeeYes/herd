@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ScrollView, View, TouchableOpacity, Alert } from 'react-native';
+import { ScrollView, View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
@@ -12,6 +12,7 @@ import ChatBubble from './ChatBubble';
 import Dropdown from './Dropdown';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
+import ConfirmationModal from './ConfirmationModal';
 
 import ValueSlider from './ValueSlider';
 
@@ -53,6 +54,7 @@ const Customise = () => {
   const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
   const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -154,33 +156,18 @@ const Customise = () => {
     return true;
   }
 
-  const restoreDefault = async () => {
-    Alert.alert(
-      'Discard you sure you want to restore default styles?',
-      '',
-      [
-        { text: "Go Back", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Restore',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            setOverrideFontSliderValues(true);
-            setOverrideColorChoiceSliderValue(true);
-            await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
-            dispatch(setStyles(defaultChatStyles));
-            setSentBoxColor(rgbToHsv(defaultChatStyles.sentBoxColor));
-            setSentTextColor(rgbToHsv(defaultChatStyles.sentTextColor));
-            setReceivedBoxColor(rgbToHsv(defaultChatStyles.receivedBoxColor));
-            setReceivedTextColor(rgbToHsv(defaultChatStyles.receivedTextColor));
-            setUiFontSize(defaultChatStyles.uiFontSize);
-            setMessageFontSize(defaultChatStyles.messageFontSize);
-            setSynchronisedFontSize(defaultChatStyles.uiFontSize);
-          },
-        },
-      ]
-    );
+  const restoreDefaultStyles = async () => {
+    setOverrideFontSliderValues(true);
+    setOverrideColorChoiceSliderValue(true);
+    await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
+    dispatch(setStyles(defaultChatStyles));
+    setSentBoxColor(rgbToHsv(defaultChatStyles.sentBoxColor));
+    setSentTextColor(rgbToHsv(defaultChatStyles.sentTextColor));
+    setReceivedBoxColor(rgbToHsv(defaultChatStyles.receivedBoxColor));
+    setReceivedTextColor(rgbToHsv(defaultChatStyles.receivedTextColor));
+    setUiFontSize(defaultChatStyles.uiFontSize);
+    setMessageFontSize(defaultChatStyles.messageFontSize);
+    setSynchronisedFontSize(defaultChatStyles.uiFontSize);
   }
 
   const tabItems = [
@@ -405,12 +392,23 @@ const Customise = () => {
 
             <CustomButton
             text={"Restore Default"}
-            onPress={restoreDefault}
+            onPress={() => setShowConfirmationModal(true)}
             disabled={checkStylesAreEqual(customStyle,defaultChatStyles)}
             buttonStyle={{ ...styles.button, marginLeft : 10, width : "45%"}}/>
 
           </View>
       </ScrollView>
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={async () => {
+        await restoreDefaultStyles();
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      confirmText="Restore"
+      cancelText="Go Back"
+      titleText="Are you sure you want to restore default styles?"
+      />
     </NavigationWarningWrapper>
   )
 }
