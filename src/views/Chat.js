@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text, View, TextInput, ActivityIndicator, 
-         Alert, SectionList,
+         SectionList,
          KeyboardAvoidingView } from 'react-native';
 import moment from 'moment';
 import { PanGestureHandler, TouchableOpacity  } from 'react-native-gesture-handler'
@@ -31,6 +31,7 @@ import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
+import ConfirmationModal from './ConfirmationModal';
 
 const maxCharacterCount = 190;
 
@@ -62,6 +63,7 @@ const Chat = ({ route, navigation }) => {
   const [sectionContentHeight, setSectionContentHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [sectionFooterHeight, setSectionFooterHeight] = useState(0);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
   const disableChatInputRef = useRef(false);
@@ -254,67 +256,52 @@ const Chat = ({ route, navigation }) => {
     ServiceInterface.addMessageToService({...newMessage, text : newMessageEncrypted});
   }
 
-  const deleteMessages = () => {
-    Alert.alert(
-      'Are you sure you want to delete these messages?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            deleteMessagesFromRealm(highlightedMessages);
+  const deleteMessages = async () => {
+    deleteMessagesFromRealm(highlightedMessages);
 
-            const fullHighlightedMessages = flattenMessages(messages)
-            .filter(message => highlightedMessages.includes(message._id));
+    const fullHighlightedMessages = flattenMessages(messages)
+    .filter(message => highlightedMessages.includes(message._id));
 
-            const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
+    const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
 
-            //set new loading index
-            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
-            setMessageStart(messageStart + messageLoadingExtension);
+    //set new loading index
+    const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+    setMessageStart(messageStart + messageLoadingExtension);
 
-            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
+    dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
 
-            //get remaining messages
-            const updatedMessages = messages.map(section => ({
-              ...section,
-              data : section.data.filter(message => !fullHighlightedMessages.includes(message))
-            }))
-            .filter(section => section.data.length > 0);
+    //get remaining messages
+    const updatedMessages = messages.map(section => ({
+      ...section,
+      data : section.data.filter(message => !fullHighlightedMessages.includes(message))
+    }))
+    .filter(section => section.data.length > 0);
 
-            if(updatedMessages.length === 0) {
-              let doneLoading = chat?.doneLoading;
-              if(!doneLoading) {
-                doneLoading = !(await loadMoreMessages(true,messageStart + messageLoadingExtension));
-              }
-              if(doneLoading) {
-                dispatch(deleteChats([contactInfo]));
-                firstMessageIDRef.current = "";
-              }
-            }
-            else {
-              firstMessageIDRef.current = getFirstMessageID(updatedMessages);
-            }
+    if(updatedMessages.length === 0) {
+      let doneLoading = chat?.doneLoading;
+      if(!doneLoading) {
+        doneLoading = !(await loadMoreMessages(true,messageStart + messageLoadingExtension));
+      }
+      if(doneLoading) {
+        dispatch(deleteChats([contactInfo]));
+        firstMessageIDRef.current = "";
+      }
+    }
+    else {
+      firstMessageIDRef.current = getFirstMessageID(updatedMessages);
+    }
 
-            const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
-              message.to.trim() === ownPublicKey.trim()
-            )
-            .map(message => ({...message,_id : parseRealmID(message)}));
+    const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
+      message.to.trim() === ownPublicKey.trim()
+    )
+    .map(message => ({...message,_id : parseRealmID(message)}));
 
-            if(backgroundServiceRunning) {
-              await ServiceInterface.removeMessagesFromService(highlightedMessages);
-              await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
-            }
+    if(backgroundServiceRunning) {
+      await ServiceInterface.removeMessagesFromService(highlightedMessages);
+      await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
+    }
 
-            setHighlightedMessages([]);
-          },
-        },
-      ]
-    );
+    setHighlightedMessages([]);
   }
 
   const handleScroll = () => {
@@ -526,7 +513,7 @@ const Chat = ({ route, navigation }) => {
     touchStyle={{backgroundColor : palette.offprimary, paddingVertical : 10}}
     textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
-    rightButtonOnClick={() => deleteMessages()}
+    rightButtonOnClick={() => setShowConfirmationModal(true)}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {id : parseRealmID(contactInfo)})}
     preText={
@@ -640,6 +627,17 @@ const Chat = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
+
+    <ConfirmationModal
+    visible={showConfirmationModal}
+    titleText="Are you sure you want to delete these messages?"
+    confirmText="Delete"
+    onConfirm={async () => {
+      await deleteMessages();
+      setShowConfirmationModal(false);
+    }}
+    onCancel={() => setShowConfirmationModal(false)}
+    />
     </>
   )
 }
