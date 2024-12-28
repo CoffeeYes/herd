@@ -61,8 +61,6 @@ const Chat = ({ route, navigation }) => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [sectionListHeight, setSectionListHeight] = useState(0);
   const [sectionContentHeight, setSectionContentHeight] = useState(0);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const [sectionFooterHeight, setSectionFooterHeight] = useState(0);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
@@ -493,7 +491,6 @@ const Chat = ({ route, navigation }) => {
   const renderSectionFooter = ({ section: { day } }) => {
     return (
       <Text 
-      onLayout={e => setSectionFooterHeight(e.nativeEvent.layout.height)}
       style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
         {day === moment().format("DD/MM") ? "Today" : day}
       </Text>
@@ -508,7 +505,6 @@ const Chat = ({ route, navigation }) => {
   return (
     <>
     <Header
-    onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
     title={contactInfo.name}
     touchStyle={{backgroundColor : palette.offprimary, paddingVertical : 10}}
     textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
