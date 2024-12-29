@@ -12,8 +12,10 @@ import Header from './Header';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
 import PermissionModal from './PermissionModal';
+import ConfirmationModal from './ConfirmationModal';
 
 import PermissionManager from '../nativeWrapper/PermissionManager';
+import Bluetooth from '../nativeWrapper/Bluetooth';
 
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
@@ -43,6 +45,7 @@ const Settings = ({ navigation }) => {
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
@@ -108,8 +111,9 @@ const Settings = ({ navigation }) => {
         return;
       }
 
-      const locationEnabled = await requestEnableLocation();
+      const locationEnabled = await Bluetooth.checkLocationEnabled();
       if(!locationEnabled) {
+        setShowConfirmationModal(true);
         dispatch(setLockable(true));
         return;
       }
@@ -350,6 +354,18 @@ certain permissions to be allowed all the time`
         useCloseButton
         description={requestedPermissions.includes("Notifications") ? notificationModalDescription : locationModalDescription}
         instructionText={locationModalInstructionText}/>
+
+        <ConfirmationModal
+        visible={showConfirmationModal}
+        titleText="Location needs to be enabled to run the background service, enable it now?"
+        confirmText='Yes'
+        cancelText='No'
+        onConfirm={() => {
+          PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
+          setShowConfirmationModal(false);
+        }}
+        onCancel={() => setShowConfirmationModal(false)}
+        />
       </ScrollView>
     </>
   )
