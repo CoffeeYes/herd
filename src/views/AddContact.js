@@ -6,6 +6,7 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 import PermissionManager from '../nativeWrapper/PermissionManager';
 import Header from './Header';
 import Card from './Card';
+import ConfirmationModal from './ConfirmationModal';
 
 import QRCodeModal from './QRCodeModal';
 import PermissionModal from './PermissionModal';
@@ -15,7 +16,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
-import { enableServicesForBluetoothScan, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
+import { requestEnableBluetooth, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ const AddContact = ({ navigation }) => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
   const [requestingPermissions, setRequestingPermissions] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const iconSize = useScreenAdjustedSize(0.35,0.075);
@@ -59,9 +61,17 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    const servicesEnabled = await enableServicesForBluetoothScan();
+    const bluetoothEnabled = await requestEnableBluetooth();
 
-    if(servicesEnabled) {
+    const locationEnabled = await Bluetooth.checkLocationEnabled();
+
+    if(!locationEnabled) {
+      setShowConfirmationModal(true);
+      dispatch(setLockable(true))
+      return;
+    }
+
+    if(locationEnabled && bluetoothEnabled) {
       let discoverable = await requestMakeDiscoverable();
       discoverable &&
       navigation.navigate("BTDeviceList");
@@ -155,6 +165,18 @@ with other phones using bluetooth.`;
       permissions={requestedPermissions}
       description={permissionModalDescription}
       instructionText={permissionModalInstructionText}/>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      titleText="Location needs to be enabled to run the background service, enable it now?"
+      confirmText='Yes'
+      cancelText='No'
+      onConfirm={() => {
+        PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      />
     </>
   )
 }

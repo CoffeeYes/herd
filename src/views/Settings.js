@@ -37,7 +37,7 @@ import {
   deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
-import { requestEnableBluetooth, requestEnableLocation, requestPermissionsForBluetooth } from '../common';
+import { requestEnableBluetooth, requestPermissionsForBluetooth } from '../common';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
