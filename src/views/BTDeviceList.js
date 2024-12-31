@@ -9,21 +9,22 @@ import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
 import CustomButton from './CustomButton';
+import ConfirmationModal from './ConfirmationModal';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
-import { enableServicesForBluetoothScan, requestMakeDiscoverable } from '../common';
+import { requestMakeDiscoverable, requestEnableBluetooth } from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [errors, setErrors] = useState([]);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
-  const [deviceList, setDeviceList, deviceRef] = useStateAndRef([],[]);
-  const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
+  const [deviceList, setDeviceList, deviceRef] = useStateAndRef([],[]); const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
 
   const updateDeviceList = newDevice => {
     const existingDevice = deviceRef.current.findIndex(existingDevice => existingDevice.macAddress === newDevice.macAddress);
@@ -113,14 +114,25 @@ const BTDeviceList = ({ navigation }) => {
     setErrors([]);
     dispatch(setLockable(false))
 
-    const servicesEnabled = await enableServicesForBluetoothScan();
+    const bluetoothEnabled = await requestEnableBluetooth();
 
-    if(servicesEnabled) {
-      const discoverable = await requestMakeDiscoverable();
-      if(discoverable) {
-        setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
-        await Bluetooth.scanForDevices();
-      }
+    if(!bluetoothEnabled) {
+      dispatch(setLockable(true));
+      return;
+    }
+
+    const locationEnabled = await Bluetooth.checkLocationEnabled();
+
+    if(!locationEnabled) {
+      setShowConfirmationModal(true);
+      dispatch(setLockable(true))
+      return;
+    }
+
+    const discoverable = await requestMakeDiscoverable();
+    if(discoverable) {
+      setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
+      await Bluetooth.scanForDevices();
     }
     dispatch(setLockable(true));
   }
@@ -171,6 +183,18 @@ const BTDeviceList = ({ navigation }) => {
         onCancel={() => setShowModal(false)}/>}
 
       </View>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      titleText="Location needs to be enabled to run the background service, enable it now?"
+      confirmText='Yes'
+      cancelText='No'
+      onConfirm={() => {
+        PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      />
     </>
   )
 }

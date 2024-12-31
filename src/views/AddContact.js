@@ -63,6 +63,11 @@ const AddContact = ({ navigation }) => {
 
     const bluetoothEnabled = await requestEnableBluetooth();
 
+    if(!bluetoothEnabled) {
+      dispatch(setLockable(true));
+      return;
+    }
+
     const locationEnabled = await Bluetooth.checkLocationEnabled();
 
     if(!locationEnabled) {
@@ -71,11 +76,11 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    if(locationEnabled && bluetoothEnabled) {
-      let discoverable = await requestMakeDiscoverable();
-      discoverable &&
-      navigation.navigate("BTDeviceList");
-    }
+    let discoverable = await requestMakeDiscoverable();
+
+    discoverable &&
+    navigation.navigate("BTDeviceList");
+
     dispatch(setLockable(true));
     setRequestingPermissions(false);
   }
