@@ -2,8 +2,6 @@ import Bluetooth from './nativeWrapper/Bluetooth';
 import Crypto from './nativeWrapper/Crypto';
 import PermissionManager from './nativeWrapper/PermissionManager';
 
-import { Alert } from 'react-native';
-
 const requestPermissionsForBluetooth = async () => {
   let permissionsNotGranted = [];
   const locationAllowed = await PermissionManager.checkLocationPermission();
@@ -33,33 +31,12 @@ const requestEnableBluetooth = async () => {
   return bluetoothEnabled;
 }
 
-const requestEnableLocation = async () => {
-  let locationEnabled = await Bluetooth.checkLocationEnabled();
-  if(!locationEnabled) {
-    Alert.alert(
-      "Location",
-      "Location is required to run in the background, enable it now?",
-      [
-        {text : "No"},
-        {text : "Yes", onPress : async () => PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)}
-      ]
-    )
-  }
-  return locationEnabled;
-}
-
 const requestMakeDiscoverable = async () => {
   let discoverable = await Bluetooth.checkBTDiscoverable();
   if(!discoverable) {
     discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
   }
   return discoverable;
-}
-
-const enableServicesForBluetoothScan = async () => {
-  const bluetoothEnabled = await requestEnableBluetooth();
-  const locationEnabled = await requestEnableLocation();
-  return bluetoothEnabled && locationEnabled;
 }
 
 const decryptStrings = async strings => {
@@ -99,9 +76,7 @@ const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
 export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
-  requestEnableLocation,
   requestMakeDiscoverable,
-  enableServicesForBluetoothScan,
   decryptStrings,
   decryptStringsWithIdentifier,
   encryptStrings

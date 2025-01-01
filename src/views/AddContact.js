@@ -173,7 +173,7 @@ with other phones using bluetooth.`;
 
       <ConfirmationModal
       visible={showConfirmationModal}
-      titleText="Location needs to be enabled to run the background service, enable it now?"
+      titleText="Location needs to be enabled to perform a bluetooth scan, enable it now?"
       confirmText='Yes'
       cancelText='No'
       onConfirm={() => {
