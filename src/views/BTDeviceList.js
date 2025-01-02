@@ -5,6 +5,7 @@ import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity,
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
+import PermissionManager from '../nativeWrapper/PermissionManager';
 
 import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';

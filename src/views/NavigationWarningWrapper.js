@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import ConfirmationModal from './ConfirmationModal';
 
-const defaultTitle = 'You have unsaved changes. Are you sure to discard them and leave the screen?';
+const defaultTitle = 'You have unsaved changes. Are you sure you want to discard them and leave?';
 
 const NavigationWarningWrapper = ({ children, checkForChanges, 
                                     confirmationText = "Discard", cancelText = "Stay",
