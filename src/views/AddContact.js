@@ -140,7 +140,10 @@ with other phones using bluetooth.`;
           text="Show My QR Code"/>
 
           <Card
-          onPress={() => navigate("QRScanner")}
+          onPress={() => {
+            dispatch(setLockable(false));
+            navigate("QRScanner")
+          }}
           cardStyle={styles.rightCard}
           disabled={requestingPermissions}
           icon="qr-code-scanner"
