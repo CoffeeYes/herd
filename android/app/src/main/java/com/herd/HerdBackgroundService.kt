@@ -174,6 +174,16 @@ class HerdBackgroundService : Service() {
     return notificationID;
   }
 
+  public fun notificationIsPending(notificationID : Int) : Boolean {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    for(notification in notificationManager.activeNotifications) {
+        if (notification.id == notificationID) {
+          return true;
+        }
+     }
+     return false;
+  }
+
   private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?, intentString : String) {
     val intent : Intent = Intent(intentString);
     intent.putParcelableArrayListExtra("messages",messages);

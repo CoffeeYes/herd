@@ -145,7 +145,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       }
       if(errorOccurred) {
         if(HerdBackgroundService.running) {
-          if(notificationIsPending(errorNotificationID)) {
+          if(service.notificationIsPending(errorNotificationID)) {
             service.sendNotification(
               errorNotificationTitle,
               errorNotificationText,
@@ -341,16 +341,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun notificationIsPending(notificationID : Int, promise : Promise ?= null) : Boolean {
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    for(notification in notificationManager.activeNotifications) {
-        if (notification.id == notificationID) {
-          promise?.resolve(true);
-          return true;
-        }
-     }
-     promise?.resolve(false);
-     return false;
+  fun notificationIsPending(notificationID : Int, promise : Promise ?= null) {
+    promise?.resolve(service.notificationIsPending(notificationID));
   }
 
   @ReactMethod
