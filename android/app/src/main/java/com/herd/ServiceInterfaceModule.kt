@@ -341,8 +341,15 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun notificationIsPending(notificationID : Int, promise : Promise ?= null) {
-    promise?.resolve(service.notificationIsPending(notificationID));
+  fun notificationIsPending(notificationID : Int, promise : Promise) {
+    promise.resolve(service.notificationIsPending(notificationID));
+  }
+
+  @ReactMethod
+  fun setFrontendRunning(running : Boolean) {
+    if(HerdBackgroundService.running) {
+      service.setFrontendRunning(running);
+    }
   }
 
   @ReactMethod

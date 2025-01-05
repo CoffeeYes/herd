@@ -76,6 +76,7 @@ class HerdBackgroundService : Service() {
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
   private val bleScanningThreadActive = AtomicBoolean(false);
+  private var frontendRunning : Boolean = false;
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -150,6 +151,10 @@ class HerdBackgroundService : Service() {
       catch(e : Exception) {
         Log.e(TAG, "Error creating background service",e)
       }
+  }
+
+  public fun setFrontendRunning(running : Boolean) {
+    frontendRunning = running;
   }
 
   public fun sendNotification(title : String, text : String, notificationID : Int = SystemClock.uptimeMillis().toInt()) : Int {

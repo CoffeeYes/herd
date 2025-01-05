@@ -171,11 +171,14 @@ const App = ({ }) => {
       }));
     })
 
+    ServiceInterface.setFrontendRunning(true);
+
     return () => {
       messagesListener.remove();
       removeFromQueueListener.remove();
       appStateListener.remove();
       orientationListener.remove();
+      ServiceInterface.setFrontendRunning(false);
     }
   },[])
 
