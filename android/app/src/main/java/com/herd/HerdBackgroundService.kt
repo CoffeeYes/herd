@@ -77,6 +77,7 @@ class HerdBackgroundService : Service() {
   private var publicKey : String? = null;
   private val bleScanningThreadActive = AtomicBoolean(false);
   private var frontendRunning : Boolean = false;
+  private var generalNotificationID : Int? = null;
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -346,6 +347,17 @@ class HerdBackgroundService : Service() {
            else {
              //emit messages to JS receiver 
              sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
+
+             if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning) {
+              if(generalNotificationID != null) {
+                if(!notificationIsPending(generalNotificationID as Int)) {
+                  generalNotificationID = sendNotification("You Have received new messages","");
+                }
+              }
+              else {
+                generalNotificationID = sendNotification("You have received new messages","");
+              }
+             }
 
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
