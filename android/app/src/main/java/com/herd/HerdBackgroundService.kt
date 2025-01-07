@@ -349,13 +349,8 @@ class HerdBackgroundService : Service() {
              sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
 
              if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning) {
-              if(generalNotificationID != null) {
-                if(!notificationIsPending(generalNotificationID as Int)) {
-                  generalNotificationID = sendNotification("You Have received new messages","");
-                }
-              }
-              else {
-                generalNotificationID = sendNotification("You have received new messages","");
+              if(generalNotificationID != null && !notificationIsPending(generalNotificationID as Int)) {
+                generalNotificationID = sendNotification("You Have received new messages","");
               }
              }
 
@@ -365,7 +360,9 @@ class HerdBackgroundService : Service() {
                "savedMessageQueue",
                "savedMessageQueueSizes"
              );
-             receivedMessages.clear();
+             if(frontendRunning) {
+               receivedMessages.clear();
+             }
 
              //start write-back phase to let server know which messages have
              //reached their final destination and can be removed from message queue

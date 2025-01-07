@@ -77,9 +77,8 @@ const App = ({ }) => {
   useEffect(() => {
     (async () => {
 
-      let newMessages = []
       if(backgroundServiceRunning) {
-        newMessages = await ServiceInterface.getMessages("received");
+        const newMessages = await ServiceInterface.getMessages("received");
 
         newMessages.length > 0 &&
         await addNewReceivedMessagesToRealm(newMessages,dispatch);
