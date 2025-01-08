@@ -180,7 +180,10 @@ class HerdBackgroundService : Service() {
     return notificationID;
   }
 
-  public fun notificationIsPending(notificationID : Int) : Boolean {
+  public fun notificationIsPending(notificationID : Int?) : Boolean {
+    if(notificationID == null) {
+      return false;
+    }
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     for(notification in notificationManager.activeNotifications) {
         if (notification.id == notificationID) {
@@ -349,7 +352,7 @@ class HerdBackgroundService : Service() {
              sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
 
              if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning) {
-              if(generalNotificationID != null && !notificationIsPending(generalNotificationID as Int)) {
+              if(!notificationIsPending(generalNotificationID)) {
                 generalNotificationID = sendNotification("You Have received new messages","");
               }
              }
@@ -360,6 +363,7 @@ class HerdBackgroundService : Service() {
                "savedMessageQueue",
                "savedMessageQueueSizes"
              );
+
              if(frontendRunning) {
                receivedMessages.clear();
              }
