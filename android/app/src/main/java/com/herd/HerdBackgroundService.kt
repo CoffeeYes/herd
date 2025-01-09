@@ -76,7 +76,7 @@ class HerdBackgroundService : Service() {
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
   private val bleScanningThreadActive = AtomicBoolean(false);
-  private var frontendRunning : Boolean = false;
+  private var frontendRunning : Boolean = true;
   private var generalNotificationID : Int? = null;
 
   private lateinit var messageQueueServiceUUID : UUID;
