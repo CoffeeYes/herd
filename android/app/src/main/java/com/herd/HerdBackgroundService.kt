@@ -1,5 +1,9 @@
 package com.herd
 
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
+
 import android.app.Service
 import android.content.Intent
 import android.content.Context
@@ -983,6 +987,54 @@ class HerdBackgroundService : Service() {
     return messagesToRemoveFromQueue;
   }
 
+  private val errorNotificationTitle = "Herd has stopped sending messages in the background";
+  private var errorNotificationText = "";
+  private var errorNotificationType = "";
+  private var errorNotificationID : Int = 0;
+  private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val action : String? = intent.action;
+      var errorOccurred : Boolean = false;
+      when(action) {
+        BluetoothAdapter.ACTION_STATE_CHANGED -> {
+          val state = intent.getIntExtra(
+            BluetoothAdapter.EXTRA_STATE,
+            BluetoothAdapter.ERROR
+          );
+          if (state == BluetoothAdapter.STATE_OFF) {
+            errorOccurred = true;
+            errorNotificationText = "because bluetooth was turned off";
+            errorNotificationType = "ADAPTER_TURNED_OFF";
+          }
+        }
+        "android.location.PROVIDERS_CHANGED" -> {
+          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+          if(!locationManager.isLocationEnabled()) {
+            errorOccurred = true;
+            errorNotificationText = "because location was turned off" 
+            errorNotificationType = "LOCATION_DISABLED";
+          }
+        }
+      }
+      if(errorOccurred) {
+        if(notificationIsPending(errorNotificationID)) {
+          sendNotification(
+            errorNotificationTitle,
+            errorNotificationText,
+            errorNotificationID
+          )
+        }
+        else {
+          errorNotificationID = sendNotification(
+            errorNotificationTitle,
+            errorNotificationText
+          )
+        }
+        stopRunning();
+      }
+    }
+  }
+
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
       Log.i(TAG, "Service onStartCommand " + startId)
       var allPermissionsGranted = PermissionManagerModule.checkPermissionsGrantedForService(context);
@@ -1006,6 +1058,9 @@ class HerdBackgroundService : Service() {
       startGATTService();
       scanLeDevice();
       advertiseLE();
+      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
+      context.registerReceiver(locationAndBTStateReceiver, bluetoothLocationFilter);
       return Service.START_STICKY
     }
 
@@ -1015,13 +1070,14 @@ class HerdBackgroundService : Service() {
   }
 
   override fun onDestroy() {
-      Log.i(TAG, "Service onDestroy")
-      if(bluetoothAdapter?.isEnabled() as Boolean) {
-        stopLeScan(false)
-        BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
-        gattServer?.close();
-      }
-      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
-      running = false;
+    Log.i(TAG, "Service onDestroy")
+    if(bluetoothAdapter?.isEnabled() as Boolean) {
+      stopLeScan(false)
+      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
+      gattServer?.close();
+    }
+    bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+    running = false;
+    context.unregisterReceiver(locationAndBTStateReceiver)
   }
 }

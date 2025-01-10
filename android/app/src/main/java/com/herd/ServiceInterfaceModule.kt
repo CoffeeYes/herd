@@ -114,14 +114,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     }
   }
     
-  private val errorNotificationTitle = "Herd has stopped sending messages in the background";
-  private var errorNotificationText = "";
-  private var errorNotificationType = "";
-  private var errorNotificationID : Int = 0;
   private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
-      var errorOccurred : Boolean = false;
+      var errorNotificationType = "";
       when(action) {
         BluetoothAdapter.ACTION_STATE_CHANGED -> {
           val state = intent.getIntExtra(
@@ -129,37 +125,17 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
             BluetoothAdapter.ERROR
           );
           if (state == BluetoothAdapter.STATE_OFF) {
-            errorOccurred = true;
-            errorNotificationText = "because bluetooth was turned off";
             errorNotificationType = "ADAPTER_TURNED_OFF";
           }
         }
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
-            errorOccurred = true;
-            errorNotificationText = "because location was turned off" 
             errorNotificationType = "LOCATION_DISABLED";
           }
         }
       }
-      if(errorOccurred) {
-        if(HerdBackgroundService.running) {
-          if(service.notificationIsPending(errorNotificationID)) {
-            service.sendNotification(
-              errorNotificationTitle,
-              errorNotificationText,
-              errorNotificationID
-            )
-          }
-          else {
-            errorNotificationID = service.sendNotification(
-              errorNotificationTitle,
-              errorNotificationText
-            )
-          }
-          service.stopRunning();
-        }
+      if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit("bluetoothOrLocationStateChange",errorNotificationType);
       }
