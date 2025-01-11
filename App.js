@@ -42,7 +42,7 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
-import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts } from './src/redux/actions/appStateActions';
+import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 
 const Stack = createStackNavigator();
 
@@ -55,7 +55,6 @@ const App = ({ }) => {
   const lockable = useSelector(state => state.appStateReducer.lockable);
   const customStyle = useSelector(state => state.chatReducer.styles)
   const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
-  const backgroundServiceRunning = useSelector(state => state.appStateReducer.backgroundServiceRunning)
 
   const passwordSetRef = useRef();
   const lockableRef = useRef();
@@ -76,8 +75,9 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
-
-      if(backgroundServiceRunning) {
+      const serviceRunning = await ServiceInterface.isRunning();
+      dispatch(setBackgroundServiceRunning(serviceRunning));
+      if(serviceRunning) {
         const newMessages = await ServiceInterface.getMessages("received");
 
         newMessages.length > 0 &&
@@ -170,6 +170,12 @@ const App = ({ }) => {
       }));
     })
 
+    const bluetoothAndLocationStateListener = eventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+      if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
+        dispatch(setBackgroundServiceRunning(false));
+      }
+    })
+
     ServiceInterface.setFrontendRunning(true);
 
     return () => {
@@ -178,6 +184,7 @@ const App = ({ }) => {
       appStateListener.remove();
       orientationListener.remove();
       ServiceInterface.setFrontendRunning(false);
+      bluetoothAndLocationStateListener.remove();
     }
   },[])
 

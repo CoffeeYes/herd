@@ -56,18 +56,6 @@ const Settings = ({ navigation }) => {
   
   const alreadyNavigating = useRef(false);
 
-  useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(ServiceInterface);
-
-    const bluetoothAndLocationStateListener = eventEmitter.addListener("bluetoothOrLocationStateChange", state => {
-      if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
-        dispatch(setBackgroundServiceRunning(false));
-      }
-    })
-
-    return () => bluetoothAndLocationStateListener.remove();
-  },[]);
-
   const copyKeyToClipboard = async () => {
     Clipboard.setString(publicKey);
     return true;
