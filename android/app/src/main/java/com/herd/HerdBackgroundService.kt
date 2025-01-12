@@ -1035,6 +1035,7 @@ class HerdBackgroundService : Service() {
     }
   }
 
+  private var locationAndBluetoothReceiverRegistered : Boolean = false;
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
       Log.i(TAG, "Service onStartCommand " + startId)
       var allPermissionsGranted = PermissionManagerModule.checkPermissionsGrantedForService(context);
@@ -1061,6 +1062,7 @@ class HerdBackgroundService : Service() {
       val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
       bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
       context.registerReceiver(locationAndBTStateReceiver, bluetoothLocationFilter);
+      locationAndBluetoothReceiverRegistered = true;
       return Service.START_STICKY
     }
 
@@ -1078,6 +1080,9 @@ class HerdBackgroundService : Service() {
     }
     bleScanTimeoutHandler.removeCallbacksAndMessages(null);
     running = false;
-    context.unregisterReceiver(locationAndBTStateReceiver)
+    if(locationAndBluetoothReceiverRegistered) {
+      context.unregisterReceiver(locationAndBTStateReceiver)
+      locationAndBluetoothReceiverRegistered = false;
+    }
   }
 }
