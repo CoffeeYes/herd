@@ -1016,7 +1016,7 @@ class HerdBackgroundService : Service() {
           }
         }
       }
-      if(errorOccurred) {
+      if(errorOccurred && running) {
         if(notificationIsPending(errorNotificationID)) {
           sendNotification(
             errorNotificationTitle,
