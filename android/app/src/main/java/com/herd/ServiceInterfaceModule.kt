@@ -297,7 +297,6 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     }
     try {
       context.unregisterReceiver(messageReceiver);
-      context.unregisterReceiver(locationAndBTStateReceiver);
     }
     catch(e : Exception) {
       Log.e(TAG,"error unregistering broadcastReceivers : $e")
@@ -348,5 +347,14 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
     bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
     context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
+  }
+
+  protected fun finalize() {
+    try {
+      context.unregisterReceiver(locationAndBTStateReceiver);
+    }
+    catch(e : Exception) { 
+      Log.d(TAG, "error unregistering receiver in finalize function", e);
+    }
   }
 }
