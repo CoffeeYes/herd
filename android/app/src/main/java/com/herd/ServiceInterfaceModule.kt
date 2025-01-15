@@ -207,7 +207,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     messageQueue : ReadableArray,
     receivedMessagesForSelf : ReadableArray,
     deletedReceivedMessages : ReadableArray,
-    publicKey : String) {
+    publicKey : String,
+    allowNotifications : Boolean) {
       val msgQ : ArrayList<HerdMessage> = createMessagesFromArray(messageQueue);
       val deletedMessages = createMessagesFromArray(deletedReceivedMessages);
       val receivedMessages = createMessagesFromArray(receivedMessagesForSelf);
@@ -217,6 +218,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("publicKey",publicKey);
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
+      serviceIntent.putExtra("allowNotifications",allowNotifications);
       val messageIntentFilter = IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED");
       messageIntentFilter.addAction("com.herd.REMOVE_MESSAGES_FROM_QUEUE");
       context.registerReceiver(messageReceiver,messageIntentFilter);

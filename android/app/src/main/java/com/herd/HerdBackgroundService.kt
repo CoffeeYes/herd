@@ -82,6 +82,7 @@ class HerdBackgroundService : Service() {
   private val bleScanningThreadActive = AtomicBoolean(false);
   private var frontendRunning : Boolean = true;
   private var generalNotificationID : Int? = null;
+  private var allowNotifications : Boolean = true;
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
@@ -355,7 +356,7 @@ class HerdBackgroundService : Service() {
              //emit messages to JS receiver 
              sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
 
-             if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning) {
+             if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning && allowNotifications) {
               if(!notificationIsPending(generalNotificationID)) {
                 generalNotificationID = sendNotification("You Have received new messages","");
               }
@@ -1051,6 +1052,7 @@ class HerdBackgroundService : Service() {
       deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
       receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
       publicKey = bundle?.getString("publicKey");
+      allowNotifications = bundle?.getBoolean("allowNotifications") as Boolean;
       //initialise byte array for sending message
       if((messageQueue?.size as Int) > 0) {
         currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))

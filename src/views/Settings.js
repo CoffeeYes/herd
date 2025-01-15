@@ -115,7 +115,8 @@ const Settings = ({ navigation }) => {
           messageQueue,
           receivedMessagesForSelf,
           deletedReceivedMessages,
-          publicKey.trim()
+          publicKey.trim(),
+          enableNotifications
         );
       }
     }
