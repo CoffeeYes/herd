@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { Text, ScrollView,
-         View, Switch, Alert, 
-         NativeEventEmitter } from 'react-native';
+         View, Switch, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -160,13 +159,15 @@ const Settings = ({ navigation }) => {
         return;
       }
       const enableNotifications = enable && nativeNotificationsEnabled;
-      dispatch(setEnableNotifications(enableNotifications))
-      await AsyncStorage.setItem("enableNotifications",enableNotifications.toString())
-      dispatch(setLockable(true))
+      dispatch(setEnableNotifications(enableNotifications));
+      await AsyncStorage.setItem("enableNotifications",enableNotifications.toString());
+      ServiceInterface.setAllowNotifications(enableNotifications);
+      dispatch(setLockable(true));
     }
     else {
       dispatch(setEnableNotifications(false));
       await AsyncStorage.setItem("enableNotifications",false.toString())
+      ServiceInterface.setAllowNotifications(false);
     }
   }
 

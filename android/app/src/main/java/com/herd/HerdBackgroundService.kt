@@ -163,6 +163,10 @@ class HerdBackgroundService : Service() {
     frontendRunning = running;
   }
 
+  public fun setAllowNotifications(allow : Boolean) {
+    allowNotifications = allow;
+  }
+
   public fun sendNotification(title : String, text : String, notificationID : Int = SystemClock.uptimeMillis().toInt()) : Int {
 
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->

@@ -330,6 +330,13 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
+  fun setAllowNotifications(allow : Boolean) {
+    if(HerdBackgroundService.running) {
+      service.setAllowNotifications(allow);
+    }
+  }
+
+  @ReactMethod
   fun notificationsAreEnabled(promise : Promise) {
     val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     promise.resolve(notificationManager.areNotificationsEnabled());
