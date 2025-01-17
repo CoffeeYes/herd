@@ -138,6 +138,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit("bluetoothOrLocationStateChange",errorNotificationType);
+
+        disableService();
       }
     }
   }

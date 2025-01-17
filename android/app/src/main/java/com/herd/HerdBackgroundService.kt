@@ -110,6 +110,7 @@ class HerdBackgroundService : Service() {
     } else {
       stopForeground(true);
     }
+    stopSelf();
     running = false;
   }
 
