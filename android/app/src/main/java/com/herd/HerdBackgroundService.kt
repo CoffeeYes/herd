@@ -1045,7 +1045,11 @@ class HerdBackgroundService : Service() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
       Log.i(TAG, "Service onStartCommand " + startId)
       var allPermissionsGranted = PermissionManagerModule.checkPermissionsGrantedForService(context);
-      if(!allPermissionsGranted) {
+      val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
+      val bluetoothEnabled = bluetoothManager.getAdapter().isEnabled();
+      val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+      val locationEnabled = locationManager.isLocationEnabled();
+      if(!allPermissionsGranted || !locationEnabled || !bluetoothEnabled) {
         Log.i(TAG,"not all permissions to start service have been granted");
         stopSelf();
         return Service.STOP_FOREGROUND_REMOVE;
