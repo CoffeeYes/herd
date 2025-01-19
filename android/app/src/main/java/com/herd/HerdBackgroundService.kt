@@ -129,11 +129,6 @@ class HerdBackgroundService : Service() {
           throw Exception("No Bluetooth Adapter Found");
         }
 
-        BLEScanner = bluetoothAdapter?.bluetoothLeScanner;
-        if(BLEScanner === null) {
-          throw Exception("No BLE Scanner Found");
-        }
-
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
             PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
@@ -1054,6 +1049,7 @@ class HerdBackgroundService : Service() {
         stopSelf();
         return Service.STOP_FOREGROUND_REMOVE;
       }
+      BLEScanner = bluetoothAdapter?.getBluetoothLeScanner();
       running = true;
       val bundle : Bundle? = intent?.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
