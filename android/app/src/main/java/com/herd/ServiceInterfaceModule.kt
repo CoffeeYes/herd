@@ -117,24 +117,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
       val action : String? = intent.action;
-      var errorNotificationType = "";
-      when(action) {
-        BluetoothAdapter.ACTION_STATE_CHANGED -> {
-          val state = intent.getIntExtra(
-            BluetoothAdapter.EXTRA_STATE,
-            BluetoothAdapter.ERROR
-          );
-          if (state == BluetoothAdapter.STATE_OFF) {
-            errorNotificationType = "ADAPTER_TURNED_OFF";
-          }
-        }
-        "android.location.PROVIDERS_CHANGED" -> {
-          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-          if(!locationManager.isLocationEnabled()) {
-            errorNotificationType = "LOCATION_DISABLED";
-          }
-        }
-      }
+      val errorNotificationType = HerdBackgroundService.checkForBluetoothOrLocationError(context, intent);
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit("bluetoothOrLocationStateChange",errorNotificationType);

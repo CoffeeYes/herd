@@ -97,6 +97,29 @@ class HerdBackgroundService : Service() {
   companion object {
     @Volatile
     var running : Boolean = false;
+
+    public fun checkForBluetoothOrLocationError(context : Context, intent : Intent) : String {
+      val action : String? = intent.action;
+      var errorType = "";
+      when(action) {
+        BluetoothAdapter.ACTION_STATE_CHANGED -> {
+          val state = intent.getIntExtra(
+            BluetoothAdapter.EXTRA_STATE,
+            BluetoothAdapter.ERROR
+          );
+          if (state == BluetoothAdapter.STATE_OFF) {
+            errorType = "ADAPTER_TURNED_OFF";
+          }
+        }
+        "android.location.PROVIDERS_CHANGED" -> {
+          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+          if(!locationManager.isLocationEnabled()) {
+            errorType = "LOCATION_DISABLED";
+          }
+        }
+      }
+      return errorType;
+    }
   }
 
   inner class LocalBinder : Binder() {
@@ -989,35 +1012,20 @@ class HerdBackgroundService : Service() {
   }
 
   private val errorNotificationTitle = "Herd has stopped sending messages in the background";
-  private var errorNotificationText = "";
-  private var errorNotificationType = "";
   private var errorNotificationID : Int = 0;
   private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action;
-      var errorOccurred : Boolean = false;
-      when(action) {
-        BluetoothAdapter.ACTION_STATE_CHANGED -> {
-          val state = intent.getIntExtra(
-            BluetoothAdapter.EXTRA_STATE,
-            BluetoothAdapter.ERROR
-          );
-          if (state == BluetoothAdapter.STATE_OFF) {
-            errorOccurred = true;
+      val errorType = checkForBluetoothOrLocationError(context,intent);
+      if(errorType.length > 0 && running) {
+        var errorNotificationText = "";
+        when(errorType) {
+          "ADAPTER_TURNED_OFF" -> {
             errorNotificationText = "because bluetooth was turned off";
-            errorNotificationType = "ADAPTER_TURNED_OFF";
           }
-        }
-        "android.location.PROVIDERS_CHANGED" -> {
-          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-          if(!locationManager.isLocationEnabled()) {
-            errorOccurred = true;
+          "LOCATION_DISABLED" -> {
             errorNotificationText = "because location was turned off" 
-            errorNotificationType = "LOCATION_DISABLED";
           }
         }
-      }
-      if(errorOccurred && running) {
         if(notificationIsPending(errorNotificationID)) {
           sendNotification(
             errorNotificationTitle,
