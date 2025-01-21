@@ -307,10 +307,21 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     promise.resolve(service.notificationIsPending(notificationID));
   }
 
+  //we must register/unregister receiver with frontend mount/unmount as there is no
+  //functional counterpart to init() in kotlin which would allow us to unregister the
+  //receiver on object destruction.
   @ReactMethod
   fun setFrontendRunning(running : Boolean) {
     if(HerdBackgroundService.running) {
       service.setFrontendRunning(running);
+    }
+    if(running) {
+      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
+      context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
+    }
+    else {
+      context.unregisterReceiver(locationAndBTStateReceiver);
     }
   }
 
@@ -335,20 +346,5 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun isRunning(promise : Promise) {
     promise.resolve(HerdBackgroundService.running);
-  }
-
-  init {
-    val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-    bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
-    context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
-  }
-
-  protected fun finalize() {
-    try {
-      context.unregisterReceiver(locationAndBTStateReceiver);
-    }
-    catch(e : Exception) { 
-      Log.d(TAG, "error unregistering receiver in finalize function", e);
-    }
   }
 }
