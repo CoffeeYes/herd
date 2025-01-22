@@ -76,6 +76,10 @@ const App = ({ }) => {
   useEffect(() => {
     (async () => {
       const serviceRunning = await ServiceInterface.isRunning();
+      const serviceBound = await ServiceInterface.isBound();
+      if(!serviceRunning && serviceBound) {
+        ServiceInterface.unbindService();
+      }
       dispatch(setBackgroundServiceRunning(serviceRunning));
       if(serviceRunning) {
         const newMessages = await ServiceInterface.getMessages("received");

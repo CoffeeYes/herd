@@ -75,6 +75,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   val context = reactContext;
   private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
+
   private var bound : Boolean = false;
 
   var serviceConnection = object : ServiceConnection {
@@ -272,15 +273,27 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun disableService() {
+  fun unbindService() {
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     try {
       context.unbindService(serviceConnection);
-      context.stopService(serviceIntent);
     }
     catch(e : Exception) {
       Log.e(TAG,"Error unbinding and stopping service service : $e")
+    }
+  }
+
+  @ReactMethod
+  fun disableService() {
+    val activity : Activity? = context.getCurrentActivity();
+    val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    unbindService();
+    try {
+      context.stopService(serviceIntent);
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error stopping service : $e")
     }
     try {
       context.unregisterReceiver(messageReceiver);
@@ -341,6 +354,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun updateNotification(title : String, text : String, notificationID : Int) {
     service.sendNotification(title,text,notificationID);
+  }
+
+  @ReactMethod
+  fun isBound(promise : Promise) {
+    promise.resolve(bound);
   }
 
   @ReactMethod
