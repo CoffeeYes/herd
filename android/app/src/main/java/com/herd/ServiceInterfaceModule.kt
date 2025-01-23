@@ -117,13 +117,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     
   private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action;
       val errorNotificationType = HerdBackgroundService.checkForBluetoothOrLocationError(context, intent);
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit("bluetoothOrLocationStateChange",errorNotificationType);
 
-        disableService();
+        unbindService();
       }
     }
   }
@@ -274,8 +273,6 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   @ReactMethod
   fun unbindService() {
-    val activity : Activity? = context.getCurrentActivity();
-    val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
     try {
       context.unbindService(serviceConnection);
     }
