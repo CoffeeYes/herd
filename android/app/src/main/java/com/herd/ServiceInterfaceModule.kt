@@ -248,10 +248,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
       var herdMessages = ArrayList<HerdMessage>();
-      if(name === "received") {
+      if(name == "received") {
         herdMessages = service.getReceivedMessages();
       }
-      else if(name === "completed") {
+      else if(name == "completed") {
         herdMessages = service.getCompletedMessages();
       }
       messages = createArrayFromMessages(herdMessages);
