@@ -1057,6 +1057,10 @@ class HerdBackgroundService : Service() {
         stopSelf();
         return Service.STOP_FOREGROUND_REMOVE;
       }
+      if(intent == null) {
+        stopSelf();
+        return Service.STOP_FOREGROUND_REMOVE;
+      }
       BLEScanner = bluetoothAdapter?.getBluetoothLeScanner();
       running = true;
       val bundle : Bundle? = intent?.getExtras();
