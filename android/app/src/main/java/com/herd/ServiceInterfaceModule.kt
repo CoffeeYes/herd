@@ -121,8 +121,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit("bluetoothOrLocationStateChange",errorNotificationType);
-
-        unbindService();
+        
+        if(bound) {
+          unbindService();
+        }
       }
     }
   }
@@ -275,9 +277,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun unbindService() {
     try {
       context.unbindService(serviceConnection);
+      bound = false;
     }
     catch(e : Exception) {
-      Log.e(TAG,"Error unbinding and stopping service service : $e")
+      Log.e(TAG,"Error unbinding service : $e")
     }
   }
 
