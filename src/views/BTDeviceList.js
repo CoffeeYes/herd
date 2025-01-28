@@ -1,7 +1,7 @@
-import React, { useState, useEffect,  useCallback } from 'react';
+import React, { useState, useEffect,  useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, 
-  NativeEventEmitter } from 'react-native';
+  NativeEventEmitter, AppState } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -22,6 +22,7 @@ const BTDeviceList = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [errors, setErrors] = useState([]);
+  const appStateRef = useRef("active");
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -42,12 +43,17 @@ const BTDeviceList = ({ navigation }) => {
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
     const serviceEventEmitter = new NativeEventEmitter(ServiceInterface);
+
+    const appStateListener = AppState.addEventListener("change",async state => {
+      appStateRef.current = state;
+    })
+
     const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
       updateDeviceList(device);
     });
 
     const scanStateChangeListener = eventEmitter.addListener("BTStateChange", async state => {
-      if(state === "DISCOVERY_STARTED") {
+      if(state === "DISCOVERY_STARTED" && appStateRef.current == "active") {
         setScanning(true);
       }
       else if (state === "DISCOVERY_FINISHED") {
@@ -96,6 +102,7 @@ const BTDeviceList = ({ navigation }) => {
       bluetoothListener.remove();
       scanStateChangeListener.remove();
       bluetoothAndLocationStateListener.remove();
+      appStateListener.remove();
     }
   },[])
 
