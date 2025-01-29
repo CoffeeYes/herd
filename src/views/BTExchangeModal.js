@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { View, Text, ActivityIndicator, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 
@@ -19,6 +20,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [activityText, setActivityText] = useState(activityStateText.waiting);
   const [receivedKey, setReceivedKey] = useState("");
   const [keySent, setKeySent] = useState(false);
+  const [error, setError] = useState("");
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
@@ -27,6 +29,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
+    const serviceEventEmitter = new NativeEventEmitter(ServiceInterface)
 
     //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
@@ -38,6 +41,15 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
         setActivityText(activityStateText.disconnected);
         setLoading(false);
         cancelBluetoothActions();
+      }
+    })
+
+    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+      if(state === "ADAPTER_TURNED_OFF") {
+        setError("Bluetooth was disabled");
+      }
+      else if(state === "LOCATION_DISABLED") {
+        setError("Location was disabled");
       }
     })
 
@@ -61,6 +73,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     return () => {
       messageListener?.remove();
       stateChangeListener?.remove();
+      bluetoothAndLocationStateListener.remove();
       cancelBluetoothActions();
     }
   },[])
@@ -83,8 +96,15 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     onRequestClose={onRequestClose}
     disableOnPress>
       <View style={{...styles.modalContentContainer, ...contentWidth}}>
-        <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
-        <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
+        {error.length == 0 ?
+        <>
+          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
+        </>
+        :
+        <>
+          <Text style={{...styles.errorText, fontSize : customStyle.scaledUIFontSize}}>{`${error}, Please try again`}</Text>
+        </>}
         <CustomButton
         onPress={() => {
           cancelBluetoothActions();
@@ -103,6 +123,10 @@ const styles = {
     borderRadius : 5,
     padding : 20,
     alignItems : "center"
+  },
+  errorText : {
+    fontWeight : "bold",
+    color : palette.red
   }
 }
 
