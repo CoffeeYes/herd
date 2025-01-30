@@ -111,36 +111,44 @@ const BTDeviceList = ({ navigation }) => {
     return async () => await Bluetooth.cancelScanForDevices();
   },[]))
 
-  const handleDeviceClick = async device => {
-    await Bluetooth.cancelScanForDevices();
-    await Bluetooth.listenAsServer();
-    await Bluetooth.connectAsClient(device.macAddress);
-    setShowModal(true);
-  }
-
-  const restartScan = async () => {
-    setErrors([]);
-    dispatch(setLockable(false))
-
+  const checkOrRequestConnectionServices = async () => {
     const bluetoothEnabled = await requestEnableBluetooth();
 
     if(!bluetoothEnabled) {
-      dispatch(setLockable(true));
-      return;
+      return false;
     }
 
     const locationEnabled = await Bluetooth.checkLocationEnabled();
 
     if(!locationEnabled) {
       setShowConfirmationModal(true);
-      dispatch(setLockable(true))
-      return;
+      return false;
     }
+    return true;
+  }
 
-    const discoverable = await requestMakeDiscoverable();
-    if(discoverable) {
-      setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
-      await Bluetooth.scanForDevices();
+  const handleDeviceClick = async device => {
+    dispatch(setLockable(false));
+    const servicesEnabled = await checkOrRequestConnectionServices();
+    dispatch(setLockable(true));
+    if(servicesEnabled) {
+      await Bluetooth.cancelScanForDevices();
+      await Bluetooth.listenAsServer();
+      await Bluetooth.connectAsClient(device.macAddress);
+      setShowModal(true);
+    }
+  }
+
+  const restartScan = async () => {
+    setErrors([]);
+    dispatch(setLockable(false))
+    const servicesEnabled = await checkOrRequestConnectionServices();
+    if(servicesEnabled) {
+      const discoverable = await requestMakeDiscoverable();
+      if(discoverable) {
+        setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
+        await Bluetooth.scanForDevices();
+      }
     }
     dispatch(setLockable(true));
   }
