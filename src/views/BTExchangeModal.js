@@ -7,7 +7,7 @@ import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
-import { useOrientationBasedStyle } from '../helper';
+import { useOrientationBasedStyle, useStateAndRef } from '../helper';
 
 const activityStateText = {
   waiting :  "Waiting On Other Device",
@@ -20,7 +20,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [activityText, setActivityText] = useState(activityStateText.waiting);
   const [receivedKey, setReceivedKey] = useState("");
   const [keySent, setKeySent] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError, errorRef] = useStateAndRef("");
 
   const customStyle = useSelector(state => state.chatReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
@@ -45,11 +45,16 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     })
 
     const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+      let disableType = "";
       if(state === "ADAPTER_TURNED_OFF") {
-        setError("Bluetooth was disabled");
+        disableType = "Bluetooth";
       }
       else if(state === "LOCATION_DISABLED") {
-        setError("Location was disabled");
+        disableType = "Location";
+      }
+
+      if(errorRef.current.length == 0 && disableType.length > 0) {
+        setError(`${disableType} was disabled`)
       }
     })
 
