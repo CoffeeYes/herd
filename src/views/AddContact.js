@@ -16,7 +16,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
-import { requestEnableBluetooth, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
+import { checkOrRequestConnectionServices, requestEnableBluetooth, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -61,18 +61,10 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    const bluetoothEnabled = await requestEnableBluetooth();
+    const connectionServicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
 
-    if(!bluetoothEnabled) {
+    if(!connectionServicesEnabled) {
       dispatch(setLockable(true));
-      return;
-    }
-
-    const locationEnabled = await Bluetooth.checkLocationEnabled();
-
-    if(!locationEnabled) {
-      setShowConfirmationModal(true);
-      dispatch(setLockable(true))
       return;
     }
 

@@ -14,7 +14,7 @@ import ConfirmationModal from './ConfirmationModal';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
-import { requestMakeDiscoverable, requestEnableBluetooth } from '../common';
+import { requestMakeDiscoverable, checkOrRequestConnectionServices} from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 
 const BTDeviceList = ({ navigation }) => {
@@ -111,25 +111,9 @@ const BTDeviceList = ({ navigation }) => {
     return async () => await Bluetooth.cancelScanForDevices();
   },[]))
 
-  const checkOrRequestConnectionServices = async () => {
-    const bluetoothEnabled = await requestEnableBluetooth();
-
-    if(!bluetoothEnabled) {
-      return false;
-    }
-
-    const locationEnabled = await Bluetooth.checkLocationEnabled();
-
-    if(!locationEnabled) {
-      setShowConfirmationModal(true);
-      return false;
-    }
-    return true;
-  }
-
   const handleDeviceClick = async device => {
     dispatch(setLockable(false));
-    const servicesEnabled = await checkOrRequestConnectionServices();
+    const servicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
     dispatch(setLockable(true));
     if(servicesEnabled) {
       await Bluetooth.cancelScanForDevices();
@@ -142,7 +126,7 @@ const BTDeviceList = ({ navigation }) => {
   const restartScan = async () => {
     setErrors([]);
     dispatch(setLockable(false))
-    const servicesEnabled = await checkOrRequestConnectionServices();
+    const servicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
     if(servicesEnabled) {
       const discoverable = await requestMakeDiscoverable();
       if(discoverable) {

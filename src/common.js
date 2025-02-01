@@ -39,6 +39,22 @@ const requestMakeDiscoverable = async () => {
   return discoverable;
 }
 
+const checkOrRequestConnectionServices = async (onLocationDisabled = () => {}) => {
+    const bluetoothEnabled = await requestEnableBluetooth();
+
+    if(!bluetoothEnabled) {
+      return false;
+    }
+
+    const locationEnabled = await Bluetooth.checkLocationEnabled();
+
+    if(!locationEnabled) {
+      onLocationDisabled();
+      return false;
+    }
+    return true;
+}
+
 const decryptStrings = async strings => {
   const decryptedStrings = await Crypto.decryptStrings(
     "herdPersonal",
@@ -77,6 +93,7 @@ export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
   requestMakeDiscoverable,
+  checkOrRequestConnectionServices,
   decryptStrings,
   decryptStringsWithIdentifier,
   encryptStrings
