@@ -327,6 +327,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       @Volatile var shouldLoop = true
       public override fun run() {
         Log.d(TAG, "Bluetooth Server Thread Was Started")
+        if(adapter != null && !adapter.isEnabled()) {
+          Log.d(TAG, "Bluetooth adapter was disabled when attempting to start BT Server Thread");
+          throw Exception("Adapter is not enabled");
+        }
         while (shouldLoop) {
           Log.i(TAG,"BT Server thread is running")
           connectionSocket = try {
@@ -366,6 +370,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
 
       public override fun run() {
+        if(adapter != null && !adapter.isEnabled()) {
+          Log.d(TAG, "Bluetooth adapter was disabled when attempting to start BT client Thread");
+          throw Exception("Bluetooth adapter is disabled");
+        }
         Log.d(TAG, "Bluetooth Client Thread was started")
         // Cancel discovery because it otherwise slows down the connection.
         adapter.cancelDiscovery()
