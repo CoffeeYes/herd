@@ -1026,19 +1026,11 @@ class HerdBackgroundService : Service() {
             errorNotificationText = "because location was turned off" 
           }
         }
-        if(notificationIsPending(errorNotificationID)) {
-          sendNotification(
-            errorNotificationTitle,
-            errorNotificationText,
-            errorNotificationID
-          )
-        }
-        else {
-          errorNotificationID = sendNotification(
-            errorNotificationTitle,
-            errorNotificationText
-          )
-        }
+        sendNotification(
+          errorNotificationTitle,
+          errorNotificationText,
+          errorNotificationID
+        )
         stopRunning();
       }
     }
