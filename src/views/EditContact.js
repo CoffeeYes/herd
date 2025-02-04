@@ -96,18 +96,11 @@ const EditContact = ({ route, navigation }) => {
     }
 
     const existingContactWithKey = getContactsByKey([publicKey.trim()])[0];
-    const existingContactWithName = getContactByName(name.trim());
 
     if(existingContactWithKey && existingContactWithKey.key != originalContact?.key) {
       errorSaving.push({
         type : "key_exists",
         message : "A user with this key already exists"
-      });
-    }
-    if(existingContactWithName && existingContactWithName.name != originalContact?.name) {
-      errorSaving.push({
-        type : "name_exists",
-        message : "A user with this name already exists"
       });
     }
 

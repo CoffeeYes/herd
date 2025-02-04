@@ -16,7 +16,7 @@ import { palette } from '../assets/palette';
 import { setLockable } from '../redux/actions/appStateActions';
 
 import { useScreenAdjustedSize } from '../helper';
-import { checkOrRequestConnectionServices, requestEnableBluetooth, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
+import { checkOrRequestConnectionServices, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
