@@ -277,16 +277,8 @@ class HerdBackgroundService : Service() {
       else {
         Log.i(TAG,"MTU Request failed, MTU changed to $mtu");
       }
-      Log.i(TAG,"Discovering GATT Services");
-      /* stopLeScan();
-      allowBleScan = false;
-      Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
-      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
-      bleScanTimeoutHandler.postDelayed({
-          Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
-          allowBleScan = true;
-      },30000) */
 
+      Log.i(TAG,"Discovering GATT Services");
       val bondState : Int = gatt.getDevice().getBondState();
       if(bondState == BluetoothDevice.BOND_NONE || bondState == BluetoothDevice.BOND_BONDED) {
         gatt.discoverServices();
@@ -720,10 +712,8 @@ class HerdBackgroundService : Service() {
             }
             if(address != null) {
               val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
-              if(gattInstance != null) {
-                gattInstance?.disconnect();
-                gattInstance?.close();
-              }
+              gattInstance?.disconnect();
+              gattInstance?.close();
               remoteDeviceInstance?.connectGatt(
                 context,
                 false,
@@ -791,6 +781,7 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"ble scanning thread is already active")
       }
   }
+
   private val bleScanTimeoutHandler = Handler(Looper.getMainLooper());
   private fun stopLeScan(includeScanTimeout : Boolean = true) {
     Log.i(TAG,"stopLeScan() called")
@@ -809,21 +800,19 @@ class HerdBackgroundService : Service() {
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
     override fun onAdvertisingSetStarted(advertisingSet : AdvertisingSet?, txPower : Int, status : Int) {
-      Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: "
-      + status);
-      /* currentAdvertisingSet = advertisingSet; */
+      Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: $status");
     }
 
     override fun onAdvertisingDataSet(advertisingSet : AdvertisingSet?, status : Int) {
-      Log.i(TAG, "onAdvertisingDataSet() :status:" + status);
+      Log.i(TAG, "onAdvertisingDataSet() : status: $status");
     }
 
     override fun onScanResponseDataSet(advertisingSet : AdvertisingSet?,status : Int) {
-      Log.i(TAG, "onScanResponseDataSet(): status:" + status);
+      Log.i(TAG, "onScanResponseDataSet(): status: $status");
     }
 
     override fun onAdvertisingSetStopped(advertisingSet : AdvertisingSet?) {
-      Log.i(TAG, "onAdvertisingSetStopped():");
+      Log.i(TAG, "onAdvertisingSetStopped()");
     }
   };
 
@@ -962,7 +951,7 @@ class HerdBackgroundService : Service() {
     val emptyBefore = messageQueue?.size as Int == 0;
     val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
     //edge case where Queue was empty on start
-    if(emptyBefore) {
+    if(emptyBefore && added) {
       currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
     }
     return added;
@@ -1017,7 +1006,7 @@ class HerdBackgroundService : Service() {
     override fun onReceive(context : Context, intent : Intent) {
       val errorType = checkForBluetoothOrLocationError(context,intent);
       if(errorType.length > 0 && running) {
-        var errorNotificationText = "";
+        var errorNotificationText = "An error occurred";
         when(errorType) {
           "ADAPTER_TURNED_OFF" -> {
             errorNotificationText = "because bluetooth was turned off";
@@ -1044,18 +1033,15 @@ class HerdBackgroundService : Service() {
       val bluetoothEnabled = bluetoothManager.getAdapter().isEnabled();
       val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
       val locationEnabled = locationManager.isLocationEnabled();
-      if(!allPermissionsGranted || !locationEnabled || !bluetoothEnabled) {
-        Log.i(TAG,"not all permissions to start service have been granted");
-        stopSelf();
-        return Service.STOP_FOREGROUND_REMOVE;
-      }
-      if(intent == null) {
+      if(!allPermissionsGranted || !locationEnabled || !bluetoothEnabled || intent == null) {
+        if(intent != null) {
+          Log.i(TAG,"not all permissions to start service have been granted");
+        }
         stopSelf();
         return Service.STOP_FOREGROUND_REMOVE;
       }
       BLEScanner = bluetoothAdapter?.getBluetoothLeScanner();
-      running = true;
-      val bundle : Bundle? = intent?.getExtras();
+      val bundle : Bundle? = intent.getExtras();
       messageQueue = bundle?.getParcelableArrayList("messageQueue");
       Log.i(TAG,"Queue size on start : ${messageQueue?.size}");
       deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
@@ -1074,6 +1060,7 @@ class HerdBackgroundService : Service() {
       bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
       context.registerReceiver(locationAndBTStateReceiver, bluetoothLocationFilter);
       locationAndBluetoothReceiverRegistered = true;
+      running = true;
       return Service.START_STICKY
     }
 
