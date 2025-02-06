@@ -153,18 +153,18 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
       <View style={styles.buttonContainer}>
         
+        <CustomButton
+        text="Submit"
+        buttonStyle={{...styles.button, marginRight : 10}}
+        disabled={password.trim().length == 0}
+        onPress={handleSubmit}/>
+
         {route?.params?.navigationTarget === "passwordSettings" &&
         <CustomButton
         text="Cancel"
         style={styles.button}
         onPress={() => isFocused && navigation.goBack()}
         />}
-
-        <CustomButton
-        text="Submit"
-        buttonStyle={{...styles.button, marginLeft : 10}}
-        disabled={password.trim().length == 0}
-        onPress={handleSubmit}/>
 
       </View>
     </FullScreenSplash>
