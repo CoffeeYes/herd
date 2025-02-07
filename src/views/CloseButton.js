@@ -1,6 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text } from 'react-native';
-import { palette } from './src/assets/palette';
+import { palette } from '../assets/palette';
 
 const CloseButton = ({onPress, buttonStyle, textStyle}) => {
   return (

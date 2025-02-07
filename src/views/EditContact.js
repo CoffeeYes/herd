@@ -5,11 +5,12 @@ import { View, TextInput, Text,
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
+import CloseButton from './CloseButton';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 
 import Crypto from '../nativeWrapper/Crypto';
 
-import { editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
+import { editContact, getContactsByKey, createContact } from '../realm/contactRealm';
 import { largeImageContainerStyle } from '../assets/styles';
 
 import { addContact } from '../redux/actions/contactActions';
@@ -18,7 +19,6 @@ import { updateContactAndReferences } from '../redux/actions/combinedActions';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { encryptStrings } from '../common';
-import CloseButton from '../../CloseButton';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();

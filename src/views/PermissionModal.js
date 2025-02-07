@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
-import CloseButton from '../../CloseButton';
+import CloseButton from './CloseButton';
 
 import { palette } from '../assets/palette';
 
