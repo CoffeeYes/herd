@@ -1,8 +1,8 @@
-import React, { useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect, useRef, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { View, ScrollView, Share,
-         Image } from 'react-native';
+         Image, AppState } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Header from './Header';
 import ContactImage from './ContactImage';
@@ -13,8 +13,10 @@ import CustomModal from './CustomModal';
 
 import { largeImageContainerStyle } from '../assets/styles';
 import { useScreenAdjustedSize } from '../helper';
+import { setLockable } from '../redux/actions/appStateActions';
 
 const Contact = ({route, navigation}) => {
+  const dispatch = useDispatch();
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id));
@@ -32,6 +34,20 @@ const Contact = ({route, navigation}) => {
   const [headerLineHeight, setHeaderLineHeight] = useState(1);
 
   const performingButtonAction = useRef(false);
+  const sharingRef = useRef(false);
+
+  useEffect(() => {
+    const appStateListener = AppState.addEventListener("change",async state => {
+      if(sharingRef.current && state == "active") {
+        sharingRef.current = false;
+        dispatch(setLockable(true));
+      }
+    })
+
+    return () => {
+      appStateListener.remove();
+    }
+  },[])
 
   const copyKeyToClipboard = () => {
     Clipboard.setString(contact.key)
@@ -39,6 +55,8 @@ const Contact = ({route, navigation}) => {
   }
 
   const shareContact = async () => {
+    dispatch(setLockable(false));
+    sharingRef.current = true;
     await Share.share({
       title : "I'd like to share my Herd Contact with you!",
       message : contact.key
