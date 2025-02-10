@@ -10,13 +10,11 @@ import { setPassword } from '../redux/actions/userActions';
 import Header from './Header';
 import PasswordCreationBox from './PasswordCreationBox';
 import FlashTextButton from './FlashTextButton';
-import CustomModal from './CustomModal';
 
 import Crypto from '../nativeWrapper/Crypto';
 import NavigationWarningWrapper from './NavigationWarningWrapper';
 import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import CustomButton from './CustomButton';
 import ConfirmationModal from './ConfirmationModal';
 
 const PasswordSettings = () => {
@@ -158,6 +156,7 @@ meaning all contacts who have previously added you will need to add you again.`
           <Text>A value of 0 allows for unlimited attempts</Text>
           <TextInput 
           value={chosenMaxPasswordAttempts}
+          onSubmitEditing={() => chosenMaxPasswordAttempts.trim().length > 0 ? saveMaxAttempts() : setChosenMaxPasswordAttempts(maxPasswordAttempts.toString())}
           onChangeText={value => ![",","."].some(substr => value.includes(substr)) && !isNaN(Number(value)) && setChosenMaxPasswordAttempts(value)}
           keyboardType="number-pad"
           style={styles.input}/>
