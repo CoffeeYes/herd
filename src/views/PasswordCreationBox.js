@@ -101,7 +101,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           name={primaryName}
           customStyle={customStyle}
           onChangeText={setPrimaryInputText}
-          onSubmitEditing={() => secondaryInputRef.current.focus()}
+          onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
           value={primaryInputText}/>
 
           <PasswordField

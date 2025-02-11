@@ -230,7 +230,14 @@ const EditContact = ({ route, navigation }) => {
             <TextInput
             style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}
             onChangeText={text => setName(text)}
-            onSubmitEditing={() => publicKey.length == 0 ? publicKeyInputRef.current.focus() : !hideSaveButton() && save()}
+            onSubmitEditing={() => {
+              if(publicKey.length == 0 && name.trim().length != 0) {
+                publicKeyInputRef.current.focus()
+              }
+              else if(!hideSaveButton()) {
+                save();
+              }
+            }}
             value={name}/>
           </View>
 
