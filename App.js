@@ -76,10 +76,6 @@ const App = ({ }) => {
   useEffect(() => {
     (async () => {
       const serviceRunning = await ServiceInterface.isRunning();
-      const serviceBound = await ServiceInterface.isBound();
-      if(!serviceRunning && serviceBound) {
-        ServiceInterface.unbindService();
-      }
       dispatch(setBackgroundServiceRunning(serviceRunning));
       if(serviceRunning) {
         const newMessages = await ServiceInterface.getMessages("received");
@@ -89,6 +85,9 @@ const App = ({ }) => {
       }
       else {
         await loadStoredMessages();
+        if(await ServiceInterface.isBound()) {
+          ServiceInterface.unbindService();
+        }
       }
       await loadInitialState();
 
@@ -100,13 +99,6 @@ const App = ({ }) => {
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
-      let uniqueKeys = [];
-      for(const message of messages) {
-        if(message.to.trim() == ownPublicKeyRef.current.trim() && !uniqueKeys.includes(message.from)) {
-          uniqueKeys.push(message.from.trim());
-        }
-      }
-      const contacts = getContactsByKey(uniqueKeys);
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
       const checkIfUserIsInChat = lastRoute.name == "chat";
@@ -117,6 +109,13 @@ const App = ({ }) => {
       if(!notificationPending) {
         notificationContactsRef.current = [];
       }
+      let uniqueKeys = [];
+      for(const message of messages) {
+        if(message.to.trim() == ownPublicKeyRef.current.trim() && !uniqueKeys.includes(message.from)) {
+          uniqueKeys.push(message.from.trim());
+        }
+      }
+      const contacts = getContactsByKey(uniqueKeys);
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
@@ -226,17 +225,16 @@ const App = ({ }) => {
     const erasurePassword = getPasswordHash("erasure");
 
     //determine the entry screen
+    let initialRoute = "splash"
     if(key?.length > 0) {
       if(loginPassword.length > 0) {
-        setInitialRoute("passwordLockScreen");
+        initialRoute = "passwordLockScreen";
       }
       else {
-        setInitialRoute("main");
+        initialRoute = "main";
       }
     }
-    else {
-      setInitialRoute("splash")
-    }
+    setInitialRoute(initialRoute)
 
     dispatch(setPublicKey(key));
 
