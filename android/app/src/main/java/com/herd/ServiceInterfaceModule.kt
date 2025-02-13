@@ -54,21 +54,42 @@ class HerdMessage(
     }
   }
 
-  private constructor(parcel: Parcel) : this(
-        _id = parcel.readString() as String,
-        to = parcel.readString() as String,
-        from = parcel.readString() as String,
-        text = parcel.readString() as String,
-        timestamp = parcel.readLong()
+  constructor(parcel: Parcel) : this(
+    _id = parcel.readString() as String,
+    to = parcel.readString() as String,
+    from = parcel.readString() as String,
+    text = parcel.readString() as String,
+    timestamp = parcel.readLong()
   )
+
+  constructor(messageObject : ReadableMap) : this (
+    _id = messageObject.getString("_id") as String,
+    to = messageObject.getString("to") as String,
+    from = messageObject.getString("from") as String,
+    text = messageObject.getString("text") as String,
+    //getDouble is the only way to get a long from JS as it is not natively supported in JS
+    timestamp = messageObject.getDouble("timestamp").toLong()
+  )
+
   override fun writeToParcel(parcel: Parcel, flags: Int) {
-      for(entry in listOf(_id,to,from,text)) {
-        parcel.writeString(entry)
-      }
-      parcel.writeLong(timestamp)
+    for(entry in listOf(_id,to,from,text)) {
+      parcel.writeString(entry)
+    }
+    parcel.writeLong(timestamp)
   }
 
   override fun describeContents() = 0
+
+  public fun toObject() : WritableMap {
+    val messageObject : WritableMap = Arguments.createMap();
+    messageObject.putString("_id",_id);
+    messageObject.putString("to",to);
+    messageObject.putString("from",from);
+    messageObject.putString("text",text);
+    //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
+    messageObject.putDouble("timestamp",timestamp.toDouble());
+    return messageObject;
+  }
 }
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
@@ -143,33 +164,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       Log.i(TAG,"removeListeners called, count : $count")
   }
 
-  fun createMessageFromObject(messageObject : ReadableMap) : HerdMessage {
-    val message : HerdMessage = HerdMessage(
-      messageObject.getString("_id") as String,
-      messageObject.getString("to") as String,
-      messageObject.getString("from") as String,
-      messageObject.getString("text") as String,
-      //getDouble is the only way to get a long from JS as it is not natively supported in JS
-      messageObject.getDouble("timestamp").toLong()
-    )
-    return message;
-  }
-
-  fun createObjectFromMessage(message : HerdMessage) : WritableMap {
-    val messageObject : WritableMap = Arguments.createMap();
-    messageObject.putString("_id",message._id);
-    messageObject.putString("to",message.to);
-    messageObject.putString("from",message.from);
-    messageObject.putString("text",message.text);
-    //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
-    messageObject.putDouble("timestamp",message.timestamp.toDouble());
-    return messageObject;
-  }
-
   fun createMessagesFromArray(messageArray : ReadableArray) : ArrayList<HerdMessage> {
     val messages : ArrayList<HerdMessage> = ArrayList();
     for(i in 0 until messageArray.size()) {
-      val currentMessageObject : HerdMessage = createMessageFromObject(messageArray.getMap(i));
+      val currentMessageObject = HerdMessage(messageArray.getMap(i));
       messages.add(currentMessageObject);
     }
     return messages;
@@ -179,7 +177,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     var messages : WritableArray = Arguments.createArray();
     try {
       for(message in herdMessages) {
-        val newMessage : WritableMap = createObjectFromMessage(message);
+        val newMessage : WritableMap = message.toObject();
         messages.pushMap(newMessage)
       }
     }
@@ -216,7 +214,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun addMessageToService(message : ReadableMap,promise : Promise) {
     if(bound) {
-      val msgParcel : HerdMessage = createMessageFromObject(message);
+      val msgParcel = HerdMessage(message);
       promise.resolve(service.addMessageToQueue(msgParcel))
     }
     else {
