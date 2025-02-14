@@ -51,6 +51,14 @@ class HerdMessage(
       }
 
       override fun newArray(size: Int) = arrayOfNulls<HerdMessage>(size)
+
+    }
+
+    fun parcelFromByteArray(bytes : ByteArray) : Parcel {
+      val parcelMessage : Parcel = Parcel.obtain();
+      parcelMessage.unmarshall(bytes,0,bytes.size);
+      parcelMessage.setDataPosition(0);
+      return parcelMessage;
     }
   }
 
@@ -71,6 +79,8 @@ class HerdMessage(
     timestamp = messageObject.getDouble("timestamp").toLong()
   )
 
+  constructor(bytes: ByteArray) : this(parcelFromByteArray(bytes));
+
   override fun writeToParcel(parcel: Parcel, flags: Int) {
     for(entry in listOf(_id,to,from,text)) {
       parcel.writeString(entry)
@@ -89,6 +99,13 @@ class HerdMessage(
     //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
     messageObject.putDouble("timestamp",timestamp.toDouble());
     return messageObject;
+  }
+
+  public fun toByteArray() : ByteArray {
+    val messageParcel : Parcel = Parcel.obtain();
+    this.writeToParcel(messageParcel,0);
+    val parcelBytes = messageParcel.marshall();
+    return parcelBytes;
   }
 }
 

@@ -326,7 +326,7 @@ class HerdBackgroundService : Service() {
            Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
            totalMessagesRead += 1;
            //create parcel and custom parcelable from received bytes
-           val message : HerdMessage = createMessageFromBytes(totalBytes);
+           val message = HerdMessage(totalBytes);
            //check if message has been received before, either in this instance of the background service
            //or another instance where it has already been passed up to JS side
            val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id.equals(message._id)}  != null) ||
@@ -348,7 +348,10 @@ class HerdBackgroundService : Service() {
              if(!messageAlreadyInQueue) {
                val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
                if((messageQueue?.size as Int) == 1 && added) {
-                 currentMessageBytes = createBytesFromMessage(messageQueue?.get(0));
+                val firstMessage = messageQueue?.get(0);
+                if(firstMessage != null) {
+                 currentMessageBytes = firstMessage.toByteArray();
+                }
                }
              }
            }
@@ -591,7 +594,10 @@ class HerdBackgroundService : Service() {
               //update message pointer to point to next message with boundary check
               messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
               //create new byteArray for next message to be sent
-              currentMessageBytes = createBytesFromMessage(messageQueue?.get(messagePointer));
+              val targetMessage = messageQueue?.get(messagePointer);
+              if(targetMessage != null) {
+                currentMessageBytes = targetMessage.toByteArray();
+              }
               Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
             }
           }
@@ -952,7 +958,10 @@ class HerdBackgroundService : Service() {
     val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
     //edge case where Queue was empty on start
     if(emptyBefore && added) {
-      currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
+      val firstMessage = messageQueue?.get(0);
+      if(firstMessage != null) {
+        currentMessageBytes = firstMessage.toByteArray();
+      }
     }
     return added;
   }
@@ -974,22 +983,6 @@ class HerdBackgroundService : Service() {
     Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
 
     return deleted;
-  }
-
-  private fun createBytesFromMessage(message : HerdMessage?) : ByteArray {
-    val messageParcel : Parcel = Parcel.obtain();
-    message?.writeToParcel(messageParcel,0);
-    val parcelBytes = messageParcel.marshall();
-    return parcelBytes;
-  }
-
-  private fun createMessageFromBytes(bytes : ByteArray) : HerdMessage {
-    //create parcel and custom parcelable from received bytes
-    val parcelMessage : Parcel = Parcel.obtain();
-    parcelMessage.unmarshall(bytes,0,bytes.size);
-    parcelMessage.setDataPosition(0);
-    val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-    return message;
   }
 
   public fun getReceivedMessages() : ArrayList<HerdMessage> {
@@ -1050,7 +1043,10 @@ class HerdBackgroundService : Service() {
       allowNotifications = bundle?.getBoolean("allowNotifications") as Boolean;
       //initialise byte array for sending message
       if((messageQueue?.size as Int) > 0) {
-        currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
+        val firstMessage = messageQueue?.get(0);
+        if(firstMessage != null) {
+          currentMessageBytes = firstMessage.toByteArray();
+        }
       }
       /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
       startGATTService();
