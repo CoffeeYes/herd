@@ -69,11 +69,11 @@ class HerdBackgroundService : Service() {
   private var bluetoothManager : BluetoothManager? = null;
   private var gattServer : BluetoothGattServer? = null;
   private val context : Context = this;
-  private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
+  private var messageQueue : ArrayList<HerdMessage> = ArrayList();
   private var messagePointer : Int = 0;
-  private var deletedMessages : ArrayList<HerdMessage>? = ArrayList();
+  private var deletedMessages : ArrayList<HerdMessage> = ArrayList();
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
-  private var receivedMessagesForSelf : ArrayList<HerdMessage>? = ArrayList();
+  private var receivedMessagesForSelf : ArrayList<HerdMessage> = ArrayList();
   private val messagesToRemoveFromQueue : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
@@ -330,28 +330,25 @@ class HerdBackgroundService : Service() {
            //check if message has been received before, either in this instance of the background service
            //or another instance where it has already been passed up to JS side
            val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id.equals(message._id)}  != null) ||
-           (receivedMessagesForSelf?.find{it -> it._id == message._id} != null)
+           (receivedMessagesForSelf.find{it -> it._id == message._id} != null)
            //check if message has been previously deleted by user
-           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id.equals(message._id)} != null;
+           val messagePreviouslyDeleted : Boolean = deletedMessages.find{it -> it._id.equals(message._id)} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
-               receivedMessagesForSelf?.add(message);
+               receivedMessagesForSelf.add(message);
              }
            }
            //if message is destined for other user add it directly to messageQueue
            else {
              Log.i(TAG,"Received Message is for another user, adding it to Queue");
-             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id.equals(message._id)} != null;
+             val messageAlreadyInQueue : Boolean = messageQueue.find{it -> it._id.equals(message._id)} != null;
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
-               val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
-               if((messageQueue?.size as Int) == 1 && added) {
-                val firstMessage = messageQueue?.get(0);
-                if(firstMessage != null) {
-                 currentMessageBytes = firstMessage.toByteArray();
-                }
+               val added = addMessagesToList(message,messageQueue, "messageQueue");
+               if(messageQueue.size == 1 && added) {
+                currentMessageBytes = messageQueue.get(0).toByteArray();
                }
              }
            }
@@ -374,7 +371,7 @@ class HerdBackgroundService : Service() {
              //emit messages to JS receiver 
              sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
 
-             if(receivedMessagesForSelf?.size as Int > 0 && !frontendRunning && allowNotifications) {
+             if(receivedMessagesForSelf.size > 0 && !frontendRunning && allowNotifications) {
               if(!notificationIsPending(generalNotificationID)) {
                 generalNotificationID = sendNotification("You Have received new messages","");
               }
@@ -405,8 +402,8 @@ class HerdBackgroundService : Service() {
 
              if(transferCompleteCharacteristic != null) {
                Log.i(TAG,"Transfer complete characteristic found");
-               val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) +
-               (receivedMessagesForSelf as ArrayList<HerdMessage>);
+               val messagesToAvoid = deletedMessages +
+               (receivedMessagesForSelf);
 
                if(messagesToAvoid.size > 0) {
                  transferCompleteCharacteristic.setValue(messagesToAvoid.get(0)._id.toByteArray());
@@ -441,7 +438,7 @@ class HerdBackgroundService : Service() {
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicWrite");
        if(characteristic.uuid.toString().equals(getString(R.string.transferCompleteCharacteristicUUID))) {
-         val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) + (receivedMessagesForSelf as ArrayList<HerdMessage>);
+         val messagesToAvoid = deletedMessages + receivedMessagesForSelf;
          writeMessageIndex += 1;
          if(writeMessageIndex < messagesToAvoid.size) {
            Log.i(TAG,"Writing message id ${writeMessageIndex + 1}/${messagesToAvoid.size}")
@@ -454,7 +451,7 @@ class HerdBackgroundService : Service() {
            writebackComplete = true;
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
-           receivedMessagesForSelf?.clear();
+           receivedMessagesForSelf.clear();
            gatt.disconnect();
            /* gatt.close(); */
          }
@@ -572,7 +569,7 @@ class HerdBackgroundService : Service() {
       offset : Int, characteristic : BluetoothGattCharacteristic) {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
         try {
-          if((messageQueue?.size as Int) > messagePointer){
+          if(messageQueue.size > messagePointer){
             //increment packet for offset calculation
             currentPacket += 1;
             Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
@@ -592,13 +589,12 @@ class HerdBackgroundService : Service() {
               //reset currentPacket counter for next message
               currentPacket = 0;
               //update message pointer to point to next message with boundary check
-              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              messagePointer = if (messagePointer < ( messageQueue.size - 1) ) (messagePointer + 1) else 0;
               //create new byteArray for next message to be sent
-              val targetMessage = messageQueue?.get(messagePointer);
-              if(targetMessage != null) {
-                currentMessageBytes = targetMessage.toByteArray();
+              if(messagePointer < messageQueue.size) {
+                currentMessageBytes = messageQueue.get(messagePointer).toByteArray();
               }
-              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
+              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue.size}, messagePointer : $messagePointer");
             }
           }
         }
@@ -615,9 +611,9 @@ class HerdBackgroundService : Service() {
          val messageID : String = String(value);
          Log.i(TAG,"Message ID Received : $messageID")
          if(messageID != "COMPLETE") {
-           val message = messageQueue?.find {it -> it._id.equals(messageID)};
+           val message = messageQueue.find {it -> it._id.equals(messageID)};
            if(message != null) {
-             val removed = messageQueue?.remove(message)
+             val removed = messageQueue.remove(message)
              Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
              messagesToRemoveFromQueue.add(message);
            }
@@ -647,7 +643,7 @@ class HerdBackgroundService : Service() {
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
-        val messageQueueSize = messageQueue?.size as Int;
+        val messageQueueSize = messageQueue.size;
         if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
           gattServer?.sendResponse(
             device,
@@ -950,37 +946,34 @@ class HerdBackgroundService : Service() {
   }
 
   public fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
-    return addMessagesToList(messages,deletedMessages as ArrayList<HerdMessage>, "deletedMessages")
+    return addMessagesToList(messages,deletedMessages, "deletedMessages")
   }
 
   public fun addMessageToQueue(message : HerdMessage) : Boolean {
-    val emptyBefore = messageQueue?.size as Int == 0;
-    val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
+    val emptyBefore = messageQueue.size == 0;
+    val added = addMessagesToList(message,messageQueue, "messageQueue");
     //edge case where Queue was empty on start
     if(emptyBefore && added) {
-      val firstMessage = messageQueue?.get(0);
-      if(firstMessage != null) {
-        currentMessageBytes = firstMessage.toByteArray();
-      }
+      currentMessageBytes = messageQueue.get(0).toByteArray();
     }
     return added;
   }
 
   public fun removeMessage(messageIDs: ArrayList<String>) : Boolean {
-    val lengthBefore : Int = messageQueue?.size as Int;
-    messageQueue = messageQueue?.filter{message -> !(message._id in messageIDs)} as ArrayList<HerdMessage>;
-    val lengthAfter : Int = messageQueue?.size as Int;
+    val lengthBefore : Int = messageQueue.size;
+    messageQueue = messageQueue.filter{message -> !(message._id in messageIDs)} as ArrayList<HerdMessage>;
+    val lengthAfter : Int = messageQueue.size;
 
     //check if deletion was successful
     var deleted : Boolean = (lengthBefore - lengthAfter) == messageIDs.size
 
     //if deleted message was last message update pointer to prevent OOB error.
-    val messageQueueSize : Int = messageQueue?.size as Int
+    val messageQueueSize : Int = messageQueue.size;
     if(messagePointer >= messageQueueSize) {
       messagePointer = messageQueueSize - 1;
     }
 
-    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
+    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue.size}")
 
     return deleted;
   }
@@ -1035,20 +1028,32 @@ class HerdBackgroundService : Service() {
       }
       BLEScanner = bluetoothAdapter?.getBluetoothLeScanner();
       val bundle : Bundle? = intent.getExtras();
-      messageQueue = bundle?.getParcelableArrayList("messageQueue");
-      Log.i(TAG,"Queue size on start : ${messageQueue?.size}");
-      deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
-      receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
-      publicKey = bundle?.getString("publicKey");
-      allowNotifications = bundle?.getBoolean("allowNotifications") as Boolean;
-      //initialise byte array for sending message
-      if((messageQueue?.size as Int) > 0) {
-        val firstMessage = messageQueue?.get(0);
-        if(firstMessage != null) {
-          currentMessageBytes = firstMessage.toByteArray();
+      if(bundle == null) {
+        Log.d(TAG,"bundle was null in service onStartCommand");
+        stopSelf();
+        return Service.STOP_FOREGROUND_REMOVE;
+      }
+      else {
+        val bundleMessageQueue = bundle.getParcelableArrayList<HerdMessage>("messageQueue");
+        if(bundleMessageQueue != null) {
+          messageQueue = bundleMessageQueue;
+        }
+        Log.i(TAG,"Queue size on start : ${messageQueue.size}");
+        val bundleDeletedMessages = bundle.getParcelableArrayList<HerdMessage>("deletedMessages");
+        if(bundleDeletedMessages != null) {
+          deletedMessages = bundleDeletedMessages;
+        }
+        val bundleReceivedMessagesForSelf = bundle.getParcelableArrayList<HerdMessage>("receivedMessagesForSelf");
+        if(bundleReceivedMessagesForSelf != null) {
+          receivedMessagesForSelf = bundleReceivedMessagesForSelf;
+        }
+        publicKey = bundle.getString("publicKey");
+        allowNotifications = bundle.getBoolean("allowNotifications");
+        //initialise byte array for sending message
+        if(messageQueue.size > 0) {
+          currentMessageBytes = messageQueue.get(0).toByteArray();
         }
       }
-      /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
       startGATTService();
       scanLeDevice();
       advertiseLE();
