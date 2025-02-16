@@ -346,7 +346,7 @@ class HerdBackgroundService : Service() {
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
-               val added = addMessagesToList(message,messageQueue, "messageQueue");
+               val added = addMessagesToList(arrayListOf(message),messageQueue, "messageQueue");
                if(messageQueue.size == 1 && added) {
                 currentMessageBytes = messageQueue.get(0).toByteArray();
                }
@@ -922,12 +922,6 @@ class HerdBackgroundService : Service() {
     }
   }
 
-  fun addMessagesToList(message : HerdMessage, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.add(message);
-    logSuccessfullyAddedToList(added,listName,1,listToAddTo.size);
-    return added;
-  }
-
   fun addMessagesToList(messages : ArrayList<HerdMessage>, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
     var added : Boolean = true;
     if(messages.size > 0) {
@@ -951,7 +945,7 @@ class HerdBackgroundService : Service() {
 
   public fun addMessageToQueue(message : HerdMessage) : Boolean {
     val emptyBefore = messageQueue.size == 0;
-    val added = addMessagesToList(message,messageQueue, "messageQueue");
+    val added = addMessagesToList(arrayListOf(message),messageQueue, "messageQueue");
     //edge case where Queue was empty on start
     if(emptyBefore && added) {
       currentMessageBytes = messageQueue.get(0).toByteArray();
@@ -1034,20 +1028,16 @@ class HerdBackgroundService : Service() {
         return Service.STOP_FOREGROUND_REMOVE;
       }
       else {
-        val bundleMessageQueue = bundle.getParcelableArrayList<HerdMessage>("messageQueue");
-        if(bundleMessageQueue != null) {
-          messageQueue = bundleMessageQueue;
-        }
+        bundle.getParcelableArrayList<HerdMessage>("messageQueue")?.let{ messageQueue = it};
         Log.i(TAG,"Queue size on start : ${messageQueue.size}");
-        val bundleDeletedMessages = bundle.getParcelableArrayList<HerdMessage>("deletedMessages");
-        if(bundleDeletedMessages != null) {
-          deletedMessages = bundleDeletedMessages;
-        }
-        val bundleReceivedMessagesForSelf = bundle.getParcelableArrayList<HerdMessage>("receivedMessagesForSelf");
-        if(bundleReceivedMessagesForSelf != null) {
-          receivedMessagesForSelf = bundleReceivedMessagesForSelf;
-        }
+        bundle.getParcelableArrayList<HerdMessage>("deletedMessages")?.let{ deletedMessages = it};
+        bundle.getParcelableArrayList<HerdMessage>("receivedMessagesForSelf")?.let{ receivedMessagesForSelf = it};
         publicKey = bundle.getString("publicKey");
+        if(publicKey == null) {
+          Log.d(TAG,"no public key found in bundle in service onStartCommand");
+          stopSelf();
+          return Service.STOP_FOREGROUND_REMOVE;
+        }
         allowNotifications = bundle.getBoolean("allowNotifications");
         //initialise byte array for sending message
         if(messageQueue.size > 0) {
