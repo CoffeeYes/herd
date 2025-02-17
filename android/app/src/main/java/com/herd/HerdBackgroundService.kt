@@ -221,7 +221,7 @@ class HerdBackgroundService : Service() {
      return false;
   }
 
-  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?, intentString : String) {
+  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>, intentString : String) {
     val intent : Intent = Intent(intentString);
     intent.putParcelableArrayListExtra("messages",messages);
     sendBroadcast(intent);

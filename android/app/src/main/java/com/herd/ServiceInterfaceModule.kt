@@ -54,11 +54,36 @@ class HerdMessage(
 
     }
 
-    fun parcelFromByteArray(bytes : ByteArray) : Parcel {
+    private final val TAG = "HerdMessage";
+
+    private fun parcelFromByteArray(bytes : ByteArray) : Parcel {
       val parcelMessage : Parcel = Parcel.obtain();
       parcelMessage.unmarshall(bytes,0,bytes.size);
       parcelMessage.setDataPosition(0);
       return parcelMessage;
+    }
+
+    public fun toWritableArray(herdMessages : ArrayList<HerdMessage>) : WritableArray {
+      var messages : WritableArray = Arguments.createArray();
+      try {
+        for(message in herdMessages) {
+          val newMessage : WritableMap = message.toWritableMap();
+          messages.pushMap(newMessage)
+        }
+      }
+      catch(e : Exception) {
+        Log.e(TAG,"Error parsing herd messages",e);
+      }
+      return messages;
+    }
+
+    public fun toArrayList(messageArray: ReadableArray) : ArrayList<HerdMessage> {
+      val messages : ArrayList<HerdMessage> = ArrayList();
+      for(i in 0 until messageArray.size()) {
+        val currentMessageObject = HerdMessage(messageArray.getMap(i));
+        messages.add(currentMessageObject);
+      }
+      return messages;
     }
   }
 
@@ -90,7 +115,7 @@ class HerdMessage(
 
   override fun describeContents() = 0
 
-  public fun toObject() : WritableMap {
+  public fun toWritableMap() : WritableMap {
     val messageObject : WritableMap = Arguments.createMap();
     messageObject.putString("_id",_id);
     messageObject.putString("to",to);
@@ -145,7 +170,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       }
       if(messages != null && messages.size > 0 && emitterString.length > 0) {
         Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
-        val messageArray = createArrayFromMessages(messages);
+        val messageArray = HerdMessage.toWritableArray(messages);
         //pass object to JS through event emitter
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit(emitterString,messageArray);
@@ -181,29 +206,6 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       Log.i(TAG,"removeListeners called, count : $count")
   }
 
-  fun createMessagesFromArray(messageArray : ReadableArray) : ArrayList<HerdMessage> {
-    val messages : ArrayList<HerdMessage> = ArrayList();
-    for(i in 0 until messageArray.size()) {
-      val currentMessageObject = HerdMessage(messageArray.getMap(i));
-      messages.add(currentMessageObject);
-    }
-    return messages;
-  }
-
-  fun createArrayFromMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
-    var messages : WritableArray = Arguments.createArray();
-    try {
-      for(message in herdMessages) {
-        val newMessage : WritableMap = message.toObject();
-        messages.pushMap(newMessage)
-      }
-    }
-    catch(e : Exception) {
-      Log.e(TAG,"Error parsing herd messages",e);
-    }
-    return messages;
-  }
-
   @ReactMethod
   fun enableService(
     messageQueue : ReadableArray,
@@ -211,9 +213,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     deletedReceivedMessages : ReadableArray,
     publicKey : String,
     allowNotifications : Boolean) {
-      val msgQ : ArrayList<HerdMessage> = createMessagesFromArray(messageQueue);
-      val deletedMessages = createMessagesFromArray(deletedReceivedMessages);
-      val receivedMessages = createMessagesFromArray(receivedMessagesForSelf);
+      val msgQ : ArrayList<HerdMessage> = HerdMessage.toArrayList(messageQueue);
+      val deletedMessages = HerdMessage.toArrayList(deletedReceivedMessages);
+      val receivedMessages = HerdMessage.toArrayList(receivedMessagesForSelf);
       val activity : Activity? = context.getCurrentActivity();
       val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
       serviceIntent.putExtra("messageQueue",msgQ);
@@ -254,7 +256,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun addDeletedMessagesToService(messages : ReadableArray, promise : Promise) {
     var success : Boolean = false;
     if(bound) {
-      val msgArray : ArrayList<HerdMessage> = createMessagesFromArray(messages);
+      val msgArray : ArrayList<HerdMessage> = HerdMessage.toArrayList(messages);
       success = service.addMessagesToDeletedList(msgArray);
     }
     promise.resolve(success);
@@ -271,7 +273,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       else if(name == "completed") {
         herdMessages = service.getCompletedMessages();
       }
-      messages = createArrayFromMessages(herdMessages);
+      messages = HerdMessage.toWritableArray(herdMessages);
     }
     promise.resolve(messages);
   }
@@ -283,7 +285,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       messageFilename,
       sizesFilename
     );
-    val messages : WritableArray = createArrayFromMessages(cachedMessages)
+    val messages : WritableArray = HerdMessage.toWritableArray(cachedMessages)
     promise.resolve(messages);
     storageInterface.deleteStoredMessages(messageFilename,sizesFilename);
   }
