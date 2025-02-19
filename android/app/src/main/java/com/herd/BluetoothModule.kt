@@ -183,14 +183,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       promise.resolve(scanMode == BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE);
     }
 
-    private val messageHandler = object : Handler(Looper.getMainLooper()) {
-
-      override fun handleMessage(msg : Message) {
-        context.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit("NEW_MESSAGE",msg.toString())
-      }
-    }
-
     init {
       reactContext.addActivityEventListener(activityListener);
       val BTFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -342,7 +334,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
           connectionSocket?.also {
               Log.d(TAG, "SERVER SOCKET WAS CONNECTED")
-              connectionThread = BTConnectionThread(it, messageHandler)
+              connectionThread = BTConnectionThread(it)
               connectionThread?.start();
               serverSocket?.close()
               shouldLoop = false
@@ -383,7 +375,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             socket.connect();
             if(socket.isConnected()) {
               Log.d(TAG, "Bluetooth client socket connected")
-              connectionThread = BTConnectionThread(socket, messageHandler);
+              connectionThread = BTConnectionThread(socket);
               connectionThread?.start();
             }
             else {
@@ -408,7 +400,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    private inner class BTConnectionThread(private val socket : BluetoothSocket, private val handler : Handler) : Thread() {
+    private inner class BTConnectionThread(private val socket : BluetoothSocket) : Thread() {
       private val inputStream : InputStream = socket.inputStream;
       private val outputStream : OutputStream = socket.outputStream;
       private val buffer : ByteArray = ByteArray(8192);
@@ -449,11 +441,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 //emit string upwards to javscript event listener
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
                 .emit("newBTMessageReceived",receivedString);
-
-                val readMsg = handler.obtainMessage(
-                          MESSAGE_READ, numBytes, -1,
-                          buffer)
-                readMsg.sendToTarget();
               }
           }
           Log.i(TAG,"BTConnectionThread shouldRun is false, returning");
