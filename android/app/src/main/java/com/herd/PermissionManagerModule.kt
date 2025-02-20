@@ -87,6 +87,16 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
 
   }
 
+  private fun allPermissionsGranted(permissions : Array<String>, grantResults : IntArray) : Boolean {
+    var allGranted = true;
+    for(item in grantResults) {
+      if(item != PackageManager.PERMISSION_GRANTED) {
+        allGranted = false;
+      }
+    }
+    return allGranted;
+  }
+
   override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
     for(i in 0..(permissions.size -1)) {
       Log.i(TAG,"Permission : ${permissions.get(i)}, result : ${grantResults.get(i)}")
@@ -110,24 +120,14 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
     }
     if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
       Log.i(TAG,"onRequestPermissionsResult location permission request code");
-      var allLocationPermissionsGranted = true;
-      for(item in grantResults) {
-        if(item != PackageManager.PERMISSION_GRANTED) {
-          allLocationPermissionsGranted = false;
-        }
-      }
+      var allLocationPermissionsGranted = allPermissionsGranted(permissions, grantResults);
       Log.i(TAG,"All Location Permissions granted : $allLocationPermissionsGranted")
       locationPermissionPromise?.resolve(allLocationPermissionsGranted);
       locationPermissionPromise = null;
     }
     else if(requestCode == BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE) {
       Log.i(TAG,"onRequestPermissionsResult bluetooth scan permission request code");
-      var allBluetoothScanPermissionsGranted = true;
-      for(item in grantResults) {
-        if(item != PackageManager.PERMISSION_GRANTED) {
-          allBluetoothScanPermissionsGranted = false;
-        }
-      }
+      var allBluetoothScanPermissionsGranted = allPermissionsGranted(permissions, grantResults);
       Log.i(TAG,"All Bluetooth Scan Permissions granted : $allBluetoothScanPermissionsGranted")
       bluetoothScanPermissionPromise?.resolve(allBluetoothScanPermissionsGranted);
       bluetoothScanPermissionPromise = null;

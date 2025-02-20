@@ -44,10 +44,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private final val TAG : String = "HerdBluetoothModule";
     val context = reactContext
 
-    private val MESSAGE_READ: Int = 0
-    private val MESSAGE_WRITE: Int = 1
-    private val MESSAGE_TOAST: Int = 2
-
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
     private val BLUETOOTH_DISCOVERABLE_REQUEST_CODE : Int = 2;
 
@@ -71,6 +67,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     @ReactMethod
     fun removeListeners(listenerCount: Int) {
         Log.i(TAG,"removeListeners called, count : $listenerCount")
+    }
+
+    private fun resetAdapterName() {
+      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
+      adapter?.setName(adapter.getName().replace("_HERD",""));
     }
 
     //anonymous inner function to override class functions
@@ -132,8 +133,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             .emit("BTStateChange","DISCOVERY_STARTED")
           }
           BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-            val adapter = bluetoothManager.getAdapter();
-            adapter.setName(adapter.getName().replace("_HERD",""));
+            resetAdapterName();
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
             .emit("BTStateChange","DISCOVERY_FINISHED")
           }
@@ -168,10 +168,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
 
         if(!isDiscoverable) {
-          val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-          if(adapter !== null) {
-            adapter.setName(adapter.getName().replace("_HERD",""));
-          }
+          resetAdapterName();
         }
       }
     }
@@ -211,8 +208,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           adapter.setName(originalAdapterName + "_HERD");
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
-            adapter.setName(adapter.getName().replace("_HERD",""));
-            promise.reject("Device Discovery could not be started")
+            resetAdapterName();
           }
           else {
             promise.resolve(true);
@@ -226,8 +222,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun cancelScanForDevices(promise : Promise) {
-      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-      adapter?.setName(adapter.getName().replace("_HERD",""));
+      val adapter = bluetoothManager.getAdapter();
       if(adapter === null) {
         promise.reject("No BluetoothAdapter Found");
       }
@@ -235,6 +230,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if(adapter.isEnabled() && adapter.isDiscovering()) {
           adapter.cancelDiscovery()
         }
+        resetAdapterName();
         promise.resolve(true);
       }
     }
