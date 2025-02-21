@@ -1044,6 +1044,7 @@ class HerdBackgroundService : Service() {
           currentMessageBytes = messageQueue.get(0).toByteArray();
         }
       }
+      running = true;
       startGATTService();
       scanLeDevice();
       advertiseLE();
@@ -1051,7 +1052,6 @@ class HerdBackgroundService : Service() {
       bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
       context.registerReceiver(locationAndBTStateReceiver, bluetoothLocationFilter);
       locationAndBluetoothReceiverRegistered = true;
-      running = true;
       return Service.START_STICKY
     }
 
