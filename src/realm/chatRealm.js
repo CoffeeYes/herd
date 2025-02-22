@@ -152,6 +152,8 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     const contacts = getContactsByKey(keys);
     
     let messagesForSelf = newMessages.filter(message => message.to.trim() == ownPublicKey.trim())
+    const contactKeysWithNewMessages = getUniqueKeysFromMessages(messagesForSelf,"from");
+    const contactsWithNewMessages = getContactsByKey(contactKeysWithNewMessages).map(contact => contact._id);
 
     const decryptedMessages = await decryptStrings(
       messagesForSelf.map(message => message.text)
@@ -166,14 +168,20 @@ const addNewReceivedMessages = async (messages,dispatch) => {
         contact = createContact({
           name : "Unknown User",
           key : message.from.trim(),
-          image : ""
+          image : "",
+          hasNewMessages : true
         });
         contacts.push(contact);
         dispatch(addContact(contact));
       }
       dispatch(addMessage(contact._id,message))
     })
-    const chats = await getContactsWithChats();
+    let chats = await getContactsWithChats();
+    chats.forEach((chat,index) => {
+      if(contactsWithNewMessages.includes(chat._id)) {
+        chats[index].hasNewMessages = true
+      }
+    })
     dispatch(setChats(chats))
   }
 }

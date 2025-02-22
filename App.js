@@ -75,6 +75,7 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
+      await loadInitialState();
       const serviceRunning = await ServiceInterface.isRunning();
       dispatch(setBackgroundServiceRunning(serviceRunning));
       if(serviceRunning) {
@@ -89,7 +90,6 @@ const App = ({ }) => {
           ServiceInterface.unbindService();
         }
       }
-      await loadInitialState();
 
       const maxPasswordAttempts = parseInt(await AsyncStorage.getItem("maxPasswordAttempts"));
       dispatch(setMaxPasswordAttempts(maxPasswordAttempts))
