@@ -43,6 +43,7 @@ import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
+import { getUniqueKeysFromMessages } from './src/realm/helper.js';
 
 const Stack = createStackNavigator();
 
@@ -109,12 +110,10 @@ const App = ({ }) => {
       if(!notificationPending) {
         notificationContactsRef.current = [];
       }
-      let uniqueKeys = [];
-      for(const message of messages) {
-        if(message.to.trim() == ownPublicKeyRef.current.trim() && !uniqueKeys.includes(message.from)) {
-          uniqueKeys.push(message.from.trim());
-        }
-      }
+      const uniqueKeys = getUniqueKeysFromMessages(
+        messages.filter(message => message.to.trim() == ownPublicKeyRef.current.trim()),
+        "from"
+      )
       const contacts = getContactsByKey(uniqueKeys);
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages

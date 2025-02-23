@@ -147,13 +147,10 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     //add messages to queue
     dispatch(addMessagesToQueue(newMessages.filter(message => message.to.trim() !== ownPublicKey.trim())));
 
-    //pull unique keys from messages to retreive existing contacts with matching keys
-    const keys = getUniqueKeysFromMessages(newMessages,"from");
-    const contacts = getContactsByKey(keys);
-    
     let messagesForSelf = newMessages.filter(message => message.to.trim() == ownPublicKey.trim())
     const contactKeysWithNewMessages = getUniqueKeysFromMessages(messagesForSelf,"from");
-    const contactsWithNewMessages = getContactsByKey(contactKeysWithNewMessages).map(contact => contact._id);
+    const contactsWithNewMessages = getContactsByKey(contactKeysWithNewMessages);
+    const contactsWithNewMessagesIDs = contactsWithNewMessages.map(contact => contact._id);
 
     const decryptedMessages = await decryptStrings(
       messagesForSelf.map(message => message.text)
@@ -161,7 +158,7 @@ const addNewReceivedMessages = async (messages,dispatch) => {
 
     messagesForSelf.forEach((message,index) => {
       message.text = decryptedMessages[index]
-      let contact = contacts.find(contact => contact.key.trim() == message.from.trim());
+      let contact = contactsWithNewMessages.find(contact => contact.key.trim() == message.from.trim());
       //if message for user has been received but the sender isn't in their address book, add an unkown contact
       //to file the message under
       if(!contact) {
@@ -171,14 +168,14 @@ const addNewReceivedMessages = async (messages,dispatch) => {
           image : "",
           hasNewMessages : true
         });
-        contacts.push(contact);
+        contactsWithNewMessages.push(contact);
         dispatch(addContact(contact));
       }
       dispatch(addMessage(contact._id,message))
     })
     let chats = await getContactsWithChats();
     chats.forEach((chat,index) => {
-      if(contactsWithNewMessages.includes(chat._id)) {
+      if(contactsWithNewMessagesIDs.includes(chat._id)) {
         chats[index].hasNewMessages = true
       }
     })
