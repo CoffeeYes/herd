@@ -78,7 +78,7 @@ const Chat = ({ route, navigation }) => {
 
   useEffect(() => {
     (async () => {
-      if(messages.length === 0 && chat || (chat?.hasNewMessages && messages.length < messageLoadingSize)) {
+      if(messages.length === 0 && chat || (chat?.hasNewMessages && getMessageLength() < messageLoadingSize)) {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
         setLoading(false);
