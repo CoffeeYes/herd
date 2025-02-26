@@ -32,6 +32,7 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
 import ConfirmationModal from './ConfirmationModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const maxCharacterCount = 190;
 
@@ -97,10 +98,15 @@ const Chat = ({ route, navigation }) => {
         }
       }
       setInitialLoad(false);
+
+      if(chat?._id) {
+        dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
+
+        let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages"));
+        chatsWithNewMessages = chatsWithNewMessages.filter(chatID => chatID != chat._id);
+        await AsyncStorage.setItem("chatsWithNewMessages", JSON.stringify(chatsWithNewMessages));
+      }
     })()
-    
-    chat?._id &&
-    dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
   },[]);
 
   //calculate actual number of messages by extracting them from sections

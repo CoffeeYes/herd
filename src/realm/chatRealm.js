@@ -8,6 +8,7 @@ import { decryptStrings, encryptStrings } from '../common';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",
@@ -174,11 +175,14 @@ const addNewReceivedMessages = async (messages,dispatch) => {
       dispatch(addMessage(contact._id,message))
     })
     let chats = await getContactsWithChats();
+    let chatsWithNewMessages = [];
     chats.forEach((chat,index) => {
       if(contactsWithNewMessagesIDs.includes(chat._id)) {
         chats[index].hasNewMessages = true
+        chatsWithNewMessages.push(chat._id);
       }
     })
+    AsyncStorage.setItem("chatsWithNewMessages",JSON.stringify(chatsWithNewMessages))
     dispatch(setChats(chats))
   }
 }
