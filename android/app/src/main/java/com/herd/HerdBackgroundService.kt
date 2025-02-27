@@ -953,7 +953,7 @@ class HerdBackgroundService : Service() {
     return added;
   }
 
-  public fun removeMessage(messageIDs: ArrayList<String>) : Boolean {
+  public fun removeMessages(messageIDs: ArrayList<String>) : Boolean {
     val lengthBefore : Int = messageQueue.size;
     messageQueue = messageQueue.filter{message -> !(message._id in messageIDs)} as ArrayList<HerdMessage>;
     val lengthAfter : Int = messageQueue.size;

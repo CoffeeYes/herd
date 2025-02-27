@@ -145,7 +145,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun removeMessagesFromService(messageIDs : ReadableArray, promise : Promise) {
     if(bound) {
       val nativeMessageIDs : ArrayList<String> = messageIDs.toArrayList() as ArrayList<String>;
-      promise.resolve(service.removeMessage(nativeMessageIDs));
+      promise.resolve(service.removeMessages(nativeMessageIDs));
     }
     else {
       promise.resolve(false);

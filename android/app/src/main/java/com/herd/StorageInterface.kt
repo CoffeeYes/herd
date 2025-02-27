@@ -71,11 +71,9 @@ class StorageInterface(val context : Context) {
     val messageSizes : ArrayList<Int> = arrayListOf();
     var messageSizesBytes : ByteArray = byteArrayOf();
     for(message in queue) {
-      val messageParcel : Parcel = Parcel.obtain();
-      message.writeToParcel(messageParcel,0);
-      val parcelBytes = messageParcel.marshall();
-      messageSizes.add(parcelBytes.size)
-      buffer += parcelBytes;
+      val messageBytes = message.toByteArray();
+      messageSizes.add(messageBytes.size)
+      buffer += messageBytes;
     }
     for(item in messageSizes) {
       messageSizesBytes += convertIntToBytes(item)
@@ -100,15 +98,11 @@ class StorageInterface(val context : Context) {
       }
     }
     Log.i(TAG,"Storage Message Bytes : ${messageSizesBytes.size}, Sizes : $messageSizes");
+    var bufferPos = 0;
     for(size in messageSizes) {
-      //create Message from bytes and add to array
-      val parcelMessage : Parcel = Parcel.obtain();
-      parcelMessage.unmarshall(buffer,0,size);
-      parcelMessage.setDataPosition(0);
-      val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-      queue.add(message);
-      //remove messageBytes from front of buffer
-      buffer = buffer.copyOfRange(size,buffer.lastIndex + 1);
+      val messageBytes = buffer.copyOfRange(bufferPos,bufferPos + size);
+      queue.add(HerdMessage(messageBytes));
+      bufferPos += size;
     }
     return queue;
   }
