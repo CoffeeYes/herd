@@ -68,15 +68,11 @@ class StorageInterface(val context : Context) {
 
   fun writeMessagesToStorage(queue : ArrayList<HerdMessage>,messagesFilename : String, sizesFilename : String) {
     var buffer : ByteArray = byteArrayOf();
-    val messageSizes : ArrayList<Int> = arrayListOf();
     var messageSizesBytes : ByteArray = byteArrayOf();
     for(message in queue) {
       val messageBytes = message.toByteArray();
-      messageSizes.add(messageBytes.size)
+      messageSizesBytes += convertIntToBytes(messageBytes.size);
       buffer += messageBytes;
-    }
-    for(item in messageSizes) {
-      messageSizesBytes += convertIntToBytes(item)
     }
     Log.i(TAG,"Message Sizes being written : ${messageSizesBytes.size}, $messageSizesBytes")
     writeToStorage(sizesFilename,messageSizesBytes);
@@ -88,14 +84,12 @@ class StorageInterface(val context : Context) {
     var buffer : ByteArray = readFromStorage(messagesFilename);
     val messageSizesBytes : ByteArray = readFromStorage(sizesFilename);
     var messageSizes : ArrayList<Int> = arrayListOf();
-    var tempArray : ByteArray = byteArrayOf();
-    for(item in messageSizesBytes) {
-      tempArray += item;
-      if(tempArray.size == 4) {
-        val currentInt : Int = convertBytesToInt(tempArray);
-        messageSizes.add(currentInt);
-        tempArray = byteArrayOf();
-      }
+    //each int is made up of 4 bytes, here we iterate over the raw byteArray in 4 byte steps to convert the bytes to ints
+    Log.d(TAG,"[readMessagesFromStorage] messageSizeBytes Length : ${messageSizesBytes.size}, mod 4 ? : ${messageSizesBytes.size % 4 == 0}")
+    val maxBufferPos = messageSizesBytes.size - 4;
+    for(bufferPos in 0..maxBufferPos step 4) {
+      val tempBuffer = messageSizesBytes.copyOfRange(bufferPos,bufferPos + 4)
+      messageSizes.add(convertBytesToInt(tempBuffer));
     }
     Log.i(TAG,"Storage Message Bytes : ${messageSizesBytes.size}, Sizes : $messageSizes");
     var bufferPos = 0;
