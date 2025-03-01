@@ -197,34 +197,30 @@ const getContactsWithChats = async () => {
     ...getUniqueKeysFromMessages(receivedMessages,"from"),
   ];
 
-  if(keys.length > 0) {
-    //get timestamp of last message for each key
-    let lastMessages = {};
-    for(const key of keys) {
-      const messages = (await getMessagesWithContact(key,-1)).messages;
-      const currentLastMessage = messages.sort((a,b) => b.timestamp - a.timestamp)[0];
-      if(currentLastMessage) {
-        lastMessages[key] = currentLastMessage;
-      }
+  //get timestamp of last message for each key
+  let lastMessages = {};
+  for(const key of keys) {
+    const messages = (await getMessagesWithContact(key,-1)).messages;
+    const currentLastMessage = messages.sort((a,b) => b.timestamp - a.timestamp)[0];
+    if(currentLastMessage) {
+      lastMessages[key] = currentLastMessage;
     }
-    //create new contacts array with last message text and timestamp
-    // because realm doesnt allow mutation in place
-    let contacts = parseRealmObjects(getContactsByKey(keys));
-    let contactsWithTimestamps = [];
-    contacts.forEach(contact => {
-      const matchingMessage = lastMessages[contact.key];
-      if(matchingMessage) {
-        contact.timestamp = matchingMessage?.timestamp;
-        contact.lastText = matchingMessage?.text;
-        contact.lastMessageSentBySelf = matchingMessage?.from !== contact.key;
-        contactsWithTimestamps.push(contact);
-      }
-    })
-    return contactsWithTimestamps;
   }
-  else {
-    return []
-  }
+
+  const contacts = getContactsByKey(keys);
+  let contactsWithTimestamps = [];
+  contacts.forEach(contact => {
+    const matchingMessage = lastMessages[contact.key];
+    if(matchingMessage) {
+      contactsWithTimestamps.push({
+        ...contact,
+        timestamp : matchingMessage.timestamp,
+        lastText : matchingMessage.text,
+        lastMessageSentBySelf : matchingMessage.from !== contact.key
+      });
+    }
+  })
+  return contactsWithTimestamps;
 }
 
 const deleteChats = keys => {
@@ -301,18 +297,13 @@ const deleteMessages = messages => {
 //for the purpose of displaying them to the user
 //when passing messageQueue to the background service these messages are not desired
 const getMessageQueue = async useMessageCopies => {
-  let sentMessages;
-  let key = (await Crypto.loadKeyFromKeystore("herdPersonal"))?.trim();
-  if(useMessageCopies) {
-    sentMessages = messageCopyRealm.objects('Message')
-  }
-  else {
-    sentMessages = messageSentRealm.objects('Message').filtered(`to != '${key}'`)
-  }
-  const receivedMessages= messageReceivedRealm.objects('Message').filtered(`to != '${key}'`)
+  const targetRealmForSentMessages = useMessageCopies ? messageCopyRealm : messageSentRealm;
+  const sentMessages = targetRealmForSentMessages.objects('Message');
+  const key = (await Crypto.loadKeyFromKeystore("herdPersonal"))?.trim();
+  const receivedMessages = messageReceivedRealm.objects('Message').filtered(`to != '${key}'`)
 
-  let sentMessagesCopy = parseRealmObjects(sentMessages);
-  let receivedMessagesCopy = parseRealmObjects(receivedMessages);
+  const sentMessagesCopy = parseRealmObjects(sentMessages);
+  const receivedMessagesCopy = parseRealmObjects(receivedMessages);
 
   return [...sentMessagesCopy,...receivedMessagesCopy]
 }
