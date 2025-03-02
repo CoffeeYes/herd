@@ -102,7 +102,7 @@ const Chat = ({ route, navigation }) => {
       if(chat?._id) {
         dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
 
-        let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages"));
+        let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
         chatsWithNewMessages = chatsWithNewMessages.filter(chatID => chatID != chat._id);
         await AsyncStorage.setItem("chatsWithNewMessages", JSON.stringify(chatsWithNewMessages));
       }

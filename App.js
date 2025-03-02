@@ -115,7 +115,7 @@ const App = ({ }) => {
         "from"
       )
       const contacts = getContactsByKey(uniqueKeys);
-      let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages"));
+      let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
@@ -249,7 +249,7 @@ const App = ({ }) => {
     let contactsWithChats = (await getContactsWithChats())
     .sort( (a,b) => a.timestamp > b.timestamp);
 
-    const chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages"));
+    const chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
     for(let chat of contactsWithChats) {
       if (chatsWithNewMessages.includes(chat._id)) {
         chat.hasNewMessages = true;
