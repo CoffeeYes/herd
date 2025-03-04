@@ -120,6 +120,9 @@ class HerdBackgroundService : Service() {
       }
       return errorType;
     }
+
+    public final val newMessageReceivedEmitterString = "com.herd.NEW_HERD_MESSAGES_RECEIVED";
+    public final val removeMessagesFromQueueEmitterString = "com.herd.REMOVE_MESSAGES_FROM_QUEUE";
   }
 
   inner class LocalBinder : Binder() {
@@ -369,7 +372,7 @@ class HerdBackgroundService : Service() {
            }
            else {
              //emit messages to JS receiver 
-             sendMessagesToReceiver(receivedMessages,"com.herd.NEW_HERD_MESSAGE_RECEIVED");
+             sendMessagesToReceiver(receivedMessages,HerdBackgroundService.newMessageReceivedEmitterString);
 
              if(receivedMessagesForSelf.size > 0 && !frontendRunning && allowNotifications) {
               if(!notificationIsPending(generalNotificationID)) {
@@ -628,7 +631,7 @@ class HerdBackgroundService : Service() {
                "messagesToRemove",
                "messagesToRemoveSizes"
              );
-             sendMessagesToReceiver(messagesToRemoveFromQueue,"com.herd.REMOVE_MESSAGES_FROM_QUEUE")
+             sendMessagesToReceiver(messagesToRemoveFromQueue,HerdBackgroundService.removeMessagesFromQueueEmitterString)
            }
 
            device.connectGatt(

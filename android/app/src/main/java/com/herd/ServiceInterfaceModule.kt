@@ -62,10 +62,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
       Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
       var emitterString : String = "";
-      if(action == "com.herd.NEW_HERD_MESSAGE_RECEIVED") {
+      if(action == HerdBackgroundService.newMessageReceivedEmitterString) {
         emitterString = "newHerdMessagesReceived";
       }
-      else if(action == "com.herd.REMOVE_MESSAGES_FROM_QUEUE") {
+      else if(action == HerdBackgroundService.removeMessagesFromQueueEmitterString) {
         emitterString = "removeMessagesFromQueue"
       }
       if(messages != null && messages.size > 0 && emitterString.length > 0) {
@@ -123,8 +123,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
       serviceIntent.putExtra("allowNotifications",allowNotifications);
-      val messageIntentFilter = IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED");
-      messageIntentFilter.addAction("com.herd.REMOVE_MESSAGES_FROM_QUEUE");
+      val messageIntentFilter = IntentFilter(HerdBackgroundService.newMessageReceivedEmitterString);
+      messageIntentFilter.addAction(HerdBackgroundService.removeMessagesFromQueueEmitterString);
       context.registerReceiver(messageReceiver,messageIntentFilter);
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);

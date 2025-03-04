@@ -209,6 +209,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
             resetAdapterName();
+            promise.resolve(false);
           }
           else {
             promise.resolve(true);
