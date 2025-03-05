@@ -44,6 +44,7 @@ import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/realm/helper.js';
+import { storeChatHasNewMessages } from './src/common.js';
 
 const Stack = createStackNavigator();
 
@@ -115,7 +116,6 @@ const App = ({ }) => {
         "from"
       )
       const contacts = getContactsByKey(uniqueKeys);
-      let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
         const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
@@ -124,10 +124,9 @@ const App = ({ }) => {
         }
         dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
         if(userInChat) {
-          chatsWithNewMessages = chatsWithNewMessages.filter(chatID => chatID != contact._id);
+          storeChatHasNewMessages(contact._id, false);
         }
       }
-      AsyncStorage.setItem("chatsWithNewMessages",JSON.stringify(chatsWithNewMessages));
       if(notificationContactsRef.current.length > 0 && enableNotificationsRef.current) {
         let notificationText = notificationContactsRef.current.slice(0,2).join(",");
         if (notificationContactsRef.current.length > 2) {

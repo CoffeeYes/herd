@@ -12,7 +12,7 @@ import {
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
 import { parseRealmID } from '../realm/helper';
-import { encryptStrings } from '../common';
+import { encryptStrings, storeChatHasNewMessages } from '../common';
 
 import { useScreenAdjustedSize } from '../helper';
 
@@ -32,7 +32,6 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
 import ConfirmationModal from './ConfirmationModal';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const maxCharacterCount = 190;
 
@@ -101,10 +100,7 @@ const Chat = ({ route, navigation }) => {
 
       if(chat?._id) {
         dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
-
-        let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
-        chatsWithNewMessages = chatsWithNewMessages.filter(chatID => chatID != chat._id);
-        await AsyncStorage.setItem("chatsWithNewMessages", JSON.stringify(chatsWithNewMessages));
+        storeChatHasNewMessages(chat._id, false);
       }
     })()
   },[]);

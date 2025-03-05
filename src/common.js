@@ -1,6 +1,7 @@
 import Bluetooth from './nativeWrapper/Bluetooth';
 import Crypto from './nativeWrapper/Crypto';
 import PermissionManager from './nativeWrapper/PermissionManager';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const requestPermissionsForBluetooth = async () => {
   let permissionsNotGranted = [];
@@ -89,6 +90,12 @@ const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
   return encryptedStrings
 }
 
+const storeChatHasNewMessages = async (chatID, hasNewMessages) => {
+  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
+  chatsWithNewMessages = hasNewMessages ? [...chatsWithNewMessages,chatID] : chatsWithNewMessages.filter(chat => chat != chatID);
+  AsyncStorage.setItem("chatsWithNewMessages",JSON.stringify(chatsWithNewMessages));
+}
+
 export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
@@ -96,5 +103,6 @@ export {
   checkOrRequestConnectionServices,
   decryptStrings,
   decryptStringsWithIdentifier,
-  encryptStrings
+  encryptStrings,
+  storeChatHasNewMessages
 }
