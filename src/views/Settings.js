@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { Text, ScrollView,
-         View, Switch, Alert } from 'react-native';
+         View, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Clipboard from '@react-native-clipboard/clipboard';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
@@ -45,6 +45,9 @@ const Settings = ({ navigation }) => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationModalText, setConfirmationModalText] = useState("");
+
+  const confirmationModalOnConfirm = useRef(() => {});
 
   const publicKey = useSelector(state => state.userReducer.publicKey);
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
@@ -58,23 +61,6 @@ const Settings = ({ navigation }) => {
   const copyKeyToClipboard = async () => {
     Clipboard.setString(publicKey);
     return true;
-  }
-
-  const showDeletionAlert = async (text, onConfirm = async () => {}, onCancel = async () => {}) => {
-    Alert.alert(
-      text,
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: async () => await onCancel() },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => await onConfirm(),
-        },
-      ]
-    );
   }
 
   const toggleBackgroundTransfer = async value => {
@@ -100,6 +86,11 @@ const Settings = ({ navigation }) => {
 
       const locationEnabled = await Bluetooth.checkLocationEnabled();
       if(!locationEnabled) {
+        setConfirmationModalText("Location needs to be enabled to run the background service, enable it now?")
+        confirmationModalOnConfirm.current = () => {
+          PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
+          setShowConfirmationModal(false);
+        }
         setShowConfirmationModal(true);
         dispatch(setLockable(true));
         return;
@@ -261,13 +252,15 @@ certain permissions to be allowed all the time`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        onPress={() => showDeletionAlert(
-          "Are you sure you want to delete all chats?",
-          () => {
+        onPress={() => {
+          setConfirmationModalText("Are you sure you want to delete all chats?"),
+          confirmationModalOnConfirm.current = () => {
             deleteAllChatsFromRealm();
             dispatch(deleteChats("all"));
+            setShowConfirmationModal(false);
           }
-        )}/>
+          setShowConfirmationModal(true);
+        }}/>
 
         <CardButton
         text="Delete All Contacts"
@@ -275,15 +268,17 @@ certain permissions to be allowed all the time`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete"
         iconSize={cardIconSize}
-        onPress={() => showDeletionAlert(
-          "Are you sure you want to delete all contacts?",
-          () => {
+        onPress={() => {
+          setConfirmationModalText("Are you sure you want to delete all contacts?"),
+          confirmationModalOnConfirm.current = () => {
             deleteAllContactsFromRealm();
             deleteAllChatsFromRealm();
             dispatch(deleteChats("all"))
             dispatch(resetContacts());
+            setShowConfirmationModal(false);
           }
-        )}/>
+          setShowConfirmationModal(true);
+        }}/>
 
         <CardButton
         text="Delete All Messages"
@@ -291,14 +286,16 @@ certain permissions to be allowed all the time`
         iconStyle={styles.deleteCardIconStyle}
         rightIcon="delete-forever"
         iconSize={cardIconSize}
-        onPress={() => showDeletionAlert(
-          "Are you sure you want to delete all messages?",
-          () => {
+        onPress={() => {
+          setConfirmationModalText("Are you sure you want to delete all messages?"),
+          confirmationModalOnConfirm.current = () => {
             deleteAllMessagesFromRealm();
             dispatch(deleteChats("all"));
             dispatch(setMessageQueue([]));
+            setShowConfirmationModal(false);
           }
-        )}/>
+          setShowConfirmationModal(true);
+        }}/>
 
         {__DEV__ &&
           <CustomButton
@@ -347,13 +344,10 @@ certain permissions to be allowed all the time`
 
         <ConfirmationModal
         visible={showConfirmationModal}
-        titleText="Location needs to be enabled to run the background service, enable it now?"
+        titleText={confirmationModalText}
         confirmText='Yes'
         cancelText='No'
-        onConfirm={() => {
-          PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
-          setShowConfirmationModal(false);
-        }}
+        onConfirm={confirmationModalOnConfirm.current}
         onCancel={() => setShowConfirmationModal(false)}
         />
       </ScrollView>
