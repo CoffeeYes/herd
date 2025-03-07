@@ -175,10 +175,11 @@ const addNewReceivedMessages = async (messages,dispatch) => {
       dispatch(addMessage(contact._id,message))
     })
     let chats = await getContactsWithChats();
-    let chatsWithNewMessages = [];
+    let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessage")) || [];
     chats.forEach((chat,index) => {
       if(contactsWithNewMessagesIDs.includes(chat._id)) {
         chats[index].hasNewMessages = true
+        !chatsWithNewMessages.includes(chat._id) &&
         chatsWithNewMessages.push(chat._id);
       }
     })
