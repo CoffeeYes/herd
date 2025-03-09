@@ -4,7 +4,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey, createContact } from './contactRealm';
 import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from './helper';
-import { decryptStrings, encryptStrings } from '../common';
+import { decryptStrings, encryptStrings, storeChatsWithNewMessages } from '../common';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
@@ -175,15 +175,12 @@ const addNewReceivedMessages = async (messages,dispatch) => {
       dispatch(addMessage(contact._id,message))
     })
     let chats = await getContactsWithChats();
-    let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessage")) || [];
     chats.forEach((chat,index) => {
       if(contactsWithNewMessagesIDs.includes(chat._id)) {
         chats[index].hasNewMessages = true
-        !chatsWithNewMessages.includes(chat._id) &&
-        chatsWithNewMessages.push(chat._id);
       }
     })
-    AsyncStorage.setItem("chatsWithNewMessages",JSON.stringify(chatsWithNewMessages))
+    await storeChatsWithNewMessages(chats);
     dispatch(setChats(chats))
   }
 }

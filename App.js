@@ -44,7 +44,7 @@ import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/realm/helper.js';
-import { storeChatHasNewMessages } from './src/common.js';
+import { loadChatsWithNewMessages, storeChatHasNewMessages } from './src/common.js';
 
 const Stack = createStackNavigator();
 
@@ -248,12 +248,7 @@ const App = ({ }) => {
     let contactsWithChats = (await getContactsWithChats())
     .sort( (a,b) => a.timestamp > b.timestamp);
 
-    const chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
-    for(let chat of contactsWithChats) {
-      if (chatsWithNewMessages.includes(chat._id)) {
-        chat.hasNewMessages = true;
-      }
-    }
+    contactsWithChats = await loadChatsWithNewMessages(contactsWithChats);
     dispatch(setChats(contactsWithChats))
 
     //load styles into store

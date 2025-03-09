@@ -90,10 +90,31 @@ const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
   return encryptedStrings
 }
 
+const chatsWithNewMessagesStorageString = "chatsWithNewMessages";
+
 const storeChatHasNewMessages = async (chatID, hasNewMessages) => {
-  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem("chatsWithNewMessages")) || [];
+  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
   chatsWithNewMessages = hasNewMessages ? [...chatsWithNewMessages,chatID] : chatsWithNewMessages.filter(chat => chat != chatID);
-  AsyncStorage.setItem("chatsWithNewMessages",JSON.stringify(chatsWithNewMessages));
+  AsyncStorage.setItem(chatsWithNewMessagesStorageString,JSON.stringify(chatsWithNewMessages));
+}
+
+const storeChatsWithNewMessages = async chats => {
+  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
+  const newChatsToAdd = chats.filter(chat => chat.hasNewMessages).map(chat => chat._id);
+  chatsWithNewMessages = [...newChatsToAdd,chatsWithNewMessages];
+  //unique instances only
+  chatsWithNewMessages = [...new Set(chatsWithNewMessages)];
+  AsyncStorage.setItem(chatsWithNewMessagesStorageString,JSON.stringify(chatsWithNewMessages));
+}
+
+const loadChatsWithNewMessages = async chats => {
+  chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
+  for(let chat of chats) {
+    if (chatsWithNewMessages.includes(chat._id)) {
+      chat.hasNewMessages = true;
+    }
+  }
+  return chats;
 }
 
 export {
@@ -104,5 +125,7 @@ export {
   decryptStrings,
   decryptStringsWithIdentifier,
   encryptStrings,
-  storeChatHasNewMessages
+  storeChatHasNewMessages,
+  storeChatsWithNewMessages,
+  loadChatsWithNewMessages
 }
