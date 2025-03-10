@@ -117,6 +117,13 @@ const loadChatsWithNewMessages = async chats => {
   return chats;
 }
 
+const STORAGE_STRINGS = {
+  MAX_PASSWORD_ATTEMPTS : "maxPasswordAttempts",
+  PASSWORD_ATTEMPT_COUNT : "passwordAttemptCount",
+  STYLES : "styles",
+  ENABLE_NOTIFICATIONS : "enableNotifications"
+}
+
 export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
@@ -127,5 +134,6 @@ export {
   encryptStrings,
   storeChatHasNewMessages,
   storeChatsWithNewMessages,
-  loadChatsWithNewMessages
+  loadChatsWithNewMessages,
+  STORAGE_STRINGS
 }

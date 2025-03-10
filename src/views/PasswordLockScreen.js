@@ -18,6 +18,7 @@ import { palette } from '../assets/palette';
 import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
+import { STORAGE_STRINGS } from '../common';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
 
   useEffect(() => { 
     (async () => {
-      const passwordCount = parseInt(await AsyncStorage.getItem("passwordAttemptCount"));
+      const passwordCount = parseInt(await AsyncStorage.getItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT));
       if(passwordCount) {
         setPasswordAttemptCount(passwordCount)
       }
@@ -90,12 +91,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
       if(maxPasswordAttempts > 0) {
         if(passwordAttemptCount == 1) {
           eraseData(true);
-          await AsyncStorage.setItem("passwordAttemptCount", maxPasswordAttempts.toString())
+          await AsyncStorage.setItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT, maxPasswordAttempts.toString())
         }
         else {
           let newCount = passwordAttemptCount - 1;
           setPasswordAttemptCount(newCount);
-          AsyncStorage.setItem("passwordAttemptCount",newCount.toString())
+          AsyncStorage.setItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT,newCount.toString())
           return;
         }
       }
@@ -105,7 +106,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
     }
     else {
       setError("");
-      AsyncStorage.setItem("passwordAttemptCount",maxPasswordAttempts.toString())
+      AsyncStorage.setItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT,maxPasswordAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
         navigationIndex = 1;

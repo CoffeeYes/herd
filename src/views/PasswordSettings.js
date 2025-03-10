@@ -16,6 +16,7 @@ import NavigationWarningWrapper from './NavigationWarningWrapper';
 import { setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ConfirmationModal from './ConfirmationModal';
+import { STORAGE_STRINGS } from '../common';
 
 const PasswordSettings = () => {
   const dispatch = useDispatch();
@@ -101,8 +102,8 @@ const PasswordSettings = () => {
 
   const saveMaxAttempts = () => {
     dispatch(setMaxPasswordAttempts(parseInt(chosenMaxPasswordAttempts)));
-    AsyncStorage.setItem("passwordAttemptCount", chosenMaxPasswordAttempts);
-    AsyncStorage.setItem("maxPasswordAttempts", chosenMaxPasswordAttempts);
+    AsyncStorage.setItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT, chosenMaxPasswordAttempts);
+    AsyncStorage.setItem(STORAGE_STRINGS.MAX_PASSWORD_ATTEMPTS, chosenMaxPasswordAttempts);
   }
 
   const resetPassword = passwordName => {

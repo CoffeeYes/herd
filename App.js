@@ -44,7 +44,7 @@ import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/realm/helper.js';
-import { loadChatsWithNewMessages, storeChatHasNewMessages } from './src/common.js';
+import { loadChatsWithNewMessages, STORAGE_STRINGS, storeChatHasNewMessages } from './src/common.js';
 
 const Stack = createStackNavigator();
 
@@ -93,7 +93,7 @@ const App = ({ }) => {
         }
       }
 
-      const maxPasswordAttempts = parseInt(await AsyncStorage.getItem("maxPasswordAttempts"));
+      const maxPasswordAttempts = parseInt(await AsyncStorage.getItem(STORAGE_STRINGS.MAX_PASSWORD_ATTEMPTS));
       dispatch(setMaxPasswordAttempts(maxPasswordAttempts))
       setLoading(false);
     })()
@@ -252,7 +252,7 @@ const App = ({ }) => {
     dispatch(setChats(contactsWithChats))
 
     //load styles into store
-    let styles = JSON.parse(await AsyncStorage.getItem("styles"));
+    let styles = JSON.parse(await AsyncStorage.getItem(STORAGE_STRINGS.STYLES));
     if(styles) {
       const [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes(
         [styles.uiFontSize,styles.titleSize,styles.subTextSize]
@@ -276,7 +276,7 @@ const App = ({ }) => {
     const sentMessageQueue = await getMessageQueue(false);
     dispatch(setMessageQueue(messageQueue.filter(message => sentMessageQueue.find(sentMessage => sentMessage._id == message._id) || message.to == key)))
 
-    const enableNotifications = await AsyncStorage.getItem("enableNotifications");
+    const enableNotifications = await AsyncStorage.getItem(STORAGE_STRINGS.ENABLE_NOTIFICATIONS);
     const notificationPermissionsGranted = await ServiceInterface.notificationsAreEnabled();
     dispatch(setEnableNotifications(enableNotifications === "true" && notificationPermissionsGranted));
   }

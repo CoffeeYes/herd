@@ -21,6 +21,7 @@ import { setStyles } from '../redux/actions/chatActions';
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, clamp, fromHsv, toHsv } from '../helper';
+import { STORAGE_STRINGS } from '../common';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
@@ -151,7 +152,7 @@ const Customise = () => {
       subTextSize : uiFontSize * subtextFontMultiplier,
     }
 
-    await AsyncStorage.setItem("styles",JSON.stringify(style));
+    await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(style));
     dispatch(setStyles(style));
     return true;
   }
@@ -159,7 +160,7 @@ const Customise = () => {
   const restoreDefaultStyles = async () => {
     setOverrideFontSliderValues(true);
     setOverrideColorChoiceSliderValue(true);
-    await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
+    await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(defaultChatStyles));
     dispatch(setStyles(defaultChatStyles));
     setSentBoxColor(rgbToHsv(defaultChatStyles.sentBoxColor));
     setSentTextColor(rgbToHsv(defaultChatStyles.sentTextColor));

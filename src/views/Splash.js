@@ -15,6 +15,7 @@ import ServiceInterface from '../nativeWrapper/ServiceInterface.js'
 import { palette } from '../assets/palette';
 import { CommonActions } from '@react-navigation/native';
 import { setEnableNotifications, setMaxPasswordAttempts } from '../redux/actions/appStateActions';
+import { STORAGE_STRINGS } from '../common';
 
 const defaultMaxPasswordAttempts = 3;
 
@@ -33,9 +34,9 @@ const Splash = ({ navigation }) => {
     const nativeNotificationsEnabled = await ServiceInterface.notificationsAreEnabled();
 
     //set default styling
-    await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
-    await AsyncStorage.setItem("maxPasswordAttempts",defaultMaxPasswordAttempts.toString());
-    await AsyncStorage.setItem("enableNotifications",nativeNotificationsEnabled.toString());
+    await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(defaultChatStyles));
+    await AsyncStorage.setItem(STORAGE_STRINGS.MAX_PASSWORD_ATTEMPTS,defaultMaxPasswordAttempts.toString());
+    await AsyncStorage.setItem(STORAGE_STRINGS.ENABLE_NOTIFICATIONS,nativeNotificationsEnabled.toString());
     dispatch(setMaxPasswordAttempts(defaultMaxPasswordAttempts));
     dispatch(setEnableNotifications(nativeNotificationsEnabled));
     setLoading(false);

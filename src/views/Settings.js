@@ -36,7 +36,7 @@ import {
   deleteAllMessages as deleteAllMessagesFromRealm,
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
-import { requestEnableBluetooth, requestPermissionsForBluetooth } from '../common';
+import { requestEnableBluetooth, requestPermissionsForBluetooth, STORAGE_STRINGS } from '../common';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -151,13 +151,13 @@ const Settings = ({ navigation }) => {
       }
       const enableNotifications = enable && nativeNotificationsEnabled;
       dispatch(setEnableNotifications(enableNotifications));
-      await AsyncStorage.setItem("enableNotifications",enableNotifications.toString());
+      await AsyncStorage.setItem(STORAGE_STRINGS.ENABLE_NOTIFICATIONS,enableNotifications.toString());
       ServiceInterface.setAllowNotifications(enableNotifications);
       dispatch(setLockable(true));
     }
     else {
       dispatch(setEnableNotifications(false));
-      await AsyncStorage.setItem("enableNotifications",false.toString())
+      await AsyncStorage.setItem(STORAGE_STRINGS.ENABLE_NOTIFICATIONS,false.toString())
       ServiceInterface.setAllowNotifications(false);
     }
   }
