@@ -19,7 +19,7 @@ import Bluetooth from '../nativeWrapper/Bluetooth';
 import { closeChatRealm } from '../realm/chatRealm';
 import { closeContactRealm } from '../realm/contactRealm';
 import { closePasswordRealm } from '../realm/passwordRealm';
-import { parseRealmID } from '../realm/helper';
+import { parseRealmID } from '../helper';
 
 import { setMessageQueue, deleteChats } from '../redux/actions/chatActions';
 import { resetContacts } from '../redux/actions/contactActions';

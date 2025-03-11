@@ -3,12 +3,11 @@ import Schemas from './Schemas';
 import Crypto from '../nativeWrapper/Crypto';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import { getContactsByKey, createContact } from './contactRealm';
-import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from './helper';
+import { parseRealmObject, parseRealmObjects, getUniqueKeysFromMessages} from '../helper';
 import { decryptStrings, encryptStrings, storeChatsWithNewMessages } from '../common';
 
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const messageCopyRealm = new Realm({
   path : "MessagesCopy",

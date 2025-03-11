@@ -43,7 +43,7 @@ import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
-import { getUniqueKeysFromMessages } from './src/realm/helper.js';
+import { getUniqueKeysFromMessages } from './src/helper.js';
 import { loadChatsWithNewMessages, STORAGE_STRINGS, storeChatHasNewMessages } from './src/common.js';
 
 const Stack = createStackNavigator();

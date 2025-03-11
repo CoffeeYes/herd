@@ -1,7 +1,7 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChats, updateMessagesWithContact } from './chatRealm';
-import { parseRealmObject, parseRealmObjects, parseRealmID} from './helper'
+import { parseRealmObject, parseRealmObjects, parseRealmID} from '../helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',

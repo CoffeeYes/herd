@@ -11,7 +11,7 @@ import {
   getMessagesWithContact,
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
-import { parseRealmID } from '../realm/helper';
+import { parseRealmID } from '../helper';
 import { encryptStrings, storeChatHasNewMessages } from '../common';
 
 import { useScreenAdjustedSize } from '../helper';
