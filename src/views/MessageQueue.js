@@ -30,23 +30,15 @@ const MessageQueue = ({}) => {
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
 
-    for(const key of ["to","from"]) {
-      const longKey = key + "ContactName";
-      //if sender or receiver is oneself, replace name with "You" and mark the message as needing to be decrypted
-      if(message[key].trim() === ownPublicKey.trim()) {
-        message[longKey] = "You";
-        textToDecrypt = true;
-      }
+    if(message.to.trim() === ownPublicKey.trim()) {
+      message.toContactName = "You";
+      message.fromContactName = contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown";
+      textToDecrypt = true;
     }
-    
-    if(!(message.toContactName === "You" && message.fromContactName === "You")) {
-      if(message.toContactName === "You") {
-        message.fromContactName = contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown";
-      }
-      else if(message.fromContactName === "You") {
-        
-        message.toContactName= contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown";
-      }
+    else if(message.from.trim() === ownPublicKey.trim()) {
+      message.fromContactName = "You";
+      message.toContactName= contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown";
+      textToDecrypt = true;
     }
 
     return [message,textToDecrypt];
