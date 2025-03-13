@@ -1,7 +1,7 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChats, updateMessagesWithContact } from './chatRealm';
-import { parseRealmObject, parseRealmObjects, parseRealmID} from '../helper'
+import { parseRealmObject, parseRealmObjects } from '../helper'
 
 const contactsRealm = new Realm({
   path : 'contacts',
@@ -10,15 +10,12 @@ const contactsRealm = new Realm({
 
 const getAllContacts = () => {
   const allContacts = contactsRealm.objects("Contact");
-  return allContacts.length > 0 ?
-  parseRealmObjects(allContacts)
-  :
-  []
+  return parseRealmObjects(allContacts)
 }
 
 const deleteContacts = contacts => {
-  const realmContacts = contactsRealm.objects("Contact");
-  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => parseRealmID(item) == parseRealmID(contact)) !== undefined);
+  const contactIDs = contacts.map(contact => Realm.BSON.ObjectId(contact._id))
+  const contactsToDelete = contactsRealm.objects("Contact").filtered(`_id IN $0`,contactIDs);
   deleteChats(contacts.map(contact => contact.key))
   contactsRealm.write(() => {
     contactsRealm.delete(contactsToDelete);
@@ -40,23 +37,8 @@ const getContactById = id => {
 }
 
 const getContactsByKey = keys => {
-  if(keys.length > 0) {
-    const keyQuery = keys.map(key => `key = '${key}'`).join(' OR ');
-    const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
-    return parseRealmObjects(contactsByKey)
-  }
-  else {
-    return []
-  }
-}
-
-const getContactByName = name => {
-  const contact = contactsRealm.objects('Contact').filtered(`name =[c] '${name}'`);
-
-  return contact.length > 0 ?
-  parseRealmObject(contact[0])
-  :
-  false
+  const contactsByKey = contactsRealm.objects('Contact').filtered(`key IN $0`,keys);
+  return parseRealmObjects(contactsByKey)
 }
 
 const editContact = async (values) => {
@@ -104,7 +86,6 @@ export {
   deleteContacts,
   createContact,
   getContactById,
-  getContactByName,
   getContactsByKey,
   editContact,
   deleteAllContacts,
