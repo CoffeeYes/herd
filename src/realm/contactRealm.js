@@ -37,8 +37,15 @@ const getContactById = id => {
 }
 
 const getContactsByKey = keys => {
-  const contactsByKey = contactsRealm.objects('Contact').filtered(`key IN $0`,keys);
-  return parseRealmObjects(contactsByKey)
+  //have to manually chain keys with OR as IN query does not currently function correctly with strings
+  if(keys.length > 0) {
+    const keyQuery = keys.map(key => `key = '${key}'`).join(' OR ');
+    const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
+    return parseRealmObjects(contactsByKey)
+  }
+  else {
+    return []
+  }
 }
 
 const editContact = async (values) => {

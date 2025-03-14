@@ -315,17 +315,16 @@ const getReceivedMessagesForSelf = async () => {
 }
 
 const removeCompletedMessagesFromRealm = messages => {
+  const messageIDs = messages.map(message => Realm.BSON.ObjectId(message._id));
   //get messages sent from this device which have reached their final destination
-  const sentMessagesToRemove = messageSentRealm.objects('Message')
-  .filter(sentMessage => messages.find(message => message._id == sentMessage._id) != undefined)
+  const sentMessagesToRemove = messageSentRealm.objects('Message').filtered(`_id in $0`,messageIDs);
 
   messageSentRealm.write(() => {
     messageSentRealm.delete(sentMessagesToRemove);
   })
 
   //get messages received, potentially for other users, which have reached their final destination
-  const receivedMessagesToDelete = messageReceivedRealm.objects('Message')
-  .filter(receivedMessage => messages.find(message => message._id == receivedMessage._id) != undefined)
+  const receivedMessagesToDelete = messageReceivedRealm.objects('Message').filtered(`_id in $0`,messageIDs);
 
   messageReceivedRealm.write(() => {
     messageReceivedRealm.delete(receivedMessagesToDelete);
