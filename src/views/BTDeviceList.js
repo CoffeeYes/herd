@@ -66,7 +66,7 @@ const BTDeviceList = ({ navigation }) => {
     })
 
 
-    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
       if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
         if(scanningRef.current) {
           if(state === "ADAPTER_TURNED_OFF") {

@@ -99,7 +99,7 @@ const App = ({ }) => {
     })()
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
-    const messagesListener = eventEmitter.addListener("newHerdMessagesReceived", async messages => {
+    const messagesListener = eventEmitter.addListener(ServiceInterface.emitterStrings.NEW_MESSAGES_RECEIVED, async messages => {
       await addNewReceivedMessagesToRealm(messages,dispatch);
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
@@ -141,7 +141,7 @@ const App = ({ }) => {
       }
     })
 
-    const removeFromQueueListener = eventEmitter.addListener("removeMessagesFromQueue", messages => {
+    const removeFromQueueListener = eventEmitter.addListener(ServiceInterface.emitterStrings.REMOVE_MESSAGES_FROM_QUEUE, messages => {
       dispatch(removeMessagesFromQueue(messages.map(message => message._id)));
     })
 
@@ -176,7 +176,7 @@ const App = ({ }) => {
       }));
     })
 
-    const bluetoothAndLocationStateListener = eventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+    const bluetoothAndLocationStateListener = eventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
       if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
         dispatch(setBackgroundServiceRunning(false));
       }

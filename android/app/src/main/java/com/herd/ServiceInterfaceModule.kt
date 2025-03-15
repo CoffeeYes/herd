@@ -39,6 +39,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
 
+  private final val emitterStrings : Map<String,String> = mapOf(
+    "NEW_MESSAGES_RECEIVED" to "newHerdMessagesReceived",
+    "REMOVE_MESSAGES_FROM_QUEUE" to "removeMessagesFromQueue",
+    "BLUETOOTH_LOCATION_STATE_CHANGE" to "bluetoothOrLocationStateChange"
+  )
+
   private var bound : Boolean = false;
 
   var serviceConnection = object : ServiceConnection {
@@ -63,10 +69,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
       var emitterString : String = "";
       if(action == HerdBackgroundService.newMessageReceivedEmitterString) {
-        emitterString = "newHerdMessagesReceived";
+        emitterString = emitterStrings.getValue("NEW_MESSAGES_RECEIVED");
       }
       else if(action == HerdBackgroundService.removeMessagesFromQueueEmitterString) {
-        emitterString = "removeMessagesFromQueue"
+        emitterString = emitterStrings.getValue("REMOVE_MESSAGES_FROM_QUEUE");
       }
       if(messages != null && messages.size > 0 && emitterString.length > 0) {
         Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
@@ -83,7 +89,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       val errorNotificationType = HerdBackgroundService.checkForBluetoothOrLocationError(context, intent);
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit("bluetoothOrLocationStateChange",errorNotificationType);
+        .emit(emitterStrings.getValue("BLUETOOTH_LOCATION_STATE_CHANGE"),errorNotificationType);
         
         if(bound) {
           unbindService();
@@ -94,6 +100,12 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   override fun getName(): String {
       return "ServiceInterfaceModule"
+  }
+
+  override fun getConstants() : Map<String, Any> {
+    return mapOf(
+      "emitterStrings" to emitterStrings
+    )
   }
 
   @ReactMethod

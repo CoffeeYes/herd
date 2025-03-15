@@ -44,7 +44,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
       }
     })
 
-    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener("bluetoothOrLocationStateChange", state => {
+    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
       let disableType = "";
       if(state === "ADAPTER_TURNED_OFF") {
         disableType = "Bluetooth";
