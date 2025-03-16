@@ -32,7 +32,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     const serviceEventEmitter = new NativeEventEmitter(ServiceInterface)
 
     //listen for connected state to begin key exchange
-    const stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
+    const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {
       if(state === "Connected") {
         setActivityText(activityStateText.connected);
         await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
@@ -59,7 +59,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     })
 
     //listen for messages to receive keys and ACKS
-    const messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
+    const messageListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_MESSAGE, msg => {
       try {
         const message = JSON.parse(msg);
         if(message?.key) {

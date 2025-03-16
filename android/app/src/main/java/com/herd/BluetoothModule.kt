@@ -55,8 +55,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
 
+    private final val emitterStrings : Map<String,String> = mapOf(
+      "NEW_BT_DEVICE" to "newBTDeviceFound",
+      "DISCOVERY_STATE_CHANGE" to "BTStateChange",
+      "CONNECTION_STATE_CHANGE" to "BTConnectionStateChange",
+      "NEW_MESSAGE" to "newBTMessageReceived"
+    )
+
     override fun getName(): String {
         return "BluetoothModule"
+    }
+
+    override fun getConstants() : Map<String,Map<String,String>> {
+      return mapOf(
+        "emitterStrings" to emitterStrings
+      )
     }
 
     @ReactMethod
@@ -113,7 +126,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
                 //pass object to JS through event emitter
                 reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit("newBTDeviceFound",deviceObject)
+                .emit(emitterStrings.getValue("NEW_BT_DEVICE"),deviceObject)
               }
               else {
                 Log.i(TAG,"Device found, doesn't contain '_HERD' in name, not emitting")
@@ -130,12 +143,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         when(action) {
           BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTStateChange","DISCOVERY_STARTED")
+            .emit(emitterStrings.getValue("DISCOVERY_STATE_CHANGE"),"DISCOVERY_STARTED")
           }
           BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
             resetAdapterName();
             reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit("BTStateChange","DISCOVERY_FINISHED")
+            .emit(emitterStrings.getValue("DISCOVERY_STATE_CHANGE"),"DISCOVERY_FINISHED")
           }
         }
       }
@@ -411,14 +424,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
               if(!socket.isConnected()) {
                 Log.e(TAG,"BT Connection Thread bluetooth socket is no longer connected")
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit("newBTMessageReceived","Disconnected");
+                .emit(emitterStrings.getValue("NEW_MESSAGE"),"Disconnected");
                 
                 shouldRun = false;
                 this.cancel();
               }
               else {
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit("BTConnectionStateChange","Connected")
+                .emit(emitterStrings.getValue("CONNECTION_STATE_CHANGE"),"Connected")
                 // Read from the InputStream.
                 numBytes = try {
                     inputStream.read(buffer);
@@ -426,7 +439,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     Log.d(TAG, "Input stream was disconnected", e);
 
                     context.getJSModule(RCTDeviceEventEmitter::class.java)
-                    .emit("BTConnectionStateChange","Disconnected");
+                    .emit(emitterStrings.getValue("CONNECTION_STATE_CHANGE"),"Disconnected");
 
                     break;
                 }
@@ -437,7 +450,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
                 //emit string upwards to javscript event listener
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit("newBTMessageReceived",receivedString);
+                .emit(emitterStrings.getValue("NEW_MESSAGE"),receivedString);
               }
           }
           Log.i(TAG,"BTConnectionThread shouldRun is false, returning");
@@ -461,7 +474,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
         finally {
           context.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("BTConnectionStateChange","Disconnected")
+          .emit(emitterStrings.getValue("CONNECTION_STATE_CHANGE"),"Disconnected")
         }
       }
     }

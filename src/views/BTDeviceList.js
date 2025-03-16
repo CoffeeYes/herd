@@ -48,11 +48,11 @@ const BTDeviceList = ({ navigation }) => {
       appStateRef.current = state;
     })
 
-    const bluetoothListener = eventEmitter.addListener("newBTDeviceFound", device => {
+    const bluetoothListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_BT_DEVICE, device => {
       updateDeviceList(device);
     });
 
-    const scanStateChangeListener = eventEmitter.addListener("BTStateChange", async state => {
+    const scanStateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.DISCOVERY_STATE_CHANGE, async state => {
       if(state === "DISCOVERY_STARTED" && appStateRef.current == "active") {
         setScanning(true);
       }
