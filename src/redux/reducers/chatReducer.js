@@ -88,19 +88,14 @@ const chatReducer = (state = initialState,action) => {
       }
     }
     case "DELETE_CHATS": {
-      let newChats = [...state.chats];
-      //chat object with multiple keys was passed
+      let contactIDs = action.payload;
+      //extract ids if entire chat objects were passed instead of just IDs
       if(action.payload[0]?._id) {
-        newChats = newChats.filter(
-          chat => action.payload.find(
-          chatToDelete => chatToDelete._id == chat._id) === undefined
-        )
+        contactIDs = action.payload.map(chat => chat._id);
       }
-      //only ID was passed
-      else {
-        newChats = newChats.filter(chat => !action.payload.includes(chat._id))
-      }
-      return {...state,
+      const newChats = [...state.chats].filter(chat => !action.payload.includes(chat._id))
+      return {
+        ...state,
         chats : newChats
       };
     }
