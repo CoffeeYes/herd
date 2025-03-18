@@ -7,26 +7,20 @@ const passwordRealm = new Realm({
 })
 
 const updatePassword = (passwordName,passwordHash) => {
-  const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0];
+  const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0] || {};
 
-  if(password) {
-    passwordRealm.write(() => {
-      passwordRealm.create('Password',{
-        ...password,
-        hash : passwordHash,
-        _id : Realm.BSON.ObjectId(password._id)},
-      true);
-    })
-  }
-  else {
-    passwordRealm.write(() => {
-      passwordRealm.create('Password',{
-        _id : Realm.BSON.ObjectId(),
-        name : passwordName,
-        hash : passwordHash
-      })
-    })
-  }
+  passwordRealm.write(() => {
+    passwordRealm.create(
+      'Password',
+      {
+      ...password,
+      name : passwordName,
+      hash : passwordHash,
+      _id : password._id ? Realm.BSON.ObjectId(password._id) : Realm.BSON.ObjectId()
+      },
+      true
+    );
+  })
 }
 
 const getPasswordHash = name => {
