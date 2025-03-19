@@ -74,10 +74,12 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
     })()
   },[primaryInputText, secondaryInputText])
 
-  const handleReset = () => {
-    reset?.();
-    setPrimaryInputText("");
-    setSecondaryInputText("");
+  const handleReset = async () => {
+    const wasReset = await reset?.();
+    if(wasReset) {
+      setPrimaryInputText("");
+      setSecondaryInputText("");
+    }
   }
 
   return (

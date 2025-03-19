@@ -31,6 +31,7 @@ const PasswordSettings = () => {
 
   const loginPasswordHasChangesRef = useRef(false);
   const erasurePasswordHasChangesRef = useRef(false);
+  const resetPasswordPromiseRef = useRef();
 
   const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasurePasswordHash = useSelector(state => state.userReducer.erasurePasswordHash);
@@ -148,6 +149,9 @@ meaning all contacts who have previously added you will need to add you again.`
         reset={() => {
           setPasswordToReset("login");
           setShowResetModal(true);
+          return new Promise(resolve => {
+            resetPasswordPromiseRef.current = resolve;
+          })
         }}
         disableReset={!hasLoginPassword}
         />
@@ -190,14 +194,23 @@ meaning all contacts who have previously added you will need to add you again.`
         reset={() => {
           setPasswordToReset("erasure");
           setShowResetModal(true);
+          return new Promise(resolve => {
+            resetPasswordPromiseRef.current = resolve
+          })
         }}
         disableReset={!hasErasurePassword}
         />
 
         <ConfirmationModal
         visible={showResetModal}
-        onConfirm={() => resetPassword(passwordToReset)}
-        onCancel={() => setShowResetModal(false)}
+        onConfirm={() => {
+          resetPassword(passwordToReset)
+          resetPasswordPromiseRef.current(true);
+        }}
+        onCancel={() => {
+          setShowResetModal(false)
+          resetPasswordPromiseRef.current(false)
+        }}
         titleText="Are you sure you want to reset this password?"
         />
 
