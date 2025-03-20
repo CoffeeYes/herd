@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { ScrollView, TextInput, Text, View } from 'react-native';
 import { palette } from '../assets/palette';
@@ -31,6 +31,7 @@ const PasswordSettings = () => {
 
   const loginPasswordHasChangesRef = useRef(false);
   const erasurePasswordHasChangesRef = useRef(false);
+  const maxPasswordAttemptsHasChangesRef = useRef(false);
   const resetPasswordPromiseRef = useRef();
 
   const loginPasswordHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -38,6 +39,10 @@ const PasswordSettings = () => {
 
   const hasLoginPassword = loginPasswordHash?.length > 0;
   const hasErasurePassword = erasurePasswordHash?.length > 0;
+
+  useEffect(() => {
+    maxPasswordAttemptsHasChangesRef.current = maxPasswordAttempts != Number(chosenMaxPasswordAttempts);
+  },[maxPasswordAttempts, chosenMaxPasswordAttempts])
 
   const checkValidPassword = (password, confirmation) => {
     const whitespace = /\s/;
@@ -127,7 +132,9 @@ meaning all contacts who have previously added you will need to add you again.`
 
   return (
     <NavigationWarningWrapper checkForChanges={() => {
-      return loginPasswordHasChangesRef.current || erasurePasswordHasChangesRef.current
+      return loginPasswordHasChangesRef.current || 
+      erasurePasswordHasChangesRef.current ||
+      maxPasswordAttemptsHasChangesRef.current
     }}>
       <Header title="Password Settings" allowGoBack/>
 
