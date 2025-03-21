@@ -129,12 +129,13 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
 
 const addNewReceivedMessages = async (messages,dispatch) => {
   const receivedMessages = parseRealmObjects(messageReceivedRealm.objects("Message"));
-  const deletedReceivedMessage = parseRealmObjects(deletedReceivedRealm.objects("Message"));
+  const deletedReceivedMessages = parseRealmObjects(deletedReceivedRealm.objects("Message"));
   const ownPublicKey = await Crypto.loadKeyFromKeystore('herdPersonal');
-  const newMessages = messages.filter(nMessage =>
-    receivedMessages.find(rMessage => rMessage._id == nMessage._id) === undefined &&
-    deletedReceivedMessage.find(dMessage => dMessage._id == nMessage.id) === undefined
-  );
+  const messagesToAvoidIDs = [
+    ...receivedMessages.map(message => message._id),
+    ...deletedReceivedMessages.map(message => message._id)
+  ]
+  const newMessages = messages.filter(message => !messagesToAvoidIDs.includes(message._id))
   messageReceivedRealm.write(() => {
     newMessages.map(message => messageReceivedRealm.create("Message",{
       ...message,

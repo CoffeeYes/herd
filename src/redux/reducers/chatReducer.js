@@ -93,7 +93,7 @@ const chatReducer = (state = initialState,action) => {
       if(action.payload[0]?._id) {
         contactIDs = action.payload.map(chat => chat._id);
       }
-      const newChats = [...state.chats].filter(chat => !action.payload.includes(chat._id))
+      const newChats = [...state.chats].filter(chat => !contactIDs.includes(chat._id))
       return {
         ...state,
         chats : newChats
@@ -159,7 +159,7 @@ const chatReducer = (state = initialState,action) => {
       .filter(section => section.data.length !== 0)
 
       const lastSection = newSections[0]?.data
-      const lastMessage = lastSection && lastSection[0];
+      const lastMessage = lastSection?.[0];
 
       const newState = {
         ...state,
