@@ -30,12 +30,7 @@ const MessageQueue = ({}) => {
   const assignParticipantsToMessage = message => {
     let textToDecrypt = false;
 
-    if(message.to.trim() === ownPublicKey.trim()) {
-      message.toContactName = "You";
-      message.fromContactName = contacts.find(contact => message.from.trim() === contact.key)?.name || "Unknown";
-      textToDecrypt = true;
-    }
-    else if(message.from.trim() === ownPublicKey.trim()) {
+    if(message.from.trim() === ownPublicKey.trim()) {
       message.fromContactName = "You";
       message.toContactName= contacts.find(contact => message.to.trim() === contact.key)?.name || "Unknown";
       textToDecrypt = true;
@@ -91,7 +86,7 @@ const MessageQueue = ({}) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
     const hours = moment(item.timestamp).format("HH:MM");
 
-    const messageIsForUser = item.toContactName == "You" || item.fromContactName == "You";
+    const messageIsForUser = item.fromContactName == "You";
 
     return (
       messageIsForUser ?
