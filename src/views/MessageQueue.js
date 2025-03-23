@@ -63,6 +63,12 @@ const MessageQueue = ({}) => {
   },[])
 
   useEffect(() => {
+    return () => {
+      Crypto.cancelCoroutineWork();
+    }
+  },[])
+
+  useEffect(() => {
     (async () => {
       const initialMessages = createInitialMessageState(messageQueue);
       setParsedQueue(initialMessages);
@@ -73,14 +79,10 @@ const MessageQueue = ({}) => {
         return result;
       },[]);
       const results = await decryptStringsWithIdentifier(messagesToDecrypt)
-      const final = assignResultsToTargets(results,[...parsedQueue]);
+      const final = assignResultsToTargets(results,[...initialMessages]);
       setParsedQueue(final);
     })()
-
-    return () => {
-      Crypto.cancelCoroutineWork();
-    }
-  },[])
+  },[messageQueue])
 
   const renderItem = useCallback(({ item }) => {
     const date = timestampToText(item.timestamp, "DD/MM/YY");
