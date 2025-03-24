@@ -45,6 +45,7 @@ import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQue
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/helper.js';
 import { loadChatsWithNewMessages, STORAGE_STRINGS, storeChatHasNewMessages } from './src/common.js';
+import { current } from '@reduxjs/toolkit';
 
 const Stack = createStackNavigator();
 
@@ -100,10 +101,11 @@ const App = ({ }) => {
 
     const eventEmitter = new NativeEventEmitter(ServiceInterface);
     const messagesListener = eventEmitter.addListener(ServiceInterface.emitterStrings.NEW_MESSAGES_RECEIVED, async messages => {
-      await addNewReceivedMessagesToRealm(messages,dispatch);
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
-      const checkIfUserIsInChat = lastRoute.name == "chat";
+      const isInChat = lastRoute.name == "chat";
+      const currentChat = lastRoute?.params?.contactID; 
+      await addNewReceivedMessagesToRealm(messages, dispatch, currentChat);
       let notificationPending = false;
       if(notificationIDRef.current) {
         notificationPending = await ServiceInterface.notificationIsPending(notificationIDRef.current);
@@ -118,13 +120,9 @@ const App = ({ }) => {
       const contacts = getContactsByKey(uniqueKeys);
       for(const contact of contacts) {
         //do not set "hasNewMessages" if user is already sitting in the chat with new messages
-        const userInChat = checkIfUserIsInChat && lastRoute.params.contactID == contact._id;
+        const userInChat = isInChat && currentChat == contact._id;
         if(!userInChat && !notificationContactsRef.current.includes(contact.name)) {
           notificationContactsRef.current.push(contact.name);
-        }
-        dispatch(updateChat({...contact, doneLoading : false, hasNewMessages : !userInChat}));
-        if(userInChat) {
-          storeChatHasNewMessages(contact._id, false);
         }
       }
       if(notificationContactsRef.current.length > 0 && enableNotificationsRef.current) {

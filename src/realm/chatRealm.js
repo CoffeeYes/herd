@@ -127,7 +127,7 @@ const sendMessageToContact = (metaData, encrypted, selfEncryptedCopy) => {
   return messageID.toString();
 }
 
-const addNewReceivedMessages = async (messages,dispatch) => {
+const addNewReceivedMessages = async (messages,dispatch, currentChat) => {
   const receivedMessages = parseRealmObjects(messageReceivedRealm.objects("Message"));
   const deletedReceivedMessages = parseRealmObjects(deletedReceivedRealm.objects("Message"));
   const ownPublicKey = await Crypto.loadKeyFromKeystore('herdPersonal');
@@ -176,8 +176,11 @@ const addNewReceivedMessages = async (messages,dispatch) => {
     })
     let chats = await getContactsWithChats();
     chats.forEach((chat,index) => {
-      if(contactsWithNewMessagesIDs.includes(chat._id)) {
-        chats[index].hasNewMessages = true
+      if(contactsWithNewMessagesIDs.includes(chat._id) && chat._id != currentChat) {
+        if(chat._id != currentChat) {
+          chats[index].hasNewMessages = true
+        }
+        chats[index].doneLoading = false;
       }
     })
     await storeChatsWithNewMessages(chats);
