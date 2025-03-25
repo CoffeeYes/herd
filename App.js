@@ -117,16 +117,18 @@ const App = ({ }) => {
         messages.filter(message => message.to.trim() == ownPublicKeyRef.current.trim()),
         "from"
       )
-      const contacts = getContactsByKey(uniqueKeys);
+      let contacts = getContactsByKey(uniqueKeys);
+      if(isInChat) {
+        contacts = contacts.filter(contact => contact._id != currentChat);
+      }
       for(const contact of contacts) {
-        //do not set "hasNewMessages" if user is already sitting in the chat with new messages
-        const userInChat = isInChat && currentChat == contact._id;
-        if(!userInChat && !notificationContactsRef.current.includes(contact.name)) {
-          notificationContactsRef.current.push(contact.name);
+        if(!notificationContactsRef.current.find(existingContact => existingContact._id == contact._id)) {
+          notificationContactsRef.current.push({_id : contact._id, name : contact.name});
         }
       }
       if(notificationContactsRef.current.length > 0 && enableNotificationsRef.current) {
-        let notificationText = notificationContactsRef.current.slice(0,2).join(",");
+        const notificationNames = notificationContactsRef.current.map(contact => contact.name);
+        let notificationText = notificationNames.slice(0,2).join(",");
         if (notificationContactsRef.current.length > 2) {
           notificationText += ` and ${notificationContactsRef.current.length - 2} more.`
         }
