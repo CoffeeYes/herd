@@ -41,11 +41,10 @@ import { getPasswordHash } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats, setStyles, setMessageQueue, updateChat, removeMessagesFromQueue } from './src/redux/actions/chatActions';
+import { setChats, setStyles, setMessageQueue, removeMessagesFromQueue } from './src/redux/actions/chatActions';
 import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/helper.js';
-import { loadChatsWithNewMessages, STORAGE_STRINGS, storeChatHasNewMessages } from './src/common.js';
-import { current } from '@reduxjs/toolkit';
+import { loadChatsWithNewMessages, STORAGE_STRINGS } from './src/common.js';
 
 const Stack = createStackNavigator();
 
@@ -143,6 +142,7 @@ const App = ({ }) => {
 
     const removeFromQueueListener = eventEmitter.addListener(ServiceInterface.emitterStrings.REMOVE_MESSAGES_FROM_QUEUE, messages => {
       dispatch(removeMessagesFromQueue(messages.map(message => message._id)));
+      removeCompletedMessagesFromRealm(messages);
     })
 
     const appStateListener = AppState.addEventListener("change",async state => {
