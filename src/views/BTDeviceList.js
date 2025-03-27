@@ -26,19 +26,10 @@ const BTDeviceList = ({ navigation }) => {
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
-  const [deviceList, setDeviceList, deviceRef] = useStateAndRef([],[]); const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
+  const [deviceList, setDeviceList, deviceListRef] = useStateAndRef([],[]);
+  const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
 
-  const updateDeviceList = newDevice => {
-    const existingDevice = deviceRef.current.findIndex(existingDevice => existingDevice.macAddress === newDevice.macAddress);
-    if(existingDevice === -1) {
-      setDeviceList([...deviceRef.current,{...newDevice, foundAgain : true}]);
-    }
-    else {
-      let listCopy = [...deviceRef.current];
-      listCopy[existingDevice] = {...listCopy[existingDevice], foundAgain : true}
-      setDeviceList(listCopy)
-    }
-  }
+  const activeScanDeviceList = useRef([]);
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
@@ -49,18 +40,24 @@ const BTDeviceList = ({ navigation }) => {
     })
 
     const bluetoothListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_BT_DEVICE, device => {
-      updateDeviceList(device);
+      if(!activeScanDeviceList.current.find(existingDevice => existingDevice.macAddress == device.macAddress)) {
+        activeScanDeviceList.current.push(device);
+      }
+      if(!deviceListRef.current.find(existingDevice => existingDevice.macAddress == device.macAddress)) {
+        setDeviceList([...deviceListRef.current,device]);
+      }
     });
 
     const scanStateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.DISCOVERY_STATE_CHANGE, async state => {
       if(state === "DISCOVERY_STARTED" && appStateRef.current == "active") {
         setScanning(true);
+        activeScanDeviceList.current = [];
       }
       else if (state === "DISCOVERY_FINISHED") {
         const servicesEnabled = await Bluetooth.checkBTEnabled() && await Bluetooth.checkLocationEnabled();
         if(servicesEnabled) {
           setScanning(false);
-          setDeviceList(deviceRef.current.filter(device => device.foundAgain))
+          setDeviceList(activeScanDeviceList.current);
         }
       }
     })
@@ -130,7 +127,6 @@ const BTDeviceList = ({ navigation }) => {
     if(servicesEnabled) {
       const discoverable = await requestMakeDiscoverable();
       if(discoverable) {
-        setDeviceList(deviceList.map(device => ({...device, foundAgain : false})));
         await Bluetooth.scanForDevices();
       }
     }
