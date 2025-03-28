@@ -20,34 +20,12 @@ import { setStyles } from '../redux/actions/chatActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize, clamp, fromHsv, toHsv } from '../helper';
+import { useScreenAdjustedSize, fromHsv, clampRgb, rgbToHsv, hsvToRgb } from '../helper';
 import { STORAGE_STRINGS } from '../common';
 
 const titleFontMultiplier = 1.5;
 const subtextFontMultiplier = 0.8;
 const buttonIconSizeMultiplier = 0.2;
-
-const clampHsv = (hsv, min = 0.01, max = 1) => {
-  return ({
-    ...hsv,
-    s : clamp(hsv.s, min, max),
-    v : clamp(hsv.v, min, max)
-  })
-}
-
-const clampRgb = (rgb, min = 0.01, max = 1) => {
-  let hsv = toHsv(rgb);
-  hsv = clampHsv(hsv,min,max);
-  return fromHsv(hsv).toLowerCase();
-}
-
-const rgbToHsv = rgb => {
-  return clampHsv(toHsv(rgb));
-}
-
-const hsvToRgb = hsv => {
-  return fromHsv(clampHsv(hsv)).toLowerCase();
-}
 
 const Customise = () => {
   const dispatch = useDispatch();

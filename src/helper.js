@@ -277,6 +277,28 @@ const fromHsv = hsv => {
   return `#${r}${g}${b}`
 }
 
+const clampHsv = (hsv, min = 0.01, max = 1) => {
+  return ({
+    ...hsv,
+    s : clamp(hsv.s, min, max),
+    v : clamp(hsv.v, min, max)
+  })
+}
+
+const clampRgb = (rgb, min = 0.01, max = 1) => {
+  let hsv = toHsv(rgb);
+  hsv = clampHsv(hsv,min,max);
+  return fromHsv(hsv).toLowerCase();
+}
+
+const rgbToHsv = rgb => {
+  return clampHsv(toHsv(rgb));
+}
+
+const hsvToRgb = hsv => {
+  return fromHsv(clampHsv(hsv)).toLowerCase();
+}
+
 const parseRealmID = object => {
     //determine whether id is in array form or string form and return appropriate value
     if(object?._id?.[0] === "$oid") {
@@ -315,8 +337,12 @@ export {
   useOrientationBasedStyle,
   useStateAndRef,
   clamp,
+  clampHsv,
+  clampRgb,
   fromHsv,
   toHsv,
+  rgbToHsv,
+  hsvToRgb,
   parseRealmID,
   parseRealmObject,
   parseRealmObjects,
