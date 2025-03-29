@@ -58,6 +58,16 @@
     "react-test-renderer": "18.1.0"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles" : [
+      "./jest.setup.js",
+      "./node_modules/react-native-gesture-handler/jestSetup.js",
+      "./mocks/jestSetups/react-native-clipboard-setup.js",
+      "./mocks/jestSetups/AsyncStorageSetup.js"
+    ],
+    "moduleNameMapper" : {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
+    }
   }
 }
