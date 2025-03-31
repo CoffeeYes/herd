@@ -88,6 +88,10 @@ const closeContactRealm = () => {
   contactsRealm.close();
 }
 
+const deleteContactRealm = () => {
+  Realm.deleteFile(contactsRealm);
+}
+
 export {
   getAllContacts,
   deleteContacts,
@@ -96,5 +100,6 @@ export {
   getContactsByKey,
   editContact,
   deleteAllContacts,
-  closeContactRealm
+  closeContactRealm,
+  deleteContactRealm
 }

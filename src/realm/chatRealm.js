@@ -401,6 +401,13 @@ const closeChatRealm = () => {
   deletedReceivedRealm.close();
 }
 
+const deleteChatRealm = () => {
+  Realm.deleteFile(messageCopyRealm);
+  Realm.deleteFile(messageReceivedRealm);
+  Realm.deleteFile(messageSentRealm);
+  Realm.deleteFile(deletedReceivedRealm);
+}
+
 export {
   getMessagesWithContact,
   updateMessagesWithContact,
@@ -416,4 +423,5 @@ export {
   getReceivedMessagesForSelf,
   removeCompletedMessagesFromRealm,
   closeChatRealm,
+  deleteChatRealm
 }

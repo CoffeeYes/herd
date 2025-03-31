@@ -40,9 +40,14 @@ const closePasswordRealm = () => {
   passwordRealm.close();
 }
 
+const deletePasswordRealm = () => {
+  Realm.deleteFile(passwordRealm);
+}
+
 export {
   updatePassword,
   getPasswordHash,
   deletePassword,
-  closePasswordRealm
+  closePasswordRealm,
+  deletePasswordRealm
 }
