@@ -3,10 +3,12 @@ import Schemas from './Schemas';
 import { deleteChats, updateMessagesWithContact } from './chatRealm';
 import { parseRealmObject, parseRealmObjects } from '../helper'
 
-const contactsRealm = new Realm({
+const contactRealmConfig = {
   path : 'contacts',
   schema : [Schemas.ContactSchema]
-})
+}
+
+const contactsRealm = new Realm(contactRealmConfig);
 
 const getAllContacts = () => {
   const allContacts = contactsRealm.objects("Contact");
@@ -89,7 +91,7 @@ const closeContactRealm = () => {
 }
 
 const deleteContactRealm = () => {
-  Realm.deleteFile(contactsRealm);
+  Realm.deleteFile(contactRealmConfig);
 }
 
 export {

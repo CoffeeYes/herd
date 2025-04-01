@@ -1,10 +1,12 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 
-const passwordRealm = new Realm({
+const passwordRealmConfig = {
   path : 'passwords',
   schema : [Schemas.PasswordSchema]
-})
+}
+
+const passwordRealm = new Realm(passwordRealmConfig)
 
 const updatePassword = (passwordName,passwordHash) => {
   const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0] || {};
@@ -41,7 +43,7 @@ const closePasswordRealm = () => {
 }
 
 const deletePasswordRealm = () => {
-  Realm.deleteFile(passwordRealm);
+  Realm.deleteFile(passwordRealmConfig);
 }
 
 export {

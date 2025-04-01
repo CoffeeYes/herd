@@ -9,25 +9,33 @@ import { decryptStrings, encryptStrings, storeChatsWithNewMessages } from '../co
 import { addMessagesToQueue, addMessage, setChats } from '../redux/actions/chatActions';
 import { addContact } from '../redux/actions/contactActions';
 
-const messageCopyRealm = new Realm({
+const messageCopyRealmConfig = {
   path : "MessagesCopy",
   schema: [Schemas.MessageSchema],
-});
+}
 
-const messageReceivedRealm = new Realm({
+const messageReceivedRealmConfig = {
   path : "MessagesReceived",
   schema: [Schemas.MessageSchema],
-});
+}
 
-const messageSentRealm = new Realm({
+const messageSentRealmConfig = {
   path : "MessagesSent",
   schema : [Schemas.MessageSchema]
-})
+}
 
-const deletedReceivedRealm = new Realm({
+const deletedReceivedRealmConfig = {
   path : "MessagesReceivedAndDeleted",
   schema : [Schemas.MessageSchema]
-})
+}
+
+const messageCopyRealm = new Realm(messageCopyRealmConfig);
+
+const messageReceivedRealm = new Realm(messageReceivedRealmConfig);
+
+const messageSentRealm = new Realm(messageSentRealmConfig);
+
+const deletedReceivedRealm = new Realm(deletedReceivedRealmConfig);
 
 const decryptMessages = async messages => {
   if(messages.length == 0) {
@@ -402,10 +410,10 @@ const closeChatRealm = () => {
 }
 
 const deleteChatRealm = () => {
-  Realm.deleteFile(messageCopyRealm);
-  Realm.deleteFile(messageReceivedRealm);
-  Realm.deleteFile(messageSentRealm);
-  Realm.deleteFile(deletedReceivedRealm);
+  Realm.deleteFile(messageCopyRealmConfig);
+  Realm.deleteFile(messageReceivedRealmConfig);
+  Realm.deleteFile(messageSentRealmConfig);
+  Realm.deleteFile(deletedReceivedRealmConfig);
 }
 
 export {
