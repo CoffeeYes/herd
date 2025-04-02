@@ -206,30 +206,18 @@ const getContactsWithChats = async () => {
     ...getUniqueKeysFromMessages(receivedMessages,"from"),
   ];
 
-  //get timestamp of last message for each key
-  let lastMessages = {};
-  for(const key of keys) {
-    const messages = (await getMessagesWithContact(key,-1)).messages;
-    const currentLastMessage = messages.sort((a,b) => b.timestamp - a.timestamp)[0];
-    if(currentLastMessage) {
-      lastMessages[key] = currentLastMessage;
+  let contacts = getContactsByKey(keys);
+  for(let contact of contacts) {
+    const messages = (await getMessagesWithContact(contact.key,-1)).messages;
+    const lastMessage = messages.sort((a,b) => b.timestamp - a.timestamp)[0];
+    if(lastMessage) {
+      contact.timestamp = lastMessage.timestamp;
+      contact.lastText = lastMessage.text;
+      contact.lastMessageSentBySelf = lastMessage.from !== contact.key;
     }
   }
-
-  const contacts = getContactsByKey(keys);
-  let contactsWithTimestamps = [];
-  contacts.forEach(contact => {
-    const matchingMessage = lastMessages[contact.key];
-    if(matchingMessage) {
-      contactsWithTimestamps.push({
-        ...contact,
-        timestamp : matchingMessage.timestamp,
-        lastText : matchingMessage.text,
-        lastMessageSentBySelf : matchingMessage.from !== contact.key
-      });
-    }
-  })
-  return contactsWithTimestamps;
+  const contactsWithChats = contacts.filter(contact => contact.timestamp);
+  return contactsWithChats
 }
 
 const deleteChats = keys => {
