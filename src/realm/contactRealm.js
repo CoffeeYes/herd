@@ -103,5 +103,6 @@ export {
   editContact,
   deleteAllContacts,
   closeContactRealm,
-  deleteContactRealm
+  deleteContactRealm,
+  contactRealmConfig
 }
