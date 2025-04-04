@@ -2,7 +2,6 @@ import Realm from 'realm';
 import { contactRealmConfig, createContact, getAllContacts } from '../src/realm/contactRealm.js';
 
 const testContact = {
-  _id : Realm.BSON.ObjectId(),
   name : "test",
   key : `MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6Aj7TtjaaostNXW4lwLMeE0I48PoNGKl
         vnQPMRF8TiJ3U5UOeWE5huUYOSnnEzc1LAuh3cuzjtmMB7BbJzsCGV9ZpeKWGFuEqLOFh6/HIYX+
@@ -18,7 +17,7 @@ beforeEach(async () => {
   contactsRealm = await Realm.open(contactRealmConfig)
 })
 
-afterEach(async () => {
+afterEach(() => {
   if(!contactsRealm.isClosed) {
     contactsRealm.close()
   }
@@ -32,4 +31,5 @@ it("can create contact", () => {
   expect(contacts[0].name).toBe(testContact.name);
   expect(contacts[0].key).toBe(testContact.key);
   expect(contacts[0].image).toBe(testContact.image);
+  expect(contacts[0]._id).toBeDefined();
 })
