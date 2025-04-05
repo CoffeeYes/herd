@@ -1,5 +1,11 @@
 import Realm from 'realm';
-import { contactRealmConfig, createContact, getAllContacts } from '../src/realm/contactRealm.js';
+import { 
+  openContactRealm,
+  createContact, 
+  getAllContacts,
+  deleteContacts, 
+  closeContactRealm,
+  deleteContactRealm} from '../src/realm/contactRealm.js';
 
 const testContact = {
   name : "test",
@@ -12,16 +18,13 @@ const testContact = {
   image : ""
 }
 
-let contactsRealm;
 beforeEach(async () => {
-  contactsRealm = await Realm.open(contactRealmConfig)
+  await openContactRealm();
 })
 
 afterEach(() => {
-  if(!contactsRealm.isClosed) {
-    contactsRealm.close()
-  }
-  Realm.deleteFile(contactRealmConfig);
+  closeContactRealm();
+  deleteContactRealm();
 })
 
 it("can create contact", () => {
@@ -33,3 +36,13 @@ it("can create contact", () => {
   expect(contacts[0].image).toBe(testContact.image);
   expect(contacts[0]._id).toBeDefined();
 })
+
+it("can delete a single contact, entire object", () => {
+  const contact = createContact(testContact);
+  let contacts = getAllContacts();
+  expect(contacts.length).toBe(1);
+  deleteContacts([contact]);
+  contacts = getAllContacts();
+  expect(contacts.length).toBe(0);
+})
+

@@ -10,11 +10,15 @@ import Realm from 'realm';
 import store from '../src/redux/store';
 import { Provider } from 'react-redux'
 import { closeChatRealm, deleteChatRealm } from '../src/realm/chatRealm';
-import { closeContactRealm, deleteContactRealm } from '../src/realm/contactRealm';
+import { closeContactRealm, deleteContactRealm, openContactRealm } from '../src/realm/contactRealm';
 import { closePasswordRealm, deletePasswordRealm } from '../src/realm/passwordRealm';
 
 // Note: test renderer must be required after react-native.
 import renderer from 'react-test-renderer';
+
+beforeAll(async () => {
+  await openContactRealm();
+})
 
 it('renders correctly', () => {
   renderer.create(

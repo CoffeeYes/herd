@@ -34,7 +34,7 @@ import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
-import { getAllContacts, getContactsByKey } from './src/realm/contactRealm';
+import { getAllContacts, getContactsByKey, openContactRealm } from './src/realm/contactRealm';
 import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
 
 import { getPasswordHash } from './src/realm/passwordRealm';
@@ -77,6 +77,7 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
+      await openContactRealm();
       await loadInitialState();
       const serviceRunning = await ServiceInterface.isRunning();
       dispatch(setBackgroundServiceRunning(serviceRunning));

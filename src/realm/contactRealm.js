@@ -8,7 +8,7 @@ const contactRealmConfig = {
   schema : [Schemas.ContactSchema]
 }
 
-const contactsRealm = new Realm(contactRealmConfig);
+let contactsRealm;
 
 const getAllContacts = () => {
   const allContacts = contactsRealm.objects("Contact");
@@ -86,6 +86,10 @@ const deleteAllContacts = () => {
   contactsRealm.write(() => contactsRealm.deleteAll())
 }
 
+const openContactRealm = async () => {
+  contactsRealm = await Realm.open(contactRealmConfig);
+}
+
 const closeContactRealm = () => {
   contactsRealm.close();
 }
@@ -103,6 +107,6 @@ export {
   editContact,
   deleteAllContacts,
   closeContactRealm,
+  openContactRealm,
   deleteContactRealm,
-  contactRealmConfig
 }
