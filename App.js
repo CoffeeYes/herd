@@ -32,12 +32,13 @@ import LoadingScreen from './src/views/LoadingScreen';
 
 import {
   addNewReceivedMessages as addNewReceivedMessagesToRealm,
+  openChatRealm,
   removeCompletedMessagesFromRealm
 } from './src/realm/chatRealm';
 import { getAllContacts, getContactsByKey, openContactRealm } from './src/realm/contactRealm';
 import { getContactsWithChats, getMessageQueue } from './src/realm/chatRealm';
 
-import { getPasswordHash } from './src/realm/passwordRealm';
+import { getPasswordHash, openPasswordRealm } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
@@ -77,7 +78,9 @@ const App = ({ }) => {
 
   useEffect(() => {
     (async () => {
+      await openChatRealm();
       await openContactRealm();
+      await openPasswordRealm();
       await loadInitialState();
       const serviceRunning = await ServiceInterface.isRunning();
       dispatch(setBackgroundServiceRunning(serviceRunning));

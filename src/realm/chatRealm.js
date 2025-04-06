@@ -29,13 +29,13 @@ const deletedReceivedRealmConfig = {
   schema : [Schemas.MessageSchema]
 }
 
-const messageCopyRealm = new Realm(messageCopyRealmConfig);
+let messageCopyRealm;
 
-const messageReceivedRealm = new Realm(messageReceivedRealmConfig);
+let messageReceivedRealm;
 
-const messageSentRealm = new Realm(messageSentRealmConfig);
+let messageSentRealm;
 
-const deletedReceivedRealm = new Realm(deletedReceivedRealmConfig);
+let deletedReceivedRealm;
 
 const decryptMessages = async messages => {
   if(messages.length == 0) {
@@ -390,6 +390,13 @@ const deleteAllMessages = () => {
   })
 }
 
+const openChatRealm = async () => {
+  messageCopyRealm = await Realm.open(messageCopyRealmConfig);
+  messageSentRealm = await Realm.open(messageSentRealmConfig);
+  messageReceivedRealm = await Realm.open(messageReceivedRealmConfig);
+  deletedReceivedRealm = await Realm.open(deletedReceivedRealmConfig);
+}
+
 const closeChatRealm = () => {
   messageCopyRealm.close();
   messageReceivedRealm.close();
@@ -418,6 +425,7 @@ export {
   getDeletedReceivedMessages,
   getReceivedMessagesForSelf,
   removeCompletedMessagesFromRealm,
+  openChatRealm,
   closeChatRealm,
   deleteChatRealm
 }

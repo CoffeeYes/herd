@@ -6,7 +6,7 @@ const passwordRealmConfig = {
   schema : [Schemas.PasswordSchema]
 }
 
-const passwordRealm = new Realm(passwordRealmConfig)
+let passwordRealm;
 
 const updatePassword = (passwordName,passwordHash) => {
   const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0] || {};
@@ -38,6 +38,10 @@ const deletePassword = name => {
   })
 }
 
+const openPasswordRealm = async () => {
+  passwordRealm = await Realm.open(passwordRealmConfig);
+}
+
 const closePasswordRealm = () => {
   passwordRealm.close();
 }
@@ -50,6 +54,7 @@ export {
   updatePassword,
   getPasswordHash,
   deletePassword,
+  openPasswordRealm,
   closePasswordRealm,
   deletePasswordRealm
 }

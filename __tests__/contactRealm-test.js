@@ -1,4 +1,4 @@
-import Realm from 'realm';
+import { closeChatRealm, deleteChatRealm, openChatRealm } from '../src/realm/chatRealm.js';
 import { 
   openContactRealm,
   createContact, 
@@ -20,11 +20,14 @@ const testContact = {
 
 beforeEach(async () => {
   await openContactRealm();
+  await openChatRealm();
 })
 
 afterEach(() => {
   closeContactRealm();
   deleteContactRealm();
+  closeChatRealm();
+  deleteChatRealm();
 })
 
 it("can create contact", () => {
