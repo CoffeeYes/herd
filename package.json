@@ -8,7 +8,7 @@
     "start": "react-native start",
     "rebuild": "cd android && gradlew clean && cd .. && react-native run-android",
     "docs": "jsdoc -c jsdoc.conf.json",
-    "test": "jest --forceExit",
+    "test": "jest",
     "test-sequential" : "jest --runInBand --forceExit",
     "lint": "eslint .",
     "run-relase": "react-native run-android --variant=release"
