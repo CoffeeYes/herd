@@ -166,18 +166,7 @@ const App = ({ }) => {
     })
 
     const orientationListener = Dimensions.addEventListener("change", () => {
-
-      const [scaledUIFontSize, scaledTitleSize, scaledSubTextSize] = calculateScaledFontSizes([
-        customStyleRef.current.uiFontSize,
-        customStyleRef.current.titleSize,
-        customStyleRef.current.subTextSize
-      ])
-
-      dispatch(setStyles({
-        scaledUIFontSize,
-        scaledSubTextSize,
-        scaledTitleSize
-      }));
+      updateScaledFonts(customStyleRef.current);
     })
 
     const bluetoothAndLocationStateListener = eventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
@@ -208,6 +197,16 @@ const App = ({ }) => {
 
   useEffect(() => {
     customStyleRef.current = customStyle;
+    updateScaledFonts(customStyle);
+  },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize, customStyle.messageFontSize])
+
+  const calculateScaledFontSizes = (fontSizes = []) => {
+    const addedWidth = Dimensions.get("window").width * 0.005;
+    const scaledFonts = fontSizes.map(fontSize => Math.round(fontSize + addedWidth));
+    return scaledFonts;
+  }
+
+  const updateScaledFonts = customStyle => {
     [scaledUIFontSize, scaledTitleSize, scaledSubTextSize, scaledMessageFontSize] = calculateScaledFontSizes([
       customStyle.uiFontSize,customStyle.titleSize,customStyle.subTextSize, customStyle.messageFontSize
     ])
@@ -217,12 +216,6 @@ const App = ({ }) => {
       scaledSubTextSize,
       scaledMessageFontSize
     }))
-  },[customStyle.uiFontSize,customStyle.titleSize, customStyle.subTextSize, customStyle.messageFontSize])
-
-  const calculateScaledFontSizes = (fontSizes = []) => {
-    const addedWidth = Dimensions.get("window").width * 0.005;
-    const scaledFonts = fontSizes.map(fontSize => Math.round(fontSize + addedWidth));
-    return scaledFonts;
   }
 
   const loadInitialState = async () => {
