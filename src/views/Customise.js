@@ -34,6 +34,7 @@ const Customise = () => {
   const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
   const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [restoringDefault, setRestoringDefault] = useState(false);
 
   const customStyle = useSelector(state => state.chatReducer.styles);
 
@@ -136,6 +137,7 @@ const Customise = () => {
   }
 
   const restoreDefaultStyles = async () => {
+    setRestoringDefault(true);
     setOverrideFontSliderValues(true);
     setOverrideColorChoiceSliderValue(true);
     await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(defaultChatStyles));
@@ -147,6 +149,7 @@ const Customise = () => {
     setUiFontSize(defaultChatStyles.uiFontSize);
     setMessageFontSize(defaultChatStyles.messageFontSize);
     setSynchronisedFontSize(defaultChatStyles.uiFontSize);
+    setRestoringDefault(false);
   }
 
   const tabItems = [
@@ -377,12 +380,14 @@ const Customise = () => {
 
           </View>
       </ScrollView>
+
       <ConfirmationModal
       visible={showConfirmationModal}
       onConfirm={async () => {
         await restoreDefaultStyles();
         setShowConfirmationModal(false);
       }}
+      loading={restoringDefault}
       onCancel={() => setShowConfirmationModal(false)}
       confirmText="Restore"
       cancelText="Go Back"
