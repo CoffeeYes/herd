@@ -59,6 +59,7 @@ import android.R.drawable
 
 import com.herd.HerdMessage
 import com.herd.StorageInterface
+import com.herd.ServiceInterfaceModule
 import com.herd.PermissionManagerModule
 
 class HerdBackgroundService : Service() {
@@ -383,8 +384,8 @@ class HerdBackgroundService : Service() {
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
                receivedMessages,
-               "savedMessageQueue",
-               "savedMessageQueueSizes"
+               ServiceInterfaceModule.storageStrings.getValue("SAVED_MESSAGE_QUEUE"),
+               ServiceInterfaceModule.storageStrings.getValue("SAVED_MESSAGE_QUEUE_SIZES")
              );
 
              if(frontendRunning) {
@@ -628,8 +629,8 @@ class HerdBackgroundService : Service() {
              //store deleted messages in case service is cancelled before app is opened
              StorageInterface(context).writeMessagesToStorage(
                messagesToRemoveFromQueue,
-               "messagesToRemove",
-               "messagesToRemoveSizes"
+               ServiceInterfaceModule.storageStrings.getValue("MESSAGES_TO_REMOVE"),
+               ServiceInterfaceModule.storageStrings.getValue("MESSAGES_TO_REMOVE_SIZES")
              );
              sendMessagesToReceiver(messagesToRemoveFromQueue,HerdBackgroundService.removeMessagesFromQueueEmitterString)
            }

@@ -39,6 +39,15 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
 
+  companion object {
+    public final val storageStrings : Map<String,String> = mapOf(
+      "SAVED_MESSAGE_QUEUE" to "savedMessageQueue",
+      "SAVED_MESSAGE_QUEUE_SIZES" to "savedMessageQueueSizes",
+      "MESSAGES_TO_REMOVE" to "messagesToRemove",
+      "MESSAGES_TO_REMOVE_SIZES" to "messagesToRemoveSizes"
+    )
+  }
+
   private final val emitterStrings : Map<String,String> = mapOf(
     "NEW_MESSAGES_RECEIVED" to "newHerdMessagesReceived",
     "REMOVE_MESSAGES_FROM_QUEUE" to "removeMessagesFromQueue",
@@ -104,7 +113,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   override fun getConstants() : Map<String, Any> {
     return mapOf(
-      "emitterStrings" to emitterStrings
+      "emitterStrings" to emitterStrings,
+      "storage" to storageStrings
     )
   }
 

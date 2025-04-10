@@ -280,15 +280,15 @@ const App = ({ }) => {
 
   const loadStoredMessages = async () => {
     const newMessages = await ServiceInterface.getStoredMessages(
-      "savedMessageQueue",
-      "savedMessageQueueSizes"
+      ServiceInterface.storage.SAVED_MESSAGE_QUEUE,
+      ServiceInterface.storage.SAVED_MESSAGE_QUEUE_SIZES
     )
     newMessages.length > 0 &&
     await addNewReceivedMessagesToRealm(newMessages,dispatch);
 
     const messagesToRemove = await ServiceInterface.getStoredMessages(
-      "messagesToRemove",
-      "messagesToRemoveSizes"
+      ServiceInterface.storage.MESSAGES_TO_REMOVE,
+      ServiceInterface.storage.MESSAGES_TO_REMOVE_SIZES
     )
 
     messagesToRemove.length > 0 &&
