@@ -7,7 +7,8 @@ import { palette } from '../assets/palette';
 
 const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled, disabledStyle, useDisabledStyle = true,
-                        loading, useLoadingIndicator, loadingIndicatorColor, loadingIndicatorStyle }) => {
+                        loading, useLoadingIndicator, loadingIndicatorColor, loadingIndicatorStyle,
+                        loadingIndicatorSize }) => {
   const customStyle = useSelector(state => state.chatReducer.styles);
   return (
     <TouchableOpacity
@@ -23,7 +24,8 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
 
       {useLoadingIndicator &&
       <ActivityIndicator 
-      animating={loading} 
+      animating={loading}
+      size={loadingIndicatorSize || 24}
       color={loadingIndicatorColor || palette.primary} 
       style={{...styles.loadingIndicator, ...loadingIndicatorStyle }}/>}
 
