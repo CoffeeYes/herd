@@ -1,9 +1,10 @@
 import React from 'react';
-import {  Text, View, ActivityIndicator } from 'react-native';
+import {  Text, View } from 'react-native';
 import { palette } from '../assets/palette';
 
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
+import LoadingIndicator from './LoadingIndicator';
 
 const ConfirmationModal = ({
   confirmText = "Confirm", cancelText = "Cancel", 
@@ -15,7 +16,7 @@ const ConfirmationModal = ({
     visible={visible}>
       <View style={styles.modalContentContainer}>
       {loading &&
-      <ActivityIndicator size="large" color={palette.primary}/>
+      <LoadingIndicator/>
       }
       <Text>{titleText}</Text>
       <View style={{flexDirection : "row", marginTop : 10}}>

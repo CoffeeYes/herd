@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, ActivityIndicator, NativeEventEmitter } from 'react-native';
+import { View, Text, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import CustomModal from './CustomModal';
@@ -8,6 +8,7 @@ import CustomButton from './CustomButton';
 
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle, useStateAndRef } from '../helper';
+import LoadingIndicator from './LoadingIndicator';
 
 const activityStateText = {
   waiting :  "Waiting On Other Device",
@@ -103,7 +104,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
       <View style={{...styles.modalContentContainer, ...contentWidth}}>
         {error.length == 0 ?
         <>
-          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
+          <LoadingIndicator/>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
         </>
         :

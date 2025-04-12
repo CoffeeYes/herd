@@ -1,9 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { TouchableOpacity, Text, ActivityIndicator, } from 'react-native';
+import { TouchableOpacity, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
+import LoadingIndicator from './LoadingIndicator';
 
 const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled, disabledStyle, useDisabledStyle = true,
@@ -23,10 +24,10 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
       <Icon name={leftIcon} size={leftIconSize}/>}
 
       {useLoadingIndicator &&
-      <ActivityIndicator 
+      <LoadingIndicator
       animating={loading}
-      size={loadingIndicatorSize || 24}
-      color={loadingIndicatorColor || palette.primary} 
+      size={loadingIndicatorSize}
+      color={loadingIndicatorColor} 
       style={{...styles.loadingIndicator, ...loadingIndicatorStyle }}/>}
 
       {text &&

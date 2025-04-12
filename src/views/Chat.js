@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TextInput, ActivityIndicator, 
+import { Text, View, TextInput,
          SectionList,
          KeyboardAvoidingView } from 'react-native';
 import moment from 'moment';
@@ -32,6 +32,7 @@ import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
 import ConfirmationModal from './ConfirmationModal';
+import LoadingIndicator from './LoadingIndicator';
 
 const maxCharacterCount = 190;
 
@@ -534,10 +535,7 @@ const Chat = ({ route, navigation }) => {
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
           {((loading || loadingMoreMessages) && !showPopup) &&
-          <ActivityIndicator
-          size="large"
-          style={styles.loadingIndicator}
-          color={palette.primary}/>}
+          <LoadingIndicator/>}
 
           <SectionList
           removeClippedSubviews

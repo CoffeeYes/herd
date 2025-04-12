@@ -1,13 +1,12 @@
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
 import FullScreenSplash from './FullScreenSplash';
 
-import { palette } from '../assets/palette';
+import LoadingIndicator from './LoadingIndicator';
 
 const LoadingScreen = () => {
   return (
     <FullScreenSplash title="Herd">
-      <ActivityIndicator size="large" color={palette.primary}/>
+      <LoadingIndicator/>
     </FullScreenSplash>
   )
 }

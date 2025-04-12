@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, TextInput, Text, 
-         ActivityIndicator, ScrollView } from 'react-native';
+import { View, TextInput, Text, ScrollView } from 'react-native';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
@@ -19,6 +18,7 @@ import { updateContactAndReferences } from '../redux/actions/combinedActions';
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 import { encryptStrings } from '../common';
+import LoadingIndicator from './LoadingIndicator';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -196,7 +196,7 @@ const EditContact = ({ route, navigation }) => {
       allowGoBack
       rightButtonIcon={!hideSaveButton() && headerIcon}
       useAlternativeIcon={saving}
-      alternativeIcon={<ActivityIndicator size="large" color={palette.primary}/>}
+      alternativeIcon={<LoadingIndicator/>}
       rightButtonOnClick={save}/>
 
       <ScrollView

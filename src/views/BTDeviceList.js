@@ -1,6 +1,6 @@
 import React, { useState, useEffect,  useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Text, View, ScrollView, ActivityIndicator, TouchableOpacity, 
+import { Text, View, ScrollView, TouchableOpacity, 
   NativeEventEmitter, AppState } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
@@ -16,6 +16,7 @@ import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
 import { requestMakeDiscoverable, checkOrRequestConnectionServices} from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
+import LoadingIndicator from './LoadingIndicator';
 
 const BTDeviceList = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -142,7 +143,7 @@ const BTDeviceList = ({ navigation }) => {
       <View style={styles.mainContainer}>
         <View>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>{scanning ? "Scanning..." : ""}</Text>
-          <ActivityIndicator size="large" color={palette.primary} animating={scanning}/>
+          <LoadingIndicator animating={scanning}/>
           {errors.map((error) =>
             <Text
             key={error.type}
