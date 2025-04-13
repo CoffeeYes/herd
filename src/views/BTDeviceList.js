@@ -15,7 +15,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
 import { requestMakeDiscoverable, checkOrRequestConnectionServices} from '../common';
-import { setLockable } from '../redux/actions/appStateActions';
+import { setBackgroundServiceRunning, setLockable } from '../redux/actions/appStateActions';
 import LoadingIndicator from './LoadingIndicator';
 
 const BTDeviceList = ({ navigation }) => {
@@ -31,6 +31,17 @@ const BTDeviceList = ({ navigation }) => {
   const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
 
   const activeScanDeviceList = useRef([]);
+
+  const bluetoothLocationErrors  = {
+    "ADAPTER_TURNED_OFF" : {
+      type : "bluetooth_not_enabled",
+      text : "Bluetooth was turned off"
+    },
+    "LOCATION_DISABLED" : {
+      type : "location_not_enabled",
+      text : "Location was turned off"
+    }
+  }
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
@@ -65,22 +76,10 @@ const BTDeviceList = ({ navigation }) => {
 
 
     const bluetoothAndLocationStateListener = serviceEventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
-      if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
+      if(Object.keys(bluetoothLocationErrors).includes(state)) {
         if(scanningRef.current) {
-          if(state === "ADAPTER_TURNED_OFF") {
-            setErrors([{
-              type : "bluetooth_not_enabled",
-              text : "Bluetooth was turned off"
-            }])
-          }
-          else if(state === "LOCATION_DISABLED") {
-            setErrors([{
-              type : "location_not_enabled",
-              text : "Location was turned off"
-            }])
-          }
+          setErrors([bluetoothLocationErrors[state]]);
         }
-
         Bluetooth.cancelScanForDevices();
         setScanning(false);
       }
