@@ -25,7 +25,7 @@ const PasswordSettings = () => {
   const [showResetModal, setShowResetModal] = useState(false);
   const [passwordToReset, setPasswordToReset] = useState("");
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
   const [chosenMaxPasswordAttempts, setChosenMaxPasswordAttempts] = useState(maxPasswordAttempts.toString());
 

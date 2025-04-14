@@ -23,7 +23,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [keySent, setKeySent] = useState(false);
   const [error, setError, errorRef] = useStateAndRef("");
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});

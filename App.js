@@ -42,8 +42,8 @@ import { getPasswordHash, openPasswordRealm } from './src/realm/passwordRealm';
 
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
-import { setChats, setStyles, setMessageQueue, removeMessagesFromQueue } from './src/redux/actions/chatActions';
-import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning } from './src/redux/actions/appStateActions';
+import { setChats, setMessageQueue, removeMessagesFromQueue } from './src/redux/actions/chatActions';
+import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning, setStyles } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/helper.js';
 import { loadChatsWithNewMessages, STORAGE_STRINGS } from './src/common.js';
 
@@ -56,7 +56,7 @@ const App = ({ }) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const passwordHash = useSelector(state => state.userReducer.loginPasswordHash);
   const lockable = useSelector(state => state.appStateReducer.lockable);
-  const customStyle = useSelector(state => state.chatReducer.styles)
+  const customStyle = useSelector(state => state.appStateReducer.styles)
   const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
 
   const passwordSetRef = useRef();

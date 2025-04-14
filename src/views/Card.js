@@ -7,7 +7,7 @@ import { palette } from '../assets/palette';
 
 const Card = ({ onPress, text, icon, iconSize , cardStyle, textStyle,
                 disabled, disabledStyle, errorText }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   return (
     <TouchableOpacity

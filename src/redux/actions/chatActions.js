@@ -97,13 +97,6 @@ const setLastText = (id, message) => {
   }
 }
 
-const setStyles = styles => {
-  return {
-    type : "SET_STYLES",
-    payload : styles
-  }
-}
-
 const setMessageQueue = queue => {
   return {
     type : "SET_MESSAGE_QUEUE",
@@ -137,7 +130,6 @@ export {
   filterMessageQueueByKeys,
   deleteMessages,
   resetMessages,
-  setStyles,
   setLastText,
   setMessageQueue,
   setMessagesForContacts,

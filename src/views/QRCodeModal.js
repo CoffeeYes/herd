@@ -8,7 +8,7 @@ import { palette } from '../assets/palette';
 import { useScreenAdjustedSize } from '../helper';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const seventyPercentWidth = useScreenAdjustedSize(0.7,0.7);
   const seventyPercentHeight = useScreenAdjustedSize(0.7,0.7, "height");
 

@@ -7,7 +7,7 @@ import { palette } from '../assets/palette';
 
 const CardButton = ({ onPress, text, rightIcon, flashIcon, iconSize, iconStyle, iconContainerStyle,
                       containerStyle, textStyle, textContainerStyle, flashText, timeout, disableTouch }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles)
+  const customStyle = useSelector(state => state.appStateReducer.styles)
   const [currentText, setCurrentText] = useState(text);
   const [displayedIcon, setDisplayedIcon] = useState(rightIcon);
 

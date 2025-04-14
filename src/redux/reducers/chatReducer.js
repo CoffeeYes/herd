@@ -185,11 +185,6 @@ const chatReducer = (state = initialState,action) => {
         chats : setLastText(state,id,message)
       }
     }
-    case "SET_STYLES": {
-      let oldStyles = {...state.styles};
-      const newStyles = {...oldStyles,...action.payload}
-      return {...state, styles : newStyles}
-    }
     case "SET_MESSAGE_QUEUE": {
       return {...state, messageQueue : action.payload}
     }

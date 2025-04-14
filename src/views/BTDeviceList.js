@@ -25,7 +25,7 @@ const BTDeviceList = ({ navigation }) => {
   const [errors, setErrors] = useState([]);
   const appStateRef = useRef("active");
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   const [deviceList, setDeviceList, deviceListRef] = useStateAndRef([],[]);
   const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);

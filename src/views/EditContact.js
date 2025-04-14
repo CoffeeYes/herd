@@ -23,7 +23,7 @@ import LoadingIndicator from './LoadingIndicator';
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const [errors, setErrors] = useState([]);
   const [saving, setSaving] = useState(false);

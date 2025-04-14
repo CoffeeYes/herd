@@ -40,7 +40,7 @@ import { requestEnableBluetooth, requestPermissionsForBluetooth, STORAGE_STRINGS
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const [QRCodeVisible, setQRCodeVisible] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);

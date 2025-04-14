@@ -16,7 +16,7 @@ import ConfirmationModal from './ConfirmationModal';
 
 import ValueSlider from './ValueSlider';
 
-import { setStyles } from '../redux/actions/chatActions';
+import { setStyles } from '../redux/actions/appStateActions';
 
 import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
@@ -36,7 +36,7 @@ const Customise = () => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [restoringDefault, setRestoringDefault] = useState(false);
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   const fontSliderProps = {
     min : boundaryValues.minFontSize,

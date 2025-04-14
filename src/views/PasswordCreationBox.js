@@ -28,7 +28,7 @@ const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSub
 const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
                             disableSave, disableReset, mainContainerStyle, save, reset,
                             originalValue, changesAreAvailable}) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");

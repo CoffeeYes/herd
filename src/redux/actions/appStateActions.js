@@ -47,6 +47,13 @@ const setBackgroundServiceRunning = running => {
   }
 }
 
+const setStyles = styles => {
+  return {
+    type : "SET_STYLES",
+    payload : styles
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
@@ -54,5 +61,6 @@ export {
   setLastRoutes,
   setMaxPasswordAttempts,
   setEnableNotifications,
-  setBackgroundServiceRunning
+  setBackgroundServiceRunning,
+  setStyles
 }

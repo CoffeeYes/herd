@@ -1,10 +1,13 @@
+import { defaultChatStyles } from '../../assets/styles'
+
 const initialState = {
   locked : false,
   lockable : true,
   lastRoutes : [],
   maxPasswordAttempts: 3,
   sendNotificationForNewMessages : true,
-  backgroundServiceRunning : false
+  backgroundServiceRunning : false,
+  styles : defaultChatStyles,
 }
 
 const appStateReducer = (state=initialState, action) => {
@@ -26,6 +29,11 @@ const appStateReducer = (state=initialState, action) => {
     }
     case "SET_BACKGROUND_SERVICE_RUNNING": {
       return {...state, backgroundServiceRunning : action.payload}
+    }
+    case "SET_STYLES": {
+      let oldStyles = {...state.styles};
+      const newStyles = {...oldStyles,...action.payload}
+      return {...state, styles : newStyles}
     }
     default:
       return state;

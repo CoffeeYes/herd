@@ -12,7 +12,7 @@ import { palette } from '../assets/palette';
 const PermissionModal = ({ visible, modalOnPress, buttonOnPress, onRequestClose, useCloseButton=false,
                          description, instructionText, icon, iconSize = 48, permissions, disableOnPress=false}) => {
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   return (
     <CustomModal

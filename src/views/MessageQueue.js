@@ -21,7 +21,7 @@ const MessageQueue = ({}) => {
   const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const messageQueue = useSelector(state => state.chatReducer.messageQueue);
   const contacts = useSelector(state => state.contactReducer.contacts);
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const [parsedQueue, setParsedQueue] = useState(messageQueue);
   const [sorting, setSorting] = useState("Oldest")
 

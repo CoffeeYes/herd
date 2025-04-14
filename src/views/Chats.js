@@ -16,7 +16,7 @@ const Chats = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const chats = useSelector(state => state.chatReducer.chats);
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const [highlightedChats, setHighlightedChats ] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 

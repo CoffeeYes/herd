@@ -12,7 +12,7 @@ import { deleteContacts } from '../redux/actions/contactActions';
 
 const Contacts = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const chats = useSelector(state => state.chatReducer.chats);
   const contacts = route.params.type === "newChat" ?
   useSelector(state => state.contactReducer.contacts)

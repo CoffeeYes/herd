@@ -10,7 +10,7 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
                         text, buttonStyle, textStyle, disabled, disabledStyle, useDisabledStyle = true,
                         loading, useLoadingIndicator, loadingIndicatorColor, loadingIndicatorStyle,
                         loadingIndicatorSize }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   return (
     <TouchableOpacity
     onPress={onPress}

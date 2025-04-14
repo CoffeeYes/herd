@@ -25,7 +25,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
   const erasureHash = useSelector(state => state.userReducer.erasurePasswordHash);
   const lastRoutes = useSelector(state => state.appStateReducer.lastRoutes);
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const maxPasswordAttempts = useSelector(state => state.appStateReducer.maxPasswordAttempts);
 
   const [password, setPassword] = useState("");

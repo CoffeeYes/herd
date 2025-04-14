@@ -39,7 +39,7 @@ const maxCharacterCount = 190;
 const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const chat = chats.find(chat => chat._id == route.params.contactID);
 
   const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])

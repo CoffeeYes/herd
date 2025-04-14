@@ -20,7 +20,7 @@ const Contact = ({route, navigation}) => {
   const [showQRCode, setShowQRCode] = useState(false);
   const [showLargeImage, setShowLargeImage] = useState(false);
   const contact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.id));
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 

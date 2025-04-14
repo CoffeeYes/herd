@@ -16,7 +16,7 @@ const Header = ({ title, allowGoBack, rightButtonIcon, rightButtonOnClick, disab
                   backArrowStyle, rightIconSize, limitTitleLines = true, titleNumberOfLines = 1,
                   useAlternativeIcon, alternativeIcon}) => {
   const navigation = useNavigation();
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const minimumHeight = useScreenAdjustedSize(0.1,0.2, "height",1,0.7,1000,1000);
   const rightButtonWidth = useScreenAdjustedSize(0.2,0.15);
   const leftButtonWidth = useScreenAdjustedSize(0.2,0.1, "width", 0.7, 0.7, 1000, 1000);
