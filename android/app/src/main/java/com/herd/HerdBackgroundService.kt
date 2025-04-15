@@ -109,13 +109,13 @@ class HerdBackgroundService : Service() {
             BluetoothAdapter.ERROR
           );
           if (state == BluetoothAdapter.STATE_OFF) {
-            errorType = "ADAPTER_TURNED_OFF";
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.getValue("ADAPTER_TURNED_OFF");
           }
         }
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
-            errorType = "LOCATION_DISABLED";
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.getValue("LOCATION_DISABLED");
           }
         }
       }
@@ -992,10 +992,10 @@ class HerdBackgroundService : Service() {
       if(errorType.length > 0 && running) {
         var errorNotificationText = "An error occurred";
         when(errorType) {
-          "ADAPTER_TURNED_OFF" -> {
+          ServiceInterfaceModule.bluetoothErrorStrings.getValue("ADAPTER_TURNED_OFF") -> {
             errorNotificationText = "because bluetooth was turned off";
           }
-          "LOCATION_DISABLED" -> {
+           ServiceInterfaceModule.bluetoothErrorStrings.getValue("LOCATION_DISALBED") -> {
             errorNotificationText = "because location was turned off" 
           }
         }

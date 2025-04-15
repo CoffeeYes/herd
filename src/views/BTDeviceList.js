@@ -33,11 +33,11 @@ const BTDeviceList = ({ navigation }) => {
   const activeScanDeviceList = useRef([]);
 
   const bluetoothLocationErrors  = {
-    "ADAPTER_TURNED_OFF" : {
+    [ServiceInterface.bluetoothErrors.ADAPTER_TURNED_OFF] : {
       type : "bluetooth_not_enabled",
       text : "Bluetooth was turned off"
     },
-    "LOCATION_DISABLED" : {
+    [ServiceInterface.bluetoothErrors.LOCATION_DISABLED] : {
       type : "location_not_enabled",
       text : "Location was turned off"
     }

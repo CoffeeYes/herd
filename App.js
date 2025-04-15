@@ -170,7 +170,8 @@ const App = ({ }) => {
     })
 
     const bluetoothAndLocationStateListener = eventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
-      if(state === "ADAPTER_TURNED_OFF" || state === "LOCATION_DISABLED") {
+      if(state === ServiceInterface.bluetoothErrors.ADAPTER_TURNED_OFF || 
+        state === ServiceInterface.bluetoothErrors.LOCATION_DISABLED) {
         dispatch(setBackgroundServiceRunning(false));
       }
     })

@@ -46,6 +46,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       "MESSAGES_TO_REMOVE" to "messagesToRemove",
       "MESSAGES_TO_REMOVE_SIZES" to "messagesToRemoveSizes"
     )
+  
+    public final val bluetoothErrorStrings: Map<String,String> = mapOf(
+      "LOCATION_DISABLED" to "LOCATION_DISABLED",
+      "ADAPTER_TURNED_OFF" to "ADAPTER_TURNED_OFF"
+    )
   }
 
   private final val emitterStrings : Map<String,String> = mapOf(
@@ -114,7 +119,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   override fun getConstants() : Map<String, Any> {
     return mapOf(
       "emitterStrings" to emitterStrings,
-      "storage" to storageStrings
+      "storage" to storageStrings,
+      "bluetoothErrors" to bluetoothErrorStrings
     )
   }
 
