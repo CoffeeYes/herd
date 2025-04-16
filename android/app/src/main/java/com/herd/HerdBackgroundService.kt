@@ -109,13 +109,13 @@ class HerdBackgroundService : Service() {
             BluetoothAdapter.ERROR
           );
           if (state == BluetoothAdapter.STATE_OFF) {
-            errorType = ServiceInterfaceModule.bluetoothErrorStrings.getValue("ADAPTER_TURNED_OFF");
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.ADAPTER_TURNED_OFF;
           }
         }
         "android.location.PROVIDERS_CHANGED" -> {
           val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
           if(!locationManager.isLocationEnabled()) {
-            errorType = ServiceInterfaceModule.bluetoothErrorStrings.getValue("LOCATION_DISABLED");
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.LOCATION_DISABLED;
           }
         }
       }
@@ -384,8 +384,8 @@ class HerdBackgroundService : Service() {
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
                receivedMessages,
-               ServiceInterfaceModule.storageStrings.getValue("SAVED_MESSAGE_QUEUE"),
-               ServiceInterfaceModule.storageStrings.getValue("SAVED_MESSAGE_QUEUE_SIZES")
+               ServiceInterfaceModule.storageStrings.SAVED_MESSAGE_QUEUE,
+               ServiceInterfaceModule.storageStrings.SAVED_MESSAGE_QUEUE_SIZES
              );
 
              if(frontendRunning) {
@@ -629,8 +629,8 @@ class HerdBackgroundService : Service() {
              //store deleted messages in case service is cancelled before app is opened
              StorageInterface(context).writeMessagesToStorage(
                messagesToRemoveFromQueue,
-               ServiceInterfaceModule.storageStrings.getValue("MESSAGES_TO_REMOVE"),
-               ServiceInterfaceModule.storageStrings.getValue("MESSAGES_TO_REMOVE_SIZES")
+               ServiceInterfaceModule.storageStrings.MESSAGES_TO_REMOVE,
+               ServiceInterfaceModule.storageStrings.MESSAGES_TO_REMOVE_SIZES
              );
              sendMessagesToReceiver(messagesToRemoveFromQueue,HerdBackgroundService.removeMessagesFromQueueEmitterString)
            }
@@ -992,10 +992,10 @@ class HerdBackgroundService : Service() {
       if(errorType.length > 0 && running) {
         var errorNotificationText = "An error occurred";
         when(errorType) {
-          ServiceInterfaceModule.bluetoothErrorStrings.getValue("ADAPTER_TURNED_OFF") -> {
+          ServiceInterfaceModule.bluetoothErrorStrings.ADAPTER_TURNED_OFF -> {
             errorNotificationText = "because bluetooth was turned off";
           }
-           ServiceInterfaceModule.bluetoothErrorStrings.getValue("LOCATION_DISALBED") -> {
+           ServiceInterfaceModule.bluetoothErrorStrings.LOCATION_DISABLED -> {
             errorNotificationText = "because location was turned off" 
           }
         }

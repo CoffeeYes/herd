@@ -39,24 +39,40 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
 
-  companion object {
-    public final val storageStrings : Map<String,String> = mapOf(
-      "SAVED_MESSAGE_QUEUE" to "savedMessageQueue",
-      "SAVED_MESSAGE_QUEUE_SIZES" to "savedMessageQueueSizes",
-      "MESSAGES_TO_REMOVE" to "messagesToRemove",
-      "MESSAGES_TO_REMOVE_SIZES" to "messagesToRemoveSizes"
-    )
-  
-    public final val bluetoothErrorStrings: Map<String,String> = mapOf(
-      "LOCATION_DISABLED" to "LOCATION_DISABLED",
-      "ADAPTER_TURNED_OFF" to "ADAPTER_TURNED_OFF"
-    )
+  object storageStrings {
+    val SAVED_MESSAGE_QUEUE = "savedMessageQueue";
+    val SAVED_MESSAGE_QUEUE_SIZES = "savedMessageQueueSizes";
+    val MESSAGES_TO_REMOVE = "messagesToRemove";
+    val MESSAGES_TO_REMOVE_SIZES = "messagesToRemoveSizes";
   }
 
-  private final val emitterStrings : Map<String,String> = mapOf(
-    "NEW_MESSAGES_RECEIVED" to "newHerdMessagesReceived",
-    "REMOVE_MESSAGES_FROM_QUEUE" to "removeMessagesFromQueue",
-    "BLUETOOTH_LOCATION_STATE_CHANGE" to "bluetoothOrLocationStateChange"
+  private final val storageStringMap : Map<String,String> = mapOf(
+    "SAVED_MESSAGE_QUEUE" to storageStrings.SAVED_MESSAGE_QUEUE,
+    "SAVED_MESSAGE_QUEUE_SIZES" to storageStrings.SAVED_MESSAGE_QUEUE_SIZES,
+    "MESSAGES_TO_REMOVE" to storageStrings.MESSAGES_TO_REMOVE,
+    "MESSAGES_TO_REMOVE_SIZES" to storageStrings.MESSAGES_TO_REMOVE_SIZES
+  )
+
+  object bluetoothErrorStrings {
+    val LOCATION_DISABLED = "LOCATION_DISABLED";
+    val ADAPTER_TURNED_OFF = "ADAPTER_TURNED_OFF";
+  }
+
+  private final val bluetoothErrorStringMap : Map<String,String> = mapOf(
+    "LOCATION_DISABLED" to bluetoothErrorStrings.LOCATION_DISABLED,
+    "ADAPTER_TURNED_OFF" to bluetoothErrorStrings.ADAPTER_TURNED_OFF
+  )
+
+  object emitterStrings {
+    val NEW_MESSAGES_RECEIVED = "newHerdMessagesReceived";
+    val REMOVE_MESSAGES_FROM_QUEUE = "removeMessagesFromQueue";
+    val BLUETOOTH_LOCATION_STATE_CHANGE = "bluetoothOrLocationStateChange";
+  }
+
+  private final val emitterStringMap : Map<String,String> = mapOf(
+    "NEW_MESSAGES_RECEIVED" to emitterStrings.NEW_MESSAGES_RECEIVED,
+    "REMOVE_MESSAGES_FROM_QUEUE" to emitterStrings.REMOVE_MESSAGES_FROM_QUEUE,
+    "BLUETOOTH_LOCATION_STATE_CHANGE" to emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE
   )
 
   private var bound : Boolean = false;
@@ -83,10 +99,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
       var emitterString : String = "";
       if(action == HerdBackgroundService.newMessageReceivedEmitterString) {
-        emitterString = emitterStrings.getValue("NEW_MESSAGES_RECEIVED");
+        emitterString = emitterStrings.NEW_MESSAGES_RECEIVED;
       }
       else if(action == HerdBackgroundService.removeMessagesFromQueueEmitterString) {
-        emitterString = emitterStrings.getValue("REMOVE_MESSAGES_FROM_QUEUE");
+        emitterString = emitterStrings.REMOVE_MESSAGES_FROM_QUEUE;
       }
       if(messages != null && messages.size > 0 && emitterString.length > 0) {
         Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
@@ -103,7 +119,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       val errorNotificationType = HerdBackgroundService.checkForBluetoothOrLocationError(context, intent);
       if(errorNotificationType.length > 0) {
         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit(emitterStrings.getValue("BLUETOOTH_LOCATION_STATE_CHANGE"),errorNotificationType);
+        .emit(emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE,errorNotificationType);
         
         if(bound) {
           unbindService();
@@ -118,9 +134,9 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   override fun getConstants() : Map<String, Any> {
     return mapOf(
-      "emitterStrings" to emitterStrings,
-      "storage" to storageStrings,
-      "bluetoothErrors" to bluetoothErrorStrings
+      "emitterStrings" to emitterStringMap,
+      "storage" to storageStringMap,
+      "bluetoothErrors" to bluetoothErrorStringMap
     )
   }
 
