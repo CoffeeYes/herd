@@ -93,18 +93,11 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   private final val messageReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action;
+      val emitterString : String? = intent.action;
       val bundle : Bundle? = intent.getExtras();
       val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
       Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
-      var emitterString : String = "";
-      if(action == HerdBackgroundService.newMessageReceivedEmitterString) {
-        emitterString = emitterStrings.NEW_MESSAGES_RECEIVED;
-      }
-      else if(action == HerdBackgroundService.removeMessagesFromQueueEmitterString) {
-        emitterString = emitterStrings.REMOVE_MESSAGES_FROM_QUEUE;
-      }
-      if(messages != null && messages.size > 0 && emitterString.length > 0) {
+      if(messages != null && messages.size > 0 && emitterString != null && emitterString.length > 0) {
         Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
         val messageArray = HerdMessage.toWritableArray(messages);
         //pass object to JS through event emitter
@@ -167,8 +160,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
       serviceIntent.putExtra("allowNotifications",allowNotifications);
-      val messageIntentFilter = IntentFilter(HerdBackgroundService.newMessageReceivedEmitterString);
-      messageIntentFilter.addAction(HerdBackgroundService.removeMessagesFromQueueEmitterString);
+      val messageIntentFilter = IntentFilter(emitterStrings.NEW_MESSAGES_RECEIVED);
+      messageIntentFilter.addAction(emitterStrings.REMOVE_MESSAGES_FROM_QUEUE);
       context.registerReceiver(messageReceiver,messageIntentFilter);
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
