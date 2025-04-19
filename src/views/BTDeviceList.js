@@ -15,7 +15,7 @@ import ConfirmationModal from './ConfirmationModal';
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
 import { requestMakeDiscoverable, checkOrRequestConnectionServices} from '../common';
-import { setBackgroundServiceRunning, setLockable } from '../redux/actions/appStateActions';
+import { setLockable } from '../redux/actions/appStateActions';
 import LoadingIndicator from './LoadingIndicator';
 
 const BTDeviceList = ({ navigation }) => {
