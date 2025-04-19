@@ -47,10 +47,10 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
 
     const bluetoothAndLocationStateListener = serviceEventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
       let disableType = "";
-      if(state === "ADAPTER_TURNED_OFF") {
+      if(state === ServiceInterface.bluetoothErrors.ADAPTER_TURNED_OFF) {
         disableType = "Bluetooth";
       }
-      else if(state === "LOCATION_DISABLED") {
+      else if(state === ServiceInterface.bluetoothErrors.LOCATION_DISABLED) {
         disableType = "Location";
       }
 
@@ -104,7 +104,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
       <View style={{...styles.modalContentContainer, ...contentWidth}}>
         {error.length == 0 ?
         <>
-          <LoadingIndicator/>
+          <LoadingIndicator animating={loading}/>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
         </>
         :

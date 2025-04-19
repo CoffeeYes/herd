@@ -28,6 +28,8 @@ const HeaderItem = ({title, text, numberOfLines, containerStyle, titleStyle, tex
 
 const FoldableMessage = ({open, to = "N/A", from = "N/A", closedTimestamp, text, textFontSize, onPress, loading,
                           openTimestamp, containerStyle, headerTitleStyle, headerTextStyle, headerNumberOfLines = 1, openTimestampStyle, disablePress, pauseLoadingIndicator}) => {
+
+  console.log("foldableMessage")
   return (
     <TouchableOpacity style={{...styles.container, paddingBottom : open ? 0 : 20, ...containerStyle}} onPress={onPress} disabled={disablePress}>
       <View style={{width : "100%"}}>
@@ -105,4 +107,5 @@ const styles = {
   },
 }
 
-export default memo(FoldableMessage,componentShouldUpdate);
+//export default memo(FoldableMessage,componentShouldUpdate);
+export default FoldableMessage;
