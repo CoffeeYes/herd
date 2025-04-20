@@ -89,6 +89,9 @@ const App = ({ }) => {
 
         newMessages.length > 0 &&
         await addNewReceivedMessagesToRealm(newMessages,dispatch);
+        
+        const messagesToRemove = await ServiceInterface.getMessages("completed");
+        removeCompletedMessagesFromRealm(messagesToRemove);
       }
       else {
         await loadStoredMessages();
