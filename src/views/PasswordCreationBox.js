@@ -6,6 +6,7 @@ import Crypto from '../nativeWrapper/Crypto';
 import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
+import CustomButton from './CustomButton';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -124,8 +125,8 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             buttonStyle={{...styles.button, width : "50%"}}
             textStyle={styles.buttonText}/>
 
-            <FlashTextButton
-            normalText="Reset"
+            <CustomButton
+            text="Reset"
             disabled={disableReset}
             onPress={handleReset}
             buttonStyle={{...styles.button, marginLeft : 10,width : "50%"}}

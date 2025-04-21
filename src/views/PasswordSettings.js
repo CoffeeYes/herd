@@ -90,7 +90,7 @@ const PasswordSettings = () => {
 
     if(!hasLoginPassword && name === "erasure") {
       setErasurePasswordErrors([{
-        type : "eraure_before_login",
+        type : "erasure_before_login",
         text : "You must set up a normal password before an erasure password can be used"}
       ])
       return false;
@@ -123,6 +123,14 @@ const PasswordSettings = () => {
     setShowResetModal(false);
   }
 
+  const handleResetAttempt = passwordName => {
+    setPasswordToReset(passwordName);
+    setShowResetModal(true);
+    return new Promise(resolve => {
+      resetPasswordPromiseRef.current = resolve
+    })
+  }
+
   const mainPasswordDescription = `You will be asked to enter this password when opening the app \
 and accessing security-critical pages such as this one.`
 
@@ -153,13 +161,7 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmLoginPassword,
           setLoginPasswordErrors
         )}
-        reset={() => {
-          setPasswordToReset("login");
-          setShowResetModal(true);
-          return new Promise(resolve => {
-            resetPasswordPromiseRef.current = resolve;
-          })
-        }}
+        reset={() => handleResetAttempt("login")}
         disableReset={!hasLoginPassword}
         />
 
@@ -198,13 +200,7 @@ meaning all contacts who have previously added you will need to add you again.`
           confirmErasurePassword,
           setErasurePasswordErrors
         )}
-        reset={() => {
-          setPasswordToReset("erasure");
-          setShowResetModal(true);
-          return new Promise(resolve => {
-            resetPasswordPromiseRef.current = resolve
-          })
-        }}
+        reset={() => handleResetAttempt("erasure")}
         disableReset={!hasErasurePassword}
         />
 
