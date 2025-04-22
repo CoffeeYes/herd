@@ -72,12 +72,9 @@ const MessageQueue = ({}) => {
     (async () => {
       const initialMessages = createInitialMessageState(messageQueue);
       setParsedQueue(initialMessages);
-      const messagesToDecrypt = initialMessages.reduce((result, message, index) => {
-        if(message.loading) {
-          result.push(({text : message.text, identifier : index.toString()}))
-        }
-        return result;
-      },[]);
+      const messagesToDecrypt = initialMessages.map((message,index) => message.loading && ({
+        text : message.text, identifier : index.toString()
+      }))
       const results = await decryptStringsWithIdentifier(messagesToDecrypt)
       const final = assignResultsToTargets(results,[...initialMessages]);
       setParsedQueue(final);
@@ -131,10 +128,6 @@ const MessageQueue = ({}) => {
           onPress={() => {
             setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
           }}
-          useLoadingIndicator
-          loading={parsedQueue.some(item => item.loading)}
-          loadingIndicatorStyle={{marginLeft : "10%"}}
-          loadingIndicatorColor={palette.white}
           disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
           buttonStyle={styles.buttonStyle}/>
 
@@ -150,7 +143,6 @@ const MessageQueue = ({}) => {
                 setParsedQueue([...parsedQueue].sort((a,b) => a.timestamp - b.timestamp))
               }
             }}
-          loading={parsedQueue.some(item => item.loading)}
           disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
           buttonStyle={{...styles.buttonStyle, marginLeft : 10}}/>
         </View>
