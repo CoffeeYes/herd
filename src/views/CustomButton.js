@@ -9,7 +9,7 @@ import LoadingIndicator from './LoadingIndicator';
 const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIconSize,
                         text, buttonStyle, textStyle, disabled, disabledStyle, useDisabledStyle = true,
                         loading, useLoadingIndicator, loadingIndicatorColor, loadingIndicatorStyle,
-                        loadingIndicatorSize }) => {
+                        loadingIndicatorSize, replaceTextWithLoadingIndicator = false }) => {
   const customStyle = useSelector(state => state.appStateReducer.styles);
   return (
     <TouchableOpacity
@@ -24,13 +24,17 @@ const CustomButton = ({ onPress, rightIcon, rightIconSize = 24, leftIcon, leftIc
       <Icon name={leftIcon} size={leftIconSize}/>}
 
       {useLoadingIndicator &&
+      !replaceTextWithLoadingIndicator || loading &&
       <LoadingIndicator
       animating={loading}
       size={loadingIndicatorSize}
       color={loadingIndicatorColor} 
-      style={{...styles.loadingIndicator, ...loadingIndicatorStyle }}/>}
+      style={{
+        ...(!replaceTextWithLoadingIndicator && ({...styles.loadingIndicator})),
+        ...loadingIndicatorStyle 
+      }}/>}
 
-      {text &&
+      {text && !(replaceTextWithLoadingIndicator && loading) &&
       <Text style={{...styles.buttonText,fontSize : customStyle.scaledUIFontSize, ...textStyle}}>
         {text}
       </Text>}
@@ -57,8 +61,6 @@ const styles = {
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center",
-    marginLeft : "auto",
-    marginRight : "auto"
   },
   disabled : {
     backgroundColor : palette.grey,

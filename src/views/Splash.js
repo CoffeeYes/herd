@@ -16,12 +16,14 @@ import { palette } from '../assets/palette';
 import { CommonActions } from '@react-navigation/native';
 import { setEnableNotifications, setMaxPasswordAttempts } from '../redux/actions/appStateActions';
 import { STORAGE_STRINGS } from '../common';
+import { useScreenAdjustedSize } from '../helper';
 
 const defaultMaxPasswordAttempts = 3;
 
 const Splash = ({ navigation }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const buttonWidth = useScreenAdjustedSize(0.4,0.4);
 
   const setup = async () => {
     setLoading(true);
@@ -63,12 +65,11 @@ const Splash = ({ navigation }) => {
         text="Get Started"
         onPress={async () => await setup()}
         useLoadingIndicator
+        replaceTextWithLoadingIndicator
         loadingIndicatorColor={palette.white}
-        loadingIndicatorStyle={{marginLeft : "1%"}}
         loading={loading}
-        buttonStyle={styles.button}
+        buttonStyle={{...styles.button,width : buttonWidth, minHeight : 60}}
         disabledStyle={styles.button}
-        textStyle={{marginLeft : "7%"}}
         disabled={badVersion || loading}/>
 
         {badVersion &&
@@ -98,7 +99,7 @@ const styles = {
   button : {
     borderWidth : 1,
     borderColor : palette.white,
-    paddingRight : "7%"
+    justifyContent : "center"
   }
 }
 export default Splash;
