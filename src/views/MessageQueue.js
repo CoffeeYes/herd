@@ -128,6 +128,9 @@ const MessageQueue = ({}) => {
           onPress={() => {
             setOpenMessages(openMessages.length > 0 ? [] : messageQueue.map(message => message._id))
           }}
+          useLoadingIndicator
+          replaceTextWithLoadingIndicator
+          loading={parsedQueue.some(item => item.loading)}
           disabled={parsedQueue.some(item => item.loading) || messageQueue.length == 0}
           buttonStyle={styles.buttonStyle}/>
 
@@ -169,7 +172,9 @@ const styles = {
   buttonStyle : {
     elevation : 2,
     borderColor : palette.offprimary,
-    flex : 1
+    flex : 1,
+    justifyContent : "center",
+    height : 50
   },
   listStyle : {
     alignItems : "center",
