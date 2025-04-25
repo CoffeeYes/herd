@@ -1,3 +1,5 @@
+import Schemas from "../../realm/Schemas";
+
 const initialState = {
   contacts : []
 }
@@ -22,18 +24,18 @@ const contactReducer = (state = initialState,action) => {
       const { _id, ...payload} = action.payload;
 
       for(const key of Object.keys(payload)) {
-        if(!["name","key","image"].includes(key)){
+        if(!Object.keys(Schemas.ContactSchema.properties).includes(key)){
           delete payload[key];
         }
       }
 
       let contact = state.contacts.find(contact => contact._id == _id);
       if(contact) {
-          let contactsCopy = [...state.contacts];
-    	  let newContact  = {
-            ...contact,
-            ...payload
-    	  };
+        let contactsCopy = [...state.contacts];
+        let newContact  = {
+          ...contact,
+          ...payload
+        };
         const contactIndex = state.contacts.indexOf(contact);
         contactsCopy[contactIndex] = newContact;
         return {...state, contacts : contactsCopy}

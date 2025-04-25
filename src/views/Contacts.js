@@ -36,30 +36,22 @@ const Contacts = ({ route, navigation }) => {
   }
 
   const handleLongPress = contactID => {
-    if(route.params.type === "newChat") {
-      navigateToNewChat(contactID);
-    }
-    else if(!highlightedContacts.includes(contactID)) {
+    if(!highlightedContacts.includes(contactID)) {
       setHighlightedContacts([...highlightedContacts,contactID]);
     }
   }
 
   const handlePress = contactID => {
-    if(route.params.type === "newChat") {
-      navigateToNewChat(contactID);
-    }
-    else {
-      if(highlightedContacts.length > 0) {
-        if(!highlightedContacts.includes(contactID)) {
-          setHighlightedContacts([...highlightedContacts,contactID]);
-        }
-        else {
-          setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contactID));
-        }
+    if(highlightedContacts.length > 0) {
+      if(!highlightedContacts.includes(contactID)) {
+        setHighlightedContacts([...highlightedContacts,contactID]);
       }
       else {
-        navigation.navigate("contact", {id : contactID})
+        setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contactID));
       }
+    }
+    else {
+      navigation.navigate("contact", {id : contactID})
     }
   }
 
@@ -79,8 +71,8 @@ const Contacts = ({ route, navigation }) => {
           image={contact.image}
           textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
-          onPress={() => handlePress(contact._id)}
-          onLongPress={() => handleLongPress(contact._id)}
+          onPress={() => route.params.type == "newChat" ? navigateToNewChat(contact._id) : handlePress(contact._id)}
+          onLongPress={() => route.params.type == "newChat" ? navigateToNewChat(contact._id) : handleLongPress(contact._id)}
           highlighted={highlightedContacts.includes(contact._id)}
           highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
           />
