@@ -181,7 +181,7 @@ meaning all contacts who have previously added you will need to add you again.`
             disabled={chosenMaxPasswordAttempts == maxPasswordAttempts || chosenMaxPasswordAttempts.trim().length == 0}
             onPress={saveMaxAttempts}
             timeout={500}
-            buttonStyle={{...styles.button, width : "100%"}}
+            buttonStyle={{width : "100%", justifyContent : "center"}}
             textStyle={styles.buttonText}/>
           </View>
         </View>

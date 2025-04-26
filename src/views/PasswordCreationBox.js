@@ -145,6 +145,7 @@ const styles = {
     backgroundColor : palette.primary,
     padding : 10,
     alignSelf : "center",
+    justifyContent : "center",
     marginTop : 10,
     borderRadius : 5,
   },
