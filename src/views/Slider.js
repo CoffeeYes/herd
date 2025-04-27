@@ -8,9 +8,9 @@ import GradientLine from './GradientLine';
 const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
-                        min, max, thumbTintColor,
+                        min, max,
                         showColorPreview, previewGradientPoints,
-                        minimumTrackTintColor, maximumTrackTintColor, ...props}) => {
+                        ...props}) => {
   return (
     <View style={{...styles.container,...containerStyle}}>
       <View style={styles.sliderContainer}>
@@ -21,9 +21,6 @@ const CustomSlider = ({
       <Slider
       minimumValue={min}
       maximumValue={max}
-      minimumTrackTintColor={minimumTrackTintColor || palette.secondary}
-      maximumTrackTintColor={maximumTrackTintColor || palette.primary}
-      thumbTintColor={thumbTintColor || palette.primary}
       style={{...styles.slider, ...sliderStyle}}
       {...props}/>
       </View>
@@ -35,6 +32,12 @@ const CustomSlider = ({
       </View>
     </View>
   )
+}
+
+CustomSlider.defaultProps = {
+  minimumTrackTintColor : palette.secondary,
+  maximumTrackTintColor : palette.primary,
+  thumbTintColor : palette.primary
 }
 
 const styles = {
