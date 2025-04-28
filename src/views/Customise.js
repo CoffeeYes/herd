@@ -39,8 +39,8 @@ const Customise = () => {
   const customStyle = useSelector(state => state.appStateReducer.styles);
 
   const fontSliderProps = {
-    min : boundaryValues.minFontSize,
-    max : boundaryValues.maxFontSize,
+    minimumValue : boundaryValues.minFontSize,
+    maximumValue : boundaryValues.maxFontSize,
     step : 1,
     tapToSeek : true,
     titleStyle : { fontSize : customStyle.scaledUIFontSize },

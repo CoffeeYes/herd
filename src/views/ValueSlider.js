@@ -7,13 +7,13 @@ import Slider from './Slider'
 
 const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
   const valueRef = useRef(value)
-  const { min, max, step } = props;
+  const { minimumValue, maximumValue, step } = props;
  
   useEffect(() => {
     if(useValue) {
-      valueRef.current = clamp(value,min,max);
+      valueRef.current = clamp(value,minimumValue,maximumValue);
     }
-  },[value, useValue, min, max])
+  },[value, useValue, minimumValue, maximumValue])
 
   return (
     <>
@@ -27,11 +27,11 @@ const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
       <Slider
       value={(() => {
         if(useValue) {
-          if(value == min) {
+          if(value == minimumValue) {
             return value + step;
           }
           else {
-            return clamp(value,min,max);
+            return clamp(value,minimumValue,maximumValue);
           }
         }
         else {

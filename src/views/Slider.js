@@ -8,7 +8,6 @@ import GradientLine from './GradientLine';
 const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
-                        min, max,
                         showColorPreview, previewGradientPoints,
                         ...props}) => {
   return (
@@ -19,8 +18,6 @@ const CustomSlider = ({
       style={styles.gradientLine}
       gradientPoints={previewGradientPoints}/>}
       <Slider
-      minimumValue={min}
-      maximumValue={max}
       style={{...styles.slider, ...sliderStyle}}
       {...props}/>
       </View>

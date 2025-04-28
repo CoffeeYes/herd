@@ -13,9 +13,9 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
   const sliderWidth = useScreenAdjustedSize(0.8, 0.6);
 
   const sliderProps = {
-    min : 0.01,
+    minimumValue : 0.01,
     step : 0.01,
-    max : 1,
+    maximumValue : 1,
     useValue : overrideSliderValues,
     containerStyle : {...styles.sliderContainer, width : sliderWidth},
     rightTitleStyle : {fontWeight : "bold", fontSize : sliderTitleSize},
@@ -73,8 +73,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
       </View>
       <ValueSlider
       {...sliderProps}
-      min={0}
-      max={360}
+      minimumValue={0}
+      maximumValue={360}
       step={1}
       rightTitle={"Hue"}
       rightText={color.h.toFixed(0)}
