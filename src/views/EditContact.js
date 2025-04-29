@@ -16,7 +16,7 @@ import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
-import { useScreenAdjustedSize } from '../helper';
+import { useScreenAdjustedSize, useStateAndRef } from '../helper';
 import { encryptStrings } from '../common';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -28,30 +28,20 @@ const EditContact = ({ route, navigation }) => {
   const [errors, setErrors] = useState([]);
   const [saving, setSaving] = useState(false);
   const [headerIcon, setHeaderIcon] = useState("save");
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [unsavedChanges, setUnsavedChanges, unsavedChangesRef] = useStateAndRef(false);
 
   const editingExistingContact = route?.params?.id?.length > 0;
 
   const contactImageSize = useScreenAdjustedSize(0.4,0.25);
 
-  const [name, setName] = useState(originalContact?.name || "");
-  const [publicKey, setPublicKey] = useState(originalContact?.key || "");
+  const [name, setName] = useState(originalContact?.name || route?.params?.name || "");
+  const [publicKey, setPublicKey] = useState(originalContact?.key || route?.params?.publicKey || "");
   const [contactImage, setContactImage] = useState(originalContact?.image || "");
 
   const publicKeyInputRef = useRef();
   const scrollViewRef = useRef();
 
-  const unsavedChangesRef = useRef(false);
-
   useEffect(() => {
-    if(!editingExistingContact) {
-      route?.params?.publicKey &&
-      setPublicKey(route.params.publicKey);
-
-      route?.params?.name &&
-      setName(route.params.name);
-    }
-
     return () => {
       Crypto.cancelCoroutineWork();
     }
@@ -175,7 +165,6 @@ const EditContact = ({ route, navigation }) => {
       contactImage.trim().length > 0
     )
     setUnsavedChanges(unsavedChanges);
-    unsavedChangesRef.current = unsavedChanges;
   },[contactImage,name,publicKey,originalContact])
 
   const hideSaveButton = () => {
