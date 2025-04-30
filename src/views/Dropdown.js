@@ -4,7 +4,7 @@ import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, dropDownBoxStyle,
-                    itemStyle, textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
+                    textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
   const [open, setOpen] = useState(false);
   const [chosenIndex, setChosenIndex] = useState(defaultIndex);
 
@@ -12,8 +12,7 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, d
     setChosenIndex(index);
     setOpen(false);
 
-    onChangeOption &&
-    onChangeOption(index);
+    onChangeOption?.(index);
   }
   return (
     <View style={{...styles.container, ...containerStyle}}>

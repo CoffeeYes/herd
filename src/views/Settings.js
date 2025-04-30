@@ -37,6 +37,7 @@ import {
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 import { requestEnableBluetooth, requestPermissionsForBluetooth, STORAGE_STRINGS } from '../common';
+import QRCode from 'react-native-qrcode-svg';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -171,6 +172,12 @@ for the following permissions in order to allow Herd to function correctly.`
   const notificationModalDescription = `In order to send you notifications when new messages are received, Herd requires \
 certain permissions to be allowed all the time`
 
+  const switchProps = {
+    disabled : QRCodeVisible,
+    trackColor : { false : palette.grey, true : palette.primary},
+    ios_backgroundColor : palette.primary
+  }
+
   return (
     <>
       <Header title="Settings"/>
@@ -188,26 +195,22 @@ certain permissions to be allowed all the time`
           <View style={{flexDirection : "row", marginVertical: 10}}>
             <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
             <Switch
+            {...switchProps}
             style={{marginLeft : 10}}
             onValueChange={val => toggleBackgroundTransfer(val)}
-            disabled={QRCodeVisible}
             value={backgroundServiceRunning}
-            trackColor={{ false: palette.grey, true: palette.primary }}
-            thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}
-            ios_backgroundColor={palette.primary}/>
+            thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}/>
           </View>
         </View>
 
         <View style={styles.card}>
           <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}> Send me a notification when new messages are received</Text>
           <Switch
+          {...switchProps}
           style={{marginTop: 10}}
-          onValueChange={async val => toggleNotifications(val)}
-          disabled={QRCodeVisible}
+          onValueChange={async val => await toggleNotifications(val)}
           value={enableNotifications}
-          trackColor={{ false: palette.grey, true: palette.primary }}
-          thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}
-          ios_backgroundColor={palette.primary}/>
+          thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}/>
         </View>
 
         <CardButton
