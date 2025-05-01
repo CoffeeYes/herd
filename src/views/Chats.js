@@ -9,7 +9,7 @@ import { deleteChats as deleteChatsFromState } from '../redux/actions/chatAction
 
 import { palette } from '../assets/palette';
 
-import { timestampToText, toHsv } from '../helper';
+import { timestampToText, defaultToReadableStyle} from '../helper';
 import ConfirmationModal from './ConfirmationModal';
 
 const Chats = ({ navigation }) => {
@@ -23,16 +23,6 @@ const Chats = ({ navigation }) => {
   const canStartNewChat = useSelector(state => state.contactReducer.contacts)
   .filter(contact => chats.find(chat => chat._id === contact._id) === undefined)
   .length > 0;
-
-  const checkStyleReadable = style => {
-      const {s,v} = toHsv(style);
-      if(s < 0.1 && v > 0.95) {
-        return palette.grey
-      }
-      else {
-        return style
-      }
-  }
 
   const handleLongPress = id => {
     if(!highlightedChats.includes(id)) {
@@ -63,8 +53,8 @@ const Chats = ({ navigation }) => {
     }
   }
 
-  const displayedSentTextColor = checkStyleReadable(customStyle.sentTextColor);
-  const displayedReceivedTextColor = checkStyleReadable(customStyle.receivedTextColor);
+  const displayedSentTextColor = defaultToReadableStyle(customStyle.sentTextColor, palette.grey);
+  const displayedReceivedTextColor = defaultToReadableStyle(customStyle.receivedTextColor, palette.grey);
 
   return (
     <>

@@ -331,6 +331,16 @@ const getUniqueKeysFromMessages = (messages = [], toOrFrom) => {
   return keys;
 }
 
+const defaultToReadableStyle = (style, defaultStyle) => {
+  const {s,v} = toHsv(style);
+  if(s < 0.1 && v > 0.95) {
+    return defaultStyle;
+  }
+  else {
+    return style
+  }
+}
+
 export {
   timestampToText,
   useScreenAdjustedSize,
@@ -346,5 +356,6 @@ export {
   parseRealmID,
   parseRealmObject,
   parseRealmObjects,
-  getUniqueKeysFromMessages
+  getUniqueKeysFromMessages,
+  defaultToReadableStyle
 }
