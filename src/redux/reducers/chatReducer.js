@@ -66,13 +66,12 @@ const updateChat = (originalChat, newValues) => {
   return updatedChat;
 }
 
-const updateMessageQueue = (messageQueue, originalKey, newKey, newName) => {
+const updateMessageQueue = (messageQueue, originalKey, newKey) => {
   const updatedQueue = messageQueue.map(message => {
     if(message.to == originalKey) {
       return {
         ...message,
-        ...(newKey?.length > 0 && {to : newKey}),
-        ...(newName?.length > 0 && {toContactName : newName})
+        to : newKey
       }
     }
     else return message;
@@ -196,8 +195,7 @@ const chatReducer = (state = initialState,action) => {
           messageQueue : updateMessageQueue(
             state.messageQueue,
             chatToUpdate.key,
-            action.payload.key,
-            action.payload.name
+            action.payload.key
           )
         }
       }
