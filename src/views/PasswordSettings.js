@@ -41,7 +41,7 @@ const PasswordSettings = () => {
   const hasErasurePassword = erasurePasswordHash?.length > 0;
 
   useEffect(() => {
-    maxPasswordAttemptsHasChangesRef.current = maxPasswordAttempts != Number(chosenMaxPasswordAttempts);
+    maxPasswordAttemptsHasChangesRef.current = maxPasswordAttempts != Number(chosenMaxPasswordAttempts) && chosenMaxPasswordAttempts.length > 0;
   },[maxPasswordAttempts, chosenMaxPasswordAttempts])
 
   const checkValidPassword = (password, confirmation) => {
@@ -66,38 +66,29 @@ const PasswordSettings = () => {
       setErrors(validationErrors);
       return false;
     }
+
     const hash = await Crypto.createHash(password);
     const loginHash = getPasswordHash("login");
-    const erasureHash = getPasswordHash("erasure");
 
-    let oppositeHash = "";
-    if (name === "login") {
-      oppositeHash = erasureHash
-    }
-    else if(name === "erasure") {
-      oppositeHash = loginHash;
-    }
-    else {
-      throw new error("invalid password name used when attempting to save password");
-    }
+    if(name === "erasure") {
+      if(hasLoginPassword) {
+        const loginAndErasureAreIdentical = await Crypto.compareHashes(loginHash,hash);
 
-    const loginAndErasureAreIdentical = await Crypto.compareHashes(hash,oppositeHash);
-
-    if(loginAndErasureAreIdentical) {
-      setErrors([{type : "login_erasure_match", text : "Login and Erasure password cannot be the same"}]);
-      return false;
-    }
-
-    if(!hasLoginPassword && name === "erasure") {
-      setErasurePasswordErrors([{
-        type : "erasure_before_login",
-        text : "You must set up a normal password before an erasure password can be used"}
-      ])
-      return false;
+        if(loginAndErasureAreIdentical) {
+          setErrors([{type : "login_erasure_match", text : "Login and Erasure password cannot be the same"}]);
+          return false;
+        }
+      }
+      else {
+        setErasurePasswordErrors([{
+          type : "erasure_before_login",
+          text : "You must set up a normal password before an erasure password can be used"}
+        ])
+        return false;
+      }
     }
 
     //reset error after validation so that error text does not "flash" when re-submitting after error
-
     setErrors([]);
 
     updatePassword(name,hash);
