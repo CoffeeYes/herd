@@ -49,21 +49,9 @@ const EditContact = ({ route, navigation }) => {
 
   const save = async () => {
     setSaving(true);
-    let errorSaving = []
-    if(name.trim().length === 0) {
-      errorSaving.push({
-        type : "empty_name",
-        message : "Username can not be empty"
-      });
-    }
+    let errorSaving = [];
 
-    if(publicKey.trim().length === 0) {
-      errorSaving.push({
-        type : "empty_key",
-        message : "Key field can not be empty"
-      })
-    }
-    else if(publicKey.trim() === ownPublicKey.trim()) {
+    if(publicKey.trim() === ownPublicKey.trim()) {
       errorSaving.push({
         type : "invalid_key",
         message : "You can not add your own key"
