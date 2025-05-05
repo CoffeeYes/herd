@@ -112,7 +112,7 @@ const MessageQueue = ({}) => {
       textStyle={{marginTop : 0}}
       />
     )
-  },[parsedQueue,openMessages, Dimensions.get("window").width])
+  },[parsedQueue,openMessages])
 
   return (
     <>
@@ -174,7 +174,7 @@ const styles = {
     borderColor : palette.offprimary,
     flex : 1,
     justifyContent : "center",
-    height : 50
+    height : "100%"
   },
   listStyle : {
     alignItems : "center",
