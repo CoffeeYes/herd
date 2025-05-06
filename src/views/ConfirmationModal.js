@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {  Text, View } from 'react-native';
 import { palette } from '../assets/palette';
 
@@ -10,6 +11,8 @@ const ConfirmationModal = ({
   confirmText = "Confirm", cancelText = "Cancel", 
   onConfirm, onCancel, visible, titleText,
   loading}) => {
+
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   return (
     <CustomModal
     disableOnPress
@@ -18,7 +21,7 @@ const ConfirmationModal = ({
       {loading &&
       <LoadingIndicator/>
       }
-      <Text>{titleText}</Text>
+      <Text style={{fontSize : customStyle.scaledUIFontSize}}>{titleText}</Text>
       <View style={{flexDirection : "row", marginTop : 10}}>
         <CustomButton
         onPress={onConfirm}

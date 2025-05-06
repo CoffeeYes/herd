@@ -158,13 +158,13 @@ meaning all contacts who have previously added you will need to add you again.`
 
         <View style={{...styles.card, ...styles.container, marginTop : 10}}>
           <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Max Attempts</Text>
-          <Text>A value of 0 allows for unlimited attempts</Text>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>A value of 0 allows for unlimited attempts</Text>
           <TextInput 
           value={chosenMaxPasswordAttempts}
           onSubmitEditing={() => chosenMaxPasswordAttempts.trim().length > 0 ? saveMaxAttempts() : setChosenMaxPasswordAttempts(maxPasswordAttempts.toString())}
           onChangeText={value => ![",","."].some(substr => value.includes(substr)) && !isNaN(Number(value)) && setChosenMaxPasswordAttempts(value)}
           keyboardType="number-pad"
-          style={styles.input}/>
+          style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}/>
           <View style={{flexDirection : "row"}}>
             <FlashTextButton
             normalText="Save"
