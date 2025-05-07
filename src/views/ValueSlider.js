@@ -27,12 +27,11 @@ const ValueSlider = ({title, titleStyle, value, useValue, ...props}) => {
       <Slider
       value={(() => {
         if(useValue) {
-          if(value == minimumValue) {
-            return value + step;
-          }
-          else {
-            return clamp(value,minimumValue,maximumValue);
-          }
+          //need to clamp to min + step due to bug
+          //but can be recreated by going sent text, setting values to anything above min
+          //and switching back to sent box with 0 values, where the value will be correct
+          //but slider position wont, until you swap back and forth again.
+          return clamp(value,minimumValue + step,maximumValue);
         }
         else {
           return valueRef.current;
