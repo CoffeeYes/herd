@@ -45,12 +45,16 @@ const styles = {
     margin : 10,
     backgroundColor : palette.white,
   },
+  slider : {
+    paddingVertical : 10,
+  },
   sliderContainer : {
     flex : 1,
   },
   gradientLine : {
     paddingHorizontal : 15,
-    flex : 1
+    flex : 1,
+    height : 20
   }
 }
 
