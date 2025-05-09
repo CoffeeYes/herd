@@ -570,7 +570,7 @@ const Chat = ({ route, navigation }) => {
         </View>
       </PanGestureHandler>
 
-      <View style={{flexDirection : "row", height : inputHeight}}>
+      <View style={styles.inputControlContainer}>
         <TextInput
         placeholder="Send a Message"
         returnKeyType='done'
@@ -578,8 +578,7 @@ const Chat = ({ route, navigation }) => {
           ...styles.chatInput,
           backgroundColor : palette.white,
           fontSize : customStyle?.scaledUIFontSize,
-          flex : 1,
-          height : inputHeight
+          flex : 1
         }}
         value={chatInput}
         maxLength={maxCharacterCount}
@@ -606,19 +605,16 @@ const Chat = ({ route, navigation }) => {
           previousTextValueRef.current = text
         }}
         multiline={true}/>
-        <View style={{
-          backgroundColor : palette.white,
-          justifyContent : "center"}
-        }>
+        <View style={styles.sendButtonContainer}>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>
             {`${characterCount} / ${maxCharacterCount}`}
           </Text>
-        </View>
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
         onPress={async () => await handleSubmit(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
 
@@ -641,6 +637,7 @@ const styles = {
     backgroundColor : palette.white,
     marginTop : "auto",
     paddingLeft : 10,
+    borderRadius : 10,
   },
   imageContainer : {
     borderWidth : 1,
@@ -674,9 +671,22 @@ const styles = {
   sendButton : {
     alignItems : "center",
     justifyContent : "center",
-    backgroundColor : palette.white,
-    height : "100%",
     padding : 5 
+  },
+  sendButtonContainer : {
+    backgroundColor : palette.white,
+    flexDirection : "row",
+    alignItems : "center",
+    justifyContent : "center",
+    borderRadius : 10,
+    marginLeft : 10,
+  },
+  inputControlContainer : {
+    flexDirection : "row", 
+    marginBottom: 10, 
+    marginLeft : 10, 
+    marginRight : 10, 
+    alignItems : "flex-end"
   },
   loadingIndicator : {
     position : "absolute",
