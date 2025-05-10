@@ -75,7 +75,6 @@ const Chat = ({ route, navigation }) => {
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
-  const inputHeight = useScreenAdjustedSize(0.075,0.15,"height", 1, 0.7, 1000, 1000);
 
   useEffect(() => {
     (async () => {
@@ -571,50 +570,50 @@ const Chat = ({ route, navigation }) => {
       </PanGestureHandler>
 
       <View style={styles.inputControlContainer}>
-        <TextInput
-        placeholder="Send a Message"
-        returnKeyType='done'
-        style={{
-          ...styles.chatInput,
-          backgroundColor : palette.white,
-          fontSize : customStyle?.scaledUIFontSize,
-          flex : 1
-        }}
-        value={chatInput}
-        maxLength={maxCharacterCount}
-        onTextInput={({nativeEvent : {text}})=> {
-          if(text.length > 1) {
-            disableChatInputRef.current = false;
-            setChatInput(text)
-          }
-        }}
-        onChangeText={text => {
-          setChatInput(previousText => {
-            if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 ) {
-              setCharacterCount(maxCharacterCount)
-              return ""  
-            }
-            else {
+        <View style={styles.inputContainer}>
+          <TextInput
+          placeholder="Send a Message"
+          returnKeyType='done'
+          style={{
+            ...styles.chatInput,
+            backgroundColor : palette.white,
+            fontSize : customStyle?.scaledUIFontSize,
+            flex : 1
+          }}
+          value={chatInput}
+          maxLength={maxCharacterCount}
+          onTextInput={({nativeEvent : {text}})=> {
+            if(text.length > 1) {
               disableChatInputRef.current = false;
-              return text
+              setChatInput(text)
             }
-          })
-          !disableChatInputRef.current && 
-          setCharacterCount(maxCharacterCount - text.length);
+          }}
+          onChangeText={text => {
+            setChatInput(previousText => {
+              if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 ) {
+                setCharacterCount(maxCharacterCount)
+                return ""  
+              }
+              else {
+                disableChatInputRef.current = false;
+                return text
+              }
+            })
+            !disableChatInputRef.current && 
+            setCharacterCount(maxCharacterCount - text.length);
 
-          previousTextValueRef.current = text
-        }}
-        multiline={true}/>
-        <View style={styles.sendButtonContainer}>
+            previousTextValueRef.current = text
+          }}
+          multiline={true}/>
           <Text style={{fontSize : customStyle.scaledUIFontSize}}>
             {`${characterCount} / ${maxCharacterCount}`}
           </Text>
+        </View>
         <TouchableOpacity
         style={{...styles.sendButton, width : twentyPercentWidth}}
         onPress={async () => await handleSubmit(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
-        </View>
       </View>
     </KeyboardAvoidingView>
 
@@ -638,6 +637,14 @@ const styles = {
     marginTop : "auto",
     paddingLeft : 10,
     borderRadius : 10,
+  },
+  inputContainer : {
+    flexDirection : "row",
+    backgroundColor : palette.white,
+    flex : 1,
+    alignItems : "center",
+    borderRadius : 10,
+    paddingRight : 10
   },
   imageContainer : {
     borderWidth : 1,
@@ -671,15 +678,10 @@ const styles = {
   sendButton : {
     alignItems : "center",
     justifyContent : "center",
-    padding : 5 
-  },
-  sendButtonContainer : {
+    padding : 5,
     backgroundColor : palette.white,
-    flexDirection : "row",
-    alignItems : "center",
-    justifyContent : "center",
     borderRadius : 10,
-    marginLeft : 10,
+    marginLeft : 10
   },
   inputControlContainer : {
     flexDirection : "row", 
