@@ -73,7 +73,7 @@ const Chat = ({ route, navigation }) => {
   const chatWindowSize = 16;
 
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
-  const twentyPercentWidth = useScreenAdjustedSize(0.2,0.2,"width");
+  const sendContainerSize = useScreenAdjustedSize(0.15,0.1,"width");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
 
   useEffect(() => {
@@ -605,12 +605,12 @@ const Chat = ({ route, navigation }) => {
             previousTextValueRef.current = text
           }}
           multiline={true}/>
-          <Text style={{fontSize : customStyle.scaledUIFontSize}}>
-            {`${characterCount} / ${maxCharacterCount}`}
+          <Text style={{fontSize : customStyle.scaledUIFontSize, color : palette.grey}}>
+            {`${characterCount}`}
           </Text>
         </View>
         <TouchableOpacity
-        style={{...styles.sendButton, width : twentyPercentWidth}}
+        style={{...styles.sendButton, width : sendContainerSize, height : sendContainerSize, borderRadius : sendContainerSize / 2}}
         onPress={async () => await handleSubmit(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
@@ -678,9 +678,7 @@ const styles = {
   sendButton : {
     alignItems : "center",
     justifyContent : "center",
-    padding : 5,
     backgroundColor : palette.white,
-    borderRadius : 10,
     marginLeft : 10
   },
   inputControlContainer : {
