@@ -72,8 +72,8 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
   const chatWindowSize = 16;
 
+  const [inputHeight, setInputHeight] = useState(0);
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
-  const sendContainerSize = useScreenAdjustedSize(0.15,0.1,"width");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
 
   useEffect(() => {
@@ -580,6 +580,7 @@ const Chat = ({ route, navigation }) => {
             fontSize : customStyle?.scaledUIFontSize,
             flex : 1
           }}
+          onLayout={e => chatInput.length == 0 && setInputHeight(e.nativeEvent.layout.height)}
           value={chatInput}
           maxLength={maxCharacterCount}
           onTextInput={({nativeEvent : {text}})=> {
@@ -610,7 +611,7 @@ const Chat = ({ route, navigation }) => {
           </Text>
         </View>
         <TouchableOpacity
-        style={{...styles.sendButton, width : sendContainerSize, height : sendContainerSize, borderRadius : sendContainerSize / 2}}
+        style={{...styles.sendButton, width : inputHeight, height : inputHeight, borderRadius : inputHeight / 2}}
         onPress={async () => await handleSubmit(chatInput)}>
           <Icon name="send" size={32} color={palette.primary}/>
         </TouchableOpacity>
