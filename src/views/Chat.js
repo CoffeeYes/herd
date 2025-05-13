@@ -63,6 +63,7 @@ const Chat = ({ route, navigation }) => {
   const [sectionListHeight, setSectionListHeight] = useState(0);
   const [sectionContentHeight, setSectionContentHeight] = useState(0);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
   const disableChatInputRef = useRef(false);
@@ -544,6 +545,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           keyExtractor={item => item._id}
           renderItem={renderItem}
+          onScroll={e => setScrollPosition(e.nativeEvent.contentOffset.y)}
           onLayout={e => setSectionListHeight(e.nativeEvent.layout.height)}
           onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
           inverted
@@ -569,7 +571,7 @@ const Chat = ({ route, navigation }) => {
         </View>
       </PanGestureHandler>
 
-      <View style={styles.inputControlContainer}>
+      <View style={{...styles.inputControlContainer, ...(scrollPosition > 0 && ({...styles.inputControlBorderTop}))}}>
         <View style={styles.inputContainer}>
           <TextInput
           placeholder="Send a Message"
@@ -647,6 +649,21 @@ const styles = {
     borderRadius : 10,
     paddingRight : 10
   },
+  sendButton : {
+    alignItems : "center",
+    justifyContent : "center",
+    backgroundColor : palette.white,
+    marginLeft : 10
+  },
+  inputControlContainer : {
+    flexDirection : "row",
+    padding : 10,
+    alignItems : "flex-end",
+  },
+  inputControlBorderTop : {
+    borderTopWidth : 1,
+    borderTopColor : "rgba(0,0,0,0.2)"
+  },
   imageContainer : {
     borderWidth : 1,
     borderColor : palette.grey,
@@ -675,19 +692,6 @@ const styles = {
   },
   popupText : {
     fontWeight : "bold"
-  },
-  sendButton : {
-    alignItems : "center",
-    justifyContent : "center",
-    backgroundColor : palette.white,
-    marginLeft : 10
-  },
-  inputControlContainer : {
-    flexDirection : "row", 
-    marginBottom: 10, 
-    marginLeft : 10, 
-    marginRight : 10, 
-    alignItems : "flex-end"
   },
   loadingIndicator : {
     position : "absolute",
