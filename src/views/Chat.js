@@ -582,7 +582,7 @@ const Chat = ({ route, navigation }) => {
             fontSize : customStyle?.scaledUIFontSize,
             flex : 1
           }}
-          onLayout={e => chatInput.length == 0 && setInputHeight(e.nativeEvent.layout.height)}
+          onLayout={e => chatInput.length == 0 && !disableChatInputRef.current && setInputHeight(e.nativeEvent.layout.height)}
           value={chatInput}
           maxLength={maxCharacterCount}
           onTextInput={({nativeEvent : {text}})=> {
