@@ -64,6 +64,7 @@ const Chat = ({ route, navigation }) => {
   const [sectionContentHeight, setSectionContentHeight] = useState(0);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [inputHeight, setInputHeight] = useState(50);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
   
   const disableChatInputRef = useRef(false);
@@ -73,7 +74,6 @@ const Chat = ({ route, navigation }) => {
   const messageLoadingSize = 5;
   const chatWindowSize = 16;
 
-  const [inputHeight, setInputHeight] = useState(0);
   const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
   const contactImageSize = useScreenAdjustedSize(0.12,0.07);
 
@@ -545,6 +545,7 @@ const Chat = ({ route, navigation }) => {
           ref={scrollRef}
           keyExtractor={item => item._id}
           renderItem={renderItem}
+          scrollEventThrottle={25}
           onScroll={e => setScrollPosition(e.nativeEvent.contentOffset.y)}
           onLayout={e => setSectionListHeight(e.nativeEvent.layout.height)}
           onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
