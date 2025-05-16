@@ -7,21 +7,31 @@ import { palette } from '../assets/palette';
 
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
+  const [secureEntry, setSecureEntry] = useState(true);
 
   return (
     <>
       <Text style={titleStyle}>{name}</Text>
-      <TextInput
-      secureTextEntry
-      style={inputStyle}
-      onChangeText={onChangeText}
-      ref={ref}
-      onSubmitEditing={onSubmitEditing}
-      value={value}/>
+      <View style={{flexDirection : "row", alignItems : "center", marginBottom : 10}}>
+        <TextInput
+        secureTextEntry={secureEntry}
+        style={inputStyle}
+        onChangeText={onChangeText}
+        ref={ref}
+        onSubmitEditing={onSubmitEditing}
+        value={value}/>
+        <TouchableOpacity 
+        style={{marginLeft : 10}}
+        onPress={() => setSecureEntry(!secureEntry)}>
+          <Icon name={secureEntry ? "eye" : "eye-off"} size={24}/>
+        </TouchableOpacity>
+      </View>
     </>
   )
 })
@@ -158,11 +168,11 @@ const styles = {
   input : {
     borderColor: 'gray',
     borderWidth: 1,
-    marginBottom : 10,
     alignSelf : "stretch",
     padding : 10,
     backgroundColor : palette.white,
-    borderRadius : 5
+    borderRadius : 5,
+    flex : 1
   },
   inputTitle : {
     fontWeight : "bold",
