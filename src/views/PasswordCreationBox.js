@@ -10,27 +10,21 @@ import CustomButton from './CustomButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle},ref) => {
+const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle, secureTextEntry = true},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
-  const [secureEntry, setSecureEntry] = useState(true);
 
   return (
     <>
       <Text style={titleStyle}>{name}</Text>
-      <View style={{flexDirection : "row", alignItems : "center", marginBottom : 10}}>
+      <View style={{flexDirection : "row", alignItems : "center"}}>
         <TextInput
-        secureTextEntry={secureEntry}
+        secureTextEntry={secureTextEntry}
         style={inputStyle}
         onChangeText={onChangeText}
         ref={ref}
         onSubmitEditing={onSubmitEditing}
         value={value}/>
-        <TouchableOpacity 
-        style={{marginLeft : 10}}
-        onPress={() => setSecureEntry(!secureEntry)}>
-          <Icon name={secureEntry ? "eye" : "eye-off"} size={24}/>
-        </TouchableOpacity>
       </View>
     </>
   )
@@ -43,6 +37,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
 
   const [primaryInputText, setPrimaryInputText] = useState("");
   const [secondaryInputText, setSecondaryInputText] = useState("");
+  const [secureEntry, setSecureEntry] = useState(true);
 
   const [saveDisabled, setSaveDisabled] = useState(false);
 
@@ -110,20 +105,32 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             </Text>)}
           </View>
 
-          <PasswordField
-          name={primaryName}
-          customStyle={customStyle}
-          onChangeText={setPrimaryInputText}
-          onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
-          value={primaryInputText}/>
+          <View style={{flexDirection : "row", justifyContent : "center", alignItems : "center", marginBottom : 10}}>
+            <View style={{flex : 1}}>
+              <PasswordField
+              secureTextEntry={secureEntry}
+              name={primaryName}
+              customStyle={customStyle}
+              onChangeText={setPrimaryInputText}
+              onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
+              value={primaryInputText}/>
 
-          <PasswordField
-          name={secondaryName}
-          customStyle={customStyle}
-          onChangeText={setSecondaryInputText}
-          ref={secondaryInputRef}
-          onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
-          value={secondaryInputText}/>
+              <PasswordField
+              secureTextEntry={secureEntry}
+              name={secondaryName}
+              customStyle={customStyle}
+              onChangeText={setSecondaryInputText}
+              ref={secondaryInputRef}
+              onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
+              value={secondaryInputText}/>
+            </View>
+
+            <TouchableOpacity 
+            style={{marginLeft : 10}}
+            onPress={() => setSecureEntry(!secureEntry)}>
+              <Icon name={secureEntry ? "eye" : "eye-off"} size={28}/>
+            </TouchableOpacity>
+          </View>
 
           <View style={{flexDirection : "row"}}>
             <FlashTextButton
