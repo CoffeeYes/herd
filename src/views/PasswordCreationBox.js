@@ -10,12 +10,12 @@ import CustomButton from './CustomButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSubmitEditing, customInputStyle, secureTextEntry = true},ref) => {
+const PasswordField = forwardRef(({name, customStyle, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
 
   return (
-    <>
+    <View style={containerStyle}>
       <Text style={titleStyle}>{name}</Text>
       <View style={{flexDirection : "row", alignItems : "center"}}>
         <TextInput
@@ -26,7 +26,7 @@ const PasswordField = forwardRef(({name, customStyle, onChangeText, value, onSub
         onSubmitEditing={onSubmitEditing}
         value={value}/>
       </View>
-    </>
+    </View>
   )
 })
 
@@ -111,6 +111,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
               secureTextEntry={secureEntry}
               name={primaryName}
               customStyle={customStyle}
+              containerStyle={{marginBottom: 10}}
               onChangeText={setPrimaryInputText}
               onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
               value={primaryInputText}/>
@@ -126,9 +127,9 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
             </View>
 
             <TouchableOpacity 
-            style={{marginLeft : 10}}
+            style={{marginLeft : 10, marginTop : 15}}
             onPress={() => setSecureEntry(!secureEntry)}>
-              <Icon name={secureEntry ? "eye" : "eye-off"} size={28}/>
+              <Icon name={secureEntry ? "eye" : "eye-off"} size={32}/>
             </TouchableOpacity>
           </View>
 
