@@ -10,7 +10,7 @@ import CustomButton from './CustomButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const PasswordField = forwardRef(({name, customStyle, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true},ref) => {
+const PasswordField = forwardRef(({name, customStyle, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
 
@@ -23,6 +23,7 @@ const PasswordField = forwardRef(({name, customStyle, containerStyle, customInpu
         style={inputStyle}
         onChangeText={onChangeText}
         ref={ref}
+        blurOnSubmit={blurOnSubmit}
         onSubmitEditing={onSubmitEditing}
         value={value}/>
       </View>
@@ -123,13 +124,14 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
               onChangeText={setSecondaryInputText}
               ref={secondaryInputRef}
               onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
+              blurOnSubmit={!saveDisabled && !disableSave}
               value={secondaryInputText}/>
             </View>
 
             <TouchableOpacity 
             style={{marginLeft : 10, marginTop : 15}}
             onPress={() => setSecureEntry(!secureEntry)}>
-              <Icon name={secureEntry ? "eye" : "eye-off"} size={32}/>
+              <Icon name={secureEntry ?  "eye-off" : "eye"} size={32} color={palette.primary}/>
             </TouchableOpacity>
           </View>
 
