@@ -37,7 +37,6 @@ import {
   deleteAllChats as deleteAllChatsFromRealm } from '../realm/chatRealm';
 import { deleteAllContacts as deleteAllContactsFromRealm} from '../realm/contactRealm'
 import { requestEnableBluetooth, requestPermissionsForBluetooth, STORAGE_STRINGS } from '../common';
-import QRCode from 'react-native-qrcode-svg';
 
 const Settings = ({ navigation }) => {
   const dispatch = useDispatch();

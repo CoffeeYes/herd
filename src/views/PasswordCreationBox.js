@@ -1,5 +1,5 @@
-import React, { useState, useRef, forwardRef, useEffect } from 'react';
-import { View, Text, TextInput } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import Crypto from '../nativeWrapper/Crypto';
 
@@ -9,27 +9,7 @@ import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
-const PasswordField = forwardRef(({name, customStyle, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
-  const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
-  const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
-
-  return (
-    <View style={containerStyle}>
-      <Text style={titleStyle}>{name}</Text>
-      <View style={{flexDirection : "row", alignItems : "center"}}>
-        <TextInput
-        secureTextEntry={secureTextEntry}
-        style={inputStyle}
-        onChangeText={onChangeText}
-        ref={ref}
-        blurOnSubmit={blurOnSubmit}
-        onSubmitEditing={onSubmitEditing}
-        value={value}/>
-      </View>
-    </View>
-  )
-})
+import PasswordField from './PasswordField';
 
 const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
                             disableSave, disableReset, mainContainerStyle, save, reset,
@@ -174,19 +154,6 @@ const styles = {
     fontWeight : "bold",
     fontFamily : "Open-Sans",
     textAlign : "center"
-  },
-  input : {
-    borderColor: 'gray',
-    borderWidth: 1,
-    alignSelf : "stretch",
-    padding : 10,
-    backgroundColor : palette.white,
-    borderRadius : 5,
-    flex : 1
-  },
-  inputTitle : {
-    fontWeight : "bold",
-    marginBottom : 5
   },
   card : {
     backgroundColor : palette.white,
