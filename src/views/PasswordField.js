@@ -1,9 +1,12 @@
 import React, { forwardRef } from 'react';
+import { useSelector } from 'react-redux';
 import { View, Text, TextInput } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const PasswordField = forwardRef(({name, customStyle, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
+const PasswordField = forwardRef(({name, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
+
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
   const inputStyle = {...styles.input, fontSize : customStyle.scaledUIFontSize, ...customInputStyle};
 

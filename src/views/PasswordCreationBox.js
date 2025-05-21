@@ -70,69 +70,67 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
   }
 
   return (
-        <View style={{...styles.card,...mainContainerStyle }}>
+    <View style={{...styles.card,...mainContainerStyle }}>
 
-          {description &&
-          <Text multiline style={{fontSize : customStyle.scaledUIFontSize}}>
-            {description}
-          </Text>}
+      {description &&
+      <Text multiline style={{fontSize : customStyle.scaledUIFontSize}}>
+        {description}
+      </Text>}
 
-          <View style={styles.errorContainer}>
-            {errors.map((error) =>
-            <Text
-            key={error?.type || error.replace(" ","_")}
-            style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
-              {` - ${error?.text || error}`}
-            </Text>)}
-          </View>
+      <View style={styles.errorContainer}>
+        {errors.map((error) =>
+        <Text
+        key={error?.type || error.replace(" ","_")}
+        style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>
+          {` - ${error?.text || error}`}
+        </Text>)}
+      </View>
 
-          <View style={{flexDirection : "row", justifyContent : "center", alignItems : "center", marginBottom : 10}}>
-            <View style={{flex : 1}}>
-              <PasswordField
-              secureTextEntry={secureEntry}
-              name={primaryName}
-              customStyle={customStyle}
-              containerStyle={{marginBottom: 10}}
-              onChangeText={setPrimaryInputText}
-              onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
-              value={primaryInputText}/>
+      <View style={styles.passwordFieldContainer}>
+        <View style={{flex : 1}}>
+          <PasswordField
+          secureTextEntry={secureEntry}
+          name={primaryName}
+          containerStyle={{marginBottom: 10}}
+          onChangeText={setPrimaryInputText}
+          onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
+          value={primaryInputText}/>
 
-              <PasswordField
-              secureTextEntry={secureEntry}
-              name={secondaryName}
-              customStyle={customStyle}
-              onChangeText={setSecondaryInputText}
-              ref={secondaryInputRef}
-              onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
-              blurOnSubmit={!saveDisabled && !disableSave}
-              value={secondaryInputText}/>
-            </View>
-
-            <TouchableOpacity 
-            style={{marginLeft : 10, marginTop : 15}}
-            onPress={() => setSecureEntry(!secureEntry)}>
-              <Icon name={secureEntry ?  "eye-off" : "eye"} size={32} color={palette.primary}/>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{flexDirection : "row"}}>
-            <FlashTextButton
-            normalText="Save"
-            flashText="Saved!"
-            disabled={saveDisabled || disableSave}
-            onPress={submit}
-            timeout={500}
-            buttonStyle={{...styles.button, width : "50%"}}
-            textStyle={styles.buttonText}/>
-
-            <CustomButton
-            text="Reset"
-            disabled={disableReset}
-            onPress={handleReset}
-            buttonStyle={{...styles.button, marginLeft : 10,width : "50%"}}
-            textStyle={styles.buttonText}/>
-          </View>
+          <PasswordField
+          secureTextEntry={secureEntry}
+          name={secondaryName}
+          onChangeText={setSecondaryInputText}
+          ref={secondaryInputRef}
+          onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
+          blurOnSubmit={!saveDisabled && !disableSave}
+          value={secondaryInputText}/>
         </View>
+
+        <TouchableOpacity 
+        style={{marginLeft : 10, marginTop : 15}}
+        onPress={() => setSecureEntry(!secureEntry)}>
+          <Icon name={secureEntry ?  "eye-off" : "eye"} size={32} color={palette.primary}/>
+        </TouchableOpacity>
+      </View>
+
+      <View style={{flexDirection : "row"}}>
+        <FlashTextButton
+        normalText="Save"
+        flashText="Saved!"
+        disabled={saveDisabled || disableSave}
+        onPress={submit}
+        timeout={500}
+        buttonStyle={{...styles.button, width : "50%"}}
+        textStyle={styles.buttonText}/>
+
+        <CustomButton
+        text="Reset"
+        disabled={disableReset}
+        onPress={handleReset}
+        buttonStyle={{...styles.button, marginLeft : 10,width : "50%"}}
+        textStyle={styles.buttonText}/>
+      </View>
+    </View>
   )
 }
 
@@ -169,6 +167,12 @@ const styles = {
   },
   errorContainer : {
     marginVertical : 10
+  },
+  passwordFieldContainer : {
+    flexDirection : "row", 
+    justifyContent : "center",
+    alignItems : "center", 
+    marginBottom : 10
   }
 }
 
