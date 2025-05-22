@@ -19,6 +19,7 @@ import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
 import { STORAGE_STRINGS } from '../common';
+import PasswordField from './PasswordField';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -147,12 +148,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
       {(passwordAttemptCount < maxPasswordAttempts || maxPasswordAttempts == 1) &&
       <Text style={{color : palette.white, marginBottom : 10}}>{`Remaining Attempts : ${passwordAttemptCount}`}</Text>}
 
-      <TextInput
-      secureTextEntry
-      style={{...styles.input, fontSize : customStyle.scaledUIFontSize, ...inputWidth}}
+      <PasswordField
+      secureTextEntry={true}
+      containerStyle={{marginBottom: 10, ...inputWidth}}
+      customInputStyle={styles.input}
       onChangeText={setPassword}
       onSubmitEditing={handleSubmit}
-      blurOnSubmit={false}
       value={password}/>
 
       <View style={styles.buttonContainer}>
