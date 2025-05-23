@@ -153,7 +153,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       containerStyle={{marginBottom: 10, ...inputWidth}}
       customInputStyle={styles.input}
       onChangeText={setPassword}
-      onSubmitEditing={handleSubmit}
+      onSubmitEditing={() => password.trim().length > 0 && handleSubmit()}
       value={password}/>
 
       <View style={styles.buttonContainer}>
