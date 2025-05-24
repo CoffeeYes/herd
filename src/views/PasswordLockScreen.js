@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Text, TextInput, Dimensions, View, BackHandler } from 'react-native';
+import { Text, Dimensions, View, BackHandler } from 'react-native';
 import { CommonActions, useIsFocused } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import CustomButton from './CustomButton';
 import FullScreenSplash from './FullScreenSplash';
+import PasswordField from './PasswordField';
+
 import { deleteAllMessages } from '../realm/chatRealm';
 import { deleteAllContacts } from '../realm/contactRealm';
 
@@ -19,7 +21,6 @@ import { useOrientationBasedStyle } from '../helper';
 import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
 import { STORAGE_STRINGS } from '../common';
-import PasswordField from './PasswordField';
 
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -138,6 +139,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
     isFocused && checkPassword();
   }
 
+  const disableSubmit = password.trim().length == 0;
+
   return (
     <FullScreenSplash containerStyle={styles.container}>
       <Text style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error}</Text>
@@ -153,7 +156,8 @@ const PasswordLockScreen = ({ navigation, route }) => {
       containerStyle={{marginBottom: 10, ...inputWidth}}
       customInputStyle={styles.input}
       onChangeText={setPassword}
-      onSubmitEditing={() => password.trim().length > 0 && handleSubmit()}
+      onSubmitEditing={() => !disableSubmit && handleSubmit()}
+      blurOnSubmit={!disableSubmit}
       value={password}/>
 
       <View style={styles.buttonContainer}>
@@ -161,7 +165,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         <CustomButton
         text="Submit"
         buttonStyle={{...styles.button, marginRight : 10}}
-        disabled={password.trim().length == 0}
+        disabled={disableSubmit}
         onPress={handleSubmit}/>
 
         {route?.params?.navigationTarget === "passwordSettings" &&
