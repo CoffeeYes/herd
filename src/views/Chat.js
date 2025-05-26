@@ -588,7 +588,7 @@ const Chat = ({ route, navigation }) => {
           maxLength={maxCharacterCount}
           onChangeText={text => {
             setChatInput(previousText => {
-              if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 ) {
+              if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 && text.length > previousTextValueRef.current.length) {
                 setCharacterCount(maxCharacterCount)
                 return ""  
               }
