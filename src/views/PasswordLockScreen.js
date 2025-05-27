@@ -22,6 +22,8 @@ import { deletePassword } from '../realm/passwordRealm';
 import { setPassword as setPasswordRedux } from '../redux/actions/userActions';
 import { STORAGE_STRINGS } from '../common';
 
+import navigationRef from '../NavigationRef';
+
 const PasswordLockScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const loginHash = useSelector(state => state.userReducer.loginPasswordHash);
@@ -111,9 +113,12 @@ const PasswordLockScreen = ({ navigation, route }) => {
       AsyncStorage.setItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT,maxPasswordAttempts.toString())
       //this is used when passwordLockScreen is shown before allowing the user to navigate to passwordSettings page
       if(route?.params?.navigationTarget === "passwordSettings") {
-        navigationIndex = 1;
+        const routes = navigationRef.current.getState().routes;
+        //remove passwordLockScreen from routes so that we can't navigate back to it
+        const newRoutes = [...routes].splice(0,routes.length -1);
+        navigationIndex = newRoutes.length - 1;
         navigationRoutes = [
-          { name: 'main', params : {initialRoute : "settings"}},
+          ...newRoutes,
           { name: 'passwordSettings'}
         ]
       }
