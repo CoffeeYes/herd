@@ -32,10 +32,10 @@ const requestEnableBluetooth = async () => {
   return bluetoothEnabled;
 }
 
-const requestMakeDiscoverable = async () => {
+const requestMakeDiscoverable = async (discoverableDuration = 30) => {
   let discoverable = await Bluetooth.checkBTDiscoverable();
   if(!discoverable) {
-    discoverable = await Bluetooth.requestBTMakeDiscoverable(30);
+    discoverable = await Bluetooth.requestBTMakeDiscoverable(discoverableDuration);
   }
   return discoverable;
 }
@@ -90,25 +90,23 @@ const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
   return encryptedStrings
 }
 
-const chatsWithNewMessagesStorageString = "chatsWithNewMessages";
-
 const storeChatHasNewMessages = async (chatID, hasNewMessages) => {
-  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
+  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(STORAGE_STRINGS.CHATS_WITH_NEW_MESSAGES)) || [];
   chatsWithNewMessages = hasNewMessages ? [...chatsWithNewMessages,chatID] : chatsWithNewMessages.filter(chat => chat != chatID);
-  AsyncStorage.setItem(chatsWithNewMessagesStorageString,JSON.stringify(chatsWithNewMessages));
+  AsyncStorage.setItem(STORAGE_STRINGS.CHATS_WITH_NEW_MESSAGES,JSON.stringify(chatsWithNewMessages));
 }
 
 const storeChatsWithNewMessages = async chats => {
-  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
+  let chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(STORAGE_STRINGS.CHATS_WITH_NEW_MESSAGES)) || [];
   const newChatsToAdd = chats.filter(chat => chat.hasNewMessages).map(chat => chat._id);
   chatsWithNewMessages = [...newChatsToAdd,chatsWithNewMessages];
   //unique instances only
   chatsWithNewMessages = [...new Set(chatsWithNewMessages)];
-  AsyncStorage.setItem(chatsWithNewMessagesStorageString,JSON.stringify(chatsWithNewMessages));
+  AsyncStorage.setItem(STORAGE_STRINGS.CHATS_WITH_NEW_MESSAGES,JSON.stringify(chatsWithNewMessages));
 }
 
 const loadChatsWithNewMessages = async chats => {
-  chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(chatsWithNewMessagesStorageString)) || [];
+  const chatsWithNewMessages = JSON.parse(await AsyncStorage.getItem(STORAGE_STRINGS.CHATS_WITH_NEW_MESSAGES)) || [];
   for(let chat of chats) {
     if (chatsWithNewMessages.includes(chat._id)) {
       chat.hasNewMessages = true;
@@ -121,7 +119,8 @@ const STORAGE_STRINGS = {
   MAX_PASSWORD_ATTEMPTS : "maxPasswordAttempts",
   PASSWORD_ATTEMPT_COUNT : "passwordAttemptCount",
   STYLES : "styles",
-  ENABLE_NOTIFICATIONS : "enableNotifications"
+  ENABLE_NOTIFICATIONS : "enableNotifications",
+  CHATS_WITH_NEW_MESSAGES : "chatsWithNewMessages"
 }
 
 export {
