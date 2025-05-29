@@ -24,11 +24,14 @@ const Contacts = ({ route, navigation }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const navigateToNewChat = id => {
+    //remove "newChat" from route history and navigate to new chat
+    const routes = navigation.getState().routes;
+    const newRoutes = [...routes].splice(0,routes.length -1);
     navigation.dispatch(
       CommonActions.reset({
-        index: 1,
+        index: newRoutes.length,
         routes: [
-          { name: 'main' },
+          ...newRoutes,
           { name: 'chat', params: { contactID: id }}
         ],
       })

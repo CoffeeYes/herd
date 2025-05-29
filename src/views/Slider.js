@@ -10,6 +10,8 @@ const CustomSlider = ({
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
                         showColorPreview, previewGradientPoints,
                         ...props}) => {
+  const rightTitleString = rightTitle?.toString();
+  const rightTextString = rightText?.toString();
   return (
     <View style={{...styles.container,...containerStyle}}>
       <View style={styles.sliderContainer}>
@@ -22,10 +24,10 @@ const CustomSlider = ({
       {...props}/>
       </View>
       <View style={rightTextContainerStyle}>
-        {rightTitle?.toString().length > 0 &&
-        <Text style={rightTitleStyle}>{rightTitle.toString()}</Text>}
-        {rightText?.toString()?.length > 0 &&
-        <Text style={rightTextStyle}>{rightText.toString()}</Text>}
+        {rightTitleString?.length > 0 &&
+        <Text style={rightTitleStyle}>{rightTitleString}</Text>}
+        {rightTextString?.length > 0 &&
+        <Text style={rightTextStyle}>{rightTextString}</Text>}
       </View>
     </View>
   )
