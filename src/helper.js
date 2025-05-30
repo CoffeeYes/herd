@@ -96,7 +96,8 @@ const useScreenAdjustedSize = (
 }
 
 const useOrientationBasedStyle = (portraitStyle, landscapeStyle) => {
-  const [style, setStyle] = useState(portraitStyle);
+  const {height, width} = Dimensions.get("window")
+  const [style, setStyle] = useState(height > width ? portraitStyle : landscapeStyle);
 
   useEffect(() => {
     //adjust iconSize whenever orientation is changed
