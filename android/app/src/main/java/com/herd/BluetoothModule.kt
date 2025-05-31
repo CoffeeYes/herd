@@ -47,6 +47,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
     private val BLUETOOTH_DISCOVERABLE_REQUEST_CODE : Int = 2;
 
+    private final val herdDeviceIdentifier = "_HERD";
+
     var bluetoothEnabledPromise : Promise? = null;
     var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
@@ -91,7 +93,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private fun resetAdapterName() {
       val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-      adapter?.setName(adapter.getName().replace("_HERD",""));
+      adapter?.setName(adapter.getName().replace(herdDeviceIdentifier,""));
     }
 
     //anonymous inner function to override class functions
@@ -124,11 +126,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             val deviceName = device?.name
             val deviceHardwareAddress = device?.address // MAC address
             if(deviceName != null) {
-              if(deviceName.contains("_HERD")) {
-                Log.i(TAG,"Device containing '_HERD' found, emitting device to JS")
+              if(deviceName.contains(herdDeviceIdentifier)) {
+                Log.i(TAG,"Device containing '$herdDeviceIdentifier' found, emitting device to JS")
                 //create object to pass to javascript
                 val deviceObject : WritableMap = Arguments.createMap();
-                deviceObject.putString("name",deviceName.replace("_HERD",""));
+                deviceObject.putString("name",deviceName.replace(herdDeviceIdentifier,""));
                 deviceObject.putString("macAddress",deviceHardwareAddress);
 
                 //pass object to JS through event emitter
@@ -136,7 +138,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 .emit(emitterStrings.NEW_BT_DEVICE,deviceObject)
               }
               else {
-                Log.i(TAG,"Device found, doesn't contain '_HERD' in name, not emitting")
+                Log.i(TAG,"Device found, doesn't contain '$herdDeviceIdentifier' in name, not emitting")
               }
             }
           }
@@ -225,7 +227,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             adapter.cancelDiscovery();
           }
           val originalAdapterName = bluetoothManager.getAdapter().getName();
-          adapter.setName(originalAdapterName + "_HERD");
+          adapter.setName(originalAdapterName + herdDeviceIdentifier);
           val discoveryStarted = adapter.startDiscovery();
           if(!discoveryStarted) {
             resetAdapterName();
