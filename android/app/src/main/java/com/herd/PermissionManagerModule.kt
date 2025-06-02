@@ -87,12 +87,25 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
 
   }
 
+  val permissionRequestCodeStrings : Map<Int,String> = mapOf(
+    BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE to "BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE ",
+    LOCATION_PERMISSION_REQUEST_CODE to "LOCATION_PERMISSION_REQUEST_CODE ",
+    BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE to "BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE ",
+    POST_NOTIFICATIONS_REQUEST_CODE to "POST_NOTIFICATIONS_REQUEST_CODE "
+  )
+
   override fun onRequestPermissionsResult(requestCode: Int,permissions: Array<String>,grantResults: IntArray) : Boolean {
     val allPermissionsGranted = grantResults.all{it == PackageManager.PERMISSION_GRANTED}
+    val requestCodeString = permissionRequestCodeStrings.get(requestCode) 
+    if(requestCodeString != null) {
+      Log.i(TAG,"onRequestPermissionsResult requestCode : $requestCodeString, allPermissionsGranted : $allPermissionsGranted")
+    }
+    else {
+      Log.d(TAG,"onRequestPermissionsResult unknown requestCode : $requestCode");
+    }
     when(requestCode) {
       BLUETOOTH_BACKGROUND_LOCATION_REQUEST_CODE -> {
         if(allPermissionsGranted) {
-          Log.i(TAG,"Background location request granted, requestin coarse and fine location access")
           val activity : PermissionAwareActivity = getReactApplicationContext().getCurrentActivity() as PermissionAwareActivity
           activity.requestPermissions(
             arrayOf(permission.ACCESS_COARSE_LOCATION,permission.ACCESS_FINE_LOCATION),
@@ -101,20 +114,15 @@ class PermissionManagerModule(reactContext : ReactApplicationContext) : ReactCon
           )
         }
         else {
-          Log.i(TAG,"access background location permission request denied")
           locationPermissionPromise?.resolve(false);
           locationPermissionPromise = null;
         }
       }
       LOCATION_PERMISSION_REQUEST_CODE -> {
-        Log.i(TAG,"onRequestPermissionsResult location permission request code");
-        Log.i(TAG,"All Location Permissions granted : $allPermissionsGranted")
         locationPermissionPromise?.resolve(allPermissionsGranted);
         locationPermissionPromise = null;
       }
       BLUETOOTH_SCAN_PERMISSION_REQUEST_CODE -> {
-        Log.i(TAG,"onRequestPermissionsResult bluetooth scan permission request code");
-        Log.i(TAG,"All Bluetooth Scan Permissions granted : $allPermissionsGranted")
         bluetoothScanPermissionPromise?.resolve(allPermissionsGranted);
         bluetoothScanPermissionPromise = null;
       }
