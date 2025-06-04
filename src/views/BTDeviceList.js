@@ -61,11 +61,11 @@ const BTDeviceList = ({ navigation }) => {
     });
 
     const scanStateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.DISCOVERY_STATE_CHANGE, async state => {
-      if(state === "DISCOVERY_STARTED" && appStateRef.current == "active") {
+      if(state === Bluetooth.discoveryEvents.DISCOVERY_STARTED && appStateRef.current == "active") {
         setScanning(true);
         activeScanDeviceList.current = [];
       }
-      else if (state === "DISCOVERY_FINISHED") {
+      else if (state === Bluetooth.discoveryEvents.DISCOVERY_FINISHED) {
         const servicesEnabled = await Bluetooth.checkBTEnabled() && await Bluetooth.checkLocationEnabled();
         if(servicesEnabled) {
           setScanning(false);

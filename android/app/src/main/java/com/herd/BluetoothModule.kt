@@ -71,13 +71,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       "NEW_MESSAGE" to emitterStrings.NEW_MESSAGE
     )
 
+    private final val bluetoothDiscoveryEventsMap : Map<String,String> = mapOf(
+      "DISCOVERY_STARTED" to BluetoothAdapter.ACTION_DISCOVERY_STARTED,
+      "DISCOVERY_FINISHED" to BluetoothAdapter.ACTION_DISCOVERY_FINISHED
+    )
+
     override fun getName(): String {
         return "BluetoothModule"
     }
 
     override fun getConstants() : Map<String,Map<String,String>> {
       return mapOf(
-        "emitterStrings" to emitterStringMap
+        "emitterStrings" to emitterStringMap,
+        "discoveryEvents" to bluetoothDiscoveryEventsMap
       )
     }
 
@@ -149,16 +155,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BTStateReceiver = object : BroadcastReceiver() {
       override fun onReceive(context : Context, intent : Intent) {
         val action : String? = intent.action
-        when(action) {
-          BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(emitterStrings.DISCOVERY_STATE_CHANGE,"DISCOVERY_STARTED")
-          }
-          BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
-            resetAdapterName();
-            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(emitterStrings.DISCOVERY_STATE_CHANGE,"DISCOVERY_FINISHED")
-          }
+        if(action != null) {
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.DISCOVERY_STATE_CHANGE,action)
+        }
+        if(action == BluetoothAdapter.ACTION_DISCOVERY_FINISHED) {
+          resetAdapterName();
         }
       }
     }
