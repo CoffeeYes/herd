@@ -110,25 +110,31 @@ const BTDeviceList = ({ navigation }) => {
 
   const handleDeviceClick = async device => {
     dispatch(setLockable(false));
-    const servicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
+    const services = await checkOrRequestConnectionServices();
     dispatch(setLockable(true));
-    if(servicesEnabled) {
+    if(services.enabled) {
       await Bluetooth.cancelScanForDevices();
       await Bluetooth.listenAsServer();
       await Bluetooth.connectAsClient(device.macAddress);
       setShowModal(true);
+    }
+    else if(services.missing == "location") {
+      setShowConfirmationModal(true);
     }
   }
 
   const restartScan = async () => {
     setErrors([]);
     dispatch(setLockable(false))
-    const servicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
-    if(servicesEnabled) {
+    const services = await checkOrRequestConnectionServices();
+    if(services.enabled) {
       const discoverable = await requestMakeDiscoverable();
       if(discoverable) {
         await Bluetooth.scanForDevices();
       }
+    }
+    else if(services.missing == "location") {
+      setShowConfirmationModal(true);
     }
     dispatch(setLockable(true));
   }

@@ -40,20 +40,19 @@ const requestMakeDiscoverable = async (discoverableDuration = 30) => {
   return discoverable;
 }
 
-const checkOrRequestConnectionServices = async (onLocationDisabled = () => {}) => {
+const checkOrRequestConnectionServices = async () => {
     const bluetoothEnabled = await requestEnableBluetooth();
 
     if(!bluetoothEnabled) {
-      return false;
+      return {enabled : false, missing : "bluetooth"};
     }
 
     const locationEnabled = await Bluetooth.checkLocationEnabled();
 
     if(!locationEnabled) {
-      onLocationDisabled();
-      return false;
+      return {enabled : false, missing : "location"};
     }
-    return true;
+    return {enabled : true};
 }
 
 const decryptStrings = async strings => {

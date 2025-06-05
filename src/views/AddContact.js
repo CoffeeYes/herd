@@ -61,10 +61,13 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    const connectionServicesEnabled = await checkOrRequestConnectionServices(() => setShowConfirmationModal(true));
+    const connectionServices = await checkOrRequestConnectionServices();
 
-    if(!connectionServicesEnabled) {
+    if(!connectionServices.enabled) {
       dispatch(setLockable(true));
+      if(connectionServices.missing == "location") {
+        setShowConfirmationModal(true);
+      }
       return;
     }
 
