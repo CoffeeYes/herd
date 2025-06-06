@@ -159,8 +159,8 @@ const App = ({ }) => {
         const routes = navigationRef.current.getState().routes.filter(route => route.name != "passwordLockScreen");
         navigationRef.current.dispatch(
           CommonActions.reset({
-            index: 1,
-            routes: [...navigationRef.current.getState().routes, {name : "passwordLockScreen"}]
+            index: routes.length,
+            routes: [...routes, {name : "passwordLockScreen"}]
           })
         )
         routes &&

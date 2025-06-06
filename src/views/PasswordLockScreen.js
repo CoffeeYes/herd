@@ -128,6 +128,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         }
         else if(lastRoutes.length > 0) {
           navigationRoutes = lastRoutes;
+          navigationIndex = lastRoutes.length - 1;
         }
       }
     }
