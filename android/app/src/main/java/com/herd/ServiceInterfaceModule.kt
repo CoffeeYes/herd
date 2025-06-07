@@ -53,6 +53,16 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     "MESSAGES_TO_REMOVE_SIZES" to storageStrings.MESSAGES_TO_REMOVE_SIZES
   )
 
+  object messageTypeStrings {
+    val COMPLETED_MESSAGES = "completed";
+    val RECEIVED_MESSAGES = "received";
+  }
+
+  private final val messageTypeStringMap : Map<String,String> = mapOf(
+    "COMPLETED_MESSAGES" to messageTypeStrings.COMPLETED_MESSAGES,
+    "RECEIVED_MESSAGES" to messageTypeStrings.RECEIVED_MESSAGES
+  )
+
   object bluetoothErrorStrings {
     val LOCATION_DISABLED = "LOCATION_DISABLED";
     val ADAPTER_TURNED_OFF = "ADAPTER_TURNED_OFF";
@@ -129,7 +139,8 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     return mapOf(
       "emitterStrings" to emitterStringMap,
       "storage" to storageStringMap,
-      "bluetoothErrors" to bluetoothErrorStringMap
+      "bluetoothErrors" to bluetoothErrorStringMap,
+      "messageTypes" to messageTypeStringMap
     )
   }
 
@@ -204,10 +215,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
       var herdMessages = ArrayList<HerdMessage>();
-      if(name == "received") {
+      if(name == messageTypeStrings.RECEIVED_MESSAGES) {
         herdMessages = service.getReceivedMessages();
       }
-      else if(name == "completed") {
+      else if(name == messageTypeStrings.COMPLETED_MESSAGES) {
         herdMessages = service.getCompletedMessages();
       }
       messages = HerdMessage.toWritableArray(herdMessages);

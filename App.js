@@ -85,12 +85,12 @@ const App = ({ }) => {
       const serviceRunning = await ServiceInterface.isRunning();
       dispatch(setBackgroundServiceRunning(serviceRunning));
       if(serviceRunning) {
-        const newMessages = await ServiceInterface.getMessages("received");
+        const newMessages = await ServiceInterface.getMessages(ServiceInterface.messageTypes.RECEIVED_MESSAGES);
 
         newMessages.length > 0 &&
         await addNewReceivedMessagesToRealm(newMessages,dispatch);
         
-        const messagesToRemove = await ServiceInterface.getMessages("completed");
+        const messagesToRemove = await ServiceInterface.getMessages(ServiceInterface.messageTypes.COMPLETED_MESSAGES);
         removeCompletedMessagesFromRealm(messagesToRemove);
       }
       else {
