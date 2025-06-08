@@ -4,7 +4,7 @@ import { View, Text, TextInput } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const PasswordField = forwardRef(({name, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
+const PasswordField = forwardRef(({name, placeholder, containerStyle, customInputStyle, onChangeText, value, onSubmitEditing,  secureTextEntry = true, blurOnSubmit=true},ref) => {
 
   const customStyle = useSelector(state => state.appStateReducer.styles);
   const titleStyle = {...styles.inputTitle, fontSize : customStyle.scaledUIFontSize};
@@ -15,6 +15,7 @@ const PasswordField = forwardRef(({name, containerStyle, customInputStyle, onCha
       <Text style={titleStyle}>{name}</Text>
       <View style={{flexDirection : "row", alignItems : "center"}}>
         <TextInput
+        placeholder={placeholder}
         secureTextEntry={secureTextEntry}
         style={inputStyle}
         onChangeText={onChangeText}

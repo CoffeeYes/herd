@@ -142,6 +142,8 @@ meaning all contacts who have previously added you will need to add you again.`
         <PasswordCreationBox
         primaryName="Main Password"
         secondaryName="Confirm Main Password"
+        primaryPlaceholder="Password"
+        secondaryPlaceholder="Confirm Password"
         originalValue={loginPasswordHash}
         changesAreAvailable={hasChanges => {loginPasswordHasChangesRef.current = hasChanges}}
         description={mainPasswordDescription}
@@ -181,6 +183,8 @@ meaning all contacts who have previously added you will need to add you again.`
         mainContainerStyle={{marginTop : 10}}
         primaryName="Erasure Password"
         secondaryName="Confirm Erasure Password"
+        primaryPlaceholder="Password"
+        secondaryPlaceholder="Confirm Password"
         originalValue={erasurePasswordHash}
         changesAreAvailable={hasChanges => {erasurePasswordHasChangesRef.current = hasChanges}}
         description={erasurePasswordDescription}

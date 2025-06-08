@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import PasswordField from './PasswordField';
 
 const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
+                            primaryPlaceholder, secondaryPlaceholder,
                             disableSave, disableReset, mainContainerStyle, save, reset,
                             originalValue, changesAreAvailable}) => {
   const customStyle = useSelector(state => state.appStateReducer.styles);
@@ -91,6 +92,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           <PasswordField
           secureTextEntry={secureEntry}
           name={primaryName}
+          placeholder={primaryPlaceholder}
           containerStyle={{marginBottom: 10}}
           onChangeText={setPrimaryInputText}
           onSubmitEditing={() => primaryInputText.trim().length > 0 && secondaryInputRef.current.focus()}
@@ -99,6 +101,7 @@ const PasswordCreationBox = ({ description, errors, primaryName, secondaryName,
           <PasswordField
           secureTextEntry={secureEntry}
           name={secondaryName}
+          placeholder={secondaryPlaceholder}
           onChangeText={setSecondaryInputText}
           ref={secondaryInputRef}
           onSubmitEditing={() => !saveDisabled && !disableSave && submit()}
