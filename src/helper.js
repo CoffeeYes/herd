@@ -18,6 +18,14 @@ const timestampToText = (timestamp,format) => {
   }
 }
 
+const calculateSize = (base, multiplier, threshold, oversizeCorrectionFactor) => {
+  let product = base * multiplier;
+  if(base > threshold) {
+    product *= oversizeCorrectionFactor;
+  }
+  return product;
+}
+
 const getSizeFromOrientation = (
   portraitMultiplier,
   landscapeMultiplier,
@@ -33,20 +41,20 @@ const getSizeFromOrientation = (
   const multiplicationBase = windowDimensions[multiplyBy];
 
   if(height > width) {
-    if(height > portraitOversizeCorrectionThreshold) {
-      return multiplicationBase * portraitMultiplier * portraitOversizeCorrectionFactor;
-    }
-    else {
-      return multiplicationBase * portraitMultiplier;
-    }
+    return calculateSize(
+      multiplicationBase,
+      portraitMultiplier,
+      portraitOversizeCorrectionThreshold,
+      portraitOversizeCorrectionFactor
+    )
   }
   else {
-    if(width > landscapeOversizeCorrectionThreshold) {
-      return multiplicationBase * landscapeMultiplier * landscapeOversizeCorrectionFactor;
-    }
-    else {
-      return multiplicationBase * landscapeMultiplier;
-    }
+    return calculateSize(
+      multiplicationBase,
+      landscapeMultiplier,
+      landscapeOversizeCorrectionThreshold,
+      landscapeOversizeCorrectionFactor
+    )
   }
 }
 
