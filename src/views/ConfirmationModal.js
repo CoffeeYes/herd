@@ -24,9 +24,11 @@ const ConfirmationModal = ({
       <Text style={{fontSize : customStyle.scaledUIFontSize}}>{titleText}</Text>
       <View style={{flexDirection : "row", marginTop : 10}}>
         <CustomButton
+        buttonStyle={styles.button}
         onPress={onConfirm}
         text={confirmText}/>
         <CustomButton
+        buttonStyle={{...styles.button, marginLeft : 10}}
         text={cancelText}
         onPress={onCancel}/>
       </View>
@@ -40,8 +42,15 @@ const styles = {
     backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
-    alignItems : "center"
+    alignItems : "center",
+    width : "90%",
+    maxHeight : "90%"
   },
+  button : {
+    minWidth : "30%",
+    alignItems : "center",
+    justifyContent : "center"
+  }
 }
 
 export default ConfirmationModal;
