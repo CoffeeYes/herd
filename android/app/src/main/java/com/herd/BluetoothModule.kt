@@ -75,6 +75,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       "DISCOVERY_STARTED" to BluetoothAdapter.ACTION_DISCOVERY_STARTED,
       "DISCOVERY_FINISHED" to BluetoothAdapter.ACTION_DISCOVERY_FINISHED
     )
+    
+    object bluetoothStates {
+      val STATE_CONNECTED = "STATE_CONNECTED";
+      val STATE_DISCONNECTED = "STATE_DISCONNECTED";
+    }
+
+    private final val bluetoothStateMap : Map<String,String> = mapOf(
+      "STATE_CONNECTED" to bluetoothStates.STATE_CONNECTED,
+      "STATE_DISCONNECTED" to bluetoothStates.STATE_DISCONNECTED
+    )
 
     override fun getName(): String {
         return "BluetoothModule"
@@ -83,7 +93,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     override fun getConstants() : Map<String,Map<String,String>> {
       return mapOf(
         "emitterStrings" to emitterStringMap,
-        "discoveryEvents" to bluetoothDiscoveryEventsMap
+        "discoveryEvents" to bluetoothDiscoveryEventsMap,
+        "bluetoothStates" to bluetoothStateMap
       )
     }
 
@@ -430,7 +441,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
               }
               else {
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit(emitterStrings.CONNECTION_STATE_CHANGE,"Connected")
+                .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
                 // Read from the InputStream.
                 numBytes = try {
                     inputStream.read(buffer);
@@ -438,7 +449,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                     Log.d(TAG, "Input stream was disconnected", e);
 
                     context.getJSModule(RCTDeviceEventEmitter::class.java)
-                    .emit(emitterStrings.CONNECTION_STATE_CHANGE,"Disconnected");
+                    .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED);
 
                     break;
                 }
@@ -473,7 +484,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
         finally {
           context.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit(emitterStrings.CONNECTION_STATE_CHANGE,"Disconnected")
+          .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED)
         }
       }
     }

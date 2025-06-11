@@ -34,11 +34,11 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
 
     //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {
-      if(state === "Connected") {
+      if(state === Bluetooth.bluetoothStates.STATE_CONNECTED) {
         setActivityText(activityStateText.connected);
         await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
       }
-      else if (state === "Disconnected") {
+      else if (state === Bluetooth.bluetoothStates.STATE_DISCONNECTED) {
         setActivityText(activityStateText.disconnected);
         setLoading(false);
         cancelBluetoothActions();
