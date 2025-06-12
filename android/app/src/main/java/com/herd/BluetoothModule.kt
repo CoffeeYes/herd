@@ -433,9 +433,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           while (shouldRun) {
               if(!socket.isConnected()) {
                 Log.e(TAG,"BT Connection Thread bluetooth socket is no longer connected")
-                context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit(emitterStrings.NEW_MESSAGE,"Disconnected");
-                
                 shouldRun = false;
                 this.cancel();
               }
