@@ -40,6 +40,7 @@ const Contact = ({route, navigation}) => {
     const appStateListener = AppState.addEventListener("change",async state => {
       if(sharingRef.current && state == "active") {
         sharingRef.current = false;
+        performingButtonAction.current = false;
         dispatch(setLockable(true));
       }
     })
@@ -61,7 +62,6 @@ const Contact = ({route, navigation}) => {
       title : "I'd like to share my Herd Contact with you!",
       message : contact.key
     })
-    performingButtonAction.current = false;
   }
 
   const calculateMaxNumberOfLines = lines => {
