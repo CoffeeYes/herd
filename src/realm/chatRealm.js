@@ -184,7 +184,7 @@ const addNewReceivedMessages = async (messages,dispatch, currentChat) => {
     })
     let chats = await getContactsWithChats();
     chats.forEach((chat,index) => {
-      if(contactsWithNewMessagesIDs.includes(chat._id) && chat._id != currentChat) {
+      if(contactsWithNewMessagesIDs.includes(chat._id)) {
         if(chat._id != currentChat) {
           chats[index].hasNewMessages = true
         }
