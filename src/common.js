@@ -55,12 +55,16 @@ const checkOrRequestConnectionServices = async () => {
     return {enabled : true};
 }
 
+const cryptographySettings = [
+  Crypto.algorithm.RSA,
+  Crypto.blockMode.ECB,
+  Crypto.padding.OAEP_SHA256_MGF1Padding,
+]
+
 const decryptStrings = async strings => {
   const decryptedStrings = await Crypto.decryptStrings(
     "herdPersonal",
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    ...cryptographySettings,
     strings
   )
   return decryptedStrings;
@@ -69,9 +73,7 @@ const decryptStrings = async strings => {
 const decryptStringsWithIdentifier = async strings => {
   const decryptedStrings = await Crypto.decryptStringsWithIdentifier(
     "herdPersonal",
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    ...cryptographySettings,
     strings
   )
   return decryptedStrings;
@@ -81,9 +83,7 @@ const encryptStrings = async (keyOrAlias, loadKeyFromStore, strings) => {
   const encryptedStrings = await Crypto.encryptStrings(
     keyOrAlias,
     loadKeyFromStore,
-    Crypto.algorithm.RSA,
-    Crypto.blockMode.ECB,
-    Crypto.padding.OAEP_SHA256_MGF1Padding,
+    ...cryptographySettings,
     strings
   )
   return encryptedStrings
