@@ -150,6 +150,10 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return publicKey;
   }
 
+  private fun generateCipherString(algorithm : String, blockMode : String, padding : String) : String {
+    return "$algorithm/$blockMode/$padding";
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -206,7 +210,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   padding : String,
   strings : ReadableArray,
   promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
     var publicKey : PublicKey? = initialisePublicKey(keyOrAlias,loadKeyFromStore);
 
     if(publicKey === null) {
@@ -280,7 +284,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   blockMode : String,
   padding : String,
   stringsWithIndex: ReadableArray) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
     var results : Array<String> = Array<String>(stringsWithIndex.size()) { "" };
@@ -317,7 +321,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   padding : String,
   strings: ReadableArray,
   promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
     var results : Array<String> = Array<String>(strings.size()) { "" };
@@ -355,7 +359,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   padding : String,
   stringsWithIndex: ReadableArray,
   promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
     //var results : WritableArray = Arguments.createArray();

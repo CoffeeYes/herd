@@ -247,7 +247,7 @@ const App = ({ }) => {
 
     //load saved chats into store
     let contactsWithChats = (await getContactsWithChats())
-    .sort( (a,b) => a.timestamp > b.timestamp);
+    .sort( (a,b) => a.timestamp - b.timestamp);
 
     contactsWithChats = await loadChatsWithNewMessages(contactsWithChats);
     dispatch(setChats(contactsWithChats))
