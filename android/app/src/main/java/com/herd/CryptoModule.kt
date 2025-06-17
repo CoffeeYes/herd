@@ -240,7 +240,7 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
         }
       }
       encryptionRoutines.joinAll();
-      if(results.any{it -> it.length === 0}) {
+      if(results.any{it -> it.length == 0}) {
         encryptionPromise?.reject("failed to encrypt a string");
       }
       else {
@@ -275,42 +275,6 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       "text" to decryptedString,
       "identifier" to identifier
     )
-  }
-
-  @ReactMethod
-  fun decryptStringsEmitResult(
-  alias : String,
-  algorithm : String,
-  blockMode : String,
-  padding : String,
-  stringsWithIndex: ReadableArray) {
-    val encryptionType = generateCipherString(algorithm,blockMode,padding);
-    //retrieve key from keystore
-    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
-    var results : Array<String> = Array<String>(stringsWithIndex.size()) { "" };
-    var nativeInputStrings : ArrayList<Map<String,Any>> = stringsWithIndex.toArrayList() as ArrayList<Map<String,Any>>;
-
-    if(privateKey === null) {
-      return;
-    }
-
-    nativeInputStrings.map{ it -> 
-      cryptographyScope.launch {
-        try {
-          val resultObject = decryptWithIdentifier(
-            encryptionType,
-            privateKey,
-            it
-          );
-
-          context.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("messageDecrypted",resultObject)
-        }
-        catch(e : Exception) {
-          Log.e(TAG, "error decrypting string in coroutine",e)
-        }
-      }
-    }
   }
 
   @ReactMethod
