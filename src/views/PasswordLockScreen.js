@@ -43,12 +43,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
   useEffect(() => { 
     (async () => {
       const passwordCount = parseInt(await AsyncStorage.getItem(STORAGE_STRINGS.PASSWORD_ATTEMPT_COUNT));
-      if(passwordCount) {
-        setPasswordAttemptCount(passwordCount)
-      }
-      else {
-        setPasswordAttemptCount(maxPasswordAttempts)
-      }
+      setPasswordAttemptCount(passwordCount || maxPasswordAttempts)
     })()
 
     const backHandler = BackHandler.addEventListener("hardwareBackPress", () => {
@@ -116,7 +111,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
         const routes = navigationRef.current.getState().routes;
         //remove passwordLockScreen from routes so that we can't navigate back to it
         const newRoutes = [...routes].splice(0,routes.length -1);
-        navigationIndex = newRoutes.length - 1;
+        navigationIndex = newRoutes.length;
         navigationRoutes = [
           ...newRoutes,
           { name: 'passwordSettings'}
@@ -150,7 +145,6 @@ const PasswordLockScreen = ({ navigation, route }) => {
   return (
     <FullScreenSplash containerStyle={styles.container}>
       <Text style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error}</Text>
-      
 
       <Text style={{...styles.inputTitle, fontSize : customStyle.scaledUIFontSize}}>Enter Your Password : </Text>
 
@@ -158,7 +152,7 @@ const PasswordLockScreen = ({ navigation, route }) => {
       <Text style={{color : palette.white, marginBottom : 10}}>{`Remaining Attempts : ${passwordAttemptCount}`}</Text>}
 
       <PasswordField
-      secureTextEntry={true}
+      secureTextEntry
       containerStyle={{marginBottom: 10, ...inputWidth}}
       customInputStyle={styles.input}
       onChangeText={setPassword}
