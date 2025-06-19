@@ -12,8 +12,8 @@ import LoadingIndicator from './LoadingIndicator';
 
 const activityStateText = {
   waiting :  "Waiting On Other Device",
-  connected : "Connected, Waiting for Data",
-  disconnected : "Disconnected"
+  [Bluetooth.bluetoothStates.STATE_CONNECTED]: "Connected, Waiting for Data",
+  [Bluetooth.bluetoothStates.STATE_DISCONNECTED]: "Disconnected"
 };
 
 const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
@@ -34,12 +34,11 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
 
     //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {
+      setActivityText(activityStateText[state] || activityStateText.waiting);
       if(state === Bluetooth.bluetoothStates.STATE_CONNECTED) {
-        setActivityText(activityStateText.connected);
         await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
       }
       else if (state === Bluetooth.bluetoothStates.STATE_DISCONNECTED) {
-        setActivityText(activityStateText.disconnected);
         setLoading(false);
         cancelBluetoothActions();
       }
