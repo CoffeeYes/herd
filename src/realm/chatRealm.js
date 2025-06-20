@@ -38,9 +38,6 @@ let messageSentRealm;
 let deletedReceivedRealm;
 
 const decryptMessages = async messages => {
-  if(messages.length == 0) {
-    return [];
-  }
   try {
     const decryptedMessages = await decryptStrings(
       messages.map(message => message.text)

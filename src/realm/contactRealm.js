@@ -35,7 +35,7 @@ const createContact = object => {
 const getContactById = id => {
   let oid = Realm.BSON.ObjectId(id)
   const contact = contactsRealm.objectForPrimaryKey("Contact",oid);
-  return contact._id ? contact : {}
+  return contact
 }
 
 const getContactsByKey = keys => {
