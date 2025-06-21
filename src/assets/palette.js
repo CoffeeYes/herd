@@ -15,11 +15,6 @@ const palette = {
   "red" : "#ff0000"
 }
 
-const imageValues = {
-  smallFactor : 0.12
-}
-
 export {
-  palette,
-  imageValues
+  palette
 }

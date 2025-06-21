@@ -1,31 +1,27 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 
-const passwordRealm = new Realm({
+const passwordRealmConfig = {
   path : 'passwords',
   schema : [Schemas.PasswordSchema]
-})
-
-const createNewPassword = (passwordName,passwordHash) => {
-  passwordRealm.write(() => {
-    passwordRealm.create('Password',{
-      _id : Realm.BSON.ObjectId(),
-      name : passwordName,
-      hash : passwordHash
-    })
-  })
 }
 
-const updatePassword = (passwordName,passwordHash) => {
-  const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0];
+let passwordRealm;
 
-  password &&
+const updatePassword = (passwordName,passwordHash) => {
+  const password = passwordRealm.objects('Password').filtered(`name = '${passwordName}'`)[0] || {};
+
   passwordRealm.write(() => {
-    passwordRealm.create('Password',{
+    passwordRealm.create(
+      'Password',
+      {
       ...password,
+      name : passwordName,
       hash : passwordHash,
-      _id : Realm.BSON.ObjectId(password._id)},
-    true);
+      _id : password._id ? Realm.BSON.ObjectId(password._id) : Realm.BSON.ObjectId()
+      },
+      true
+    );
   })
 }
 
@@ -42,14 +38,23 @@ const deletePassword = name => {
   })
 }
 
+const openPasswordRealm = async () => {
+  passwordRealm = await Realm.open(passwordRealmConfig);
+}
+
 const closePasswordRealm = () => {
   passwordRealm.close();
 }
 
+const deletePasswordRealm = () => {
+  Realm.deleteFile(passwordRealmConfig);
+}
+
 export {
-  createNewPassword,
   updatePassword,
   getPasswordHash,
   deletePassword,
-  closePasswordRealm
+  openPasswordRealm,
+  closePasswordRealm,
+  deletePasswordRealm
 }

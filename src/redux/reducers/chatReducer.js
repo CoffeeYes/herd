@@ -1,25 +1,28 @@
 import { defaultChatStyles } from '../../assets/styles'
 import { timestampToText } from '../../helper';
 
-const generateMessageDays = (existingMessages = [], newMessages) => {
+const generateMessageDays = (existingMessages = [], newMessages, reverseOrder = true) => {
   let dates = [...existingMessages]
   for(let message of newMessages) {
-    if(message) {
-      let messageDate = timestampToText(message.timestamp, "DD/MM");
-      const existingDate = dates.find(item => item.day === messageDate)
-      if(existingDate) {
-        existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
-        existingDate.data.push(message)
-      }
-      else {
-        dates.push({day : messageDate, data : [message]})
-      }
+    let messageDate = timestampToText(message.timestamp, "DD/MM");
+    const existingDate = dates.find(item => item.day === messageDate)
+    //append message to existing date entry if it is a new message
+    if(existingDate) {
+      existingDate.data.find(existingMessage => existingMessage._id === message._id) === undefined &&
+      existingDate.data.push(message)
+    }
+    //first message with this date, initialise message array for this date
+    else {
+      dates.push({day : messageDate, data : [message]})
     }
   }
-  for (date of dates) {
-    date.data = date.data.sort((a,b) => a.timestamp > b.timestamp)
+  for (let date of dates) {
+    date.data.sort((a,b) => a.timestamp - b.timestamp);
+    reverseOrder && date.data.reverse();
   }
-  return dates.sort((a,b) => a.data[a.data.length -1].timestamp > b.data[b.data.length -1].timestamp)
+  dates.sort((a,b) => a.data[a.data.length -1].timestamp - b.data[b.data.length -1].timestamp);
+  reverseOrder && dates.reverse();
+  return dates;
 }
 
 const initialState = {
@@ -46,24 +49,29 @@ const setLastText = (state, id, message) => {
 
 const updateChat = (originalChat, newValues) => {
   let updatedChat = {...originalChat};
-  const updateableValues = ["name","key","image", "doneLoading"];
+  const updateableValues = ["name","key","image", "doneLoading","hasNewMessages"];
 
-  Object.keys(newValues).map(key => {
-    if(updateableValues.indexOf(key) != -1) {
-      updatedChat[key] = newValues[key];
+  for(const [key,value] of Object.entries(newValues)) {
+    if(typeof value === "undefined" || value === null) {
+      throw new Error(`[updateChat] : passed invalid value '${value}' for key '${key}' when attempting to update chat`)
     }
-  })
+    else if(!updateableValues.includes(key) && key !== "_id") {
+      throw new Error(`[updateChat] : invalid key '${key}' passed when attempting to update chat`)
+    }
+    else {
+      updatedChat[key] = value;
+    }
+  }
 
   return updatedChat;
 }
 
-const updateMessageQueue = (messageQueue, originalKey, newKey, newName) => {
+const updateMessageQueue = (messageQueue, originalKey, newKey) => {
   const updatedQueue = messageQueue.map(message => {
     if(message.to == originalKey) {
       return {
         ...message,
-        ...(newKey?.length > 0 && {to : newKey}),
-        ...(newName?.length > 0 && {toContactName : newName})
+        to : newKey
       }
     }
     else return message;
@@ -77,20 +85,21 @@ const chatReducer = (state = initialState,action) => {
       return {...state,
         chats : action.payload
       }
-      break;
     }
     case "DELETE_CHATS": {
-      return {...state,
-        chats : [...state.chats].filter(
-          chat => action.payload.find(
-          chatToDelete => chatToDelete._id == chat._id) === undefined
-        )
+      let contactIDs = action.payload;
+      //extract ids if entire chat objects were passed instead of just IDs
+      if(action.payload[0]?._id) {
+        contactIDs = action.payload.map(chat => chat._id);
+      }
+      const newChats = [...state.chats].filter(chat => !contactIDs.includes(chat._id))
+      return {
+        ...state,
+        chats : newChats
       };
-      break;
     }
     case "ADD_CHAT": {
       return {...state, chats : [...state.chats, action.payload]};
-      break;
     }
     case "UPDATE_CHAT": {
       const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
@@ -107,7 +116,6 @@ const chatReducer = (state = initialState,action) => {
         console.log("NO CHAT TO UPDATE NAME WAS FOUND");
         return state
       }
-      break;
     }
     case "ADD_MESSAGE": {
       const { message, id } = action.payload
@@ -119,63 +127,55 @@ const chatReducer = (state = initialState,action) => {
         }
       };
       return newState;
-      break;
-    }
-    case "ADD_MESSAGE_TO_QUEUE": {
-      return {
-        ...state,
-        messageQueue : [...state.messageQueue, action.payload.message]
-      }
-      break;
     }
     case "ADD_MESSAGES_TO_QUEUE": {
       return {
         ...state,
         messageQueue : [...state.messageQueue, ...action.payload]
       }
-      break;
     }
     case "REMOVE_MESSAGES_FROM_QUEUE": {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => action.payload.find(item => item._id == message._id) === undefined)
+        (message => !action.payload.includes(message._id))
       }
-      break;
     }
-    case "FILTER_QUEUE_BY_CONTACT": {
+    case "FILTER_QUEUE_BY_KEYS": {
       return {
         ...state,
         messageQueue : [...state.messageQueue].filter
-        (message => message.to !== action.payload)
+        (message => !action.payload.includes(message.to))
       }
-      break;
     }
     case "DELETE_MESSAGES": {
-      const { id, messages } = action.payload;
+      const { id, messageIDs } = action.payload;
 
       const newSections = state.messages[id].map(section => ({
         ...section,
-        data : [...section.data].filter(message => messages.find(id => id === message._id) === undefined )}
+        data : [...section.data].filter(message => !messageIDs.includes(message._id))}
       ))
       .filter(section => section.data.length !== 0)
-      
+
+      const lastSection = newSections[0]?.data
+      const lastMessage = lastSection?.[0];
+
       const newState = {
         ...state,
+        ...(lastMessage && {chats : setLastText(state,id,lastMessage)}),
         messages : {
           ...state.messages,
           [id] : newSections
         }
       }
       return newState;
-      break;
     }
     case "RESET_MESSAGES": {
       return {...state,
         messages : {},
-        chats : []
+        chats : [],
+        messageQueue : []
       };
-      break;
     }
     case "SET_LAST_TEXT": {
       const {id, message} = action.payload;
@@ -183,49 +183,48 @@ const chatReducer = (state = initialState,action) => {
         ...state,
         chats : setLastText(state,id,message)
       }
-      break;
-    }
-    case "SET_STYLES": {
-      return {...state,styles : action.payload}
-      break;
     }
     case "SET_MESSAGE_QUEUE": {
       return {...state, messageQueue : action.payload}
-      break;
     }
     case "UPDATE_MESSAGE_QUEUE": {
       const chatToUpdate = state.chats.find(chat => chat._id === action.payload._id);
       if(chatToUpdate) {
         return {
           ...state,
-          messageQueue : updateMessageQueue(state.messageQueue,{...chatToUpdate}.key,action.payload.key,action.payload.name)
+          messageQueue : updateMessageQueue(
+            state.messageQueue,
+            chatToUpdate.key,
+            action.payload.key
+          )
         }
       }
       else {
         return state;
       }
-      break;
     }
-    case "SET_MESSAGES_FOR_CONTACT": {
-      return {...state,
-        messages : {
-          ...state.messages,
-          [action.payload.id] : action.payload.messages
-        }
+    case "SET_MESSAGES_FOR_CONTACTS": {
+      let messagesCopy = {...state.messages};
+      for(const item of action.payload) {
+        messagesCopy[item.id] = item.messages;
       }
-      break;
+      return {...state,
+        messages : messagesCopy
+      }
     }
     case "PREPEND_MESSAGES_FOR_CONTACT": {
-      const {id, messages} = action.payload
+      const {id, messages} = action.payload;
+      const generatedDays = generateMessageDays(state.messages[id],messages);
+      const allPreviousMessagesDeleted = state.messages?.[id]?.length === 0;
       const newState = {
         ...state,
         messages : {
           ...state.messages,
-          [id] : generateMessageDays(state.messages[id],messages)
-        }
+          [id] : generatedDays,
+        },
+        ...(allPreviousMessagesDeleted && ({chats : setLastText(state,id,generatedDays[0].data[0])}))
       }
       return newState;
-      break;
     }
     default:
       return state

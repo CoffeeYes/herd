@@ -37,6 +37,7 @@ public class MainApplication extends Application implements ReactApplication {
           packages.add(new CryptoPackage());
           packages.add(new BluetoothPackage());
           packages.add(new ServiceInterfacePackage());
+          packages.add(new PermissionManagerPackage());
           return packages;
         }
 

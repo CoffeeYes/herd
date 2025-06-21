@@ -1,113 +1,123 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, Modal, TouchableOpacity, ActivityIndicator, NativeEventEmitter } from 'react-native';
+import { View, Text, NativeEventEmitter } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
-import Crypto from '../nativeWrapper/Crypto';
+import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
-import navigationRef from '../NavigationRef';
 
 import { palette } from '../assets/palette';
+import { useOrientationBasedStyle, useStateAndRef } from '../helper';
+import LoadingIndicator from './LoadingIndicator';
 
-const BTExchangeModal = ({ navigation, visible, setVisible}) => {
+const activityStateText = {
+  waiting :  "Waiting On Other Device",
+  [Bluetooth.bluetoothStates.STATE_CONNECTED]: "Connected, Waiting for Data",
+  [Bluetooth.bluetoothStates.STATE_DISCONNECTED]: "Disconnected"
+};
+
+const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
-  const [activityText, setActivityText] = useState("Waiting On Other Device");
-  const [otherKey, _setOtherKey] = useState("");
-  const [keyReceived, _setKeyReceived] = useState(false);
-  const [keySent, _setKeySent] = useState(false);
+  const [activityText, setActivityText] = useState(activityStateText.waiting);
+  const [receivedKey, setReceivedKey] = useState("");
+  const [keySent, setKeySent] = useState(false);
+  const [error, setError, errorRef] = useStateAndRef("");
 
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
 
-  const otherKeyRef = useRef();
-  const keyReceivedRef = useRef();
-  const keySentRef = useRef();
-
-  const setOtherKey = data => {
-    otherKeyRef.current = data;
-    _setOtherKey(data);
-  }
-  const setKeyReceived = data => {
-    keyReceivedRef.current = data;
-    _setKeyReceived(data);
-  }
-  const setKeySent = data => {
-    keySentRef.current = data;
-    _setKeySent(data);
-  }
+  const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});
 
   useEffect(() => {
     const eventEmitter = new NativeEventEmitter(Bluetooth);
-    let messageListener;
-    let stateChangeListener;
+    const serviceEventEmitter = new NativeEventEmitter(ServiceInterface)
 
-    if(visible) {
-      //listen for connected state to begin key exchange
-      stateChangeListener = eventEmitter.addListener("BTConnectionStateChange", async state => {
-        if(state === "Connected") {
-          setActivityText("Connected, Waiting for Data");
-          const key = await Crypto.loadKeyFromKeystore("herdPersonal");
-          await Bluetooth.writeToBTConnection(JSON.stringify({key : key}));
+    //listen for connected state to begin key exchange
+    const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {
+      setActivityText(activityStateText[state] || activityStateText.waiting);
+      if(state === Bluetooth.bluetoothStates.STATE_CONNECTED) {
+        await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
+      }
+      else if (state === Bluetooth.bluetoothStates.STATE_DISCONNECTED) {
+        setLoading(false);
+        cancelBluetoothActions();
+      }
+    })
+
+    const bluetoothAndLocationStateListener = serviceEventEmitter.addListener(ServiceInterface.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE, state => {
+      let disableType = "";
+      if(state === ServiceInterface.bluetoothErrors.ADAPTER_TURNED_OFF) {
+        disableType = "Bluetooth";
+      }
+      else if(state === ServiceInterface.bluetoothErrors.LOCATION_DISABLED) {
+        disableType = "Location";
+      }
+
+      if(errorRef.current.length == 0 && disableType.length > 0) {
+        setError(`${disableType} was disabled`)
+      }
+    })
+
+    //listen for messages to receive keys and ACKS
+    const messageListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_MESSAGE, msg => {
+      try {
+        const message = JSON.parse(msg);
+        if(message?.key) {
+          setReceivedKey(message.key);
+          Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
         }
-      })
-      //listen for messages to receive keys and ACKS
-      messageListener = eventEmitter.addListener("newBTMessageReceived", msg => {
-        try {
-          const message = JSON.parse(msg);
-          if(message?.key) {
-            setOtherKey(message.key);
-            setKeyReceived(true);
-            Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
-          }
-          if(message?.haveReceivedKey) {
-            setKeySent(true);
-          }
+        if(message?.haveReceivedKey) {
+          setKeySent(true);
         }
-        catch(e) {
-          console.log("Error parsing JSON : ",e);
-        }
-      });
-    }
+      }
+      catch(e) {
+        console.log("Error parsing JSON : ",e);
+      }
+    });
     //remove all listeners and cancel threads, reset variables
-    else {
+    return () => {
       messageListener?.remove();
       stateChangeListener?.remove();
-      Bluetooth.cancelListenAsServer();
-      Bluetooth.cancelConnectAsClient();
-      Bluetooth.cancelBTConnectionThread();
-      setKeySent(false);
-      setKeyReceived(false);
-      setOtherKey("");
+      bluetoothAndLocationStateListener.remove();
+      cancelBluetoothActions();
     }
-  },[visible])
+  },[])
 
-  //navigate to createContact when keys have been exchanged
   useEffect(() => {
-    if(keySentRef.current && keyReceivedRef.current) {
-      navigationRef.current.navigate("editContact",{publicKey : otherKeyRef.current});
-      setVisible(false);
+    if(receivedKey.length > 0 && keySent) {
+      cancelBluetoothActions();
+      onSuccess({publicKey : receivedKey})
     }
-  },[keySentRef.current,keyReceivedRef.current])
+  },[keySent, receivedKey])
 
-  const cancel = async () => {
+  const cancelBluetoothActions = async () => {
     await Bluetooth.cancelListenAsServer();
     await Bluetooth.cancelConnectAsClient();
     await Bluetooth.cancelBTConnectionThread();
-    setVisible(false);
   }
 
   return (
     <CustomModal
-    visible={visible}
-    onRequestClose={() => setVisible(false)}
+    onRequestClose={onRequestClose}
     disableOnPress>
-        <View style={styles.modalContentContainer}>
-          <ActivityIndicator size="large" color={palette.primary} animating={loading}/>
-          <Text style={{fontSize : customStyle.uiFontSize}}>{activityText}</Text>
-          <CustomButton
-          onPress={() => cancel()}
-          buttonStyle={{marginTop : 10}}
-          text="Cancel"/>
-        </View>
+      <View style={{...styles.modalContentContainer, ...contentWidth}}>
+        {error.length == 0 ?
+        <>
+          <LoadingIndicator animating={loading}/>
+          <Text style={{fontSize : customStyle.scaledUIFontSize}}>{activityText}</Text>
+        </>
+        :
+        <>
+          <Text style={{...styles.errorText, fontSize : customStyle.scaledUIFontSize}}>{`${error}, Please try again`}</Text>
+        </>}
+        <CustomButton
+        onPress={() => {
+          cancelBluetoothActions();
+          onCancel();
+        }}
+        buttonStyle={{marginTop : 10}}
+        text="Cancel"/>
+      </View>
     </CustomModal>
   )
 }
@@ -118,6 +128,10 @@ const styles = {
     borderRadius : 5,
     padding : 20,
     alignItems : "center"
+  },
+  errorText : {
+    fontWeight : "bold",
+    color : palette.red
   }
 }
 

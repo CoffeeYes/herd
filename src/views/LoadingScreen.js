@@ -1,26 +1,14 @@
 import React from 'react';
-import { View, Text, ActivityIndicator } from 'react-native';
+import FullScreenSplash from './FullScreenSplash';
 
-import { palette } from '../assets/palette';
+import LoadingIndicator from './LoadingIndicator';
 
 const LoadingScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Herd</Text>
-      <ActivityIndicator size="large" color={palette.primary}/>
-    </View>
+    <FullScreenSplash title="Herd">
+      <LoadingIndicator/>
+    </FullScreenSplash>
   )
-}
-
-const styles = {
-  container : {
-    flex : 1,
-    alignItems : "center",
-    justifyContent : "center"
-  },
-  text : {
-    fontSize : 48
-  }
 }
 
 export default LoadingScreen;

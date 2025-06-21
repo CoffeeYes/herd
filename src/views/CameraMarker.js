@@ -3,32 +3,38 @@ import { View, Dimensions } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const CameraMarker = ({ borderWidth = 5, borderColor = palette.white }) => {
+import { useScreenAdjustedSize } from '../helper';
+
+const CameraMarker = ({ borderWidth = 5, color = palette.white }) => {
+
+  const height = useScreenAdjustedSize(0.4,0.8,"height") + (2 * borderWidth);
+  const width = useScreenAdjustedSize(0.8,0.4) + (2 * borderWidth);
+  const markerWidth = useScreenAdjustedSize(0.2,0.1);
 
   const sharedStyles = {
     ...styles.border,
-    borderColor : borderColor
+    width : markerWidth,
+    height : markerWidth,
+    borderColor : color
   }
-
-  const width = borderWidth;
 
   return (
     <View style={{
     justifyContent : "space-between",
-    width : Dimensions.get("window").width * 0.8,
-    height : Dimensions.get("window").height * 0.4}}>
+    width : height,
+    height : height}}>
 
       <View style={styles.row}>
         <View style={{
           ...sharedStyles,
-          borderTopWidth : width,
-          borderLeftWidth : width}}
+          borderTopWidth : borderWidth,
+          borderLeftWidth : borderWidth}}
         />
 
         <View style={{
           ...sharedStyles,
-          borderTopWidth : width,
-          borderRightWidth : width,
+          borderTopWidth : borderWidth,
+          borderRightWidth : borderWidth,
           alignSelf : "flex-end"}}
         />
       </View>
@@ -36,14 +42,14 @@ const CameraMarker = ({ borderWidth = 5, borderColor = palette.white }) => {
       <View style={styles.row}>
         <View style={{
           ...sharedStyles,
-          borderBottomWidth : width,
-          borderLeftWidth : width}}
+          borderBottomWidth : borderWidth,
+          borderLeftWidth : borderWidth}}
         />
 
         <View style={{
           ...sharedStyles,
-          borderBottomWidth : width,
-          borderRightWidth : width,
+          borderBottomWidth : borderWidth,
+          borderRightWidth : borderWidth,
           alignSelf : "flex-end"}}
         />
       </View>

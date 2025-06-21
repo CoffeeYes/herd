@@ -1,7 +1,18 @@
-import { createStore, applyMiddleware } from 'redux';
+import { configureStore } from '@reduxjs/toolkit';
 import thunkMiddleware from 'redux-thunk';
-import rootReducer from './reducers/rootReducer';
+import userReducer from './reducers/userReducer';
+import appStateReducer from './reducers/appStateReducer';
+import chatReducer from './reducers/chatReducer';
+import contactReducer from './reducers/contactReducer';
 
-const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
+const store = configureStore({
+  reducer : {
+    userReducer,
+    appStateReducer,
+    chatReducer,
+    contactReducer
+  },
+  middleware : [thunkMiddleware] 
+})
 
 export default store;

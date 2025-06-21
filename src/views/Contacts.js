@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, TouchableOpacity, Image, View, ActivityIndicator, Dimensions, ScrollView, Alert} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Header from './Header';
-import ListItem from './ListItem';
-import { getAllContacts, deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
-import { getContactsWithChats } from '../realm/chatRealm';
-import { parseRealmID } from '../realm/helper';
+import { ScrollView } from 'react-native';
+import { deleteContacts as deleteContactsFromRealm } from '../realm/contactRealm';
 import { CommonActions } from '@react-navigation/native';
 
-import { deleteContacts } from '../redux/actions/contactActions';
-import { deleteChat } from '../redux/actions/chatActions';
+import Header from './Header';
+import ListItem from './ListItem';
+import ConfirmationModal from './ConfirmationModal';
 
+import { deleteContacts } from '../redux/actions/contactActions';
 
 const Contacts = ({ route, navigation }) => {
   const dispatch = useDispatch();
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
   const chats = useSelector(state => state.chatReducer.chats);
   const contacts = route.params.type === "newChat" ?
   useSelector(state => state.contactReducer.contacts)
@@ -24,60 +21,40 @@ const Contacts = ({ route, navigation }) => {
   useSelector(state => state.contactReducer.contacts);
   const [highlightedContacts, setHighlightedContacts ] = useState([]);
 
-  const onPressDelete = async index => {
-    Alert.alert(
-      'Are you sure ?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => setHighlightedContacts([]) },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: () => {
-            dispatch(deleteContacts(highlightedContacts));
-            deleteContactsFromRealm(highlightedContacts);
-            setHighlightedContacts([]);
-          },
-        },
-      ]
-    );
-  }
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const navigateToNewChat = id => {
+    //remove "newChat" from route history and navigate to new chat
+    const routes = navigation.getState().routes;
+    const newRoutes = [...routes].splice(0,routes.length -1);
     navigation.dispatch(
       CommonActions.reset({
-        index: 1,
+        index: newRoutes.length,
         routes: [
-          { name: 'main' },
+          ...newRoutes,
           { name: 'chat', params: { contactID: id }}
         ],
       })
     );
   }
 
-  const handleLongPress = contact => {
-    if(highlightedContacts.indexOf(contact) == -1) {
-      setHighlightedContacts([...highlightedContacts,contact]);
+  const handleLongPress = contactID => {
+    if(!highlightedContacts.includes(contactID)) {
+      setHighlightedContacts([...highlightedContacts,contactID]);
     }
   }
 
-  const handlePress = contact => {
+  const handlePress = contactID => {
     if(highlightedContacts.length > 0) {
-      const contactIndex = highlightedContacts.indexOf(contact);
-      if(contactIndex === -1) {
-        setHighlightedContacts([...highlightedContacts,contact]);
+      if(!highlightedContacts.includes(contactID)) {
+        setHighlightedContacts([...highlightedContacts,contactID]);
       }
       else {
-        setHighlightedContacts([...highlightedContacts].filter(highlightedContact => highlightedContact !== contact));
+        setHighlightedContacts(highlightedContacts.filter(highlightedContact => highlightedContact !== contactID));
       }
     }
     else {
-      route.params.type === "newChat" ?
-      navigateToNewChat(parseRealmID(contact))
-      :
-      navigation.navigate("contact", {id : parseRealmID(contact)})
+      navigation.navigate("contact", {id : contactID})
     }
   }
 
@@ -86,7 +63,7 @@ const Contacts = ({ route, navigation }) => {
       <Header
       title={route.params.type === "newChat" ? "Start a new Chat" : "Contacts"}
       {...(!route.params.disableAddNew && {rightButtonIcon : highlightedContacts.length > 0 ? "delete" : "add"})}
-      rightButtonOnClick={() => highlightedContacts.length > 0 ? onPressDelete() : navigation.navigate("addContact")}
+      rightButtonOnClick={() => highlightedContacts.length > 0 ? setShowConfirmationModal(true) : navigation.navigate("addContact")}
       allowGoBack={route.params.disableAddNew}/>
 
       <ScrollView>
@@ -94,17 +71,28 @@ const Contacts = ({ route, navigation }) => {
           <ListItem
           name={contact.name}
           key={contact._id}
-          navigation={navigation}
           image={contact.image}
-          textStyle={{fontWeight : "bold", fontSize : customStyle.uiFontSize}}
+          textStyle={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}
           containerStyle={index === (contacts?.length - 1) && ({borderBottomWidth : 0})}
-          onPress={() => handlePress(contact)}
-          onLongPress={() => handleLongPress(contact)}
-          highlighted={highlightedContacts.indexOf(contact) !== -1}
+          onPress={() => route.params.type == "newChat" ? navigateToNewChat(contact._id) : handlePress(contact._id)}
+          onLongPress={() => route.params.type == "newChat" ? navigateToNewChat(contact._id) : handleLongPress(contact._id)}
+          highlighted={highlightedContacts.includes(contact._id)}
           highlightedStyle={{backgroundColor : "rgba(0,0,0,0.1)"}}
           />
         )}
       </ScrollView>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={() => {
+        dispatch(deleteContacts(highlightedContacts));
+        deleteContactsFromRealm(contacts.filter(contact => highlightedContacts.includes(contact._id)));
+        setHighlightedContacts([]);
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      titleText="Are you sure you want to delete these contacts?"
+      />
     </>
   )
 }

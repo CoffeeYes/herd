@@ -26,9 +26,41 @@ const setLastRoutes = routes => {
   }
 }
 
+const setMaxPasswordAttempts = maxAttempts => {
+  return {
+    type : "SET_MAX_PASSWORD_ATTEMPTS",
+    payload : maxAttempts
+  }
+}
+
+const setEnableNotifications = enable => {
+  return {
+    type : "SET_ENABLE_NOTIF",
+    payload : enable
+  }
+}
+
+const setBackgroundServiceRunning = running => {
+  return {
+    type : "SET_BACKGROUND_SERVICE_RUNNING",
+    payload : running
+  }
+}
+
+const setStyles = styles => {
+  return {
+    type : "SET_STYLES",
+    payload : styles
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
   setLockable,
-  setLastRoutes
+  setLastRoutes,
+  setMaxPasswordAttempts,
+  setEnableNotifications,
+  setBackgroundServiceRunning,
+  setStyles
 }

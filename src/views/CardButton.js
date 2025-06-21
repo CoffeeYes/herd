@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { palette } from '../assets/palette';
 
-const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContainerStyle,
-                      containerStyle, textStyle, flashText, timeout, disableTouch }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles)
+const CardButton = ({ onPress, text, rightIcon, flashIcon, iconSize, iconStyle, iconContainerStyle,
+                      containerStyle, textStyle, textContainerStyle, flashText, timeout, disableTouch }) => {
+  const customStyle = useSelector(state => state.appStateReducer.styles)
   const [currentText, setCurrentText] = useState(text);
+  const [displayedIcon, setDisplayedIcon] = useState(rightIcon);
 
   const flash = async () => {
     const success = await onPress();
-    if(success && flashText?.length > 0 && timeout > 0) {
-      setCurrentText(flashText);
+    if(success && timeout > 0) {
+      flashText?.length > 0 && setCurrentText(flashText);
+      flashIcon?.length > 0 && setDisplayedIcon(flashIcon);
       setTimeout(() => {
         setCurrentText(text);
+        setDisplayedIcon(rightIcon)
       },timeout)
     }
   }
@@ -27,10 +30,10 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
     onPress={flash}>
 
       {currentText?.length > 0 &&
-      <View style={styles.textContainer}>
+      <View style={{...styles.textContainer, ...textContainerStyle}}>
         <Text style={{
         ...styles.text,
-        fontSize : customStyle.uiFontSize,
+        fontSize : customStyle.scaledUIFontSize,
         ...textStyle}}>
           {currentText}
         </Text>
@@ -40,8 +43,8 @@ const CardButton = ({ onPress, text, rightIcon, iconSize, iconStyle, iconContain
       <View style={{...styles.iconContainer,...iconContainerStyle}}>
         <Icon
         style={{...styles.icon, ...iconStyle}}
-        name={rightIcon}
-        size={iconSize || customStyle.uiFontSize + 16}/>
+        name={displayedIcon}
+        size={iconSize || customStyle.scaledUIFontSize}/>
       </View>}
 
     </TouchableOpacity>
@@ -53,7 +56,7 @@ const styles = {
     flexDirection : "row",
     justifyContent : "space-around",
     alignItems : "center",
-    width : Dimensions.get('window').width * 0.9,
+    width : "90%",
     padding : 20,
     borderRadius : 10,
     backgroundColor : palette.white,
@@ -69,7 +72,7 @@ const styles = {
     marginRight : "auto",
     flexDirection : "row",
     justifyContent : "flex-start",
-    width : Dimensions.get('window').width * 0.4,
+    width : "60%",
   },
   iconContainer : {
     justifyContent : "center"

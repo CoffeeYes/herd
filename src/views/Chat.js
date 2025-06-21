@@ -1,75 +1,85 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TextInput, ActivityIndicator, StatusBar,
-         Dimensions, ScrollView, TouchableOpacity, Alert, SectionList,
-         KeyboardAvoidingView, Keyboard} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Text, View, TextInput,
+         SectionList,
+         KeyboardAvoidingView } from 'react-native';
 import moment from 'moment';
-import { v4 as uuidv4 } from 'uuid';
-import {PanGestureHandler  } from 'react-native-gesture-handler'
+import { PanGestureHandler, TouchableOpacity  } from 'react-native-gesture-handler'
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 import {
   getMessagesWithContact,
   sendMessageToContact,
   deleteMessages as deleteMessagesFromRealm} from '../realm/chatRealm';
-import { getContactById } from '../realm/contactRealm';
-import { parseRealmID } from '../realm/helper';
-import { imageValues } from '../assets/palette';
-import _ from 'lodash'
+import { parseRealmID } from '../helper';
+import { encryptStrings, storeChatHasNewMessages } from '../common';
+
+import { useScreenAdjustedSize } from '../helper';
 
 import {
   addChat,
   updateChat,
-  setLastText,
   prependMessagesForContact,
   addMessage,
   addMessagesToQueue,
-  removeMessagesFromQueue,
   deleteChats,
   deleteMessages as deleteMessagesFromState} from '../redux/actions/chatActions';
 
 import { palette } from '../assets/palette';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
-import Crypto from '../nativeWrapper/Crypto';
 
 import Header from './Header';
 import ChatBubble from './ChatBubble';
 import ContactImage from './ContactImage';
+import ConfirmationModal from './ConfirmationModal';
+import LoadingIndicator from './LoadingIndicator';
 
-const swipeSize = Dimensions.get('window').height * 0.25;
+const maxCharacterCount = 190;
 
 const Chat = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const chats = useSelector(state => state.chatReducer.chats);
-  const customStyle = useSelector(state => state.chatReducer.styles);
-  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || []);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
+  const chat = chats.find(chat => chat._id == route.params.contactID);
+
+  const messages = useSelector(state => state.chatReducer.messages?.[route.params.contactID] || [])
+  const backgroundServiceRunning = useSelector(state => state.appStateReducer.backgroundServiceRunning);
+
   const contactInfo = useSelector(state => state.contactReducer.contacts.find(contact => contact._id == route.params.contactID))
   const [loading, setLoading] = useState(false);
   const [chatInput, setChatInput] = useState("");
-  const [characterCount, setCharacterCount] = useState(190);
+  const [characterCount, setCharacterCount] = useState(maxCharacterCount);
   const [highlightedMessages, setHighlightedMessages] = useState([]);
-  const [inputDisabled, setInputDisabled] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const [messageStart, setMessageStart] = useState(-messageLoadingSize);
-  const [messageEnd, setMessageEnd] = useState(undefined);
+  const [messageEnd, setMessageEnd] = useState();
   const [loadingMoreMessages, setLoadingMoreMessages] = useState(false);
   const [allowScrollToLoadMessages, setAllowScrollToLoadMessages] = useState(true);
   const [enableGestureHandler, setEnableGestureHandler] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [showedPopup, setShowedPopup] = useState(false);
-  const [initialScrollIndex, setInitialScrollIndex] = useState(0);
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [chatWindowSize, setChatWindowSize] = useState(1);
-
+  const [scrolling, setScrolling] = useState(false);
+  const [momentumScrolling, setMomentumScrolling] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [sectionListHeight, setSectionListHeight] = useState(0);
+  const [sectionContentHeight, setSectionContentHeight] = useState(0);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [inputHeight, setInputHeight] = useState(50);
   const ownPublicKey = useSelector(state => state.userReducer.publicKey)
+  
+  const disableChatInputRef = useRef(false);
+  const previousTextValueRef = useRef("");
+  const shouldScrollToBottomRef = useRef(false);
 
   const messageLoadingSize = 5;
+  const chatWindowSize = 16;
+
+  const twentyFivePercentHeight = useScreenAdjustedSize(0.25,0.25,"height");
+  const contactImageSize = useScreenAdjustedSize(0.12,0.07);
 
   useEffect(() => {
     (async () => {
-      const existingChat = chats.find(chat => chat._id == contactInfo._id);
-      const chatStarted = existingChat !== undefined;
-      const doneLoading = existingChat?.doneLoading;
-      if(messages.length === 0 && existingChat) {
+      if(messages.length === 0 && chat || (chat?.hasNewMessages && getMessageLength() < messageLoadingSize)) {
         setLoading(true);
         await loadMessages(-messageLoadingSize);
         setLoading(false);
@@ -79,35 +89,21 @@ const Chat = ({ route, navigation }) => {
         const longest = sentLength > receivedLength ? sentLength : receivedLength;
         setMessageStart(-longest - messageLoadingSize)
         setMessageEnd(-longest)
-        scrollToBottom(false);
         //if all messages were previously loaded into state when current chat was previously mounted,
         //disable the ability to load more messages and prevent popup from being shown
-        if(doneLoading) {
+        if(chat?.doneLoading) {
           setShowedPopup(true);
           setAllowScrollToLoadMessages(false);
           setEnableGestureHandler(false);
         }
       }
+      setInitialLoad(false);
+
+      if(chat?._id) {
+        dispatch(updateChat({_id : chat._id, hasNewMessages : false}))
+        storeChatHasNewMessages(chat._id, false);
+      }
     })()
-
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true);
-        setAllowScrollToLoadMessages(true);
-      }
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false);
-      }
-    );
-
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
   },[]);
 
   //calculate actual number of messages by extracting them from sections
@@ -117,7 +113,7 @@ const Chat = ({ route, navigation }) => {
     let flattenedMessages = [];
     if(customMessages?.length > 0) {
       if(customMessages?.[0]?.data) {
-        flattenedMessages = customMessages.map(section => section.data).flat(1);
+        flattenedMessages = flattenMessages(customMessages);
       }
       else if (customMessages?.[0]?._id?.length > 0) {
         flattenedMessages = customMessages
@@ -141,77 +137,60 @@ const Chat = ({ route, navigation }) => {
     }
   }
 
-  //use a ref for messages length because when calling loadMoreMessages
-  //during deleteMessages process messages state is outdated, leading to wrong
-  //length being used for decision making in deleting chat
-  const messageLengthRef = useRef();
-  useEffect(() => {
-    const [sentLength,receivedLength] = getMessageLength(true);
-    const messageLength = sentLength + receivedLength;
-    messageLengthRef.current = messageLength;
-    if (sentLength > messageLoadingSize || receivedLength > messageLoadingSize) {
-      setInitialScrollIndex(messageLength);
+  const firstMessageIDRef = useRef("");
+
+  const flattenMessages = (messages, includeDays = false) => {
+    let extractedArray = [];
+    if(includeDays) {
+      extractedArray = messages.map(section => [...section.data, section.day])
     }
-  },[messages])
+    else {
+      extractedArray = messages.map(section => section.data);
+    }
+    return extractedArray.flat()
+  }
 
   const loadMessages = async (messageStart, messageEnd) => {
     const messagePackage = await getMessagesWithContact(contactInfo.key,messageStart,messageEnd);
     const newMessages = messagePackage.messages;
 
-    if(newMessages.length === 0) {
-      if(messageLengthRef.current === 0) {
-        dispatch(deleteChats([contactInfo]))
-      }
-      else {
-        //show popup that no more messages can be loaded, but only do so when
-        //there are already messages in the chat to prevent the popup from showing
-        //when a new chat is started
-        showNoMoreMessagePopup();
-        return;
-      }
-      setAllowScrollToLoadMessages(false);
+    //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
+    //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
+    // if there are any present in the database.
+    const extractedMessageIDs = flattenMessages(messages).map(message => message._id)
+
+    //generate array difference between new and existing messages to see if actual new messages are present
+    const newMessagesToAdd = newMessages.filter(messageID => !extractedMessageIDs.includes(messageID)).length > 0;
+
+    const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
+
+    const noMoreMessagesToLoad = (receivedMessageCount < messageLoadingSize) && (sentMessageCount < messageLoadingSize)
+
+    if(!newMessagesToAdd || (noMoreMessagesToLoad && !initialLoad)) {
+      showNoMoreMessagePopup();
     }
-    else {
-      //if overrideLoadInitial is used when loading more messages, we need to catch when all new messages are duplicates of the current messages
-      //as this means there are no more messages. This is necessary because overrideLoadInitial will always return messages
-      // if there are any present in the database.
-      const extractedMessageIDs = messages.map(section => section.data).flat(1).map(message => message._id)
-
-      let newMessagesToAdd = false;
-      const [sentMessageCount,receivedMessageCount] = getMessageLength(true, newMessages);
-
-      for(const message of newMessages) {
-        const found = extractedMessageIDs?.includes(message._id);
-        if(!found) {
-          newMessagesToAdd = true;
-        }
-      }
-
-      const noMoreMessagesToLoad = receivedMessageCount < messageLoadingSize && sentMessageCount < messageLoadingSize
-      if(!newMessagesToAdd || noMoreMessagesToLoad) {
-        showNoMoreMessagePopup();
-      }
-    }
-
+    
+    newMessagesToAdd && 
     dispatch(prependMessagesForContact(route.params.contactID,newMessages));
-    //if this is the first load, more messages can be returned that expected
-    //in order to ensure correct message order. As such, adjust the message
+    //if this is the first load, more messages can be returned than expected
+    //As such, adjust the message
     //loading size so that the correct messages are loaded on the next load attempt
     if(messageStart == -messageLoadingSize) {
       setMessageStart(messagePackage?.newStart ? messagePackage.newStart - messageLoadingSize : -(2*messageLoadingSize));
       setMessageEnd(messagePackage?.newEnd ? messagePackage.newEnd : -messageLoadingSize);
-      const newLastText = {...newMessages[newMessages.length-1]};
-      dispatch(setLastText(contactInfo._id, newLastText));
+      if(newMessages.length > 0) {
+        firstMessageIDRef.current = newMessages[0]._id
+      }
     }
+    return newMessagesToAdd;
   }
 
   const sendMessage = async message => {
-    setChatInput("");
-    setCharacterCount(190);
     if(message.trim() === "") {
       return;
     }
-    setInputDisabled(true);
+    setChatInput("");
+    setCharacterCount(maxCharacterCount);
 
     const timestamp = Date.now();
 
@@ -229,22 +208,18 @@ const Chat = ({ route, navigation }) => {
     }
 
     //encrypt the message to be sent using the other users public key
-    const newMessageEncrypted = await Crypto.encryptStringWithKey(
+    const newMessageEncrypted = (await encryptStrings(
       contactInfo.key,
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      message
-    )
+      false,
+      [message]
+    ))[0];
 
     //encrypt the passed in message using the users own public key
-    const newMessageEncryptedCopy = await Crypto.encryptString(
+    const newMessageEncryptedCopy = (await encryptStrings(
       "herdPersonal",
-      Crypto.algorithm.RSA,
-      Crypto.blockMode.ECB,
-      Crypto.padding.OAEP_SHA256_MGF1Padding,
-      message
-    )
+      true,
+      [message]
+    ))[0];
 
     //add message to UI
     const messageID = sendMessageToContact(metaData, newMessageEncrypted, newMessageEncryptedCopy);
@@ -252,14 +227,11 @@ const Chat = ({ route, navigation }) => {
     const selfEncryptedCopy = {...metaData,_id : messageID, text : newMessageEncryptedCopy};
 
     //add new chat to chats state in redux store if it isnt in chats state
-    if(chats.find(chat => chat.key === contactInfo.key) === undefined) {
+    if(!chat) {
       const newChat = {
-        _id : contactInfo._id,
-        image : contactInfo.image,
-        key : contactInfo.key,
+        ...contactInfo,
         lastMessageSentBySelf : true,
         lastText : message,
-        name : contactInfo.name,
         timestamp : timestamp,
         doneLoading : true
       }
@@ -272,93 +244,66 @@ const Chat = ({ route, navigation }) => {
     }
     dispatch(addMessage(contactInfo._id,newMessage));
 
-    dispatch(addMessagesToQueue([{
-      ...selfEncryptedCopy,
-      fromContactName : "You",
-      toContactName : contactInfo.name,
-    }]));
+    dispatch(addMessagesToQueue([selfEncryptedCopy]));
 
-    setInputDisabled(false);
-
-    !enableGestureHandler &&
-    scrollToBottom();
-
+    if(!enableGestureHandler) {
+      shouldScrollToBottomRef.current = true;
+    }
     setMessageStart(messageStart - 1);
 
-    await ServiceInterface.isRunning() &&
-    ServiceInterface.addMessageToService(selfEncryptedCopy);
+    backgroundServiceRunning &&
+    ServiceInterface.addMessageToService({...newMessage, text : newMessageEncrypted});
   }
 
-  const deleteMessages = () => {
-    Alert.alert(
-      'Are you sure you want to delete these messages?',
-      '',
-      [
-        { text: "Cancel", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            setInputDisabled(true);
-            deleteMessagesFromRealm(highlightedMessages);
+  const deleteMessages = async () => {
+    deleteMessagesFromRealm(highlightedMessages);
 
-            const fullHighlightedMessages = messages.map(section => section.data).flat(1)
-            .filter(message => highlightedMessages.includes(message._id));
+    const fullHighlightedMessages = flattenMessages(messages)
+    .filter(message => highlightedMessages.includes(message._id));
 
-            const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
+    const [sentLength, receivedLength] = getMessageLength(true,fullHighlightedMessages);
 
-            //set new loading index
-            const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
-            setMessageStart(messageStart + messageLoadingExtension);
+    //set new loading index
+    const messageLoadingExtension = sentLength > receivedLength ? sentLength : receivedLength;
+    setMessageStart(messageStart + messageLoadingExtension);
 
-            dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
+    dispatch(deleteMessagesFromState(contactInfo._id,highlightedMessages));
 
-            //get remaining messages
-            const updatedMessages = messages.map(section => ({
-              ...section,
-              data : section.data.filter(message => fullHighlightedMessages.indexOf(message) === -1)
-            }))
-            .filter(section => section.data.length > 0);
+    //get remaining messages
+    const updatedMessages = messages.map(section => ({
+      ...section,
+      data : section.data.filter(message => !fullHighlightedMessages.includes(message))
+    }))
+    .filter(section => section.data.length > 0);
 
-            if(updatedMessages.length > 0) {
-              const lastSection = updatedMessages[updatedMessages.length -1];
-              const lastMessageIndex = lastSection.data.length -1;
-              const lastMessage = lastSection.data[lastMessageIndex];
-              dispatch(setLastText(contactInfo._id,lastMessage))
-            }
-            else if(!chats.find(chat => chat._id === contactInfo._id)?.doneLoading){
-              //if all messages were deleted attempt to load more
-              await loadMoreMessages(true,messageStart + messageLoadingExtension);
-            }
-            else {
-              //all messages were deleted and there are no more messages to load
-              //so remove chat from chats page
-              dispatch(deleteChats([contactInfo]))
-            }
+    if(updatedMessages.length === 0) {
+      let doneLoading = chat?.doneLoading;
+      if(!doneLoading) {
+        doneLoading = !(await loadMoreMessages(true,messageStart + messageLoadingExtension));
+      }
+      if(doneLoading) {
+        dispatch(deleteChats([contactInfo]));
+        firstMessageIDRef.current = "";
+      }
+    }
+    else {
+      firstMessageIDRef.current = getFirstMessageID(updatedMessages);
+    }
 
-            const messagesToDelete = highlightedMessages.map(message => ({...message,_id : parseRealmID(message)}));
+    const deletedReceivedMessages = fullHighlightedMessages.filter(message =>
+      message.to.trim() === ownPublicKey.trim()
+    )
+    .map(message => ({...message,_id : parseRealmID(message)}));
 
-            const deletedReceivedMessages = highlightedMessages.filter(message =>
-              message.to === ownPublicKey
-            )
-            .map(message => ({...message,_id : parseRealmID(message)}));
+    if(backgroundServiceRunning) {
+      await ServiceInterface.removeMessagesFromService(highlightedMessages);
+      await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
+    }
 
-            if(await ServiceInterface.isRunning()) {
-              await ServiceInterface.removeMessagesFromService(highlightedMessages);
-              await ServiceInterface.addDeletedMessagesToService(deletedReceivedMessages);
-            }
-
-            setHighlightedMessages([]);
-            setInputDisabled(false);
-          },
-        },
-      ]
-    );
+    setHighlightedMessages([]);
   }
 
-  const handleScroll = async event => {
+  const handleScroll = () => {
     if(!showedPopup) {
       const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
       loadMoreMessages(overrideLoadInitial);
@@ -367,31 +312,24 @@ const Chat = ({ route, navigation }) => {
 
   const loadMoreMessages = async (overrideLoadInitial = false, start = messageStart, end = messageEnd) => {
     if(!loadingMoreMessages) {
+      let loadedMoreMessages = false
       setLoadingMoreMessages(true)
       if(overrideLoadInitial) {
-        await loadMessages(start)
+        loadedMoreMessages = await loadMessages(start)
       }
       else {
-        await loadMessages(start,end)
+        loadedMoreMessages = await loadMessages(start,end)
       }
       setMessageEnd(start);
       setMessageStart(start - messageLoadingSize);
 
       setLoadingMoreMessages(false);
-
-      messageLengthRef.current > 0 &&
-      scrollRef.current.scrollToLocation({
-        animated : true,
-        sectionIndex : 0,
-        itemIndex : 0,
-        viewOffset : -20
-      })
+      return loadedMoreMessages;
     }
   }
 
-  const handleContentSizeChange = (contentWidth, contentHeight) => {
-    let windowHeight = Dimensions.get('window').height;
-    if(contentHeight < windowHeight * 0.8 ) {
+  useEffect(() => {
+    if(sectionContentHeight <= sectionListHeight) {
       setAllowScrollToLoadMessages(false)
       setEnableGestureHandler(true)
     }
@@ -399,12 +337,30 @@ const Chat = ({ route, navigation }) => {
       !showedPopup && setAllowScrollToLoadMessages(true)
       setEnableGestureHandler(false)
     }
+  },[sectionListHeight,sectionContentHeight])
+
+  const handleContentSizeChange = (contentHeight) => {
+    setSectionContentHeight(contentHeight);
+    // compare IDs of old first message to new first message to determine if messages have been prepended
+    // and a scroll to top is necessary.
+    const firstMessageID = getFirstMessageID(messages);
+    if (messages.length > 0 && firstMessageIDRef.current !== firstMessageID && firstMessageIDRef.current.length > 0){
+      scrollToTop(true,false);
+    }
+    else if(shouldScrollToBottomRef.current) {
+      scrollToBottom();
+      shouldScrollToBottomRef.current = false;
+    }
+    
+    if(firstMessageID) {
+      firstMessageIDRef.current = firstMessageID;
+    }
   }
 
   const handleGesture = event => {
     const overrideLoadInitial = getMessageLength(false,messages) < messageLoadingSize;
-    const allow = event.nativeEvent.translationY > swipeSize && enableGestureHandler;
-    allow && !showedPopup && messages.length > 0 &&
+    const swipeLargeEnough = event.nativeEvent.translationY > (sectionListHeight * 0.4);
+    swipeLargeEnough && !showedPopup && messages.length > 0 &&
     loadMoreMessages(overrideLoadInitial);
   }
 
@@ -425,23 +381,82 @@ const Chat = ({ route, navigation }) => {
   }
 
   const scrollRef = useRef();
+  const momentumEndFiredCount = useRef(0);
 
   const scrollToBottom = (animated = true) => {
-    const lastSectionIndex = messages?.length -1;
-    const lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
-
-    messages.length > 0 &&
-    lastSectionIndex >= 0 &&
-    lastMessageIndex >= 0 &&
+    messages?.[0]?.data?.length > 0 &&
     scrollRef.current.scrollToLocation({
-      animated : animated,
-      sectionIndex : lastSectionIndex,
-      itemIndex : lastMessageIndex
+      animated,
+      sectionIndex : 0,
+      itemIndex : 0,
+      viewOffset : 6,
+      viewPosition : 0
     });
   }
 
+  const getFirstMessageID = messages => {
+    const firstMessageSectionIndex = messages.length - 1;
+    const firstMessageIndex = messages[firstMessageSectionIndex]?.data?.length - 1;
+    const firstMessageID = messages[firstMessageSectionIndex]?.data[firstMessageIndex]?._id;
+    return firstMessageID;
+  }
+  
+  let scrollRetryCount = 0;
+  let sectionOffset = 1
+  const scrollToTop = (animated = true, isFailureRetry) => {
+    let lastSectionIndex = messages?.length - sectionOffset;
+    let lastMessageIndex = messages?.[lastSectionIndex]?.data?.length -1;
+    let targetIndexAfterFailure = lastMessageIndex - scrollRetryCount;
+    if(targetIndexAfterFailure < 0) {
+      sectionOffset += 1;
+      lastSectionIndex = messages?.length - sectionOffset;
+      let totalPassedMessages = 0;
+      for(let i = sectionOffset; i > 1; i--) {
+        if(messages?.[messages?.length - i]?.length > 0) {
+          totalPassedMessages += messages?.[messages?.length - i].data.length
+        }
+      }
+      const differenceFromPreviousSection = scrollRetryCount - lastMessageIndex - totalPassedMessages;
+      targetIndexAfterFailure = messages?.[lastSectionIndex]?.data?.length - 1 - differenceFromPreviousSection;
+    }
+
+    const scrollOptions = {
+      animated,
+      sectionIndex : lastSectionIndex,
+      viewPosition : 1,
+    }
+
+    if(messages.length > 0 && lastSectionIndex >= 0 && lastMessageIndex >= 0) {
+      if(isFailureRetry) {
+        scrollRetryCount += 1;
+        if (targetIndexAfterFailure >= 0 && scrollRetryCount <= 4) {
+          scrollRef.current.scrollToLocation({
+            ...scrollOptions,
+            itemIndex : targetIndexAfterFailure
+          })
+        }
+        else {
+          scrollRetryCount = 0;
+          console.log("retrying scrollToTop failed 4 times or hit 0, not attempting more")
+        }
+      }
+      else {
+        scrollRetryCount = 0;
+        scrollRef.current.scrollToLocation({
+          ...scrollOptions,
+          itemIndex : lastMessageIndex 
+        })
+      }
+    }
+  }
+
   const longPressMessage = id => {
-    setHighlightedMessages(highlightedMessages => [...highlightedMessages,id]);
+    setHighlightedMessages(highlightedMessages => 
+      highlightedMessages.includes(id) ? 
+      highlightedMessages 
+      : 
+      [...highlightedMessages,id]
+    );
   }
 
   const shortPressMessage = id => {
@@ -458,124 +473,158 @@ const Chat = ({ route, navigation }) => {
     });
   }
 
-  const renderItem = ({item}) => {
+  const renderItem = useCallback(({item}) => {
     return (
       <ChatBubble
       text={item.text}
-      activeOpacity={highlightedMessages.length === 0 && 0.8}
+      textFontSize={customStyle.scaledMessageFontSize}
       onLongPress={useCallback(() => longPressMessage(item._id),[])}
       onPress={useCallback(() => shortPressMessage(item._id),[])}
-      highlighted={highlightedMessages.indexOf(item._id) !== -1}
+      highlighted={highlightedMessages.includes(item._id)}
       timestamp={moment(item.timestamp).format("HH:mm")}
       messageFrom={item.from === ownPublicKey}
       customStyle={customStyle}
+      showCopyButton={highlightedMessages.length === 1 && highlightedMessages.includes(item._id)}
       />
+    )
+  },[messages, highlightedMessages])
+
+  const renderSectionFooter = ({ section: { day } }) => {
+    return (
+      <Text 
+      style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
+        {day === moment().format("DD/MM") ? "Today" : day}
+      </Text>
     )
   }
 
-  const renderItemCallback = useCallback( ({item}) => {
-    return renderItem({item})
-  },[messages,highlightedMessages])
-
-  const getItemLayout = (data, index) => {
-    //multiply by 1.1 for each point increase in fontsize
-    const fontSizeFactor = (1 + ((customStyle.messageFontSize - 14)  * 0.1))
-    // min height at 14 fontsize ~= 80, max ~= 150, (80 + 150) / 2 = 115
-    const estimatedMessageHeight = 115 * fontSizeFactor;
-    return {
-      length : estimatedMessageHeight,
-      offset : estimatedMessageHeight * index,
-      index
-    }
+  const handleSubmit = async text => {
+    disableChatInputRef.current = true;
+    await sendMessage(text);
   }
 
   return (
     <>
     <Header
     title={contactInfo.name}
-    touchStyle={{backgroundColor : palette.offprimary}}
+    touchStyle={{backgroundColor : palette.offprimary, paddingVertical : 10}}
     textStyle={{marginLeft : 10, fontSize : customStyle.titleSize}}
     rightButtonIcon={highlightedMessages.length > 0 && "delete"}
-    rightButtonOnClick={() => deleteMessages()}
+    rightButtonOnClick={() => setShowConfirmationModal(true)}
     allowGoBack
     onTextTouch={() => navigation.navigate("contact", {id : parseRealmID(contactInfo)})}
     preText={
       contactInfo?.image?.length > 0 &&
-      <View style={styles.imageContainer}>
-        <ContactImage
-        imageURI={contactInfo.image}
-        iconSize={24}
-        imageWidth={Dimensions.get("window").width * imageValues.smallFactor}
-        imageHeight={Dimensions.get("window").height * imageValues.smallFactor}/>
-      </View>
+      <ContactImage
+      imageURI={contactInfo.image}
+      iconSize={contactImageSize}
+      size={contactImageSize}
+      containerStyle={styles.imageContainer}
+      disableTouch/>
     }/>
     <KeyboardAvoidingView
-    onLayout={e => setChatWindowSize(e.nativeEvent.layout.height)}
     style={{flex : 1}}>
 
       {showPopup &&
-      <View style={styles.popup}>
-        <Text style={{...styles.popupText, fontSize : customStyle.uiFontSize}}>No more messages to load</Text>
+      <View style={{...styles.popup, marginTop : twentyFivePercentHeight, width : "80%"}}>
+        <Text style={{...styles.popupText, fontSize : customStyle.scaledUIFontSize}}>No more messages to load</Text>
       </View>}
 
       <PanGestureHandler
-      enabled={enableGestureHandler && !loadingMoreMessages && !keyboardVisible}
+      enabled={enableGestureHandler && !loadingMoreMessages}
       onGestureEvent={handleGesture}>
         <View style={{flex : 1}}>
           {((loading || loadingMoreMessages) && !showPopup) &&
-          <ActivityIndicator
-          size="large"
-          color={palette.primary}/>}
+          <LoadingIndicator/>}
 
           <SectionList
           removeClippedSubviews
-          contentContainerStyle={{paddingBottom : 5}}
+          contentContainerStyle={{paddingTop : 5, flexGrow : 1, justifyContent : "flex-end"}}
           windowSize={chatWindowSize}
           sections={messages}
           ref={scrollRef}
-          initialScrollIndex={initialScrollIndex}
-          onScroll={ e => (allowScrollToLoadMessages && e.nativeEvent.contentOffset.y === 0) && handleScroll()}
           keyExtractor={item => item._id}
-          renderItem={renderItemCallback}
-          onContentSizeChange={handleContentSizeChange}
-          getItemLayout={getItemLayout}
-          renderSectionHeader={({ section: { day } }) => (
-            <Text style={{...styles.messageDay,fontSize : customStyle.messageFontSize}}>
-              {day === moment().format("DD/MM") ? "Today" : day}
-            </Text>
-          )}/>
+          renderItem={renderItem}
+          scrollEventThrottle={25}
+          onScroll={e => setScrollPosition(e.nativeEvent.contentOffset.y)}
+          onLayout={e => setSectionListHeight(e.nativeEvent.layout.height)}
+          onContentSizeChange={(contentWidth, contentHeight) => handleContentSizeChange(contentHeight)}
+          inverted
+          onEndReached={() => allowScrollToLoadMessages && (scrolling || momentumScrolling) && handleScroll()}
+          onScrollBeginDrag={() => setScrolling(true)}
+          onScrollEndDrag={() => setScrolling(false)}
+          onScrollToIndexFailed={e => {
+            if(e.index > 0) {
+              scrollToTop(true,true)
+            }
+          }}
+          onMomentumScrollBegin={() => {
+            setMomentumScrolling(true);
+          }}
+          onMomentumScrollEnd={() => {
+            momentumEndFiredCount.current += 1;
+            if(momentumEndFiredCount.current > 2) {
+              setMomentumScrolling(false);
+              momentumEndFiredCount.current = 0;
+            }
+          }}
+          renderSectionFooter={renderSectionFooter}/>
         </View>
       </PanGestureHandler>
 
-      <View style={{flexDirection : "row"}}>
-        <TextInput
-        placeholder="Send a Message"
-        style={{
-          ...styles.chatInput,
-          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
-          fontSize : customStyle?.uiFontSize,
-          flex : 1
-        }}
-        value={chatInput}
-        editable={!inputDisabled}
-        maxLength={190}
-        onChangeText={text => {
-          setChatInput(text)
-          setCharacterCount(190 - text.length)
-        }}
-        multiline={true}
-        blurOnSubmit={true}
-        onSubmitEditing={event => sendMessage(event.nativeEvent.text.trim())}/>
-        <View style={{
-          backgroundColor : inputDisabled ? palette.mediumgrey : palette.white,
-          justifyContent : "center"}
-        }>
-          <Text style={{fontSize : customStyle.uiFontSize}}>
-            {`${characterCount} / 190`}
+      <View style={{...styles.inputControlContainer, ...(scrollPosition > 0 && ({...styles.inputControlBorderTop}))}}>
+        <View style={styles.inputContainer}>
+          <TextInput
+          placeholder="Send a Message"
+          returnKeyType='done'
+          style={{
+            ...styles.chatInput,
+            backgroundColor : palette.white,
+            fontSize : customStyle?.scaledUIFontSize,
+            flex : 1
+          }}
+          onLayout={e => chatInput.length == 0 && !disableChatInputRef.current && setInputHeight(e.nativeEvent.layout.height)}
+          value={chatInput}
+          maxLength={maxCharacterCount}
+          onChangeText={text => {
+            setChatInput(previousText => {
+              if(previousText == "" && text.includes(previousTextValueRef.current) && previousTextValueRef.current.length > 1 && text.length > previousTextValueRef.current.length) {
+                setCharacterCount(maxCharacterCount)
+                return ""  
+              }
+              else {
+                disableChatInputRef.current = false;
+                return text
+              }
+            })
+            !disableChatInputRef.current && 
+            setCharacterCount(maxCharacterCount - text.length);
+
+            previousTextValueRef.current = text
+          }}
+          multiline={true}/>
+          <Text style={{fontSize : customStyle.scaledUIFontSize, color : palette.grey}}>
+            {`${characterCount}`}
           </Text>
         </View>
+        <TouchableOpacity
+        style={{...styles.sendButton, width : inputHeight, height : inputHeight, borderRadius : inputHeight / 2}}
+        onPress={async () => await handleSubmit(chatInput)}>
+          <Icon name="send" size={32} color={palette.primary}/>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
+
+    <ConfirmationModal
+    visible={showConfirmationModal}
+    titleText="Are you sure you want to delete these messages?"
+    confirmText="Delete"
+    onConfirm={async () => {
+      await deleteMessages();
+      setShowConfirmationModal(false);
+    }}
+    onCancel={() => setShowConfirmationModal(false)}
+    />
     </>
   )
 }
@@ -584,37 +633,52 @@ const styles = {
   chatInput : {
     backgroundColor : palette.white,
     marginTop : "auto",
-    paddingLeft : 10
+    paddingLeft : 10,
+    borderRadius : 10,
+  },
+  inputContainer : {
+    flexDirection : "row",
+    backgroundColor : palette.white,
+    flex : 1,
+    alignItems : "center",
+    borderRadius : 10,
+    paddingRight : 10
+  },
+  sendButton : {
+    alignItems : "center",
+    justifyContent : "center",
+    backgroundColor : palette.white,
+    marginLeft : 10
+  },
+  inputControlContainer : {
+    flexDirection : "row",
+    padding : 10,
+    alignItems : "flex-end",
+  },
+  inputControlBorderTop : {
+    borderTopWidth : 1,
+    borderTopColor : "rgba(0,0,0,0.2)"
   },
   imageContainer : {
     borderWidth : 1,
     borderColor : palette.grey,
-    width : Dimensions.get("window").width * imageValues.smallFactor,
-    height : Dimensions.get("window").width * imageValues.smallFactor,
     marginLeft : 10,
-    borderRadius : Dimensions.get("window").width * (imageValues.smallFactor/2),
     overflow : "hidden",
     alignSelf : "center",
     alignItems : "center",
     justifyContent : "center",
     marginRight : 20
   },
-  image : {
-    width : Dimensions.get("window").width * imageValues.smallFactor,
-    height : Dimensions.get("window").width * imageValues.smallFactor,
-  },
   messageDay : {
     alignSelf : "center",
   },
   popup : {
     position : "absolute",
-    marginLeft : Dimensions.get("window").width * 0.1,
-    marginTop : Dimensions.get("window").height * 0.1,
-    width : Dimensions.get("window").width * 0.8,
     zIndex : 999,
     elevation : 999,
     backgroundColor : palette.white,
     padding : 20,
+    alignSelf : "center",
     alignItems : "center",
     borderRadius : 5,
     borderColor : palette.primary,
@@ -623,6 +687,12 @@ const styles = {
   },
   popupText : {
     fontWeight : "bold"
+  },
+  loadingIndicator : {
+    position : "absolute",
+    alignSelf : "center",
+    marginTop : 20,
+    zIndex : 999
   }
 }
 

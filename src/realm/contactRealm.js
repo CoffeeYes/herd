@@ -1,24 +1,23 @@
 import Realm from 'realm';
 import Schemas from './Schemas';
 import { deleteChats, updateMessagesWithContact } from './chatRealm';
-import { parseRealmObject, parseRealmObjects, parseRealmID} from './helper'
+import { parseRealmObject, parseRealmObjects } from '../helper'
 
-const contactsRealm = new Realm({
+const contactRealmConfig = {
   path : 'contacts',
   schema : [Schemas.ContactSchema]
-})
+}
+
+let contactsRealm;
 
 const getAllContacts = () => {
   const allContacts = contactsRealm.objects("Contact");
-  return allContacts.length > 0 ?
-  parseRealmObjects(allContacts)
-  :
-  []
+  return parseRealmObjects(allContacts)
 }
 
 const deleteContacts = contacts => {
-  const realmContacts = contactsRealm.objects("Contact");
-  const contactsToDelete = realmContacts.filter(contact => contacts.find(item => parseRealmID(item) == parseRealmID(contact)) !== undefined);
+  const contactIDs = contacts.map(contact => Realm.BSON.ObjectId(contact._id))
+  const contactsToDelete = contactsRealm.objects("Contact").filtered(`_id IN $0`,contactIDs);
   deleteChats(contacts.map(contact => contact.key))
   contactsRealm.write(() => {
     contactsRealm.delete(contactsToDelete);
@@ -36,10 +35,11 @@ const createContact = object => {
 const getContactById = id => {
   let oid = Realm.BSON.ObjectId(id)
   const contact = contactsRealm.objectForPrimaryKey("Contact",oid);
-  return contact._id ? contact : {}
+  return contact
 }
 
 const getContactsByKey = keys => {
+  //have to manually chain keys with OR as IN query does not currently function correctly with strings
   if(keys.length > 0) {
     const keyQuery = keys.map(key => `key = '${key}'`).join(' OR ');
     const contactsByKey = contactsRealm.objects('Contact').filtered(keyQuery);
@@ -50,32 +50,52 @@ const getContactsByKey = keys => {
   }
 }
 
-const getContactByName = name => {
-  const contact = contactsRealm.objects('Contact').filtered(`name =[c] '${name}'`);
-
-  return contact.length > 0 ?
-  parseRealmObject(contact[0])
-  :
-  false
-}
-
-const editContact = async (id, values) => {
-  const contact = getContactById(Realm.BSON.ObjectId(id));
+const editContact = async (values) => {
+  const contact = getContactById(Realm.BSON.ObjectId(values._id));
   const oldKey = contact.key;
-  await updateMessagesWithContact(oldKey,values.key);
+  let messagesUpdated = false;
+
+  if(values.key !== oldKey) {
+    messagesUpdated = await updateMessagesWithContact(oldKey,values.key);
+  }
+
+  const validKeys = Object.keys(Schemas.ContactSchema.properties)
+  .filter(key => key !== "_id");
+
   contactsRealm.write(() => {
-    contact.name = values.name;
-    contact.key = values.key;
-    contact.image = values.image;
+    for(const key of  Object.keys(values).filter(key => key !== "_id")) {
+      if (validKeys.includes(key)) {
+        if(key == "key") {
+          if(messagesUpdated) {
+            contact[key] = values[key];
+          }
+        }
+        else {
+          contact[key] = values[key]
+        }
+      }
+      else {
+        throw new Error(`invalid key ${key} passed in value object when attempting to update contact`)
+      }
+    }
   })
+  return messagesUpdated;
 }
 
 const deleteAllContacts = () => {
   contactsRealm.write(() => contactsRealm.deleteAll())
 }
 
+const openContactRealm = async () => {
+  contactsRealm = await Realm.open(contactRealmConfig);
+}
+
 const closeContactRealm = () => {
   contactsRealm.close();
+}
+
+const deleteContactRealm = () => {
+  Realm.deleteFile(contactRealmConfig);
 }
 
 export {
@@ -83,9 +103,10 @@ export {
   deleteContacts,
   createContact,
   getContactById,
-  getContactByName,
   getContactsByKey,
   editContact,
   deleteAllContacts,
-  closeContactRealm
+  closeContactRealm,
+  openContactRealm,
+  deleteContactRealm,
 }

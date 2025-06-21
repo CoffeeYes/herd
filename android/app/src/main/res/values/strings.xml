@@ -4,6 +4,9 @@
       Service for passing Herd messages in the background
     </string>
 
+    <string name="serviceUUID">
+      30895318-6f7e-4f68-b21a-01a4e2f946fa
+    </string>
     <string name="messageQueueServiceUUID">
       7a38fab9-c286-402d-ac6d-6b79c1cbf329
     </string>
@@ -19,5 +22,14 @@
     <string name="MTUCharacteristicUUID">
       7f9f74f7-2d7d-4f6a-b5c9-81983202ef1f
     </string>
+    <string name="BTConnectionUUID">
+      acc99392-7f38-11eb-9439-0242ac130002
+    </string>
 
+    <string name="serviceChannelID">
+      HerdServiceChannel
+    </string>
+    <string name="messageChannelID">
+      HerdMessageChannel
+    </string>
 </resources>

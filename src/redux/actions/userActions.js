@@ -4,9 +4,13 @@ const setPublicKey = key => ({
 })
 
 const setPassword = (passwordName, hash) => {
+  if(!["login","erasure"].includes(passwordName)) {
+    throw new Error("Unknown passwordName passed to setPassword function, does not match 'login' or 'erasure'");
+  }
+
   return {
-    type : passwordName === "login" ? "SET_LOGIN_PASSWORD" : "SET_ERASURE_PASSWORD",
-    payload : hash
+    type : "SET_PASSWORD",
+    payload : {hash, passwordName}
   }
 }
 

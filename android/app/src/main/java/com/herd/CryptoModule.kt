@@ -4,6 +4,11 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.WritableArray;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -25,11 +30,29 @@ import javax.crypto.spec.OAEPParameterSpec
 import java.security.spec.MGF1ParameterSpec
 import javax.crypto.spec.PSource
 
+import kotlinx.coroutines.*;
+
 class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private final val TAG = "HerdCryptoModule";
+  var cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+  val coroutineResultContext = newSingleThreadContext("coroutineResultContext");
+  val context = reactContext;
+
+  var encryptionPromise : Promise? = null;
+  var decryptionPromise : Promise? = null;
 
   override fun getName(): String {
       return "CryptoModule"
+  }
+
+  @ReactMethod
+  fun addListener(listenerName: String) {
+      Log.i(TAG,"addListener called, eventName : $listenerName")
+  }
+
+  @ReactMethod
+  fun removeListeners(listenerCount: Int) {
+      Log.i(TAG,"removeListeners called, count : $listenerCount")
   }
 
   override fun getConstants(): Map<String, Any>? {
@@ -37,38 +60,13 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
       // https://facebook.github.io/react-native/docs/native-modules-android.html#the-toast-module
       val constants : Map<String, Any> = mapOf(
           "algorithm" to mapOf(
-              "RSA" to "RSA",
-              "AES" to "AES",
-              "AES_128" to "AES_128",
-              "AES_256" to "AES_256",
-              "ARC4" to "ARC4",
-              "BLOWFISH" to "BLOWFISH",
-              "ChaCha20" to "ChaCha20",
-              "DES" to "DES",
-              "DESede" to "DESede"
+              "RSA" to "RSA"
           ),
           "blockMode" to mapOf(
-              "CBC" to "CBC",
-              "CFB" to "CFB",
-              "CTR" to "CTR",
-              "CTS" to "CTS",
-              "ECB" to "ECB",
-              "OFB" to "OFB",
-              "OFB" to "OFB",
-              "GCM" to "GCM",
-              "Poly1305" to "Poly1305",
-              "NONE" to "NONE"
+              "ECB" to "ECB"
           ),
           "padding" to mapOf(
-              "NO_PADDING" to "NoPadding",
-              "ISO10126Padding" to "ISO10126Padding",
-              "PKCS5Padding" to "PKCS5Padding",
-              "OAEPPadding" to "OAEPPadding",
-              "OAEP_SHA1_MGF1Padding" to "OAEPwithSHA-1andMGF1Padding",
-              "OAEP_SHA256_MGF1Padding" to "OAEPwithSHA-256andMGF1Padding",
-              "OAEP_SHA224_MGF1Padding" to "OAEPwithSHA-224andMGF1Padding",
-              "OAEP_SHA384_MGF1Padding" to "OAEPwithSHA-384andMGF1Padding",
-              "OAEP_SHA512_MGF1Padding" to "OAEPwithSHA-512andMGF1Padding"
+              "OAEP_SHA256_MGF1Padding" to "OAEPwithSHA-256andMGF1Padding"
           )
       )
 
@@ -134,6 +132,28 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
     return cipher;
   }
 
+  private fun initialisePublicKey(keyOrAlias : String, loadKeyFromStore: Boolean) : PublicKey? {
+    var publicKey : PublicKey? = null;
+    if(loadKeyFromStore) {
+      publicKey = loadPublicKey(keyOrAlias,"AndroidKeyStore");
+    }
+    else {
+      try {
+        val publicBytes = Base64.decode(keyOrAlias,Base64.DEFAULT);
+        publicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
+      }
+      catch(e : Exception) {
+        val errorMessage = "Error initialising public key passed in as parameter"
+        Log.i(TAG,errorMessage,e)
+      }
+    }
+    return publicKey;
+  }
+
+  private fun generateCipherString(algorithm : String, blockMode : String, padding : String) : String {
+    return "$algorithm/$blockMode/$padding";
+  }
+
   @ReactMethod
   fun generateRSAKeyPair(alias : String, promise : Promise) {
 
@@ -182,96 +202,183 @@ class CryptoModule(reactContext: ReactApplicationContext) : ReactContextBaseJava
   }
 
   @ReactMethod
-  fun encryptString(
-  alias : String,
+  fun encryptStrings(
+  keyOrAlias : String,
+  loadKeyFromStore : Boolean,
   algorithm : String,
   blockMode : String,
   padding : String,
-  stringToEncrypt : String,
+  strings : ReadableArray,
   promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-    //retrieve key from keystore
-    val publicKey : PublicKey? = loadPublicKey(alias,"AndroidKeyStore");
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
+    var publicKey : PublicKey? = initialisePublicKey(keyOrAlias,loadKeyFromStore);
+
     if(publicKey === null) {
-      return promise.resolve("Public Key does not exist")
+      val errorMessage = "error loading or initialising publicKey in encryptStrings function, publicKey was null";
+      Log.i(TAG,errorMessage)
+      return promise.reject("could not make load or use public key")
     }
-
-    //init cipher with RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher = initialiseCipher(encryptionType, publicKey);
-
-    //cast string to bytes
-    val stringAsBytes : ByteArray = stringToEncrypt.toByteArray();
-    try {
-      //encrypt bytes
-      val encryptedBytes = cipher.doFinal(stringAsBytes);
-      //encode encrypted string to base64 for javascript and pass upwards
-      val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
-      return promise.resolve(encryptedStringBASE64);
-    }
-    catch(e : GeneralSecurityException) {
-      return promise.reject("Encrypt string error",e)
-    }
-  }
-
-  @ReactMethod
-  fun encryptStringWithKey(
-  key : String,
-  algorithm : String,
-  blockMode : String,
-  padding : String,
-  stringToEncrypt : String,
-  promise : Promise) {
-    //create encryption type string to pass to cipher init
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
-
-    try {
-      //convert passed in public key string to bytes and format it as public key
-      val publicBytes = Base64.decode(key,Base64.DEFAULT);
-      val publicKey : PublicKey = KeyFactory.getInstance("RSA").generatePublic(X509EncodedKeySpec(publicBytes));
-      //init encryption cipher
-      val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
-      //convert message to encrypt to bytes
-      val stringAsBytes = stringToEncrypt.toByteArray();
-      //encrypt message bytes
-      val encryptedBytes = cipher.doFinal(stringAsBytes);
-      //convert message bytes to base64 for javascript and resolve promise with string
-      val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
-      promise.resolve(encryptedStringBASE64);
-    }
-    catch(e : Exception) {
-      promise.reject("Encrypt string error",e)
+    
+    encryptionPromise = promise;
+    var results : Array<String> = Array<String>(strings.size()) { "" };
+    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
+    
+    cryptographyScope.launch {
+      val encryptionRoutines =  
+        nativeInputStrings.mapIndexed{ index, it -> 
+          cryptographyScope.launch {
+          try {
+            val stringAsBytes : ByteArray = it.toByteArray();
+            val cipher : Cipher = initialiseCipher(encryptionType, publicKey);
+            val encryptedBytes = cipher.doFinal(stringAsBytes)
+            val encryptedStringBASE64 = Base64.encodeToString(encryptedBytes,Base64.DEFAULT);
+            results[index] = encryptedStringBASE64;
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error encrypting string in coroutine",e)
+          }
+        }
+      }
+      encryptionRoutines.joinAll();
+      if(results.any{it -> it.length == 0}) {
+        encryptionPromise?.reject("failed to encrypt a string");
+      }
+      else {
+        encryptionPromise?.resolve(Arguments.fromArray(results));
+      }
+      encryptionPromise = null;
     }
   }
 
-  @ReactMethod
   fun decryptString(
+    encryptionType : String,
+    privateKey : PrivateKey,
+    stringToDecrypt : String
+  ) : String {
+    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+    val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
+    val decryptedBytes = cipher.doFinal(encryptedStringAsBytes);
+    val decryptedString = String(decryptedBytes);
+    return decryptedString; 
+  }
+
+  fun decryptWithIdentifier(
+    encryptionType : String,
+    privateKey : PrivateKey,
+    decryptionObject : Map<String,Any>
+  ) : Map<String,Any>{
+    val text : String = decryptionObject["text"] as String;
+    val identifier : String = decryptionObject["identifier"] as String;
+    val decryptedString = decryptString(encryptionType,privateKey,text);
+
+    return mapOf(
+      "text" to decryptedString,
+      "identifier" to identifier
+    )
+  }
+
+  @ReactMethod
+  fun decryptStrings(
   alias : String,
   algorithm : String,
   blockMode : String,
   padding : String,
-  stringToDecrypt : String,
+  strings: ReadableArray,
   promise : Promise) {
-    val encryptionType = algorithm.plus("/").plus(blockMode).plus("/").plus(padding);
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
     //retrieve key from keystore
     val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+    var results : Array<String> = Array<String>(strings.size()) { "" };
+    var nativeInputStrings : ArrayList<String> = strings.toArrayList() as ArrayList<String>;
+
+    decryptionPromise = promise;
+
+    if(privateKey === null) {
+      return promise.resolve("Private key does not exist")
+    }
+    
+    cryptographyScope.launch {
+      val decryptionRoutines =  
+        nativeInputStrings.mapIndexed{ index, it -> 
+          cryptographyScope.launch {
+          try {
+            results[index] = decryptString(encryptionType,privateKey,it);
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error decrypting string in coroutine",e)
+          }
+        }
+      }
+      decryptionRoutines.joinAll();
+      decryptionPromise?.resolve(Arguments.fromArray(results))
+      decryptionPromise = null;
+    }
+  }
+
+  @ReactMethod
+  fun decryptStringsWithIdentifier(
+  alias : String,
+  algorithm : String,
+  blockMode : String,
+  padding : String,
+  stringsWithIndex: ReadableArray,
+  promise : Promise) {
+    val encryptionType = generateCipherString(algorithm,blockMode,padding);
+    //retrieve key from keystore
+    val privateKey = loadPrivateKey(alias,"AndroidKeyStore");
+    //var results : WritableArray = Arguments.createArray();
+    var results : ArrayList<Map<String,Any>> = ArrayList<Map<String,Any>>();
+    var jsResults : WritableArray = Arguments.createArray();
+    var nativeInputStrings : ArrayList<Map<String,Any>> = stringsWithIndex.toArrayList() as ArrayList<Map<String,Any>>;
 
     if(privateKey === null) {
       return promise.resolve("Private key does not exist")
     }
 
-    //init cipher according to RSA/ECB/OAEPWithSHA-256AndMGF1Padding scheme
-    val cipher : Cipher = initialiseCipher(encryptionType, privateKey);
+    decryptionPromise = promise;
+    
+    cryptographyScope.launch {
+      val decryptionRoutines =  
+        nativeInputStrings.map{ it -> 
+          cryptographyScope.launch {
+          try {
+            val resultObject = decryptWithIdentifier(
+              encryptionType,
+              privateKey,
+              it
+            )
+            withContext(coroutineResultContext) {
+              results.add(resultObject);
+            }
+          }
+          catch(e : Exception) {
+            Log.e(TAG, "error decrypting string in coroutine",e)
+            results.add(mapOf(
+              "identifier" to it["identifier"] as String,
+              "text" to "An error occurred attemping to decrypt this message"
+            ))
+          }
+        }
+      }
+      decryptionRoutines.joinAll();
+      for(result in results) {
+        var jsResult : WritableMap = Arguments.createMap();
+        jsResult.putString("text",result["text"] as String);
+        jsResult.putString("identifier",result["identifier"] as String);
+        jsResults.pushMap(jsResult);
+      }
+      decryptionPromise?.resolve(jsResults)
+      decryptionPromise = null;
+    }
+  }
 
-    //decode base64 string passed in from javscript
-    val encryptedStringAsBytes = Base64.decode(stringToDecrypt,Base64.DEFAULT);
-    //try to decrypt bytes and resolve promise accordingly
-    try {
-      val decryptedString = cipher.doFinal(encryptedStringAsBytes);
-      return promise.resolve(String(decryptedString))
-    }
-    catch(e : GeneralSecurityException) {
-      return promise.reject("Decrypt string error",e)
-    }
+  @ReactMethod
+  fun cancelCoroutineWork(promise : Promise) {
+    cryptographyScope.cancel();
+    cryptographyScope = CoroutineScope(SupervisorJob() + Dispatchers.Default);
+    decryptionPromise?.resolve(Arguments.createArray());
+    encryptionPromise?.resolve(Arguments.createArray());
+    promise.resolve(true);
   }
 
   private fun generateMessageDigest(message : String, algorithm : String) : ByteArray {

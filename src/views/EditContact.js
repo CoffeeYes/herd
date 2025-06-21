@@ -1,126 +1,133 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { View, TextInput, TouchableOpacity, Text, Dimensions, Image, Alert,
-         ActivityIndicator, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { View, TextInput, Text, ScrollView } from 'react-native';
 import Header from './Header';
 import {launchImageLibrary} from 'react-native-image-picker';
 import ContactImage from './ContactImage';
-import FlashTextButton from './FlashTextButton';
+import CloseButton from './CloseButton';
+import NavigationWarningWrapper from './NavigationWarningWrapper';
 
-import { getContactById, editContact, getContactByName, getContactsByKey, createContact } from '../realm/contactRealm';
-import { largeImageContainerStyle } from '../assets/styles';
 import Crypto from '../nativeWrapper/Crypto';
 
-import { updateContact, addContact } from '../redux/actions/contactActions';
+import { editContact, getContactsByKey, createContact } from '../realm/contactRealm';
+import { largeImageContainerStyle } from '../assets/styles';
+
+import { addContact } from '../redux/actions/contactActions';
 import { updateContactAndReferences } from '../redux/actions/combinedActions';
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize, useStateAndRef } from '../helper';
+import { encryptStrings } from '../common';
+import LoadingIndicator from './LoadingIndicator';
 
 const EditContact = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const originalContact = useSelector(state => state.contactReducer.contacts.find(contact => contact._id === route?.params?.id));
-  const customStyle = useSelector(state => state.chatReducer.styles);
-  const [name, _setName] = useState(originalContact?.name || "");
-  const [publicKey, _setPublicKey] = useState(originalContact?.key || "");
-  const [contactImage, _setContactImage] = useState(originalContact?.image || "");
-  const [editingExistingContact,_setEditingExistingContact] = useState(route?.params?.id?.length > 0);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
+  const ownPublicKey = useSelector(state => state.userReducer.publicKey);
   const [errors, setErrors] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [headerIcon, setHeaderIcon] = useState("save");
+  const [unsavedChanges, setUnsavedChanges, unsavedChangesRef] = useStateAndRef(false);
 
-  const nameRef = useRef(originalContact?.name || "");
-  const keyRef = useRef(originalContact?.key || "");
-  const imageRef = useRef(originalContact?.image || "");
-  const editingExistingContactRef = useRef(route?.params?.id?.length > 0);
-  const originalContactRef = useRef(originalContact || {});
+  const editingExistingContact = route?.params?.id?.length > 0;
 
-  //refs for accessing state in event listeners, used to prevent discarding unsaved changes
-  const setPublicKey = data => {
-    keyRef.current = data;
-    _setPublicKey(data);
-  }
-  const setName = data => {
-    nameRef.current = data;
-    _setName(data);
-  }
-  const setContactImage = data => {
-    imageRef.current = data;
-    _setContactImage(data);
-  }
-  const setEditingExistingContact = data => {
-    editingExistingContactRef.current = data;
-    _setEditingExistingContact(data);
-  }
+  const contactImageSize = useScreenAdjustedSize(0.4,0.25);
+
+  const [name, setName] = useState(originalContact?.name || route?.params?.name || "");
+  const [publicKey, setPublicKey] = useState(originalContact?.key || route?.params?.publicKey || "");
+  const [contactImage, setContactImage] = useState(originalContact?.image || "");
+
+  const publicKeyInputRef = useRef();
+  const scrollViewRef = useRef();
 
   useEffect(() => {
-    originalContactRef.current = originalContact
-  },[originalContact])
-
-  useEffect(() => {
-    if(!editingExistingContact) {
-      setContactImage("")
-      setPublicKey(route?.params?.publicKey || "");
-      setName(route?.params?.name || "");
+    return () => {
+      Crypto.cancelCoroutineWork();
     }
   },[])
 
   const save = async () => {
-    let errorSaving = []
-    try {
-      const encryptedTest = await Crypto.encryptStringWithKey(
-        publicKey.trim(),
-        Crypto.algorithm.RSA,
-        Crypto.blockMode.ECB,
-        Crypto.padding.OAEP_SHA256_MGF1Padding,
-        "test"
-      )
-    }
-    catch(e) {
+    setSaving(true);
+    let errorSaving = [];
+
+    if(publicKey.trim() === ownPublicKey.trim()) {
       errorSaving.push({
         type : "invalid_key",
-        message : "Invalid Public Key"
+        message : "You can not add your own key"
       })
     }
-
-    if(name.trim().length === 0) {
-      errorSaving.push({
-        type : "empty_fields",
-        message : "Username can not be empty"
-      });
+    else {
+      try {
+        await encryptStrings(
+          publicKey.trim(),
+          false,
+          ["test"]
+        )
+      }
+      catch(e) {
+        errorSaving.push({
+          type : "invalid_key",
+          message : "Invalid Public Key"
+        })
+      }
     }
 
-    const keyExists = getContactsByKey([publicKey.trim()]);
-    const nameExists = getContactByName(name.trim());
+    const existingContactWithKey = getContactsByKey([publicKey.trim()])[0];
 
-    if(keyExists != "" && keyExists[0].key != originalContact?.key) {
+    if(existingContactWithKey && existingContactWithKey.key != originalContact?.key) {
       errorSaving.push({
         type : "key_exists",
         message : "A user with this key already exists"
       });
     }
-    if(nameExists && nameExists.name != originalContact?.name) {
-      errorSaving.push({
-        type : "name_exists",
-        message : "A user with this name already exists"
-      });
-    }
 
     if(errorSaving.length > 0) {
       setErrors(errorSaving);
+      scrollViewRef.current.scrollTo({
+        y: 0,
+        animated: true,
+      });
+      setSaving(false);
       return false;
     }
 
     setErrors([]);
-    const newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage};
+    let newInfo = {name : name.trim(), key : publicKey.trim(), image : contactImage, ...(route?.params?.id && {_id : route.params.id})};
     if(editingExistingContact) {
-      editContact(route.params.id, newInfo);
-      dispatch(updateContactAndReferences({...newInfo,_id : route.params.id}));
+      const messagesUpdated = await editContact(newInfo);
+      if(!messagesUpdated) {
+        delete newInfo.key;
+      }
+      dispatch(updateContactAndReferences(newInfo));
+
+      setHeaderIcon("check");
+      setTimeout(() => {
+        setHeaderIcon("save");
+      },500)
     }
     else {
       const createdContact = createContact(newInfo);
       dispatch(addContact(createdContact));
       navigation.navigate('main');
     }
+    setSaving(false);
     return true;
+  }
+
+  const handleImageResponse = response => {
+    if(response.errorCode) {
+      setErrors([{
+        type : "image_error",
+        message : response.errorMessage
+      }])
+    }
+    else if(!response.didCancel) {
+      const {base64, type} = response?.assets?.[0];
+      if(base64 && type){
+        setContactImage("data:" + type + ";base64," + base64);
+      }
+    }
   }
 
   const editImage = async () => {
@@ -129,133 +136,122 @@ const EditContact = ({ route, navigation }) => {
       mediaType : 'photo',
       includeBase64 : true
     }
-    launchImageLibrary(options,response => {
-      if(response.errorCode) {
-        setErrors([{
-          type : "image_error",
-          message : response.errorMessage
-        }])
-      }
-      else if(!response.didCancel) {
-        setContactImage("data:" + response.type + ";base64," + response.base64);
-      }
-    });
+    const response = await launchImageLibrary(options);
+    handleImageResponse(response)
   }
 
-
   useEffect(() => {
-    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
-      e.preventDefault();
+    const unsavedChanges = editingExistingContact ? (
+      originalContact.name.trim() != name.trim() ||
+      originalContact.key.trim() != publicKey.trim() ||
+      originalContact.image != contactImage
+    ) 
+    :
+    (
+      name.trim().length > 0 ||
+      publicKey.trim().length > 0 ||
+      contactImage.trim().length > 0
+    )
+    setUnsavedChanges(unsavedChanges);
+  },[contactImage,name,publicKey,originalContact])
 
-      const unsavedChanges = (
-        originalContactRef?.current?.name?.trim() != nameRef?.current?.trim() ||
-        originalContactRef?.current?.key?.trim() != keyRef?.current?.trim() ||
-        originalContactRef?.current?.image != imageRef?.current
-      )
-
-      if(unsavedChanges && editingExistingContactRef.current) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure to discard them and leave the screen?',
-          [
-            {
-              text: 'Discard',
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-            { text: "Stay", style: 'cancel', onPress: () => {} },
-          ]
-        );
-      }
-      else {
-        navigation.dispatch(e.data.action);
-      }
-    })
-
-    return beforeGoingBack;
-  },[navigation])
+  const hideSaveButton = () => {
+    return (
+      !unsavedChanges &&
+      headerIcon !== "check" ||
+      publicKey.trim().length == 0 ||
+      name.trim().length == 0
+    )
+  }
 
   return (
-    <>
-      <Header title={editingExistingContact ? "Edit Contact" : "Add Contact"} allowGoBack/>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
+    <NavigationWarningWrapper
+    checkForChanges={() => unsavedChangesRef.current}>
 
-        <TouchableOpacity
-        style={largeImageContainerStyle}
-        onPress={editImage}>
+      <Header
+      title={editingExistingContact ? "Edit Contact" : "Add Contact"}
+      allowGoBack
+      rightButtonIcon={!hideSaveButton() && headerIcon}
+      useAlternativeIcon={saving}
+      alternativeIcon={<LoadingIndicator/>}
+      rightButtonOnClick={save}/>
+
+      <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps='handled'>
+        
+        <View style={styles.imageContainer}>
+
           <ContactImage
+          containerStyle={largeImageContainerStyle}
           imageURI={contactImage}
           iconSize={64}
-          imageWidth={Dimensions.get("window").width * 0.4}
-          imageHeight={Dimensions.get("window").height * 0.4}/>
-        </TouchableOpacity>
+          onPress={editImage}
+          size={contactImageSize}/>
+
+          {contactImage.length > 0 &&
+          <CloseButton onPress={() => setContactImage("")}/>}
+
+        </View>
 
         {errors.map(error => {
           return (
-            <Text key={error.type} style={{...styles.error, fontSize : customStyle.uiFontSize}}>{error.message}</Text>
+            <Text key={error.type} style={{...styles.error, fontSize : customStyle.scaledUIFontSize}}>{error.message}</Text>
           )
         })}
 
-        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Name</Text>
-        <TextInput
-        style={{...styles.input,fontSize : customStyle.uiFontSize}}
-        onChangeText={text => setName(text)}
-        value={name}/>
+        <View style={styles.inputContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.scaledUIFontSize}}>Name</Text>
+            <TextInput
+            style={{...styles.input, fontSize : customStyle.scaledUIFontSize}}
+            onChangeText={text => setName(text)}
+            onSubmitEditing={() => {
+              if(publicKey.length == 0 && name.trim().length != 0) {
+                publicKeyInputRef.current.focus()
+              }
+              else if(!hideSaveButton()) {
+                save();
+              }
+            }}
+            value={name}/>
+          </View>
 
-        <Text style={{...styles.inputTitle,fontSize : customStyle.uiFontSize}}>Public Key</Text>
-        <TextInput
-        multiline={editingExistingContact}
-        style={{...styles.input,fontSize : customStyle.uiFontSize}}
-        onChangeText={text => setPublicKey(text)}
-        value={publicKey}/>
-
-        <FlashTextButton
-        normalText="Save"
-        flashText="Saved!"
-        onPress={save}
-        timeout={editingExistingContact ? 500 : 0}
-        disabled={
-          (name.trim().length === 0 || publicKey.trim().length === 0) ||
-          (name.trim() === originalContact?.name?.trim() &&
-          publicKey.trim() === originalContact?.key?.trim() &&
-          contactImage === originalContact?.image)
-        }
-        buttonStyle={styles.button}
-        textStyle={styles.buttonText}/>
+          <View style={{width : "100%"}}>
+            <Text style={{...styles.inputTitle,fontSize : customStyle.scaledUIFontSize}}>Public Key</Text>
+            <TextInput
+            ref={publicKeyInputRef}
+            multiline={editingExistingContact}
+            blurOnSubmit
+            style={{...styles.input,fontSize : customStyle.scaledUIFontSize}}
+            onChangeText={text => setPublicKey(text)}
+            onSubmitEditing={() => !hideSaveButton() && save()}
+            value={publicKey}/>
+          </View>
+        </View>
       </ScrollView>
-    </>
+    </NavigationWarningWrapper>
   )
 }
 
 const styles = {
   container : {
-    padding : 20,
+    padding : 30,
     alignItems : "flex-start"
-  },
-  button : {
-    backgroundColor : palette.primary,
-    padding : 10,
-    alignSelf : "center",
-    marginTop : 10,
-    borderRadius : 5,
-  },
-  buttonText : {
-    color : palette.white,
-    fontWeight : "bold",
-    textAlign : "center",
-    ...(Platform.OS === 'android' && {fontFamily : "Open-Sans"})
   },
   input : {
     borderColor: palette.gray,
     borderWidth: 1,
     marginBottom : 10,
-    width : Dimensions.get('window').width * 0.9,
+    width : "100%",
     alignSelf : "center",
     padding : 10,
     backgroundColor : palette.white,
     borderRadius : 5
+  },
+  inputContainer : {
+    width : "100%"
   },
   inputTitle : {
     fontWeight : "bold",
@@ -265,6 +261,10 @@ const styles = {
     color : palette.red,
     fontWeight : "bold",
     alignSelf : "center"
+  },
+  imageContainer : {
+    alignSelf : "center",
+    flexDirection : "row"
   }
 }
 

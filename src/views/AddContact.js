@@ -1,25 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Text, View, TouchableOpacity, Alert } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useFocusEffect } from '@react-navigation/native';
+import { View } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
-import Crypto from '../nativeWrapper/Crypto';
+import PermissionManager from '../nativeWrapper/PermissionManager';
 import Header from './Header';
 import Card from './Card';
+import ConfirmationModal from './ConfirmationModal';
 
 import QRCodeModal from './QRCodeModal';
-import LocationModal from './LocationModal';
+import PermissionModal from './PermissionModal';
 
 import { palette } from '../assets/palette';
 
 import { setLockable } from '../redux/actions/appStateActions';
 
+import { useScreenAdjustedSize } from '../helper';
+import { checkOrRequestConnectionServices, requestMakeDiscoverable, requestPermissionsForBluetooth } from '../common';
+
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [BTError,setBTError] = useState("");
+  const [bluetoothError,setBluetoothError] = useState("");
   const [showQRCode, setShowQRCode] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [requestedPermissions, setRequestedPermissions] = useState([]);
+  const [requestingPermissions, setRequestingPermissions] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const publicKey = useSelector(state => state.userReducer.publicKey);
+
+  const iconSize = useScreenAdjustedSize(0.35,0.075);
+
+  const navigating = useRef(false);
 
   useEffect(() => {
     initialBTCheck();
@@ -29,75 +40,86 @@ const AddContact = ({ navigation }) => {
     let adapter = await Bluetooth.checkForBTAdapter();
 
     if(!adapter) {
-      return setBTError("No Bluetooth Adapters Found");
+      return setBluetoothError("No Bluetooth Adapters Found");
     }
   }
 
   const requestBTPermissions = async () => {
-    setBTError("");
-    const btEnabled = await Bluetooth.checkBTEnabled();
-    const locationAllowed = await Bluetooth.checkLocationPermission();
-    const locationEnabled = await Bluetooth.checkLocationEnabled();
+    setBluetoothError("");
+    setRequestedPermissions([]);
+    setRequestingPermissions(true);
+    //disable lockability so that lockscreen doesn't crop up when a modal is shown
     dispatch(setLockable(false));
-    if(!btEnabled) {
-      await Bluetooth.requestBTEnable()
+
+    const missingPermissions = await requestPermissionsForBluetooth();
+    
+    if(missingPermissions.length > 0) {
+      setRequestedPermissions(missingPermissions);
+      setShowPermissionModal(true);
+      dispatch(setLockable(true));
+      setRequestingPermissions(false);
+      return;
     }
-    if (!locationAllowed) {
-      const locationRequest = await Bluetooth.requestLocationPermissions();
-      if(!locationRequest) {
-        setShowLocationModal(true);
-        dispatch(setLockable(true));
-        return;
+
+    const connectionServices = await checkOrRequestConnectionServices();
+
+    if(!connectionServices.enabled) {
+      dispatch(setLockable(true));
+      if(connectionServices.missing == "location") {
+        setShowConfirmationModal(true);
       }
+      return;
     }
-    if (!locationEnabled) {
-      Alert.alert(
-        "Location",
-        "Location is required to run in the background, enable it now?",
-        [
-          {text : "No"},
-          {text : "Yes", onPress : async () => await Bluetooth.requestLocationEnable()}
-        ]
-      )
-    }
-    else {
-      await Bluetooth.requestBTMakeDiscoverable(60) &&
-      navigation.navigate("BTDeviceList");
-    }
+
+    let discoverable = await requestMakeDiscoverable();
+
+    discoverable &&
+    navigation.navigate("BTDeviceList");
+
     dispatch(setLockable(true));
+    setRequestingPermissions(false);
   }
 
-  const locationModalDescription = `Herd requires location permissions in order to connect \
+  const permissionModalDescription = `Herd requires permissions in order to connect \
 with other phones using bluetooth.`;
 
-  const locationModalInstructionText = `Please navigate to Herd's app settings and select \
-'allow all the time' under location permissions in order to use bluetooth to add a contact.`;
+  const permissionModalInstructionText = `Please navigate to Herd's app settings and select \
+'allow all the time' under for the following permissions in order to use bluetooth to add a contact.`;
+
+  useFocusEffect(() => {
+    navigating.current = false;
+  })
+
+  const navigate = (target,params) => {
+    if(!navigating.current && !showQRCode && !showPermissionModal) {
+      navigating.current = true;
+      navigation.navigate(target,params);
+    }
+  }
 
   return (
     <>
-      <Header allowGoBack title="Add Contact" />
+      <Header allowGoBack disableBackButton={navigating.current || showQRCode || showPermissionModal} title="Add Contact" />
 
       <View style={styles.mainContainer}>
         <View style={styles.row}>
 
           <Card
-          onPress={requestBTPermissions}
-          disabled={BTError.length > 0}
-          cardStyle={BTError.length > 0 ?
-            styles.cardDisabled
-            :
-            styles.leftCard
-          }
-          errorText={BTError}
+          onPress={() => !navigating.current && !showQRCode && requestBTPermissions()}
+          disabled={bluetoothError.length > 0}
+          cardStyle={styles.leftCard}
+          disabledStyle={styles.cardDisabled}
+          errorText={bluetoothError}
           icon="bluetooth-searching"
-          iconSize={120}
+          iconSize={iconSize}
           text="Start Bluetooth Scan"/>
 
           <Card
-          onPress={() => navigation.navigate("editContact")}
+          onPress={() => navigate("editContact")}
+          disabled={requestingPermissions}
           cardStyle={styles.rightCard}
           icon="import-export"
-          iconSize={120}
+          iconSize={iconSize}
           text="Import Key"/>
 
         </View>
@@ -105,17 +127,22 @@ with other phones using bluetooth.`;
         <View style={styles.row}>
 
           <Card
-          onPress={() => setShowQRCode(true)}
+          onPress={() => !navigating.current && !showPermissionModal && setShowQRCode(true)}
           cardStyle={styles.leftCard}
+          disabled={requestingPermissions}
           icon="qr-code-2"
-          iconSize={120}
+          iconSize={iconSize}
           text="Show My QR Code"/>
 
           <Card
-          onPress={() => navigation.navigate("QRScanner")}
+          onPress={() => {
+            dispatch(setLockable(false));
+            navigate("QRScanner")
+          }}
           cardStyle={styles.rightCard}
+          disabled={requestingPermissions}
           icon="qr-code-scanner"
-          iconSize={120}
+          iconSize={iconSize}
           text="Scan QR Code"/>
 
         </View>
@@ -128,16 +155,31 @@ with other phones using bluetooth.`;
       title="My Key"
       value={{key : publicKey}}/>
 
-      <LocationModal
-      visible={showLocationModal}
-      modalOnPress={() => setShowLocationModal(false)}
-      onRequestClose={() => setShowLocationModal(false)}
+      <PermissionModal
+      useCloseButton
+      disableOnPress
+      icon="location-on"
+      visible={showPermissionModal}
+      onRequestClose={() => setShowPermissionModal(false)}
       buttonOnPress={() => {
-        setShowLocationModal(false);
-        Bluetooth.navigateToApplicationSettings();
+        setShowPermissionModal(false);
+        PermissionManager.navigateToSettings(PermissionManager.navigationTargets.settings);
       }}
-      description={locationModalDescription}
-      instructionText={locationModalInstructionText}/>
+      permissions={requestedPermissions}
+      description={permissionModalDescription}
+      instructionText={permissionModalInstructionText}/>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      titleText="Location needs to be enabled to perform a bluetooth scan, enable it now?"
+      confirmText='Yes'
+      cancelText='No'
+      onConfirm={() => {
+        PermissionManager.navigateToSettings(PermissionManager.navigationTargets.locationSettings)
+        setShowConfirmationModal(false);
+      }}
+      onCancel={() => setShowConfirmationModal(false)}
+      />
     </>
   )
 }
@@ -160,6 +202,9 @@ const styles = {
     flexDirection : "row",
     marginTop : 10,
     flex : 1
+  },
+  modalContent : {
+    backgroundColor : palette.white
   }
 }
 

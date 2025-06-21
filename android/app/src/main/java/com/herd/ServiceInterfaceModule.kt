@@ -13,6 +13,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 
 import com.herd.HerdBackgroundService
 import com.herd.StorageInterface
+import com.herd.HerdMessage
 
 import android.app.Service
 import android.content.ServiceConnection
@@ -21,8 +22,6 @@ import android.content.Context
 import android.app.Activity
 import android.app.ActivityManager
 import android.os.Bundle
-import android.os.Parcelable
-import android.os.Parcel
 import android.os.IBinder
 import android.util.Log
 import kotlinx.parcelize.Parcelize
@@ -31,47 +30,61 @@ import android.content.ComponentName
 import android.content.BroadcastReceiver
 import android.content.IntentFilter
 
-/* @Parcelize */
-class HerdMessage(
-  val _id : String,
-  val to : String,
-  val from : String,
-  val text : String,
-  val timestamp : Long
-) : Parcelable {
-  companion object {
-    @JvmField
-    val CREATOR = object : Parcelable.Creator<HerdMessage> {
-      override fun createFromParcel(parcel : Parcel) : HerdMessage {
-        return HerdMessage(parcel);
-      }
-
-      override fun newArray(size: Int) = arrayOfNulls<HerdMessage>(size)
-    }
-  }
-
-  private constructor(parcel: Parcel) : this(
-        _id = parcel.readString() as String,
-        to = parcel.readString() as String,
-        from = parcel.readString() as String,
-        text = parcel.readString() as String,
-        timestamp = parcel.readLong()
-  )
-  override fun writeToParcel(parcel: Parcel, flags: Int) {
-      parcel.writeString(_id)
-      parcel.writeString(to)
-      parcel.writeString(from)
-      parcel.writeString(text)
-      parcel.writeLong(timestamp)
-  }
-
-  override fun describeContents() = 0
-}
+import android.bluetooth.BluetoothAdapter
+import android.location.LocationManager
+import android.app.NotificationManager
 
 class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   val context = reactContext;
   private final val TAG = "HerdServiceInterface";
   private lateinit var service : HerdBackgroundService;
+
+  object storageStrings {
+    val SAVED_MESSAGE_QUEUE = "savedMessageQueue";
+    val SAVED_MESSAGE_QUEUE_SIZES = "savedMessageQueueSizes";
+    val MESSAGES_TO_REMOVE = "messagesToRemove";
+    val MESSAGES_TO_REMOVE_SIZES = "messagesToRemoveSizes";
+  }
+
+  private final val storageStringMap : Map<String,String> = mapOf(
+    "SAVED_MESSAGE_QUEUE" to storageStrings.SAVED_MESSAGE_QUEUE,
+    "SAVED_MESSAGE_QUEUE_SIZES" to storageStrings.SAVED_MESSAGE_QUEUE_SIZES,
+    "MESSAGES_TO_REMOVE" to storageStrings.MESSAGES_TO_REMOVE,
+    "MESSAGES_TO_REMOVE_SIZES" to storageStrings.MESSAGES_TO_REMOVE_SIZES
+  )
+
+  object messageTypeStrings {
+    val COMPLETED_MESSAGES = "completed";
+    val RECEIVED_MESSAGES = "received";
+  }
+
+  private final val messageTypeStringMap : Map<String,String> = mapOf(
+    "COMPLETED_MESSAGES" to messageTypeStrings.COMPLETED_MESSAGES,
+    "RECEIVED_MESSAGES" to messageTypeStrings.RECEIVED_MESSAGES
+  )
+
+  object bluetoothErrorStrings {
+    val LOCATION_DISABLED = "LOCATION_DISABLED";
+    val ADAPTER_TURNED_OFF = "ADAPTER_TURNED_OFF";
+  }
+
+  private final val bluetoothErrorStringMap : Map<String,String> = mapOf(
+    "LOCATION_DISABLED" to bluetoothErrorStrings.LOCATION_DISABLED,
+    "ADAPTER_TURNED_OFF" to bluetoothErrorStrings.ADAPTER_TURNED_OFF
+  )
+
+  object emitterStrings {
+    val NEW_MESSAGES_RECEIVED = "newHerdMessagesReceived";
+    val REMOVE_MESSAGES_FROM_QUEUE = "removeMessagesFromQueue";
+    val BLUETOOTH_LOCATION_STATE_CHANGE = "bluetoothOrLocationStateChange";
+  }
+
+  private final val emitterStringMap : Map<String,String> = mapOf(
+    "NEW_MESSAGES_RECEIVED" to emitterStrings.NEW_MESSAGES_RECEIVED,
+    "REMOVE_MESSAGES_FROM_QUEUE" to emitterStrings.REMOVE_MESSAGES_FROM_QUEUE,
+    "BLUETOOTH_LOCATION_STATE_CHANGE" to emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE
+  )
+
   private var bound : Boolean = false;
 
   var serviceConnection = object : ServiceConnection {
@@ -90,16 +103,29 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   private final val messageReceiver = object : BroadcastReceiver() {
     override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action;
-      if(action == "com.herd.NEW_HERD_MESSAGE_RECEIVED") {
-        val bundle : Bundle? = intent.getExtras();
-        val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
-        Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
-        if(messages != null && (messages?.size as Int) > 0) {
-          val messageArray = createArrayFromMessages(messages as ArrayList<HerdMessage>);
-          //pass object to JS through event emitter
-          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
-          .emit("newHerdMessagesReceived",messageArray);
+      val emitterString : String? = intent.action;
+      val bundle : Bundle? = intent.getExtras();
+      val messages : ArrayList<HerdMessage>? = bundle?.getParcelableArrayList("messages");
+      Log.i(TAG,"Received ${messages?.size} new messages in messageReceiver");
+      if(messages != null && messages.size > 0 && emitterString != null && emitterString.length > 0) {
+        Log.i(TAG,"emitting messages to JS side with emitterString : ${emitterString}")
+        val messageArray = HerdMessage.toWritableArray(messages);
+        //pass object to JS through event emitter
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterString,messageArray);
+      }
+    }
+  }
+    
+  private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val errorNotificationType = HerdBackgroundService.checkForBluetoothOrLocationError(context, intent);
+      if(errorNotificationType.length > 0) {
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE,errorNotificationType);
+        
+        if(bound) {
+          unbindService();
         }
       }
     }
@@ -107,6 +133,15 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
 
   override fun getName(): String {
       return "ServiceInterfaceModule"
+  }
+
+  override fun getConstants() : Map<String, Any> {
+    return mapOf(
+      "emitterStrings" to emitterStringMap,
+      "storage" to storageStringMap,
+      "bluetoothErrors" to bluetoothErrorStringMap,
+      "messageTypes" to messageTypeStringMap
+    )
   }
 
   @ReactMethod
@@ -119,68 +154,26 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       Log.i(TAG,"removeListeners called, count : $count")
   }
 
-  fun createMessageFromObject(messageObject : ReadableMap) : HerdMessage {
-    val message : HerdMessage = HerdMessage(
-      messageObject.getString("_id") as String,
-      messageObject.getString("to") as String,
-      messageObject.getString("from") as String,
-      messageObject.getString("text") as String,
-      //getDouble is the only way to get a long from JS as it is not natively supported in JS
-      messageObject.getDouble("timestamp").toLong()
-    )
-    return message;
-  }
-
-  fun createObjectFromMessage(message : HerdMessage) : WritableMap {
-    val messageObject : WritableMap = Arguments.createMap();
-    messageObject.putString("_id",message._id);
-    messageObject.putString("to",message.to);
-    messageObject.putString("from",message.from);
-    messageObject.putString("text",message.text);
-    //cast int to double to get 64 bit "long" in JS as JS doesnt support longs
-    messageObject.putDouble("timestamp",message.timestamp.toDouble());
-    return messageObject;
-  }
-
-  fun createMessagesFromArray(messageArray : ReadableArray) : ArrayList<HerdMessage> {
-    val messages : ArrayList<HerdMessage> = ArrayList();
-    for(i in 0 until messageArray.size()) {
-      val currentMessageObject : HerdMessage = createMessageFromObject(messageArray.getMap(i));
-      messages.add(currentMessageObject);
-    }
-    return messages;
-  }
-
-  fun createArrayFromMessages(herdMessages : ArrayList<HerdMessage>) : WritableArray {
-    var messages : WritableArray = Arguments.createArray();
-    try {
-      for(message in herdMessages) {
-        val newMessage : WritableMap = createObjectFromMessage(message);
-        messages.pushMap(newMessage)
-      }
-    }
-    catch(e : Exception) {
-      Log.e(TAG,"Error parsing herd messages",e);
-    }
-    return messages;
-  }
-
   @ReactMethod
   fun enableService(
     messageQueue : ReadableArray,
     receivedMessagesForSelf : ReadableArray,
     deletedReceivedMessages : ReadableArray,
-    publicKey : String) {
-      val msgQ : ArrayList<HerdMessage> = createMessagesFromArray(messageQueue);
-      val deletedMessages = createMessagesFromArray(deletedReceivedMessages);
-      val receivedMessages = createMessagesFromArray(receivedMessagesForSelf);
+    publicKey : String,
+    allowNotifications : Boolean) {
+      val msgQ : ArrayList<HerdMessage> = HerdMessage.toArrayList(messageQueue);
+      val deletedMessages = HerdMessage.toArrayList(deletedReceivedMessages);
+      val receivedMessages = HerdMessage.toArrayList(receivedMessagesForSelf);
       val activity : Activity? = context.getCurrentActivity();
       val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
       serviceIntent.putExtra("messageQueue",msgQ);
       serviceIntent.putExtra("publicKey",publicKey);
       serviceIntent.putExtra("deletedMessages",deletedMessages);
       serviceIntent.putExtra("receivedMessagesForSelf",receivedMessages);
-      context.registerReceiver(messageReceiver,IntentFilter("com.herd.NEW_HERD_MESSAGE_RECEIVED"));
+      serviceIntent.putExtra("allowNotifications",allowNotifications);
+      val messageIntentFilter = IntentFilter(emitterStrings.NEW_MESSAGES_RECEIVED);
+      messageIntentFilter.addAction(emitterStrings.REMOVE_MESSAGES_FROM_QUEUE);
+      context.registerReceiver(messageReceiver,messageIntentFilter);
       context.startService(serviceIntent);
       context.bindService(serviceIntent,serviceConnection,Context.BIND_AUTO_CREATE);
   }
@@ -188,7 +181,7 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   @ReactMethod
   fun addMessageToService(message : ReadableMap,promise : Promise) {
     if(bound) {
-      val msgParcel : HerdMessage = createMessageFromObject(message);
+      val msgParcel = HerdMessage(message);
       promise.resolve(service.addMessageToQueue(msgParcel))
     }
     else {
@@ -197,10 +190,10 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   }
 
   @ReactMethod
-  fun removeMessagesFromService(messages : ReadableArray, promise : Promise) {
+  fun removeMessagesFromService(messageIDs : ReadableArray, promise : Promise) {
     if(bound) {
-      val messagesToDelete : ArrayList<HerdMessage> = createMessagesFromArray(messages);
-      promise.resolve(service.removeMessage(messagesToDelete));
+      val nativeMessageIDs : ArrayList<String> = messageIDs.toArrayList() as ArrayList<String>;
+      promise.resolve(service.removeMessages(nativeMessageIDs));
     }
     else {
       promise.resolve(false);
@@ -211,28 +204,24 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
   fun addDeletedMessagesToService(messages : ReadableArray, promise : Promise) {
     var success : Boolean = false;
     if(bound) {
-      val msgArray : ArrayList<HerdMessage> = createMessagesFromArray(messages);
+      val msgArray : ArrayList<HerdMessage> = HerdMessage.toArrayList(messages);
       success = service.addMessagesToDeletedList(msgArray);
     }
     promise.resolve(success);
   }
 
   @ReactMethod
-  fun getReceivedMessages(promise : Promise) {
+  fun getMessages(name : String, promise : Promise) {
     var messages : WritableArray = Arguments.createArray();
     if(bound) {
-      val herdMessages : ArrayList<HerdMessage> = service.getReceivedMessages();
-      messages = createArrayFromMessages(herdMessages);
-    }
-    promise.resolve(messages);
-  }
-
-  @ReactMethod
-  fun getCompletedMessages(promise : Promise) {
-    var messages : WritableArray = Arguments.createArray();
-    if(bound) {
-      val herdMessages : ArrayList<HerdMessage> = service.getCompletedMessages();
-      messages = createArrayFromMessages(herdMessages);
+      var herdMessages = ArrayList<HerdMessage>();
+      if(name == messageTypeStrings.RECEIVED_MESSAGES) {
+        herdMessages = service.getReceivedMessages();
+      }
+      else if(name == messageTypeStrings.COMPLETED_MESSAGES) {
+        herdMessages = service.getCompletedMessages();
+      }
+      messages = HerdMessage.toWritableArray(herdMessages);
     }
     promise.resolve(messages);
   }
@@ -244,29 +233,97 @@ class ServiceInterfaceModule(reactContext: ReactApplicationContext) : ReactConte
       messageFilename,
       sizesFilename
     );
-    val messages : WritableArray = createArrayFromMessages(cachedMessages)
+    val messages : WritableArray = HerdMessage.toWritableArray(cachedMessages)
     promise.resolve(messages);
     storageInterface.deleteStoredMessages(messageFilename,sizesFilename);
+  }
+
+  @ReactMethod
+  fun unbindService() {
+    try {
+      context.unbindService(serviceConnection);
+      bound = false;
+    }
+    catch(e : Exception) {
+      Log.e(TAG,"Error unbinding service : $e")
+    }
   }
 
   @ReactMethod
   fun disableService() {
     val activity : Activity? = context.getCurrentActivity();
     val serviceIntent : Intent = Intent(activity, HerdBackgroundService::class.java);
+    unbindService();
     try {
-      context.unbindService(serviceConnection);
       context.stopService(serviceIntent);
     }
     catch(e : Exception) {
-      Log.e(TAG,"Error unbinding and stopping service service : $e")
+      Log.e(TAG,"Error stopping service : $e")
     }
     try {
       context.unregisterReceiver(messageReceiver);
     }
     catch(e : Exception) {
-      Log.e(TAG,"error unregistering message receiver : $e")
+      Log.e(TAG,"error unregistering broadcastReceivers : $e")
     }
     bound = false;
+  }
+
+  @ReactMethod
+  fun sendNotification(title : String, text : String, promise : Promise) {
+    if(HerdBackgroundService.running) {
+      val notificationID = service.sendNotification(title,text);
+      promise.resolve(notificationID);
+    }
+    else {
+      promise.resolve(null);
+    }
+  }
+
+  @ReactMethod
+  fun notificationIsPending(notificationID : Int, promise : Promise) {
+    promise.resolve(service.notificationIsPending(notificationID));
+  }
+
+  //we must register/unregister receiver with frontend mount/unmount as there is no
+  //functional counterpart to init() in kotlin which would allow us to unregister the
+  //receiver on object destruction.
+  @ReactMethod
+  fun setFrontendRunning(running : Boolean) {
+    if(HerdBackgroundService.running) {
+      service.setFrontendRunning(running);
+    }
+    if(running) {
+      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
+      context.registerReceiver(locationAndBTStateReceiver,bluetoothLocationFilter);
+    }
+    else {
+      context.unregisterReceiver(locationAndBTStateReceiver);
+    }
+  }
+
+  @ReactMethod
+  fun setAllowNotifications(allow : Boolean) {
+    if(HerdBackgroundService.running) {
+      service.setAllowNotifications(allow);
+    }
+  }
+
+  @ReactMethod
+  fun notificationsAreEnabled(promise : Promise) {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    promise.resolve(notificationManager.areNotificationsEnabled());
+  }
+
+  @ReactMethod
+  fun updateNotification(title : String, text : String, notificationID : Int) {
+    service.sendNotification(title,text,notificationID);
+  }
+
+  @ReactMethod
+  fun isBound(promise : Promise) {
+    promise.resolve(bound);
   }
 
   @ReactMethod

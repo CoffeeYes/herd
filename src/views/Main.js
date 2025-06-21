@@ -1,5 +1,4 @@
-import React, {useState, useEffect} from 'react';
-import { View, ScrollView, Text, TouchableOpacity} from 'react-native';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { palette } from '../assets/palette';
@@ -9,10 +8,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Chats from './Chats';
 import Contacts from './Contacts';
 import Settings from './Settings';
+import { useScreenAdjustedSize } from '../helper';
 
 const Tab = createBottomTabNavigator();
 
-const Main = ({ navigation, route }) => {
+const Main = ({ route }) => {
+
+    const iconSize = useScreenAdjustedSize(0.07,0.04);
+    const tabBarHeight = useScreenAdjustedSize(0.075,0.15,"height",1,0.7,undefined,1000);
 
     return(
       <Tab.Navigator
@@ -22,16 +25,10 @@ const Main = ({ navigation, route }) => {
         tabBarShowLabel : false,
         tabBarInactiveTintColor: palette.black,
         tabBarActiveTintColor: palette.primary,
-        tabBarIcon : ({ color, size }) => {
-          if(route.name === "chats") {
-            return <Icon name="chat" size={size} color={color}/>
-          }
-          else if (route.name === "contacts") {
-            return <Icon name="contacts" size={size} color={color}/>
-          }
-          else if (route.name === "settings") {
-            return <Icon name="settings" size={size} color={color}/>
-          }
+        tabBarStyle : {height : tabBarHeight},
+        tabBarIconStyle : {width : iconSize},
+        tabBarIcon : ({ color }) => {
+          return <Icon name={route.name === "chats" ? "chat" : route.name} size={iconSize} color={color}/>
         }
       })}>
         <Tab.Screen name="chats" component={Chats} />
@@ -39,26 +36,6 @@ const Main = ({ navigation, route }) => {
         <Tab.Screen name="settings" component={Settings} />
       </Tab.Navigator>
     )
-}
-
-const styles = {
-  navContainer : {
-    backgroundColor : palette.white,
-    flexDirection : "row",
-    justifyContent : "space-between",
-    width : "100%"
-  },
-  navItem : {
-    padding : 20,
-    flex : 1,
-    alignItems : "center"
-  },
-  navItemActive : {
-    padding : 20,
-    flex : 1,
-    alignItems : "center",
-    backgroundColor : palette.primary
-  }
 }
 
 export default Main

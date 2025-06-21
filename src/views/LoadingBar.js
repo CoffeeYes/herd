@@ -3,51 +3,63 @@ import { View, Animated } from 'react-native';
 
 import { palette } from '../assets/palette';
 
-const LoadingBar = ({containerStyle, loadingBarStyle, barColor, sliderColor, animationDuration = 500}) => {
+const LoadingBar = ({containerStyle, loadingBarStyle, numBars = 1,
+                     barColor = palette.grey, sliderColor = palette.black,
+                     animationDuration = 500, paused = false}) => {
   const loadingViewPosition = useRef(new Animated.Value(0)).current;
-  const [containerWidth, setContainerWidth] = useState(0);
-  const [barWidth, setBarWidth] = useState(0);
-  const [animationStarted, setAnimationStarted] = useState(false);
+  const [outerWidth , setOuterWidth] = useState(0);
+  const [innerWidth, setInnerWidth] = useState(0);
 
-  const moveToEnd = () => {
-    return Animated.timing(loadingViewPosition, {
-      toValue: containerWidth - barWidth,
-      duration: animationDuration,
-      useNativeDriver : false
-    }).start(moveToBeginning)
-  }
+  let animationLoop;
+  const moveToEnd = Animated.timing(loadingViewPosition, {
+    toValue: outerWidth - innerWidth,
+    duration: animationDuration,
+    useNativeDriver : true,
+    isInteraction : false //https://github.com/facebook/react-native/issues/8624
+  })
 
-  const moveToBeginning = () => {
-    Animated.timing(loadingViewPosition, {
-      toValue: 0,
-      duration: animationDuration,
-      useNativeDriver : false
-    }).start(moveToEnd)
-  }
+  const moveToBeginning = Animated.timing(loadingViewPosition, {
+    toValue: 0,
+    duration: animationDuration,
+    useNativeDriver : true,
+    isInteraction : false
+  })
 
   useEffect(() => {
-    if (containerWidth > 0 && barWidth > 0 && !animationStarted && loadingViewPosition) {
-      setAnimationStarted(true);
-      moveToEnd();
+    animationLoop?.stop();
+    if(!paused) {
+      if(outerWidth > 0 && innerWidth > 0) {
+        animationLoop = Animated.loop(
+          Animated.sequence([
+            moveToEnd,
+            moveToBeginning
+          ])
+        ).start();
+      }
     }
-  },[containerWidth,barWidth,loadingViewPosition])
+  },[outerWidth, innerWidth, paused])
 
   return (
-    <View style={{
-      ...styles.loadingContainerView,
-      ...containerStyle,
-      ...(barColor && {backgroundColor : barColor})
-    }}
-    onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
-      <Animated.View
-      style={{
-        ...styles.loadingView,
-        ...loadingBarStyle,
-        marginLeft : loadingViewPosition,
-        ...(sliderColor && {backgroundColor : sliderColor})
+    [...Array(numBars).keys()].map(num => {
+    return (
+      <View key={num} style={{
+        ...styles.loadingContainerView,
+        ...containerStyle,
+        backgroundColor : barColor,
+        marginTop : (numBars > 1 && num > 0) ? 10: 0
       }}
-      onLayout={e => setBarWidth(e.nativeEvent.layout.width)}/>
-    </View>
+      onLayout={e => setOuterWidth(e.nativeEvent.layout.width)}>
+        <Animated.View
+        onLayout={e => setInnerWidth(e.nativeEvent.layout.width)}
+        style={{
+          ...styles.loadingView,
+          ...loadingBarStyle,
+          transform : [{translateX : loadingViewPosition}],
+          backgroundColor : sliderColor
+        }}/>
+      </View>
+    )
+    })
   )
 }
 
@@ -60,13 +72,11 @@ const styles = {
     alignSelf : "center",
     height : 10,
     borderRadius : 5,
-    backgroundColor : palette.grey,
     overflow : "hidden"
   },
   loadingView : {
     width : "20%",
     height : "100%",
-    backgroundColor : palette.black,
     borderRadius : 5
   }
 }

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import {palette} from '../assets/palette';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
-                    itemStyle, textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
+const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle, dropDownBoxStyle,
+                    textStyle, chosenStyle, choiceContainerStyle, choiceStyle }) => {
   const [open, setOpen] = useState(false);
   const [chosenIndex, setChosenIndex] = useState(defaultIndex);
 
@@ -12,23 +12,26 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
     setChosenIndex(index);
     setOpen(false);
 
-    onChangeOption &&
-    onChangeOption(index);
+    onChangeOption?.(index);
   }
   return (
     <View style={{...styles.container, ...containerStyle}}>
-      <TouchableOpacity style={{...styles.choice, borderBottomWidth : 2}} onPress={() => setOpen(!open)}>
+
+      <Pressable
+      style={{...styles.choice, borderBottomWidth : 2,...dropDownBoxStyle}}
+      onPress={() => setOpen(!open)}>
         <Text style={{...styles.text,...textStyle}}>{choices[chosenIndex].text}</Text>
         <Icon
         size={24}
         style={{marginLeft : "auto"}}
-        name="arrow-downward"/>
-      </TouchableOpacity>
+        name={open ? "arrow-back" : "arrow-downward"}/>
+      </Pressable>
+
       {open &&
       <View style={{...styles.choiceContainer, ...choiceContainerStyle}}>
         {choices.map((choice,index) => {
           return (
-            <TouchableOpacity
+            <Pressable
             activeOpacity={1}
             style={{
               ...styles.choice,
@@ -45,7 +48,7 @@ const Dropdown = ({ choices, defaultIndex = 0, onChangeOption, containerStyle,
               }}>
                 {choice.text}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           )
         })}
       </View>}

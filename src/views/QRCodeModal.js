@@ -1,28 +1,44 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text } from 'react-native';
 import { useSelector } from 'react-redux';
 import QRCode from 'react-native-qrcode-svg';
 import CustomModal from './CustomModal';
 
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize } from '../helper';
 
 const QRCodeModal = ({ visible, value, onPress, onRequestClose, title }) => {
-  const customStyle = useSelector(state => state.chatReducer.styles);
+  const customStyle = useSelector(state => state.appStateReducer.styles);
+  const seventyPercentWidth = useScreenAdjustedSize(0.7,0.7);
+  const seventyPercentHeight = useScreenAdjustedSize(0.7,0.7, "height");
+
+  // use height to size QR code when landscape, and width when portrait
+  // orientation === landscape ? height - textHeight : width;
+  const qrSize = seventyPercentWidth > seventyPercentHeight ? seventyPercentHeight - 30 : seventyPercentWidth;
+
   return (
     <CustomModal
     visible={visible}
     onRequestClose={onRequestClose}
     onPress={onPress}>
-      <View style={styles.modalContentContainer}>
+      <View style={{
+        ...styles.modalContentContainer,
+      }}>
         {title &&
         <View style={styles.header}>
-          <Text style={{...styles.title,fontSize : customStyle.uiFontSize}}>{title}</Text>
+          <Text
+          numberOfLines={1}
+          style={{
+            ...styles.title,
+            maxWidth : qrSize,
+            fontSize : customStyle.scaledUIFontSize,
+          }}>
+            {title}
+          </Text>
         </View>}
-        <View style={styles.QRContainer}>
-          <QRCode
-          value={JSON.stringify(value)}
-          size={300}/>
-        </View>
+        <QRCode
+        value={JSON.stringify(value)}
+        size={qrSize}/>
       </View>
     </CustomModal>
   )
@@ -52,9 +68,7 @@ const styles = {
     backgroundColor : palette.white,
     borderRadius : 5,
     padding : 20,
-    alignItems : "center",
-    maxWidth : Dimensions.get('window').width * 0.8,
-    maxHeight : Dimensions.get('window').height * 0.8
+    alignItems : "center"
   },
   header : {
     marginBottom : 10

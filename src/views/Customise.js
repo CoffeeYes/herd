@@ -1,90 +1,122 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
-import { ScrollView, View, Text, Dimensions, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import { ColorPicker, fromHsv, toHsv } from 'react-native-color-picker';
+import React, { useState, useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { ScrollView, View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ColorChoice from './ColorChoice';
 import Header from './Header';
 import FlashTextButton from './FlashTextButton';
 import CustomButton from './CustomButton';
 import CardButton from './CardButton';
-import TabItem from './TabItem';
 import ListItem from './ListItem';
 import ChatBubble from './ChatBubble';
 import Dropdown from './Dropdown';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import NavigationWarningWrapper from './NavigationWarningWrapper';
+import ConfirmationModal from './ConfirmationModal';
 
-import Slider from './Slider';
+import ValueSlider from './ValueSlider';
 
-import { setStyles } from '../redux/actions/chatActions';
+import { setStyles } from '../redux/actions/appStateActions';
 
-import { defaultChatStyles } from '../assets/styles';
+import { defaultChatStyles, boundaryValues } from '../assets/styles';
 import { palette } from '../assets/palette';
+import { useScreenAdjustedSize, fromHsv, clampRgb, rgbToHsv, hsvToRgb } from '../helper';
+import { STORAGE_STRINGS } from '../common';
 
-const Customise = ({ navigation }) => {
+const titleFontMultiplier = 1.5;
+const subtextFontMultiplier = 0.8;
+const buttonIconSizeMultiplier = 0.2;
+
+const Customise = () => {
   const dispatch = useDispatch();
-  const [sentBoxColor, _setSentBoxColor] = useState("");
-  const [sentTextColor, _setSentTextColor] = useState("");
-  const [receivedBoxColor, _setReceivedBoxColor] = useState("");
-  const [receivedTextColor, _setReceivedTextColor] = useState("");
   const [activeItem, setActiveItem] = useState(0);
-  const [tabWidth, setTabWidth] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [originalStyles, setOriginalStyles] = useState({});
-  const [messageFontSize, _setMessageFontSize] = useState(defaultChatStyles.messageFontSize);
-  const [uiFontSize, _setUiFontSize] = useState(defaultChatStyles.uiFontSize);
-  const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(true);
+  const [synchroniseFontChanges, setSynchroniseFontChanges] = useState(false);
+  const [overrideFontSliderValues, setOverrideFontSliderValues] = useState(false);
+  const [overrideColorChoiceSliderValue, setOverrideColorChoiceSliderValue] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [restoringDefault, setRestoringDefault] = useState(false);
 
+  const customStyle = useSelector(state => state.appStateReducer.styles);
 
-  const sentBoxColorRef = useRef();
-  const sentTextColorRef = useRef();
-  const receivedBoxColorRef = useRef();
-  const receivedTextColorRef = useRef();
-  const messageFontSizeRef = useRef();
-  const uiFontSizeRef = useRef();
-
-  const setSentBoxColor = data => {
-    sentBoxColorRef.current = data
-    _setSentBoxColor(data)
-  }
-  const setSentTextColor = data => {
-    sentTextColorRef.current = data
-    _setSentTextColor(data)
-  }
-  const setReceivedBoxColor = data => {
-    receivedBoxColorRef.current = data
-    _setReceivedBoxColor(data)
-  }
-  const setReceivedTextColor = data => {
-    receivedTextColorRef.current = data
-    _setReceivedTextColor(data)
+  const fontSliderProps = {
+    minimumValue : boundaryValues.minFontSize,
+    maximumValue : boundaryValues.maxFontSize,
+    step : 1,
+    tapToSeek : true,
+    titleStyle : { fontSize : customStyle.scaledUIFontSize },
+    rightTextContainerStyle : {alignItems : "center", padding : 5, justifyContent : "center"},
+    rightTitleStyle : {fontWeight : "bold", fontSize : customStyle.scaledUIFontSize},
+    rightTextStyle : {fontSize : customStyle.scaledUIFontSize},
+    useValue : overrideFontSliderValues
   }
 
-  const setMessageFontSize = data => {
-    messageFontSizeRef.current = data;
-    _setMessageFontSize(data)
-  }
-  const setUiFontSize = data => {
-    uiFontSizeRef.current = data;
-    _setUiFontSize(data)
-  }
+  const iconSize = useScreenAdjustedSize(0.1,0.065);
+  const cardIconSize = useScreenAdjustedSize(0.075,0.05);
+  const screenFontScaler = useScreenAdjustedSize(0.005,0.005);
+  const headerIconSize = useScreenAdjustedSize(0.05,0.025,"width",0.7,1,1000,1000)
+  const scaledHeaderIconSize = ((uiFontSize + 16) / defaultChatStyles.uiFontSize) * headerIconSize
+
+  const [sentBoxColor, setSentBoxColor] = useState(rgbToHsv(customStyle.sentBoxColor));
+  const [sentTextColor, setSentTextColor] = useState(rgbToHsv(customStyle.sentTextColor));
+  const [receivedBoxColor, setReceivedBoxColor] = useState(rgbToHsv(customStyle.receivedBoxColor));
+  const [receivedTextColor, setReceivedTextColor] = useState(rgbToHsv(customStyle.receivedTextColor));
+  const [messageFontSize, setMessageFontSize] = useState(customStyle.messageFontSize);
+  const [uiFontSize, setUiFontSize] = useState(customStyle.uiFontSize);
+  const [scaledFontSize, setScaledFontSize] = useState(customStyle.uiFontSize);
+  const [scaledSynchronisedFontSize, setScaledSynchronisedFontSize] = useState(customStyle.uiFontSize);
+  const [synchronisedFontSize, setSynchronisedFontSize] = useState(customStyle.uiFontSize);
+
+  const activeScaledFontSize = synchroniseFontChanges ? scaledSynchronisedFontSize : scaledFontSize;
+  const activeMessageFontSize = synchroniseFontChanges ? synchronisedFontSize : messageFontSize + screenFontScaler;
+
+  const unsavedChangesRef = useRef(false);
 
   useEffect(() => {
-    loadStyles().then(() => setLoading(false));
-  },[])
+    setScaledFontSize(uiFontSize + screenFontScaler)
+  },[uiFontSize, screenFontScaler])
 
-  const loadStyles = async () => {
-    const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-    if(styles) {
-      setSentBoxColor(toHsv(styles.sentBoxColor));
-      setSentTextColor(toHsv(styles.sentTextColor));
-      setReceivedBoxColor(toHsv(styles.receivedBoxColor));
-      setReceivedTextColor(toHsv(styles.receivedTextColor));
-      setMessageFontSize(styles.messageFontSize);
-      setUiFontSize(styles.uiFontSize);
-      setOriginalStyles(styles);
+  useEffect(() => {
+    setScaledSynchronisedFontSize(synchronisedFontSize + screenFontScaler)
+  },[synchronisedFontSize,screenFontScaler])
+
+  //checks if fontsize states have been set to default values before turning overrideFontSliderValues off
+  //to ensure sliders return to default positions
+  useEffect(() => {
+    if(
+      uiFontSize === defaultChatStyles.uiFontSize && 
+      messageFontSize === defaultChatStyles.messageFontSize && 
+      synchronisedFontSize === defaultChatStyles.uiFontSize &&
+      overrideFontSliderValues
+    ) {
+      setOverrideFontSliderValues(false);
     }
-  }
+  },[uiFontSize, messageFontSize, synchronisedFontSize, overrideFontSliderValues])
+
+  useEffect(() => {
+    if(
+      hsvToRgb(receivedTextColor) === clampRgb(defaultChatStyles.receivedTextColor) &&
+      hsvToRgb(receivedBoxColor) === clampRgb(defaultChatStyles.receivedBoxColor) &&
+      hsvToRgb(sentTextColor) === clampRgb(defaultChatStyles.sentTextColor) &&
+      hsvToRgb(sentBoxColor) === clampRgb(defaultChatStyles.sentBoxColor)
+    ) {
+      setOverrideColorChoiceSliderValue(false);
+    }
+  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor])
+
+  useEffect(() => {
+    setOverrideColorChoiceSliderValue(false);
+  },[activeItem])
+
+  useEffect(() => {
+    unsavedChangesRef.current = !checkStylesAreEqual(customStyle,{
+      sentTextColor,
+      sentBoxColor,
+      receivedBoxColor,
+      receivedTextColor,
+      messageFontSize,
+      uiFontSize
+    })
+  },[receivedBoxColor,receivedTextColor,sentBoxColor,sentTextColor,messageFontSize,uiFontSize, customStyle])
 
   const saveStyles = async () => {
     const style = {
@@ -95,102 +127,59 @@ const Customise = ({ navigation }) => {
       receivedTextColor : fromHsv(receivedTextColor),
       messageFontSize : messageFontSize,
       uiFontSize : uiFontSize,
-      titleSize : uiFontSize * 1.5,
-      subTextSize : uiFontSize * 0.8,
+      titleSize : uiFontSize * titleFontMultiplier,
+      subTextSize : uiFontSize * subtextFontMultiplier,
     }
 
-    setOriginalStyles(style);
-    await AsyncStorage.setItem("styles",JSON.stringify(style));
+    await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(style));
     dispatch(setStyles(style));
     return true;
   }
 
-  useEffect(() => {
-    const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
-      e.preventDefault();
-      const styles = JSON.parse(await AsyncStorage.getItem("styles"));
-
-      const unsavedChanges = (
-        fromHsv(sentBoxColorRef.current).toLowerCase() != styles.sentBoxColor.toLowerCase() ||
-        fromHsv(sentTextColorRef.current).toLowerCase() != styles.sentTextColor.toLowerCase() ||
-        fromHsv(receivedBoxColorRef.current).toLowerCase() != styles.receivedBoxColor.toLowerCase() ||
-        fromHsv(receivedTextColorRef.current).toLowerCase() != styles.receivedTextColor.toLowerCase() ||
-        messageFontSizeRef.current != styles.messageFontSize ||
-        uiFontSizeRef.current != styles.uiFontSize
-      )
-
-      if(unsavedChanges) {
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure to discard them and leave the screen?',
-          [
-            {
-              text: 'Discard',
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-            { text: "Stay", style: 'cancel', onPress: () => {} },
-          ]
-        );
-      }
-      else {
-        navigation.dispatch(e.data.action);
-      }
-  })
-
-    return beforeGoingBack;
-  },[navigation])
-
-  const restoreDefault = async () => {
-    Alert.alert(
-      'Discard you sure you want to restore default styles?',
-      '',
-      [
-        { text: "Go Back", style: 'cancel', onPress: () => {} },
-        {
-          text: 'Restore',
-          style: 'destructive',
-          // If the user confirmed, then we dispatch the action we blocked earlier
-          // This will continue the action that had triggered the removal of the screen
-          onPress: async () => {
-            await AsyncStorage.setItem("styles",JSON.stringify(defaultChatStyles));
-            dispatch(setStyles(defaultChatStyles));
-            loadStyles();
-          },
-        },
-      ]
-    );
+  const restoreDefaultStyles = async () => {
+    setRestoringDefault(true);
+    setOverrideFontSliderValues(true);
+    setOverrideColorChoiceSliderValue(true);
+    await AsyncStorage.setItem(STORAGE_STRINGS.STYLES,JSON.stringify(defaultChatStyles));
+    dispatch(setStyles(defaultChatStyles));
+    setSentBoxColor(rgbToHsv(defaultChatStyles.sentBoxColor));
+    setSentTextColor(rgbToHsv(defaultChatStyles.sentTextColor));
+    setReceivedBoxColor(rgbToHsv(defaultChatStyles.receivedBoxColor));
+    setReceivedTextColor(rgbToHsv(defaultChatStyles.receivedTextColor));
+    setUiFontSize(defaultChatStyles.uiFontSize);
+    setMessageFontSize(defaultChatStyles.messageFontSize);
+    setSynchronisedFontSize(defaultChatStyles.uiFontSize);
+    setRestoringDefault(false);
   }
+
   const tabItems = [
     {
-    	name : "sentBox",
-    	text : "Sent Box",
+      name : "sentBox",
+      text : "Sent Box",
       title : "Sent Box Color",
       color : sentBoxColor,
       originalColor : "sentBoxColor",
       setColor : setSentBoxColor
     },
     {
-    	name : "sentText",
-    	text : "Sent Text",
+      name : "sentText",
+      text : "Sent Text",
       title : "Sent Text Color",
       color : sentTextColor,
       originalColor : "sentTextColor",
       setColor : setSentTextColor
     },
     {
-    	name : "receivedBox",
-    	text : "Received Box",
+      name : "receivedBox",
+      text : "Received Box",
       title : "Received Box Color",
       color : receivedBoxColor,
       originalColor : "receivedBoxColor",
       setColor : setReceivedBoxColor
     },
     {
-    	name : "receivedText",
-    	text : "Received Text",
+      name : "receivedText",
+      text : "Received Text",
       title : "Received Text Color",
       color : receivedTextColor,
       originalColor : "receivedTextColor",
@@ -205,7 +194,7 @@ const Customise = ({ navigation }) => {
       setValue : setMessageFontSize,
       title : "Messages",
       rightTitle : "font size",
-      rightText : messageFontSize?.toString()
+      rightText : messageFontSize
     },
     {
       tag : "ui_size",
@@ -213,163 +202,198 @@ const Customise = ({ navigation }) => {
       setValue : setUiFontSize,
       title : "User Interface",
       rightTitle : "font size",
-      rightText : uiFontSize?.toString()
+      rightText : uiFontSize
     }
   ]
 
-  const changeFonts = (val,index) => {
-    if(synchroniseFontChanges) {
-      fontSizes.map(item => item.setValue(val))
+  const setAllFontSizes = value => {
+    fontSizes.forEach(item => item.setValue(value));
+    setSynchronisedFontSize(value)
+  }
+
+  const getChatBubbleColor = () => {
+    return ({
+      sentBoxColor : fromHsv(sentBoxColor),
+      receivedBoxColor : fromHsv(receivedBoxColor),
+      sentTextColor : fromHsv(sentTextColor),
+      receivedTextColor : fromHsv(receivedTextColor),
+      messageFontSize : messageFontSize
+    })
+  }
+
+  const checkStylesAreEqual = (original, updated) => {
+    const colorKeys = ["sentBoxColor","sentTextColor","receivedBoxColor","receivedTextColor"];
+    const fontKeys = ["uiFontSize","messageFontSize"];
+    for(const key of colorKeys) {
+      const clampedOriginal = original[key]?.v ? hsvToRgb(original[key]) : clampRgb(original[key]);
+      const clampedUpdated = updated[key]?.v ? hsvToRgb(updated[key]) : clampRgb(updated[key]);
+      if(clampedOriginal !== clampedUpdated) {
+        return false;
+      }
     }
-    else {
-      fontSizes[index].setValue(val);
+    for(const key of fontKeys) {
+      if(original[key] !== updated[key]) {
+        return false;
+      }
     }
+    return true;
   }
 
   return (
-    <>
-    <Header title="Customise" allowGoBack/>
-    <ScrollView contentContainerStyle={{paddingBottom : 10}}>
+    <NavigationWarningWrapper
+    checkForChanges={() => unsavedChangesRef.current}>
+      <Header title="Customise" allowGoBack/>
+      <ScrollView contentContainerStyle={{paddingBottom : 10}}>
+         <Header
+          title="Preview"
+          allowGoBack
+          disableBackButton
+          rightButtonIcon="delete"
+          rightButtonOnClick={() => {}}
+          disableRightButton
+          backArrowSize={scaledHeaderIconSize}
+          rightIconSize={scaledHeaderIconSize}
+          textStyle={{fontSize : (activeScaledFontSize) * titleFontMultiplier}}
+          containerStyle={styles.topSpacer}/>
 
-      {loading ?
-      <ActivityIndicator size="large" color={palette.primary}/>
-      :
-      <>
-        <View style={styles.messagesContainer}>
-          <ChatBubble
-          disableTouch
-          text="This is a sample sent message"
-          timestamp="12 : 20"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
-          messageFrom={true}/>
-
-          <ChatBubble
-          disableTouch
-          text="This is a sample response message"
-          timestamp="12 : 21"
-          customStyle={{
-            sentBoxColor : fromHsv(sentBoxColor),
-            receivedBoxColor : fromHsv(receivedBoxColor),
-            sentTextColor : fromHsv(sentTextColor),
-            receivedTextColor : fromHsv(receivedTextColor),
-            messageFontSize : messageFontSize}
-          }
-          messageFrom={false}/>
-
-        </View>
-
-        <Header title="Preview" textStyle={{fontSize : uiFontSize * 1.5}}/>
-
-        <View style={{alignItems : "center"}}>
           <CardButton
+          containerStyle={{alignSelf : "center"}}
+          iconSize={cardIconSize + (scaledFontSize * buttonIconSizeMultiplier)}
           disableTouch
           text="Preview"
-          textStyle={{fontSize : uiFontSize}}
-          rightIcon="preview" iconSize={uiFontSize + 16}/>
-        </View>
+          textStyle={{fontSize : (activeScaledFontSize)}}
+          rightIcon="preview"/>
 
-        <ListItem
-        name="Preview"
-        rightText="Preview"
-        subText="Preview"
-        rightTextStyle={{fontSize : uiFontSize * 0.8}}
-        subTextStyle={{fontSize : uiFontSize * 0.8}}
-        textStyle={{fontSize : uiFontSize}}
-        disableTouch
-        />
-
-        <View style={styles.fontSlidersContainer}>
-          <TouchableOpacity
-          style={{marginLeft : 20, marginTop : 10, alignSelf : "flex-start"}}
-          onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
-            <Icon
-            size={32}
-            color={synchroniseFontChanges ? palette.primary : palette.black}
-            name={synchroniseFontChanges ? "lock" : "lock-open"}/>
-          </TouchableOpacity>
-
-          {fontSizes.map((item,index)=> {
-            return (
-              <Fragment key={item.tag}>
-                <Text style={{alignSelf : "center", fontWeight : "bold"}}>{item.title}</Text>
-                <Slider
-                containerStyle={styles.sliderContainer}
-                sliderStyle={{flex : 1}}
-                minimumTrackTintColor={palette.secondary}
-                maximumTrackTintColor={palette.primary}
-                thumbTintColor={palette.primary}
-                tapToSeek
-                onSlidingComplete={val => changeFonts(Math.round(val),index)}
-                onValueChange={val => changeFonts(Math.round(val),index)}
-                value={item.value}
-                min={defaultChatStyles.messageFontSize}
-                max={24}
-                rightTitle={item.rightTitle}
-                rightText={item.rightText}
-                rightTextContainerStyle={{alignItems : "center", padding : 5, justifyContent : "center"}}
-                rightTitleStyle={{fontWeight : "bold"}}
-                />
-              </Fragment>
-            )
-          })}
-        </View>
-
-        <View style={styles.colorChoiceContainer}>
-          <Dropdown
-          onChangeOption={index => setActiveItem(index)}
-          choices={tabItems}
-          textStyle={{fontSize : originalStyles.uiFontSize}}
-          chosenStyle={{color : palette.primary}}
-          containerStyle={{borderRadius : 5}}
+          <ListItem
+          name="Preview"
+          rightText="Preview"
+          subText="Preview"
+          rightTextStyle={{fontSize : ((activeScaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
+          subTextStyle={{fontSize : ((activeScaledFontSize) * subtextFontMultiplier) + screenFontScaler}}
+          textStyle={{fontSize : (activeScaledFontSize)}}
+          disableTouch
           />
-
-          <ColorChoice
-            title={tabItems[activeItem].name}
-            color={toHsv(tabItems[activeItem].color)}
-            setColor={tabItems[activeItem].setColor}
-            oldColor={originalStyles[tabItems[activeItem].originalColor]}
-          />
-        </View>
-
-        <View style={styles.buttonRow}>
-          <FlashTextButton
-          normalText="Save"
-          flashText="Saved!"
-          onPress={saveStyles}
-          timeout={500}
-          buttonStyle={{...styles.button, flexDirection : "row"}}
-          disabled={
-            fromHsv(sentBoxColor).toLowerCase() == originalStyles.sentBoxColor.toLowerCase() &&
-            fromHsv(sentTextColor).toLowerCase() == originalStyles.sentTextColor.toLowerCase() &&
-            fromHsv(receivedBoxColor).toLowerCase() == originalStyles.receivedBoxColor.toLowerCase() &&
-            fromHsv(receivedTextColor).toLowerCase() == originalStyles.receivedTextColor.toLowerCase() &&
-            messageFontSize === originalStyles.messageFontSize &&
-            uiFontSize === originalStyles.uiFontSize
-          }/>
 
           <CustomButton
-          text={"Restore Default"}
-          onPress={restoreDefault}
-          disabled={
-            fromHsv(originalStyles.sentBoxColor).toLowerCase() == defaultChatStyles.sentBoxColor.toLowerCase() &&
-            fromHsv(originalStyles.sentTextColor).toLowerCase() == defaultChatStyles.sentTextColor.toLowerCase() &&
-            fromHsv(originalStyles.receivedBoxColor).toLowerCase() == defaultChatStyles.receivedBoxColor.toLowerCase() &&
-            fromHsv(originalStyles.receivedTextColor).toLowerCase() == defaultChatStyles.receivedTextColor.toLowerCase() &&
-            originalStyles.messageFontSize == defaultChatStyles.messageFontSize &&
-            originalStyles.uiFontSize == defaultChatStyles.uiFontSize
-          }
-          buttonStyle={{ ...styles.button, marginLeft : 10}}/>
+          text="Preview"
+          disabled 
+          useDisabledStyle={false}
+          buttonStyle={styles.topSpacer}
+          textStyle={{fontSize : (activeScaledFontSize)}}
+          />
 
-        </View>
-      </>}
-    </ScrollView>
-    </>
+          <View style={styles.fontSlidersContainer}>
+            <TouchableOpacity
+            style={{...styles.topSpacer, marginLeft : 20, alignSelf : "flex-start"}}
+            onPress={() => setSynchroniseFontChanges(!synchroniseFontChanges)}>
+              <Icon
+              size={iconSize}
+              color={synchroniseFontChanges ? palette.primary : palette.black}
+              name={synchroniseFontChanges ? "lock" : "lock-open"}/>
+            </TouchableOpacity>
+
+            {synchroniseFontChanges ? 
+            <ValueSlider
+            {...fontSliderProps}
+            value={Math.round(synchronisedFontSize)}
+            title={fontSizes.map(item => item.title).join(" + ")}
+            onSlidingComplete={value => setAllFontSizes(value)}
+            onValueChange={value => setAllFontSizes(value)}
+            rightTitle="font size"
+            rightText={synchronisedFontSize}
+            />
+            :
+            fontSizes.map((item)=> {
+              return (
+                <ValueSlider
+                {...fontSliderProps}
+                title={item.title}
+                key={item.title}
+                onSlidingComplete={value => item.setValue(value)}
+                onValueChange={value => item.setValue(value)}
+                value={Math.round(item.value)}
+                rightTitle={item.rightTitle}
+                rightText={item.rightText}
+                />
+              )
+            })}
+          </View>
+
+          <View style={styles.messagesContainer}>
+            <ChatBubble
+            disableTouch
+            text="This is a sample sent message"
+            textFontSize={(activeMessageFontSize)}
+            timestamp="12 : 20"
+            customStyle={getChatBubbleColor()}
+            messageFrom={true}/>
+
+            <ChatBubble
+            disableTouch
+            text="This is a sample response message"
+            textFontSize={(activeMessageFontSize)}
+            timestamp="12 : 21"
+            customStyle={getChatBubbleColor()}
+            messageFrom={false}/>
+          </View>
+
+          <View style={styles.colorChoiceContainer}>
+            <Dropdown
+            onChangeOption={index => {
+              if(index != activeItem) {
+                setOverrideColorChoiceSliderValue(true);
+                setActiveItem(index);
+              }
+            }}
+            choices={tabItems}
+            textStyle={{fontSize : customStyle.scaledUIFontSize}}
+            chosenStyle={{color : palette.primary}}
+            dropDownBoxStyle={{borderRadius : 5}}
+            />
+            <ColorChoice
+            overrideSliderValues={overrideColorChoiceSliderValue}
+            color={tabItems[activeItem].color}
+            onColorChange={color => tabItems[activeItem].setColor(color)}
+            oldColor={clampRgb(customStyle[tabItems[activeItem].originalColor])}
+            sliderTextSize={customStyle.scaledUIFontSize}
+            sliderTitleSize={customStyle.scaledUIFontSize}
+            />
+          </View>
+
+          <View style={styles.buttonRow}>
+            <FlashTextButton
+            normalText="Save"
+            flashText="Saved!"
+            onPress={saveStyles}
+            timeout={500}
+            buttonStyle={{...styles.button, flexDirection : "row", width : "45%"}}
+            disabled={checkStylesAreEqual(customStyle,{
+              sentBoxColor,sentTextColor,receivedBoxColor,
+              receivedTextColor,messageFontSize,uiFontSize
+            })}/>
+
+            <CustomButton
+            text={"Restore Default"}
+            onPress={() => setShowConfirmationModal(true)}
+            disabled={checkStylesAreEqual(customStyle,defaultChatStyles)}
+            buttonStyle={{ ...styles.button, marginLeft : 10, width : "45%"}}/>
+
+          </View>
+      </ScrollView>
+
+      <ConfirmationModal
+      visible={showConfirmationModal}
+      onConfirm={async () => {
+        await restoreDefaultStyles();
+        setShowConfirmationModal(false);
+      }}
+      loading={restoringDefault}
+      onCancel={() => setShowConfirmationModal(false)}
+      confirmText="Restore"
+      cancelText="Go Back"
+      titleText="Are you sure you want to restore default styles?"
+      />
+    </NavigationWarningWrapper>
   )
 }
 
@@ -382,7 +406,8 @@ const styles = {
     backgroundColor : palette.white,
     marginHorizontal : 10,
     borderRadius : 5,
-    elevation : 2
+    elevation : 2,
+    zIndex : 10
   },
   tabRow : {
     flexDirection : "row",
@@ -400,15 +425,6 @@ const styles = {
     alignItems : "center",
     marginTop : 10,
   },
-  sliderContainer : {
-    alignItems : "center",
-    flexDirection : "row",
-    marginHorizontal : 10,
-    backgroundColor : palette.white,
-    marginBottom : 10,
-    paddingVertical : 10,
-    borderRadius : 5,
-  },
   button : {
     height : "100%",
     justifyContent : "center",
@@ -421,6 +437,9 @@ const styles = {
     marginVertical : 10,
     borderRadius : 5,
     paddingVertical : 10,
+  },
+  topSpacer : {
+    marginTop : 10
   }
 }
 export default Customise;

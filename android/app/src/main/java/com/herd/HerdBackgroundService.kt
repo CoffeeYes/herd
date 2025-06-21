@@ -1,5 +1,9 @@
 package com.herd
 
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
+
 import android.app.Service
 import android.content.Intent
 import android.content.Context
@@ -32,6 +36,7 @@ import android.bluetooth.BluetoothGattDescriptor
 
 import android.os.Handler
 import android.os.ParcelUuid
+import android.os.SystemClock
 import java.util.UUID
 import java.util.ArrayList
 import java.util.concurrent.atomic.AtomicBoolean
@@ -41,12 +46,10 @@ import java.io.FileOutputStream
 import android.os.Bundle
 import android.os.Parcelable
 import android.os.Parcel
+import android.os.Build
 import kotlinx.parcelize.Parcelize
 import android.os.Looper
 import android.location.LocationManager
-
-import android.content.BroadcastReceiver
-import android.content.IntentFilter
 
 import android.app.Notification
 import android.app.NotificationManager
@@ -56,33 +59,38 @@ import android.R.drawable
 
 import com.herd.HerdMessage
 import com.herd.StorageInterface
+import com.herd.ServiceInterfaceModule
+import com.herd.PermissionManagerModule
 
 class HerdBackgroundService : Service() {
   private val TAG = "HerdBackgroundService";
   private var bluetoothAdapter : BluetoothAdapter? = null;
   private var BLEScanner : BluetoothLeScanner? = null;
   private var BLEAdvertiser : BluetoothLeAdvertiser? = null;
-  private val serviceUUID = UUID.fromString("30895318-6f7e-4f68-b21a-01a4e2f946fa");
-  private final val parcelServiceUUID = ParcelUuid(serviceUUID);
   private var bluetoothManager : BluetoothManager? = null;
   private var gattServer : BluetoothGattServer? = null;
   private val context : Context = this;
-  private var messageQueue : ArrayList<HerdMessage>? = ArrayList();
+  private var messageQueue : ArrayList<HerdMessage> = ArrayList();
   private var messagePointer : Int = 0;
-  private var deletedMessages : ArrayList<HerdMessage>? = ArrayList();
+  private var deletedMessages : ArrayList<HerdMessage> = ArrayList();
   private var receivedMessages : ArrayList<HerdMessage> = ArrayList();
-  private var receivedMessagesForSelf : ArrayList<HerdMessage>? = ArrayList();
+  private var receivedMessagesForSelf : ArrayList<HerdMessage> = ArrayList();
   private val messagesToRemoveFromQueue : ArrayList<HerdMessage> = ArrayList();
   private var currentMessageBytes : ByteArray = byteArrayOf();
   private val bleDeviceList = mutableSetOf<BluetoothDevice>();
   private var remoteMessageQueueSize : Int = 0;
   private var publicKey : String? = null;
   private val bleScanningThreadActive = AtomicBoolean(false);
+  private var frontendRunning : Boolean = true;
+  private var generalNotificationID : Int? = null;
+  private var allowNotifications : Boolean = true;
 
   private lateinit var messageQueueServiceUUID : UUID;
   private lateinit var messageQueueCharacteristicUUID : UUID;
   private lateinit var messageQueueDescriptorUUID : UUID;
   private lateinit var transferCompleteCharacteristicUUID : UUID;
+  private lateinit var serviceUUID : UUID;
+  private lateinit var parcelServiceUUID : ParcelUuid;
 
   @Volatile
   private var allowBleScan : Boolean = true;
@@ -90,6 +98,29 @@ class HerdBackgroundService : Service() {
   companion object {
     @Volatile
     var running : Boolean = false;
+
+    public fun checkForBluetoothOrLocationError(context : Context, intent : Intent) : String {
+      val action : String? = intent.action;
+      var errorType = "";
+      when(action) {
+        BluetoothAdapter.ACTION_STATE_CHANGED -> {
+          val state = intent.getIntExtra(
+            BluetoothAdapter.EXTRA_STATE,
+            BluetoothAdapter.ERROR
+          );
+          if (state == BluetoothAdapter.STATE_OFF) {
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.ADAPTER_TURNED_OFF;
+          }
+        }
+        "android.location.PROVIDERS_CHANGED" -> {
+          val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+          if(!locationManager.isLocationEnabled()) {
+            errorType = ServiceInterfaceModule.bluetoothErrorStrings.LOCATION_DISABLED;
+          }
+        }
+      }
+      return errorType;
+    }
   }
 
   inner class LocalBinder : Binder() {
@@ -97,43 +128,14 @@ class HerdBackgroundService : Service() {
   }
   private val binder = LocalBinder();
 
-  private final val bluetoothStateReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action
-      if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-        if (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_OFF) {
-          Log.i(TAG,"Bluetooth Turned off, stopping service");
-          //let the user know the service is stopping
-          sendNotification(
-            "Herd has stopped sending messages in the background",
-            "because bluetooth was turned off"
-          )
-          //stop this service and remove constant notification
-          stopForeground(true);
-          running = false;
-        }
-      }
+  public fun stopRunning() {
+    if(Build.VERSION.SDK_INT >= 33) {
+      stopForeground(STOP_FOREGROUND_REMOVE);
+    } else {
+      stopForeground(true);
     }
-  }
-
-  private final val locationStateReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context : Context, intent : Intent) {
-      val action : String? = intent.action
-      if(action === "android.location.PROVIDERS_CHANGED") {
-        val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager;
-        if(!locationManager.isLocationEnabled()) {
-          Log.i(TAG,"Location has been turned off, stopping service");
-          //let the user know the service is stopping
-          sendNotification(
-            "Herd has stopped sending messages in the background",
-            "because location was turned off"
-          )
-          //stop this service and remove constant notification
-          stopForeground(true);
-          running = false;
-        }
-      }
-    }
+    stopSelf();
+    running = false;
   }
 
   override fun onCreate() {
@@ -141,7 +143,9 @@ class HerdBackgroundService : Service() {
       messageQueueServiceUUID = UUID.fromString(getString(R.string.messageQueueServiceUUID));
       messageQueueCharacteristicUUID = UUID.fromString(getString(R.string.messageQueueCharacteristicUUID));
       messageQueueDescriptorUUID = UUID.fromString(getString(R.string.messageQueueDescriptorUUID));
-      transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID))
+      transferCompleteCharacteristicUUID =  UUID.fromString(getString(R.string.transferCompleteCharacteristicUUID));
+      serviceUUID =  UUID.fromString(getString(R.string.serviceUUID));
+      parcelServiceUUID = ParcelUuid(serviceUUID);
       try {
         bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager?.getAdapter();
@@ -149,39 +153,12 @@ class HerdBackgroundService : Service() {
           throw Exception("No Bluetooth Adapter Found");
         }
 
-        BLEScanner = bluetoothAdapter?.bluetoothLeScanner;
-        if(BLEScanner === null) {
-          throw Exception("No BLE Scanner Found");
-        }
-
         val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
             PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
         }
 
-        //create service notification channel
-        val SERVICE_CHANNEL_ID = "HerdServiceChannel"
-        val serviceChannelName = "Herd Service Channel"
-        val serviceChannelDescriptionText = "Herd Background Service"
-        val serviceChannlImportance = NotificationManager.IMPORTANCE_DEFAULT
-        val serviceChannel = NotificationChannel(SERVICE_CHANNEL_ID, serviceChannelName, serviceChannlImportance)
-        serviceChannel.description = serviceChannelDescriptionText
-
-        //create message notification channel
-        val MESSAGE_CHANNEL_ID = "HerdMessageChannel"
-        val msgChannelName = "Herd Message Channel"
-        val msgChannelDescriptionText = "Herd Messages"
-        val msgChannelImportance = NotificationManager.IMPORTANCE_DEFAULT
-        val msgChannel = NotificationChannel(MESSAGE_CHANNEL_ID, msgChannelName, msgChannelImportance)
-        msgChannel.description = msgChannelDescriptionText
-
-
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannels(mutableListOf(serviceChannel,msgChannel))
-
-        //create notification
-        val notification : Notification = Notification.Builder(this,SERVICE_CHANNEL_ID)
+        //create ongoing notification visible as long as the service is running
+        val notification : Notification = Notification.Builder(this,getString(R.string.serviceChannelID))
         .setOngoing(true)
         .setContentTitle("Herd Background Service")
         .setContentText("Herd is Running in the background in order to transfer messages")
@@ -202,13 +179,22 @@ class HerdBackgroundService : Service() {
       }
   }
 
-  private fun sendNotification(title : String, text : String) {
+  public fun setFrontendRunning(running : Boolean) {
+    frontendRunning = running;
+  }
+
+  public fun setAllowNotifications(allow : Boolean) {
+    allowNotifications = allow;
+  }
+
+  public fun sendNotification(title : String, text : String, notificationID : Int = SystemClock.uptimeMillis().toInt()) : Int {
+
     val pendingIntent: PendingIntent = Intent(this, MainActivity::class.java).let { notificationIntent ->
         PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     //create notification
-    val notification : Notification = Notification.Builder(this,"HerdMessageChannel")
+    val notification : Notification = Notification.Builder(this,getString(R.string.messageChannelID))
     .setOngoing(false)
     .setContentTitle(title)
     .setContentText(text)
@@ -218,13 +204,26 @@ class HerdBackgroundService : Service() {
     .setAutoCancel(true)
     .build()
 
-    Log.i(TAG,"Sending Notification for new messages");
     val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-    notificationManager.notify(1738,notification);
+    notificationManager.notify("com.herd.herd",notificationID,notification);
+    return notificationID;
   }
 
-  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>?) {
-    val intent : Intent = Intent("com.herd.NEW_HERD_MESSAGE_RECEIVED");
+  public fun notificationIsPending(notificationID : Int?) : Boolean {
+    if(notificationID == null) {
+      return false;
+    }
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    for(notification in notificationManager.activeNotifications) {
+        if (notification.id == notificationID) {
+          return true;
+        }
+     }
+     return false;
+  }
+
+  private fun sendMessagesToReceiver(messages : ArrayList<HerdMessage>, intentString : String) {
+    val intent : Intent = Intent(intentString);
     intent.putParcelableArrayListExtra("messages",messages);
     sendBroadcast(intent);
   }
@@ -244,10 +243,10 @@ class HerdBackgroundService : Service() {
       } + ", Thread : ${Thread.currentThread()}");
 
       if(newState == BluetoothProfile.STATE_CONNECTED) {
-        //max MTU is 517, max packet size is 600. 301 is highest even divisor of 600
-        //that fits in MTU
         stopLeScan();
-        gatt.requestMtu(301);
+        //we request 517 to both be conform to android 14 AND to force devices that would use
+        //an MTU of 600 to downgrade their link to the standard 512 MTU size.
+        gatt.requestMtu(517);
       }
       else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         if(status == 133 && clientRetryCount < 7) {
@@ -279,16 +278,8 @@ class HerdBackgroundService : Service() {
       else {
         Log.i(TAG,"MTU Request failed, MTU changed to $mtu");
       }
-      Log.i(TAG,"Discovering GATT Services");
-      /* stopLeScan();
-      allowBleScan = false;
-      Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
-      bleScanTimeoutHandler.removeCallbacksAndMessages(null);
-      bleScanTimeoutHandler.postDelayed({
-          Log.i(TAG,"30 Second wait over, new BLE Scan now allowed");
-          allowBleScan = true;
-      },30000) */
 
+      Log.i(TAG,"Discovering GATT Services");
       val bondState : Int = gatt.getDevice().getBondState();
       if(bondState == BluetoothDevice.BOND_NONE || bondState == BluetoothDevice.BOND_BONDED) {
         gatt.discoverServices();
@@ -302,7 +293,6 @@ class HerdBackgroundService : Service() {
 
     var totalBytes : ByteArray = byteArrayOf();
     var totalMessagesRead : Int = 0;
-    var receivedMessagesForUser : Boolean = false;
     var messageReadTimeout : Boolean = false;
     var messageTimeoutRegistered : Boolean = false;
     val handler : Handler = Handler(Looper.getMainLooper());
@@ -337,35 +327,37 @@ class HerdBackgroundService : Service() {
            Log.i(TAG,"Done reading Message, total size : ${totalBytes.size}");
            totalMessagesRead += 1;
            //create parcel and custom parcelable from received bytes
-           val message : HerdMessage = createMessageFromBytes(totalBytes);
+           val message = HerdMessage(totalBytes);
            //check if message has been received before, either in this instance of the background service
            //or another instance where it has already been passed up to JS side
            val messageAlreadyReceived : Boolean = (receivedMessages.find{it -> it._id.equals(message._id)}  != null) ||
-           (receivedMessagesForSelf?.find{it -> it._id == message._id} != null)
+           (receivedMessagesForSelf.find{it -> it._id == message._id} != null)
            //check if message has been previously deleted by user
-           val messagePreviouslyDeleted : Boolean = deletedMessages?.find{it -> it._id.equals(message._id)} != null;
+           val messagePreviouslyDeleted : Boolean = deletedMessages.find{it -> it._id.equals(message._id)} != null;
            //check if message is destined for this user, set notification flag if it isnt a deleted message
            if(message.to.trim().equals(publicKey?.trim())) {
              if (!messageAlreadyReceived && !messagePreviouslyDeleted) {
-               receivedMessagesForUser = true;
-               receivedMessagesForSelf?.add(message);
+               receivedMessagesForSelf.add(message);
              }
            }
            //if message is destined for other user add it directly to messageQueue
            else {
              Log.i(TAG,"Received Message is for another user, adding it to Queue");
-             val messageAlreadyInQueue : Boolean = messageQueue?.find{it -> it._id.equals(message._id)} != null;
+             val messageAlreadyInQueue : Boolean = messageQueue.find{it -> it._id.equals(message._id)} != null;
              Log.i(TAG,"message : " + message._id);
              Log.i(TAG,"Message Already in Queue : $messageAlreadyInQueue");
              if(!messageAlreadyInQueue) {
-               val added = addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
-               if((messageQueue?.size as Int) == 1 && added) {
-                 currentMessageBytes = createBytesFromMessage(messageQueue?.get(0));
+               val added = addMessagesToList(arrayListOf(message),messageQueue, "messageQueue");
+               if(messageQueue.size == 1 && added) {
+                currentMessageBytes = messageQueue.get(0).toByteArray();
                }
              }
            }
            //add custom parcelable to received array
-           if(!messageAlreadyReceived && !messagePreviouslyDeleted) {
+           if(
+           !messageAlreadyReceived && 
+           !messagePreviouslyDeleted && 
+           !(message.from.trim().equals(publicKey?.trim()))) {
              receivedMessages.add(message)
            }
            //reset array for total bytes
@@ -377,22 +369,25 @@ class HerdBackgroundService : Service() {
              gatt.readCharacteristic(characteristic);
            }
            else {
-             //send a notificaiton if messages destined for this user were received
-             //also emit messages to receiver in case they are already in the app
-             if(receivedMessagesForUser) {
-               sendNotification("You have messages waiting for you","You have received new messages");
-               sendMessagesToReceiver(receivedMessages);
+             //emit messages to JS receiver 
+             sendMessagesToReceiver(receivedMessages,ServiceInterfaceModule.emitterStrings.NEW_MESSAGES_RECEIVED);
+
+             if(receivedMessagesForSelf.size > 0 && !frontendRunning && allowNotifications) {
+              if(!notificationIsPending(generalNotificationID)) {
+                generalNotificationID = sendNotification("You Have received new messages","");
+              }
              }
-             //reset flag
-             receivedMessagesForUser = false;
 
              totalMessagesRead = 0;
              StorageInterface(context).writeMessagesToStorage(
                receivedMessages,
-               "savedMessageQueue",
-               "savedMessageQueueSizes"
+               ServiceInterfaceModule.storageStrings.SAVED_MESSAGE_QUEUE,
+               ServiceInterfaceModule.storageStrings.SAVED_MESSAGE_QUEUE_SIZES
              );
-             receivedMessages.clear();
+
+             if(frontendRunning) {
+               receivedMessages.clear();
+             }
 
              //start write-back phase to let server know which messages have
              //reached their final destination and can be removed from message queue
@@ -408,8 +403,8 @@ class HerdBackgroundService : Service() {
 
              if(transferCompleteCharacteristic != null) {
                Log.i(TAG,"Transfer complete characteristic found");
-               val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) +
-               (receivedMessagesForSelf as ArrayList<HerdMessage>);
+               val messagesToAvoid = deletedMessages +
+               (receivedMessagesForSelf);
 
                if(messagesToAvoid.size > 0) {
                  transferCompleteCharacteristic.setValue(messagesToAvoid.get(0)._id.toByteArray());
@@ -444,7 +439,7 @@ class HerdBackgroundService : Service() {
     override fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicWrite");
        if(characteristic.uuid.toString().equals(getString(R.string.transferCompleteCharacteristicUUID))) {
-         val messagesToAvoid = (deletedMessages as ArrayList<HerdMessage>) + (receivedMessagesForSelf as ArrayList<HerdMessage>);
+         val messagesToAvoid = deletedMessages + receivedMessagesForSelf;
          writeMessageIndex += 1;
          if(writeMessageIndex < messagesToAvoid.size) {
            Log.i(TAG,"Writing message id ${writeMessageIndex + 1}/${messagesToAvoid.size}")
@@ -457,7 +452,7 @@ class HerdBackgroundService : Service() {
            writebackComplete = true;
            gatt.writeCharacteristic(characteristic);
            writeMessageIndex = 0;
-           receivedMessagesForSelf?.clear();
+           receivedMessagesForSelf.clear();
            gatt.disconnect();
            /* gatt.close(); */
          }
@@ -561,14 +556,21 @@ class HerdBackgroundService : Service() {
 
     override fun onMtuChanged(device : BluetoothDevice, mtu : Int) {
       Log.i(TAG,"Server Callback onMtuChanged, new mtu : $mtu");
-      offsetSize = mtu - 1;
+      if(mtu < 512) {
+        offsetSize = mtu - 1;
+      }
+      else {
+        //maximum ATT size is 512, even if a larger mtu is requested.
+        //thus we limit the actual transfer size to 512
+        offsetSize = 512;
+      }
     }
 
     override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, characteristic : BluetoothGattCharacteristic) {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
         try {
-          if((messageQueue?.size as Int) > messagePointer){
+          if(messageQueue.size > messagePointer){
             //increment packet for offset calculation
             currentPacket += 1;
             Log.i(TAG,"Char Read Req Total Parcel Size : ${currentMessageBytes.size}")
@@ -588,10 +590,12 @@ class HerdBackgroundService : Service() {
               //reset currentPacket counter for next message
               currentPacket = 0;
               //update message pointer to point to next message with boundary check
-              messagePointer = if (messagePointer < ( (messageQueue?.size as Int) - 1) ) (messagePointer + 1) else 0;
+              messagePointer = if (messagePointer < ( messageQueue.size - 1) ) (messagePointer + 1) else 0;
               //create new byteArray for next message to be sent
-              currentMessageBytes = createBytesFromMessage(messageQueue?.get(messagePointer));
-              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue?.size}, messagePointer : $messagePointer");
+              if(messagePointer < messageQueue.size) {
+                currentMessageBytes = messageQueue.get(messagePointer).toByteArray();
+              }
+              Log.i(TAG,"Message Succesfully sent, messageQueue length : ${messageQueue.size}, messagePointer : $messagePointer");
             }
           }
         }
@@ -608,9 +612,9 @@ class HerdBackgroundService : Service() {
          val messageID : String = String(value);
          Log.i(TAG,"Message ID Received : $messageID")
          if(messageID != "COMPLETE") {
-           val message = messageQueue?.find {it -> it._id.equals(messageID)};
+           val message = messageQueue.find {it -> it._id.equals(messageID)};
            if(message != null) {
-             val removed = messageQueue?.remove(message)
+             val removed = messageQueue.remove(message)
              Log.i(TAG,"Message to remove from queue was found in queue, removed : $removed");
              messagesToRemoveFromQueue.add(message);
            }
@@ -618,12 +622,15 @@ class HerdBackgroundService : Service() {
          }
          else {
            Log.i(TAG,"Server message writeback complete");
-           //store deleted messages in case service is cancelled before app is opened
-           StorageInterface(context).writeMessagesToStorage(
-             messagesToRemoveFromQueue,
-             "messagesToRemove",
-             "messagesToRemoveSizes"
-           );
+           if(messagesToRemoveFromQueue.size > 0) {
+             //store deleted messages in case service is cancelled before app is opened
+             StorageInterface(context).writeMessagesToStorage(
+               messagesToRemoveFromQueue,
+               ServiceInterfaceModule.storageStrings.MESSAGES_TO_REMOVE,
+               ServiceInterfaceModule.storageStrings.MESSAGES_TO_REMOVE_SIZES
+             );
+             sendMessagesToReceiver(messagesToRemoveFromQueue,ServiceInterfaceModule.emitterStrings.REMOVE_MESSAGES_FROM_QUEUE)
+           }
 
            device.connectGatt(
               context,
@@ -637,14 +644,15 @@ class HerdBackgroundService : Service() {
     override fun onDescriptorReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, descriptor : BluetoothGattDescriptor) {
         Log.i(TAG,"Bluetooth GATT Server Callback onDescriptorReadRequest");
+        val messageQueueSize = messageQueue.size;
         if(descriptor.getUuid().equals(messageQueueDescriptorUUID)) {
           gattServer?.sendResponse(
             device,
             requestId,BluetoothGatt.GATT_SUCCESS,
             0,
-            byteArrayOf((messageQueue?.size as Int).toByte())
+            byteArrayOf(messageQueueSize.toByte())
           );
-          if((messageQueue?.size as Int) == 0) {
+          if(messageQueueSize == 0) {
             remoteHasReadMessages = true;
             if(!writebackComplete) {
               Log.i(TAG,"writeback not complete, connecting as client")
@@ -707,10 +715,8 @@ class HerdBackgroundService : Service() {
             }
             if(address != null) {
               val remoteDeviceInstance = bluetoothAdapter?.getRemoteDevice(address);
-              if(gattInstance != null) {
-                gattInstance?.disconnect();
-                gattInstance?.close();
-              }
+              gattInstance?.disconnect();
+              gattInstance?.close();
               remoteDeviceInstance?.connectGatt(
                 context,
                 false,
@@ -778,12 +784,13 @@ class HerdBackgroundService : Service() {
         Log.i(TAG,"ble scanning thread is already active")
       }
   }
+
   private val bleScanTimeoutHandler = Handler(Looper.getMainLooper());
-  private fun stopLeScan() {
+  private fun stopLeScan(includeScanTimeout : Boolean = true) {
     Log.i(TAG,"stopLeScan() called")
     BLEScanner?.stopScan(leScanCallback);
     bleScanningThreadActive.set(false);
-    if(allowBleScan) {
+    if(allowBleScan && includeScanTimeout) {
       allowBleScan = false;
       Log.i(TAG,"Waiting 30 seconds before allowing another BLE Scan");
       bleScanTimeoutHandler.removeCallbacksAndMessages(null);
@@ -796,21 +803,19 @@ class HerdBackgroundService : Service() {
 
   private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
     override fun onAdvertisingSetStarted(advertisingSet : AdvertisingSet?, txPower : Int, status : Int) {
-      Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: "
-      + status);
-      /* currentAdvertisingSet = advertisingSet; */
+      Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: $status");
     }
 
     override fun onAdvertisingDataSet(advertisingSet : AdvertisingSet?, status : Int) {
-      Log.i(TAG, "onAdvertisingDataSet() :status:" + status);
+      Log.i(TAG, "onAdvertisingDataSet() : status: $status");
     }
 
     override fun onScanResponseDataSet(advertisingSet : AdvertisingSet?,status : Int) {
-      Log.i(TAG, "onScanResponseDataSet(): status:" + status);
+      Log.i(TAG, "onScanResponseDataSet(): status: $status");
     }
 
     override fun onAdvertisingSetStopped(advertisingSet : AdvertisingSet?) {
-      Log.i(TAG, "onAdvertisingSetStopped():");
+      Log.i(TAG, "onAdvertisingSetStopped()");
     }
   };
 
@@ -918,15 +923,12 @@ class HerdBackgroundService : Service() {
     }
   }
 
-  fun addMessagesToList(message : HerdMessage, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.add(message) as Boolean;
-    logSuccessfullyAddedToList(added,listName,1,listToAddTo.size);
-    return added;
-  }
-
   fun addMessagesToList(messages : ArrayList<HerdMessage>, listToAddTo : ArrayList<HerdMessage>, listName : String) : Boolean {
-    val added : Boolean = listToAddTo.addAll(messages) as Boolean;
-    logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
+    var added : Boolean = true;
+    if(messages.size > 0) {
+      added = listToAddTo.addAll(messages);
+      logSuccessfullyAddedToList(added,listName,messages.size,listToAddTo.size)
+    }
     return added;
   }
 
@@ -939,46 +941,36 @@ class HerdBackgroundService : Service() {
   }
 
   public fun addMessagesToDeletedList(messages : ArrayList<HerdMessage>) : Boolean {
-    return addMessagesToList(messages,deletedMessages as ArrayList<HerdMessage>, "deletedMessages")
+    return addMessagesToList(messages,deletedMessages, "deletedMessages")
   }
 
   public fun addMessageToQueue(message : HerdMessage) : Boolean {
-    return addMessagesToList(message,messageQueue as ArrayList<HerdMessage>, "messageQueue");
+    val emptyBefore = messageQueue.size == 0;
+    val added = addMessagesToList(arrayListOf(message),messageQueue, "messageQueue");
+    //edge case where Queue was empty on start
+    if(emptyBefore && added) {
+      currentMessageBytes = messageQueue.get(0).toByteArray();
+    }
+    return added;
   }
 
-  public fun removeMessage(messages : ArrayList<HerdMessage>) : Boolean {
-    val lengthBefore : Int = messageQueue?.size as Int;
-    messageQueue = messageQueue?.filter{msg -> messages.find{message -> message._id.equals(msg._id)} == null} as ArrayList<HerdMessage>;
-    val lengthAfter : Int = messageQueue?.size as Int;
+  public fun removeMessages(messageIDs: ArrayList<String>) : Boolean {
+    val lengthBefore : Int = messageQueue.size;
+    messageQueue = messageQueue.filter{message -> !(message._id in messageIDs)} as ArrayList<HerdMessage>;
+    val lengthAfter : Int = messageQueue.size;
 
     //check if deletion was successful
-    var deleted : Boolean = (lengthBefore - lengthAfter) == messages.size
+    var deleted : Boolean = (lengthBefore - lengthAfter) == messageIDs.size
 
     //if deleted message was last message update pointer to prevent OOB error.
-    val messageQueueSize : Int = messageQueue?.size as Int
+    val messageQueueSize : Int = messageQueue.size;
     if(messagePointer >= messageQueueSize) {
       messagePointer = messageQueueSize - 1;
     }
 
-    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue?.size}")
+    Log.i(TAG,"Removed ${lengthBefore - lengthAfter} messages from Queue, new size : ${messageQueue.size}")
 
     return deleted;
-  }
-
-  private fun createBytesFromMessage(message : HerdMessage?) : ByteArray {
-    val messageParcel : Parcel = Parcel.obtain();
-    message?.writeToParcel(messageParcel,0);
-    val parcelBytes = messageParcel.marshall();
-    return parcelBytes;
-  }
-
-  private fun createMessageFromBytes(bytes : ByteArray) : HerdMessage {
-    //create parcel and custom parcelable from received bytes
-    val parcelMessage : Parcel = Parcel.obtain();
-    parcelMessage.unmarshall(bytes,0,bytes.size);
-    parcelMessage.setDataPosition(0);
-    val message : HerdMessage = HerdMessage.CREATOR.createFromParcel(parcelMessage);
-    return message;
   }
 
   public fun getReceivedMessages() : ArrayList<HerdMessage> {
@@ -989,25 +981,78 @@ class HerdBackgroundService : Service() {
     return messagesToRemoveFromQueue;
   }
 
+  private val errorNotificationTitle = "Herd has stopped sending messages in the background";
+  private var errorNotificationID : Int = 0;
+  private final val locationAndBTStateReceiver = object : BroadcastReceiver() {
+    override fun onReceive(context : Context, intent : Intent) {
+      val errorType = checkForBluetoothOrLocationError(context,intent);
+      if(errorType.length > 0 && running) {
+        var errorNotificationText = "An error occurred";
+        when(errorType) {
+          ServiceInterfaceModule.bluetoothErrorStrings.ADAPTER_TURNED_OFF -> {
+            errorNotificationText = "because bluetooth was turned off";
+          }
+           ServiceInterfaceModule.bluetoothErrorStrings.LOCATION_DISABLED -> {
+            errorNotificationText = "because location was turned off" 
+          }
+        }
+        sendNotification(
+          errorNotificationTitle,
+          errorNotificationText,
+          errorNotificationID
+        )
+        stopRunning();
+      }
+    }
+  }
+
+  private var locationAndBluetoothReceiverRegistered : Boolean = false;
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
       Log.i(TAG, "Service onStartCommand " + startId)
-      running = true;
-      val bundle : Bundle? = intent?.getExtras();
-      messageQueue = bundle?.getParcelableArrayList("messageQueue");
-      Log.i(TAG,"Queue size on start : ${messageQueue?.size}");
-      deletedMessages = bundle?.getParcelableArrayList("deletedMessages");
-      receivedMessagesForSelf = bundle?.getParcelableArrayList("receivedMessagesForSelf");
-      publicKey = bundle?.getString("publicKey");
-      //initialise byte array for sending message
-      if((messageQueue?.size as Int) > 0) {
-        currentMessageBytes = createBytesFromMessage(messageQueue?.get(0))
+      var allPermissionsGranted = PermissionManagerModule.checkPermissionsGrantedForService(context);
+      val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager;
+      val bluetoothEnabled = bluetoothManager.getAdapter().isEnabled();
+      val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager;
+      val locationEnabled = locationManager.isLocationEnabled();
+      if(!allPermissionsGranted || !locationEnabled || !bluetoothEnabled || intent == null) {
+        if(intent != null) {
+          Log.i(TAG,"not all permissions to start service have been granted");
+        }
+        stopSelf();
+        return Service.STOP_FOREGROUND_REMOVE;
       }
-      /* bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager */
+      BLEScanner = bluetoothAdapter?.getBluetoothLeScanner();
+      val bundle : Bundle? = intent.getExtras();
+      if(bundle == null) {
+        Log.d(TAG,"bundle was null in service onStartCommand");
+        stopSelf();
+        return Service.STOP_FOREGROUND_REMOVE;
+      }
+      else {
+        bundle.getParcelableArrayList<HerdMessage>("messageQueue")?.let{ messageQueue = it};
+        Log.i(TAG,"Queue size on start : ${messageQueue.size}");
+        bundle.getParcelableArrayList<HerdMessage>("deletedMessages")?.let{ deletedMessages = it};
+        bundle.getParcelableArrayList<HerdMessage>("receivedMessagesForSelf")?.let{ receivedMessagesForSelf = it};
+        publicKey = bundle.getString("publicKey");
+        if(publicKey == null) {
+          Log.d(TAG,"no public key found in bundle in service onStartCommand");
+          stopSelf();
+          return Service.STOP_FOREGROUND_REMOVE;
+        }
+        allowNotifications = bundle.getBoolean("allowNotifications");
+        //initialise byte array for sending message
+        if(messageQueue.size > 0) {
+          currentMessageBytes = messageQueue.get(0).toByteArray();
+        }
+      }
+      running = true;
       startGATTService();
       scanLeDevice();
       advertiseLE();
-      this.registerReceiver(bluetoothStateReceiver,IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
-      this.registerReceiver(locationStateReceiver,IntentFilter("android.location.PROVIDERS_CHANGED"));
+      val bluetoothLocationFilter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+      bluetoothLocationFilter.addAction("android.location.PROVIDERS_CHANGED")
+      context.registerReceiver(locationAndBTStateReceiver, bluetoothLocationFilter);
+      locationAndBluetoothReceiverRegistered = true;
       return Service.START_STICKY
     }
 
@@ -1017,14 +1062,17 @@ class HerdBackgroundService : Service() {
   }
 
   override fun onDestroy() {
-      Log.i(TAG, "Service onDestroy")
-      if(bluetoothAdapter?.isEnabled() as Boolean) {
-        stopLeScan()
-        BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
-        gattServer?.close();
-      }
-      this.unregisterReceiver(bluetoothStateReceiver);
-      this.unregisterReceiver(locationStateReceiver);
-      running = false;
+    Log.i(TAG, "Service onDestroy")
+    if(bluetoothAdapter?.isEnabled() as Boolean) {
+      stopLeScan(false)
+      BLEAdvertiser?.stopAdvertisingSet(advertisingCallback);
+      gattServer?.close();
+    }
+    bleScanTimeoutHandler.removeCallbacksAndMessages(null);
+    running = false;
+    if(locationAndBluetoothReceiverRegistered) {
+      context.unregisterReceiver(locationAndBTStateReceiver)
+      locationAndBluetoothReceiverRegistered = false;
+    }
   }
 }
