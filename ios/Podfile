@@ -6,7 +6,12 @@ platform :ios, '13.0'
 target 'herd' do
   config = use_native_modules!
 
-  use_react_native!(:path => config[:reactNativePath])
+  use_react_native!(
+		:path => config[:reactNativePath],
+		#disable hermes engine as it causes problems with current version of realm
+		#see https://github.com/realm/realm-js/issues/3831
+		:hermes_enabled => false
+	)
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
