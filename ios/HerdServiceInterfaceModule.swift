@@ -2,6 +2,22 @@ import Foundation
 
 @objc(HerdServiceInterfaceModule)
 class HerdServiceInterfaceModule : NSObject {
+  
+  @objc
+  func constantsToExport() -> [String : Any] {
+    return [
+      "emitterStrings" : [
+        "NEW_MESSAGES_RECEIVED" : "newHerdMessagesReceived",
+        "REMOVE_MESSAGES_FROM_QUEUE" : "removeMessagesFromQueue",
+        "BLUETOOTH_LOCATION_STATE_CHANGE" : "bluetoothOrLocationStateChange",
+      ],
+      "messageTypes" : [
+        "COMPLETED_MESSAGES" : "completed",
+        "RECEIVED_MESSAGES" : "received"
+      ]
+    ]
+  }
+  
   @objc
   func isRunning(_ resolve : RCTPromiseResolveBlock,
   reject : RCTPromiseRejectBlock) {

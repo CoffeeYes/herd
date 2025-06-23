@@ -9,7 +9,7 @@
     "rebuild": "cd android && gradlew clean && cd .. && react-native run-android",
     "docs": "jsdoc -c jsdoc.conf.json",
     "test": "jest",
-    "test-sequential" : "jest --runInBand --forceExit",
+    "test-sequential": "jest --runInBand --forceExit",
     "lint": "eslint .",
     "run-relase": "react-native run-android --variant=release"
   },
@@ -60,14 +60,14 @@
   },
   "jest": {
     "preset": "react-native",
-    "setupFiles" : [
+    "setupFiles": [
       "./jest.setup.js",
       "./node_modules/react-native-gesture-handler/jestSetup.js",
       "./mocks/jestSetups/react-native-clipboard-setup.js",
       "./mocks/jestSetups/AsyncStorageSetup.js",
       "./mocks/jestSetups/ServiceInterfaceMock.js"
     ],
-    "moduleNameMapper" : {
+    "moduleNameMapper": {
       "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
       "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
     }

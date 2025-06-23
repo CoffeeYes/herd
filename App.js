@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   NativeEventEmitter,
   AppState,
-  Dimensions
+  Dimensions,
+  SafeAreaView
 } from 'react-native';
 
 import { createStackNavigator } from '@react-navigation/stack';

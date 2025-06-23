@@ -4,6 +4,15 @@ import CoreLocation
 
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
+  
+  @objc
+  func constantsToExport() -> [String : Any] {
+    return [
+      "bluetoothStates" : [
+        "STATE_CONNECTED" : "STATE_CONNECTED"
+      ]
+    ]
+  }
     
     var currentManagerState : CBManagerState?;
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
