@@ -14,7 +14,13 @@ class HerdServiceInterfaceModule : NSObject {
       "messageTypes" : [
         "COMPLETED_MESSAGES" : "completed",
         "RECEIVED_MESSAGES" : "received"
-      ]
+      ],
+      "storage" : [
+        "SAVED_MESSAGE_QUEUE" : "savedMessageQueue",
+        "SAVED_MESSAGE_QUEUE_SIZES" : "savedMessageQueueSizes",
+        "MESSAGES_TO_REMOVE" : "messagesToRemove",
+        "MESSAGES_TO_REMOVE_SIZES" : "messagesToRemoveSizes"
+      ],
     ]
   }
   
@@ -63,5 +69,21 @@ class HerdServiceInterfaceModule : NSObject {
   @objc
   func disableService() {
       
+  }
+  
+  @objc
+  func setFrontendRunning(_ running : Bool) {
+    
+  }
+  
+  @objc
+  func notificationsAreEnabled(_ resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+      resolve(false);
+  }
+  
+  @objc
+  func isBound() -> Bool {
+    return false;
   }
 }

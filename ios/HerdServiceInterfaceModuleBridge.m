@@ -35,5 +35,11 @@ resolve : (RCTPromiseResolveBlock) resolve
 reject : (RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(disableService)
+RCT_EXTERN_METHOD(setFrontendRunning : (BOOL) running)
+
+RCT_EXTERN_METHOD(notificationsAreEnabled : (RCTPromiseResolveBlock) resolve
+reject : (RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(isBound)
 
 @end
