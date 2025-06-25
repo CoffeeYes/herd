@@ -8,8 +8,21 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   @objc
   func constantsToExport() -> [String : Any] {
     return [
+      "emitterStrings" : [
+        "NEW_BT_DEVICE" : "newBTDeviceFound",
+        "DISCOVERY_STATE_CHANGE" : "BTStateChange",
+        "CONNECTION_STATE_CHANGE" : "BTConnectionStateChange",
+        "NEW_MESSAGE" : "newBTMessageReceived"
+      ],
+      "discoveryEvents" : [
+        //needs to be changed down the line in android and IOS as current android implementation
+        //uses android-only strings from BluetoothAdapter class
+        "DISCOVERY_STARTED" : "DISCOVERY_STARTED",
+        "DISCOVERY_FINISHED" : "DISCOVERY_FINISHED"
+      ],
       "bluetoothStates" : [
-        "STATE_CONNECTED" : "STATE_CONNECTED"
+        "STATE_CONNECTED" : "STATE_CONNECTED",
+        "STATE_DISCONNECTED" : "STATE_DISCONNECTED"
       ]
     ]
   }

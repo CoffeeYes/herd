@@ -11,15 +11,19 @@ class HerdServiceInterfaceModule : NSObject {
         "REMOVE_MESSAGES_FROM_QUEUE" : "removeMessagesFromQueue",
         "BLUETOOTH_LOCATION_STATE_CHANGE" : "bluetoothOrLocationStateChange",
       ],
-      "messageTypes" : [
-        "COMPLETED_MESSAGES" : "completed",
-        "RECEIVED_MESSAGES" : "received"
-      ],
       "storage" : [
         "SAVED_MESSAGE_QUEUE" : "savedMessageQueue",
         "SAVED_MESSAGE_QUEUE_SIZES" : "savedMessageQueueSizes",
         "MESSAGES_TO_REMOVE" : "messagesToRemove",
         "MESSAGES_TO_REMOVE_SIZES" : "messagesToRemoveSizes"
+      ],
+      "bluetoothErrors" : [
+        "LOCATION_DISABLED" : "LOCATION_DISABLED",
+        "ADAPTER_TURNED_OFF" : "ADAPTER_TURNED_OFF",
+      ],
+      "messageTypes" : [
+        "COMPLETED_MESSAGES" : "completed",
+        "RECEIVED_MESSAGES" : "received"
       ],
     ]
   }

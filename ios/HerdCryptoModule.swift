@@ -6,42 +6,17 @@ import CryptoKit
 class HerdCryptoModule : NSObject {
     @objc
     func constantsToExport() -> [String : [String : String]]! {
-        let constants : [String : [String : String]] = [
+        return [
             "algorithm" : [
                 "RSA" : "RSA",
-                "AES" : "AES",
-                "AES_128" : "AES_128",
-                "AES_256" : "AES_256",
-                "ARC4" : "ARC4",
-                "BLOWFISH" : "BLOWFISH",
-                "ChaCha20" : "ChaCha20",
-                "DES" : "DES",
-                "DESede" : "DESede"
             ],
             "blockMode" : [
-                "CBC" : "CBC",
-                "CFB" : "CFB",
-                "CTR" : "CTR",
-                "CTS" : "CTS",
                 "ECB" : "ECB",
-                "OFB" : "OFB",
-                "GCM" : "GCM",
-                "Poly1305" : "Poly1305",
-                "NONE" : "NONE"
             ],
             "padding" : [
-                "NO_PADDING" : "NoPadding",
-                "ISO10126Padding" : "ISO10126Padding",
-                "PKCS5Padding" : "PKCS5Padding",
-                "OAEPPadding" : "OAEPPadding",
-                "OAEP_SHA1_MGF1Padding" : "OAEPwithSHA-1andMGF1Padding",
                 "OAEP_SHA256_MGF1Padding" : "OAEPwithSHA-256andMGF1Padding",
-                "OAEP_SHA224_MGF1Padding" : "OAEPwithSHA-224andMGF1Padding",
-                "OAEP_SHA384_MGF1Padding" : "OAEPwithSHA-384andMGF1Padding",
-                "OAEP_SHA512_MGF1Padding" : "OAEPwithSHA-512andMGF1Padding"
             ]
         ]
-        return constants;
     }
     @objc
     func generateRSAKeyPair(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
