@@ -49,6 +49,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
         bluetoothManager?.scanForPeripherals(withServices : nil);
         resolve(true);
     }
+
     @objc
     func cancelScanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
@@ -63,17 +64,6 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     reject : RCTPromiseRejectBlock) {
         resolve(currentManagerState == CBManagerState.poweredOn)
     }
-
-    @objc
-    func checkBTPermissions(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(CBCentralManager.authorization == .allowedAlways)
-    }
-    @objc
-    func requestBTPermissions(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
   
     @objc
     func checkForBTAdapter(_ resolve : RCTPromiseResolveBlock,
@@ -86,69 +76,56 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func requestBTMakeDiscoverable(_ duration : Int,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
-    @objc
-    func checkLocationPermission(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-      resolve(checkLocationIsAuthorized())
-    }
-
-    func checkLocationIsAuthorized() -> Bool {
-        return locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedAlways ||
-        locationManager?.authorizationStatus == CLAuthorizationStatus.authorizedWhenInUse
-    }
-
-    @objc
-    func requestLocationPermissions(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        var authorized = checkLocationIsAuthorized();
-        if(!authorized) {
-          locationManager?.requestAlwaysAuthorization();
-          authorized = checkLocationIsAuthorized();
-        }
-        resolve(authorized)
-    }
 
     @objc
     func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(checkLocationIsAuthorized())
+        resolve(HerdPermissionManagerModule().checkLocationIsAuthorized())
     }
+
     @objc
     func requestLocationEnable(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func writeToBTConnection(_ value : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func cancelBTConnectionThread() {
 
     }
+
     @objc
     func listenAsServer(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func cancelListenAsServer(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func connectAsClient(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+
     @objc
     func cancelConnectAsClient(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {

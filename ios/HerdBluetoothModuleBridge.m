@@ -12,12 +12,6 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(checkBTEnabled : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(checkBTPermissions : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(requestBTPermissions : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
 RCT_EXTERN_METHOD(checkForBTAdapter : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
@@ -27,12 +21,6 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(requestBTMakeDiscoverable : (int) duration
 resolve: (RCTPromiseResolveBlock) resolve
 reject: (RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(checkLocationPermission : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(requestLocationPermissions : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(checkLocationEnabled : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
