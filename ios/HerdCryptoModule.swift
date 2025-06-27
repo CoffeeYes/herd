@@ -190,6 +190,46 @@ class HerdCryptoModule : NSObject {
     }
 
     @objc
+    func encryptStrings(_ keyOrAlias : String,
+    loadKeyFromKeystore : Bool,
+    algorithm : String,
+    blockmode : String,
+    padding : String,
+    strings : [String],
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(true);
+    }
+
+    @objc
+    func decryptStrings(_ alias : String,
+    algorithm : String,
+    blockmode : String,
+    padding : String,
+    strings : [String],
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(true);
+    }
+
+    @objc
+    func decryptStringsWithIdentifier(_ alias : String,
+    algorithm : String,
+    blockmode : String,
+    padding : String,
+    strings : [NSObject],
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(true);
+    }
+
+    @objc
+    func cancelCoroutineWork(_ resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+        resolve(true);
+    }
+
+    @objc
     func createHash(_ value : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {

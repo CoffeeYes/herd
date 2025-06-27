@@ -40,6 +40,42 @@ stringToDecrypt : (NSString*) stringToDecrypt
 resolve : (RCTPromiseResolveBlock)resolve
 reject : (RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(
+	encryptStrings : (NSString*) keyOrAlias
+	loadKeyFromKeystore : (BOOL) loadKeyFromKeystore
+	algorithm : (NSString*) algorithm
+	blockmode : (NSString*) blockmode
+	padding : (NSString*) padding
+	strings : (NSArray) strings
+	resolve : (RCTPromiseResolveBlock)resolve
+	reject : (RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+	decryptStrings : (NSString*) alias 
+	algorithm : (NSString*) algorithm
+	blockmode : (NSString*) blockmode
+	padding : (NSString*) padding
+	strings : (NSArray) strings
+	resolve : (RCTPromiseResolveBlock)resolve
+	reject : (RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+	decryptStringsWithIdentifier : (NSString*) alias
+  algorithm : (NSString*) algorithm
+  blockmode : (NSString*) blockmode
+  padding : (NSString*) padding
+  strings : (NSArray) strings
+  resolve : (RCTPromiseResolveBlock) resolve
+	reject : (RCTPromiseRejectBlock)reject
+)
+
+RCT_EXTERN_METHOD(
+	cancelCoroutineWork : (RCTPromiseResolveBlock) resolve
+	reject : (RCTPromiseRejectBlock) reject
+)
+
 RCT_EXTERN_METHOD(createHash : (NSString*) value
 resolve : (RCTPromiseResolveBlock)resolve
 reject : (RCTPromiseRejectBlock)reject)
