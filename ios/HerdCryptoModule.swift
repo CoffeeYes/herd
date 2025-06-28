@@ -189,6 +189,30 @@ class HerdCryptoModule : NSObject {
       resolve(cipherString);
     }
 
+    func encryptString(_ publicKey: SecKey, _ stringToEncrypt : String) -> String {
+        let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256
+        guard let base64Data = stringToEncrypt.data(using : .utf8) else {
+            NSLog("Error converting string to base64")
+            return ""
+        }
+
+        guard SecKeyIsAlgorithmSupported(publicKey, .encrypt, algorithm) else {
+            NSLog("Encryption error, key algorithm is not supported")
+            return ""
+        }
+        guard (base64Data.count < (SecKeyGetBlockSize(publicKey) - 130)) else {
+            NSLog("String is too long to be encrypted with key")
+            return ""
+        }
+        var error : Unmanaged<CFError>?
+        guard let cipherData = SecKeyCreateEncryptedData(publicKey,algorithm,base64Data as CFData, &error) as Data? else {
+            NSLog("Error encrypting string")
+            return ""
+        }
+        let cipherString = cipherData.base64EncodedString()
+        return cipherString;
+    }
+
     @objc
     func encryptStrings(_ keyOrAlias : String,
     loadKeyFromKeystore : Bool,
@@ -198,7 +222,28 @@ class HerdCryptoModule : NSObject {
     strings : [String],
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(true);
+        var results = [String]();
+        var publicKey : SecKey? = nil;
+        if(loadKeyFromKeystore) {
+          publicKey = loadRSAPublicKey(keyOrAlias)
+        }
+        else {
+          guard let keyAsData = Data(base64Encoded : keyOrAlias) else {
+              NSLog("Error converting key to data")
+              return resolve("base64 error");
+          }
+          let attributes : [String : Any] = [
+              kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
+              kSecAttrKeySizeInBits as String : 2048,
+              kSecAttrKeyClass as String : kSecAttrKeyClassPublic
+          ]
+          var error : Unmanaged<CFError>?
+          publicKey = SecKeyCreateWithData(keyAsData as CFData, attributes as CFDictionary,&error);
+        }
+        for string in strings {
+            results.append(encryptString(publicKey!, string))
+        }
+        resolve(results);
     }
 
     @objc
