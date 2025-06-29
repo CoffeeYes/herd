@@ -246,6 +246,29 @@ class HerdCryptoModule : NSObject {
         resolve(results);
     }
 
+    func decryptString(_ privateKey: SecKey, _ stringToDecrypt : String) -> String {
+        let algorithm: SecKeyAlgorithm = .rsaEncryptionOAEPSHA256
+        guard let base64Data = Data(base64Encoded : stringToDecrypt) else {
+            NSLog("Error converting string to base64")
+            return ""
+        }
+        guard SecKeyIsAlgorithmSupported(privateKey, .decrypt, algorithm) else {
+            NSLog("Decryption error error, key algorithm is not supported")
+            return ""
+        }
+        guard (base64Data.count == SecKeyGetBlockSize(privateKey)) else {
+            NSLog("String is wrong size to be decrypted with key")
+            return ""
+        }
+        var error : Unmanaged<CFError>?
+        guard let plainTextData = SecKeyCreateDecryptedData(privateKey,algorithm,base64Data as CFData, &error) as Data? else {
+            NSLog("Error decrypting string")
+            return ""
+        }
+        let plainTextString = String(decoding: plainTextData, as: UTF8.self)
+        return plainTextString;
+    }
+
     @objc
     func decryptStrings(_ alias : String,
     algorithm : String,
@@ -254,7 +277,15 @@ class HerdCryptoModule : NSObject {
     strings : [String],
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(true);
+        let privateKey = loadRSAPrivateKey(alias);
+        var results = [String]();
+        if(privateKey == nil) {
+            reject("KEY_ERROR","error loading private key from keystore",NSError());
+        }
+        for string in strings {
+            results.append(decryptString(privateKey!,string))
+        }
+        resolve(results);
     }
 
     @objc
