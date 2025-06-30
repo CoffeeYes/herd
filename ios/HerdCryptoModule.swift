@@ -293,10 +293,26 @@ class HerdCryptoModule : NSObject {
     algorithm : String,
     blockmode : String,
     padding : String,
-    strings : [NSObject],
+    strings : [NSDictionary],
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(true);
+        let privateKey = loadRSAPrivateKey(alias);
+        var results = [[String : String]]()
+        if(privateKey == nil) {
+            reject("KEY_ERROR","error loading private key from keystore",NSError());
+        }
+        //need to guard against mismatched object structure in future, i.e 'text' or 'identifier' are null
+        //currently force unwrapping nullable strings into non-nullable strings, could crash app
+        for object in strings {
+            let text = object.value(forKey: "text") as? String;
+            let identifier = object.value(forKey : "identifier") as? String;
+            let decrypted = decryptString(privateKey!, text!);
+            results.append([
+                "text" : decrypted,
+                "identifier" : identifier!
+            ])
+        }
+        resolve(results);
     }
 
     @objc
