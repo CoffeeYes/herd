@@ -81,9 +81,11 @@ class HerdServiceInterfaceModule : NSObject {
   }
   
   @objc
-  func notificationsAreEnabled(_ resolve : RCTPromiseResolveBlock,
+  func notificationsAreEnabled(_ resolve : @escaping RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      resolve(false);
+    UNUserNotificationCenter.current().getNotificationSettings { settings in
+      resolve(settings.authorizationStatus == .authorized)
+    }
   }
   
   @objc
