@@ -45,9 +45,15 @@ class HerdPermissionManagerModule : NSObject {
     }
 
     @objc
-    func requestNotificationPermissions(_ resolve : RCTPromiseResolveBlock,
+  func requestNotificationPermissions(_ resolve : @escaping RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      let center = UNUserNotificationCenter.current();
+      center.requestAuthorization(options: [.alert, .badge, .sound]) { (granted, error) in
+        if let error = error {
+          print("Error requesting notification permission: \(error)")
+        }
+        resolve(granted)
+      }
     }
 
     @objc
