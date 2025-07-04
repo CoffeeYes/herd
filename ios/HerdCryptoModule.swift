@@ -59,7 +59,7 @@ class HerdCryptoModule : NSObject {
     func loadRSAPublicKey(_ alias : String) -> SecKey? {
         let privateKey = loadRSAPrivateKey(alias)
         if(privateKey != nil) {
-            let publicKey = SecKeyCopyPublicKey(privateKey as! SecKey);
+            let publicKey = SecKeyCopyPublicKey(privateKey!);
             return publicKey;
         }
         else {

@@ -16,10 +16,11 @@ class HerdPermissionManagerModule : NSObject {
     reject : RCTPromiseRejectBlock) {
         resolve(CBCentralManager.authorization == .allowedAlways)
     }
+  
     @objc
     func requestBTPermissions(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      resolve(CBCentralManager.authorization == .allowedAlways)
     }
 
     @objc
