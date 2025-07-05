@@ -36,7 +36,14 @@ class HerdCryptoModule : NSObject {
     }
     @objc
     func deleteKeyPair(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
-        resolve(nil);
+      let getquery: [String: Any] = [
+        kSecClass as String: kSecClassKey,
+        kSecAttrApplicationTag as String: alias,
+        kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+        kSecReturnRef as String: true
+      ]
+      let deleted = SecItemDelete(getquery as CFDictionary);
+      resolve(deleted == errSecSuccess);
     }
 
     func loadRSAPrivateKey(_ alias : String) -> SecKey? {
