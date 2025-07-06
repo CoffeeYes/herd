@@ -34,27 +34,28 @@ class HerdCryptoModule : NSObject {
         }
         resolve(true);
     }
+  
+    let privateKeyQuery : [String: Any] = [
+      kSecClass as String: kSecClassKey,
+      kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
+      kSecReturnRef as String: true
+    ]
+  
     @objc
     func deleteKeyPair(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
-      let getquery: [String: Any] = [
-        kSecClass as String: kSecClassKey,
-        kSecAttrApplicationTag as String: alias,
-        kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-        kSecReturnRef as String: true
-      ]
-      let deleted = SecItemDelete(getquery as CFDictionary);
+      var keyQuery = privateKeyQuery;
+      keyQuery[kSecAttrApplicationTag as String] = alias;
+      
+      let deleted = SecItemDelete(keyQuery as CFDictionary);
       resolve(deleted == errSecSuccess);
     }
 
     func loadRSAPrivateKey(_ alias : String) -> SecKey? {
-        let getquery: [String: Any] = [
-          kSecClass as String: kSecClassKey,
-          kSecAttrApplicationTag as String: alias,
-          kSecAttrKeyType as String: kSecAttrKeyTypeRSA,
-          kSecReturnRef as String: true
-      ]
+      var keyQuery = privateKeyQuery;
+      keyQuery[kSecAttrApplicationTag as String] = alias;
+      
       var storedKey: CFTypeRef?
-      let status = SecItemCopyMatching(getquery as CFDictionary, &storedKey)
+      let status = SecItemCopyMatching(keyQuery as CFDictionary, &storedKey)
       guard status == errSecSuccess else {
         NSLog("Error getting private RSA key from enclave")
         return nil;
