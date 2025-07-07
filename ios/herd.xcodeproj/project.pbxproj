@@ -12,6 +12,8 @@
 		134091EE27F6374100C69C5B /* HerdBluetoothModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 134091EA27F6374100C69C5B /* HerdBluetoothModuleBridge.m */; };
 		134091EF27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 134091ED27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m */; };
 		1343776C28074AB500195DE5 /* HerdCryptoModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1343776B28074AB500195DE5 /* HerdCryptoModule.swift */; };
+		13903C3F2E1C151000FCCFEB /* EventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13903C3E2E1C150900FCCFEB /* EventEmitter.swift */; };
+		13903C452E1C155F00FCCFEB /* EventEmitterBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 13903C442E1C155F00FCCFEB /* EventEmitterBridge.m */; };
 		13A5A96D2809DB2700DD9AF1 /* HerdBluetoothModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A5A96C2809DB2700DD9AF1 /* HerdBluetoothModule.swift */; };
 		13A5A96F2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13A5A96E2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
@@ -59,6 +61,8 @@
 		134091ED27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HerdServiceInterfaceModuleBridge.m; sourceTree = "<group>"; };
 		1343776A28074AB400195DE5 /* herd-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "herd-Bridging-Header.h"; sourceTree = "<group>"; };
 		1343776B28074AB500195DE5 /* HerdCryptoModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerdCryptoModule.swift; sourceTree = "<group>"; };
+		13903C3E2E1C150900FCCFEB /* EventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEmitter.swift; sourceTree = "<group>"; };
+		13903C442E1C155F00FCCFEB /* EventEmitterBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EventEmitterBridge.m; sourceTree = "<group>"; };
 		13A5A96C2809DB2700DD9AF1 /* HerdBluetoothModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerdBluetoothModule.swift; sourceTree = "<group>"; };
 		13A5A96E2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerdServiceInterfaceModule.swift; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* herd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = herd.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -207,10 +211,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				13903C3E2E1C150900FCCFEB /* EventEmitter.swift */,
 				13BB2F282E0D5D6900BD474C /* HerdPermissionManagerModule.swift */,
 				13A5A96C2809DB2700DD9AF1 /* HerdBluetoothModule.swift */,
 				13A5A96E2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift */,
 				134091E827F632BF00C69C5B /* HerdCryptoModuleBridge.m */,
+				13903C442E1C155F00FCCFEB /* EventEmitterBridge.m */,
 				13BB2F2B2E0D5DBC00BD474C /* HerdPermissionManagerModuleBridge.m */,
 				134091EA27F6374100C69C5B /* HerdBluetoothModuleBridge.m */,
 				134091ED27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m */,
@@ -700,12 +706,14 @@
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13A5A96D2809DB2700DD9AF1 /* HerdBluetoothModule.swift in Sources */,
 				13BB2F2C2E0D5DBC00BD474C /* HerdPermissionManagerModuleBridge.m in Sources */,
+				13903C3F2E1C151000FCCFEB /* EventEmitter.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				134091EF27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m in Sources */,
 				13A5A96F2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift in Sources */,
 				1343776C28074AB500195DE5 /* HerdCryptoModule.swift in Sources */,
 				13BB2F292E0D5D7300BD474C /* HerdPermissionManagerModule.swift in Sources */,
 				134091E927F632BF00C69C5B /* HerdCryptoModuleBridge.m in Sources */,
+				13903C452E1C155F00FCCFEB /* EventEmitterBridge.m in Sources */,
 				134091EE27F6374100C69C5B /* HerdBluetoothModuleBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
