@@ -13,6 +13,14 @@ class EventEmitter : RCTEventEmitter {
   
   @objc
   override func supportedEvents() -> [String] {
-      return []
+      return [
+        "newHerdMessagesReceived",
+        "removeMessagesFromQueue",
+        "bluetoothOrLocationStateChange",
+        "newBTDeviceFound",
+        "BTStateChange",
+        "BTConnectionStateChange",
+        "newBTMessageReceived"
+      ]
   }
 }
