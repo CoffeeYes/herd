@@ -35,6 +35,15 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       print("CBCentralManager State is : \(central.state)")
     }
   
+  func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+    EventEmitter.emitter?.sendEvent(
+      withName: "newBTDeviceFound",
+      body: [
+        "name" : peripheral.name ?? "Unknown Device"
+      ]
+    )
+  }
+  
     var bluetoothManager : CBCentralManager?
     var locationManager : CLLocationManager?
     override init() {
