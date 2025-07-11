@@ -55,17 +55,23 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func scanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        bluetoothManager?.scanForPeripherals(withServices : nil);
-        resolve(true);
+      bluetoothManager?.scanForPeripherals(withServices : nil);
+      let scanning = bluetoothManager?.isScanning
+      if(scanning!) {
+        EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_STARTED")
+      }
+      resolve(scanning);
     }
 
     @objc
     func cancelScanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        if(bluetoothManager?.isScanning != nil) {
-            bluetoothManager?.stopScan();
-        }
-        resolve(true);
+      let scanning = bluetoothManager?.isScanning;
+      if(scanning!) {
+          bluetoothManager?.stopScan();
+      }
+      EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_FINISHED")
+      resolve(true);
     }
 
     @objc
