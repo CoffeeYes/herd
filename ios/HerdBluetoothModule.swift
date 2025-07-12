@@ -59,6 +59,10 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
         EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_STARTED")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+          self.bluetoothManager?.stopScan();
+          EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_FINISHED")
+        }
       }
       resolve(scanning);
     }
