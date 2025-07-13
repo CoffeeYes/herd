@@ -5,24 +5,39 @@ import CoreLocation
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   
+  enum emitterStrings : String {
+    case NEW_BT_DEVICE = "newBTDeviceFound"
+    case DISCOVERY_STATE_CHANGE = "BTStateChange"
+    case CONNECTION_STATE_CHANGE = "BTConnectionStateChange"
+    case NEW_MESSAGE = "newBTMessageReceived"
+  }
+
+  enum discoveryEvents : String {
+    case DISCOVERY_STARTED,DISCOVERY_FINISHED
+  }
+
+  enum bluetoothStates : String {
+    case STATE_CONNECTED,STATE_DISCONNECTED
+  }
+  
   @objc
   func constantsToExport() -> [String : Any] {
     return [
       "emitterStrings" : [
-        "NEW_BT_DEVICE" : "newBTDeviceFound",
-        "DISCOVERY_STATE_CHANGE" : "BTStateChange",
-        "CONNECTION_STATE_CHANGE" : "BTConnectionStateChange",
-        "NEW_MESSAGE" : "newBTMessageReceived"
+        "NEW_BT_DEVICE" : emitterStrings.NEW_BT_DEVICE.rawValue,
+        "DISCOVERY_STATE_CHANGE" : emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
+        "CONNECTION_STATE_CHANGE" : emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+        "NEW_MESSAGE" : emitterStrings.NEW_MESSAGE.rawValue
       ],
       "discoveryEvents" : [
         //needs to be changed down the line in android and IOS as current android implementation
         //uses android-only strings from BluetoothAdapter class
-        "DISCOVERY_STARTED" : "DISCOVERY_STARTED",
-        "DISCOVERY_FINISHED" : "DISCOVERY_FINISHED"
+        "DISCOVERY_STARTED" : discoveryEvents.DISCOVERY_STARTED.rawValue,
+        "DISCOVERY_FINISHED" : discoveryEvents.DISCOVERY_FINISHED.rawValue
       ],
       "bluetoothStates" : [
-        "STATE_CONNECTED" : "STATE_CONNECTED",
-        "STATE_DISCONNECTED" : "STATE_DISCONNECTED"
+        "STATE_CONNECTED" : bluetoothStates.STATE_CONNECTED,
+        "STATE_DISCONNECTED" : bluetoothStates.STATE_DISCONNECTED
       ]
     ]
   }
@@ -37,7 +52,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
     EventEmitter.emitter?.sendEvent(
-      withName: "newBTDeviceFound",
+      withName: emitterStrings.NEW_BT_DEVICE.rawValue,
       body: [
         "name" : peripheral.name ?? "Unknown Device"
       ]
@@ -58,10 +73,10 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       bluetoothManager?.scanForPeripherals(withServices : nil);
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
-        EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_STARTED")
+        EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_STARTED.rawValue)
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
           self.bluetoothManager?.stopScan();
-          EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_FINISHED")
+          EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
         }
       }
       resolve(scanning);
@@ -74,7 +89,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       if(scanning!) {
           bluetoothManager?.stopScan();
       }
-      EventEmitter.emitter?.sendEvent(withName: "btStateChange", body: "DISCOVERY_FINISHED")
+      EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
       resolve(true);
     }
 
