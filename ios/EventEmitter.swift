@@ -14,13 +14,13 @@ class EventEmitter : RCTEventEmitter {
   @objc
   override func supportedEvents() -> [String] {
       return [
-        "newHerdMessagesReceived",
-        "removeMessagesFromQueue",
-        "bluetoothOrLocationStateChange",
-        "newBTDeviceFound",
-        "BTStateChange",
-        "BTConnectionStateChange",
-        "newBTMessageReceived"
+        HerdServiceInterfaceModule.emitterStrings.NEW_MESSAGES_RECEIVED.rawValue,
+        HerdServiceInterfaceModule.emitterStrings.REMOVE_MESSAGES_FROM_QUEUE.rawValue,
+        HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
+        HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
+        HerdBluetoothModule.emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
+        HerdBluetoothModule.emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+        HerdBluetoothModule.emitterStrings.NEW_MESSAGE.rawValue,
       ]
   }
 }
