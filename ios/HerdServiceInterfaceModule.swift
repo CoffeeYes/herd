@@ -92,6 +92,7 @@ class HerdServiceInterfaceModule : NSObject {
   reject : RCTPromiseRejectBlock) {
       resolve(false)
   }
+
   @objc
   func disableService() {
       
@@ -101,6 +102,11 @@ class HerdServiceInterfaceModule : NSObject {
   func setFrontendRunning(_ running : Bool) {
     
   }
+
+  @objc
+  func setAllowNotifications(_ allow : Bool) {
+
+  }
   
   @objc
   func notificationsAreEnabled(_ resolve : @escaping RCTPromiseResolveBlock,
@@ -108,6 +114,31 @@ class HerdServiceInterfaceModule : NSObject {
     UNUserNotificationCenter.current().getNotificationSettings { settings in
       resolve(settings.authorizationStatus == .authorized)
     }
+  }
+
+
+  @objc
+  func notificationIsPending(_ notificationID: Int,
+  resolve : RCTPromiseResolveBlock,
+  reject : RCTPromiseRejectBlock) {
+      resolve(false)
+  }
+
+  @objc
+  func sendNotification(_ title : String,
+  text : String,
+  resolve : RCTPromiseResolveBlock,
+  reject : RCTPromiseRejectBlock) {
+      resolve(false)
+  }
+  
+  @objc
+  func updateNotification(_ title : String,
+  text : String,
+  notificationID : Int,
+  resolve : RCTPromiseResolveBlock,
+  reject : RCTPromiseRejectBlock) {
+      resolve(false)
   }
   
   @objc

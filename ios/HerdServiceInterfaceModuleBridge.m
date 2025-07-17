@@ -35,7 +35,21 @@ resolve : (RCTPromiseResolveBlock) resolve
 reject : (RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(disableService)
+
 RCT_EXTERN_METHOD(setFrontendRunning : (BOOL) running)
+
+RCT_EXTERN_METHOD(setAllowNotifications : (BOOL) allow)
+
+RCT_EXTERN_METHOD(sendNotification : (NSString*) title
+text : (NSString*) text
+resolve : (RCTPromiseResolveBlock) resolve
+reject : (RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(updateNotification : (NSString*) title
+text : (NSString*) text
+notificationID : Int
+resolve : (RCTPromiseResolveBlock) resolve
+reject : (RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(notificationsAreEnabled : (RCTPromiseResolveBlock) resolve
 reject : (RCTPromiseRejectBlock) reject)
