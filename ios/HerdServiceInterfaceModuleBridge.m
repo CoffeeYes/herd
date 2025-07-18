@@ -54,6 +54,7 @@ reject : (RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(notificationsAreEnabled : (RCTPromiseResolveBlock) resolve
 reject : (RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(isBound)
+RCT_EXTERN_METHOD(isBound : (RCTPromiseResolveBlock) resolve
+reject : (RCTPromiseRejectBlock) reject)
 
 @end

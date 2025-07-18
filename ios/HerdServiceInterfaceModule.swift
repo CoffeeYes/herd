@@ -116,7 +116,6 @@ class HerdServiceInterfaceModule : NSObject {
     }
   }
 
-
   @objc
   func notificationIsPending(_ notificationID: Int,
   resolve : RCTPromiseResolveBlock,
@@ -142,7 +141,10 @@ class HerdServiceInterfaceModule : NSObject {
   }
   
   @objc
-  func isBound() -> Bool {
+  func isBound( _ resolve : RCTPromiseResolveBlock,
+  reject : RCTPromiseRejectBlock
+  ) -> Bool {
+    resolve(false);
     return false;
   }
 }
