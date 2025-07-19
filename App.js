@@ -229,9 +229,11 @@ const App = ({ }) => {
     const loginPassword = getPasswordHash("login");
     const erasurePassword = getPasswordHash("erasure");
 
+    const setupComplete = JSON.parse(await AsyncStorage.getItem(STORAGE_STRINGS.SETUP_COMPLETE))
+
     //determine the entry screen
     let initialRoute = "splash"
-    if(key?.length > 0) {
+    if(setupComplete) {
       if(loginPassword.length > 0) {
         initialRoute = "passwordLockScreen";
       }

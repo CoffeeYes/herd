@@ -42,6 +42,8 @@ const Splash = ({ navigation }) => {
     dispatch(setMaxPasswordAttempts(defaultMaxPasswordAttempts));
     dispatch(setEnableNotifications(nativeNotificationsEnabled));
     setLoading(false);
+
+    await AsyncStorage.setItem(STORAGE_STRINGS.SETUP_COMPLETE, JSON.stringify(true));
     
     navigation.dispatch(CommonActions.reset({
       index : 0,

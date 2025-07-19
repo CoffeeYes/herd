@@ -119,7 +119,8 @@ const STORAGE_STRINGS = {
   PASSWORD_ATTEMPT_COUNT : "passwordAttemptCount",
   STYLES : "styles",
   ENABLE_NOTIFICATIONS : "enableNotifications",
-  CHATS_WITH_NEW_MESSAGES : "chatsWithNewMessages"
+  CHATS_WITH_NEW_MESSAGES : "chatsWithNewMessages",
+  SETUP_COMPLETE : "setupComplete"
 }
 
 export {
