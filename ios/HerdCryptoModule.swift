@@ -18,15 +18,18 @@ class HerdCryptoModule : NSObject {
             ]
         ]
     }
+  
+    let commonKeyAttributes : [String : Any] = [
+      kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
+      kSecAttrKeySizeInBits as String : 2048,
+    ]
+  
     @objc
     func generateRSAKeyPair(_ alias : String, resolve : RCTPromiseResolveBlock, reject : RCTPromiseRejectBlock) {
-        let attributes : [String : Any] = [
-                kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
-                kSecAttrKeySizeInBits as String : 2048,
-                kSecPrivateKeyAttrs as String: [
-                    kSecAttrIsPermanent as String:    true,
-                    kSecAttrApplicationTag as String: alias
-                ]
+        var attributes = commonKeyAttributes;
+        attributes[kSecPrivateKeyAttrs as String] = [
+          kSecAttrIsPermanent as String:    true,
+          kSecAttrApplicationTag as String: alias
         ]
         var error : Unmanaged<CFError>?
         guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
@@ -131,11 +134,10 @@ class HerdCryptoModule : NSObject {
               NSLog("Error converting key to data")
               return resolve("base64 error");
           }
-          let attributes : [String : Any] = [
-              kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
-              kSecAttrKeySizeInBits as String : 2048,
-              kSecAttrKeyClass as String : kSecAttrKeyClassPublic
-          ]
+          
+          var attributes = commonKeyAttributes
+          attributes[kSecAttrKeyClass as String] = kSecAttrKeyClassPublic
+
           var error : Unmanaged<CFError>?
           publicKey = SecKeyCreateWithData(keyAsData as CFData, attributes as CFDictionary,&error);
         }
