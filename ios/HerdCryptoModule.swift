@@ -232,13 +232,11 @@ class HerdCryptoModule : NSObject {
         return resolve("string conversion error");
       }
       
-      var hash = [UInt8](repeating: 0, count: Int(CC_SHA256_DIGEST_LENGTH));
-      CC_SHA256((stringData as NSData).bytes,CC_LONG(stringData.count),&hash)
+      let digest = SHA512.hash(data: stringData);
       
-      var hashString = "";
-      for byte in hash {
-        hashString += String(format : "%02x", UInt8(byte))
-      }
+      let hashString = digest
+      .compactMap{String(format: "%02x",$0)}
+      .joined()
       
       resolve(hashString);
     }
