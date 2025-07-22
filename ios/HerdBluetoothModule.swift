@@ -68,9 +68,15 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     var bluetoothManager : CBCentralManager?
     var locationManager : CLLocationManager?
     override init() {
-        super.init()
-        bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
-        locationManager = CLLocationManager();
+      super.init()
+      bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
+      locationManager = CLLocationManager();
+      EventEmitter.registerEmitterEvents(events: [
+        HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
+        HerdBluetoothModule.emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
+        HerdBluetoothModule.emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+        HerdBluetoothModule.emitterStrings.NEW_MESSAGE.rawValue
+      ])
     }
     
     @objc

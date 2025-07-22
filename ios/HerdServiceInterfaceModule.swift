@@ -25,6 +25,15 @@ class HerdServiceInterfaceModule : NSObject {
     case RECEIVED_MESSAGES = "received"
   }
   
+  override init() {
+    super.init()
+    EventEmitter.registerEmitterEvents(events: [
+      emitterStrings.NEW_MESSAGES_RECEIVED.rawValue,
+      emitterStrings.REMOVE_MESSAGES_FROM_QUEUE.rawValue,
+      emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue
+    ])
+  }
+  
   @objc
   func constantsToExport() -> [String : Any] {
     return [
