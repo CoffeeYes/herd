@@ -114,7 +114,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func checkForBTAdapter(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      resolve(currentManagerState == CBManagerState.poweredOn || currentManagerState ==  CBManagerState.poweredOff)
+      resolve(currentManagerState != CBManagerState.unknown && currentManagerState !=  CBManagerState.unsupported)
     }
   
     @objc
