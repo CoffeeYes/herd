@@ -325,7 +325,6 @@ const App = ({ }) => {
       screenOptions={{headerShown : false}}>
           <Stack.Screen
           name="passwordLockScreen"
-          options={{gestureEnabled : false}}
           component={PasswordLockScreen}/>
           <Stack.Screen name="splash" component={Splash}/>
           <Stack.Screen name="main" component={Main}/>

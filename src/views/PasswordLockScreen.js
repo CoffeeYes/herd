@@ -54,6 +54,10 @@ const PasswordLockScreen = ({ navigation, route }) => {
       return false;
     })
 
+    navigation.setOptions({
+      gestureEnabled : route?.params?.navigationTarget == "passwordSettings"
+    })
+
     return () => {
       backHandler.remove();
     }
