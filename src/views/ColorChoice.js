@@ -19,6 +19,7 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
     useValue : overrideSliderValues,
     containerStyle : {...styles.sliderContainer, width : sliderWidth},
     rightTitleStyle : {fontWeight : "bold", fontSize : sliderTitleSize},
+    tapToSeek : true,
     rightTextStyle : {fontSize : sliderTextSize}
   }
 

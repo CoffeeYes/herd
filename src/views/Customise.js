@@ -348,6 +348,7 @@ const Customise = () => {
             choices={tabItems}
             textStyle={{fontSize : customStyle.scaledUIFontSize}}
             chosenStyle={{color : palette.primary}}
+            containerStyle={{zIndex : 999}}
             dropDownBoxStyle={{borderRadius : 5}}
             />
             <ColorChoice
