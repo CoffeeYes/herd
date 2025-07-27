@@ -5,6 +5,7 @@ import ValueSlider from './ValueSlider';
 
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, fromHsv } from '../helper';
+import { circle } from 'react-native/Libraries/Animated/Easing';
 
 const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {
@@ -57,20 +58,24 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
   return (
     <View style={{...styles.colorPickerContainer, ...containerStyle}}>
       <View style={{...styles.circleContainer,...style}}>
-        <View style={{...styles.semiCircle, 
-          width : circleWidth / 2, 
-          height : circleWidth, 
-          borderTopLeftRadius : circleWidth / 2, 
-          borderBottomLeftRadius: circleWidth / 2, 
-          backgroundColor : oldColor}
-        }/>
-        <View style={{...styles.semiCircle, 
-          width : circleWidth / 2, 
-          height : circleWidth, 
-          borderTopRightRadius : circleWidth / 2, 
-          borderBottomRightRadius : circleWidth / 2, 
-          backgroundColor : fromHsv(color)}
-        }/>
+        <View style={{width : circleWidth / 2, overflow : "hidden"}}>
+          <View style={{...styles.semiCircle, 
+            width : circleWidth, 
+            height : circleWidth, 
+            borderTopLeftRadius : circleWidth / 2, 
+            borderBottomLeftRadius: circleWidth / 2, 
+            backgroundColor : oldColor}
+          }/>
+        </View>
+        <View style={{width : circleWidth / 2, overflow : "hidden", transform : [{rotate : '180deg'}]}}>
+          <View style={{...styles.semiCircle, 
+            width : circleWidth, 
+            height : circleWidth, 
+            borderTopLeftRadius : circleWidth / 2, 
+            borderBottomLeftRadius: circleWidth / 2, 
+            backgroundColor : fromHsv(color)}
+          }/>
+        </View>
       </View>
       <ValueSlider
       {...sliderProps}
