@@ -635,6 +635,8 @@ const styles = {
     marginTop : "auto",
     paddingLeft : 10,
     borderRadius : 10,
+    paddingBottom : 10,
+    paddingTop : 10
   },
   inputContainer : {
     flexDirection : "row",
