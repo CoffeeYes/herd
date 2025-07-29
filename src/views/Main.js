@@ -19,6 +19,7 @@ const Main = ({ route }) => {
 
     return(
       <Tab.Navigator
+      backBehavior='history'
       initialRouteName={route?.params?.initialRoute || "chats"}
       screenOptions={({ route }) => ({
         headerShown : false,
