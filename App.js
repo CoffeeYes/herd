@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   NativeEventEmitter,
@@ -302,7 +302,7 @@ const App = ({ }) => {
     removeCompletedMessagesFromRealm(messagesToRemove);
   }
 
-  const PrimaryWrapper = ({children}) => {
+  const PrimaryWrapper = useCallback(({children}) => {
     return (
       Platform.OS === "ios" ?
       <SafeAreaView style={{flex : 1}}>
@@ -313,7 +313,7 @@ const App = ({ }) => {
       {children}
       </>
     )
-  }
+  },[])
 
   return (
     <PrimaryWrapper>
