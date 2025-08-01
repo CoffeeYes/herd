@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   NativeEventEmitter,
@@ -49,6 +49,19 @@ import { getUniqueKeysFromMessages } from './src/helper.js';
 import { loadChatsWithNewMessages, STORAGE_STRINGS } from './src/common.js';
 
 const Stack = createStackNavigator();
+
+const PrimaryWrapper = ({children}) => {
+  return (
+    Platform.OS === "ios" ?
+    <SafeAreaView style={{flex : 1}}>
+      {children}
+    </SafeAreaView>
+    :
+    <>
+    {children}
+    </>
+  )
+}
 
 const App = ({ }) => {
   const dispatch = useDispatch();
@@ -301,19 +314,6 @@ const App = ({ }) => {
     messagesToRemove.length > 0 &&
     removeCompletedMessagesFromRealm(messagesToRemove);
   }
-
-  const PrimaryWrapper = useCallback(({children}) => {
-    return (
-      Platform.OS === "ios" ?
-      <SafeAreaView style={{flex : 1}}>
-        {children}
-      </SafeAreaView>
-      :
-      <>
-      {children}
-      </>
-    )
-  },[])
 
   return (
     <PrimaryWrapper>
