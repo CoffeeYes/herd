@@ -4,11 +4,22 @@ import CoreLocation
 
 @objc(HerdPermissionManagerModule)
 class HerdPermissionManagerModule : NSObject {
-
+  
     var locationManager : CLLocationManager?
     override init() {
-        super.init();
-        locationManager = CLLocationManager();
+      super.init();
+      locationManager = CLLocationManager();
+    }
+    
+    @objc
+    func constantsToExport() -> [String : Any] {
+      return [
+        "navigationTargets" : [
+          "settings" : UIApplication.openSettingsURLString,
+          "notificationSettings" : "",
+          "locationSettings" : ""
+        ]
+      ]
     }
 
     @objc
@@ -58,8 +69,9 @@ class HerdPermissionManagerModule : NSObject {
     }
 
     @objc
-    func navigateToSettings(_ resolve : RCTPromiseResolveBlock,
+  func navigateToSettings(_ navigationTarget : String,
+    resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      resolve(false)
     }
 }

@@ -19,7 +19,8 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(requestNotificationPermissions: (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(navigateToSettings: (RCTPromiseResolveBlock) resolve
+RCT_EXTERN_METHOD(navigateToSettings: (NSString*) navigationTarget
+resolve: (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
 @end
