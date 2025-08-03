@@ -16,8 +16,8 @@ class HerdPermissionManagerModule : NSObject {
       return [
         "navigationTargets" : [
           "settings" : UIApplication.openSettingsURLString,
-          "notificationSettings" : "",
-          "locationSettings" : ""
+          "notificationSettings" : UIApplication.openSettingsURLString,
+          "locationSettings" : UIApplication.openSettingsURLString
         ]
       ]
     }
@@ -70,8 +70,16 @@ class HerdPermissionManagerModule : NSObject {
 
     @objc
   func navigateToSettings(_ navigationTarget : String,
-    resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
+  resolve : @escaping RCTPromiseResolveBlock,
+  reject : RCTPromiseRejectBlock) {
+    if let settingsURL = URL(string: navigationTarget) {
+      DispatchQueue.main.async(execute: {
+        UIApplication.shared.open(settingsURL)
+        resolve(true)
+      })
+    }
+    else {
       resolve(false)
     }
+  }
 }
