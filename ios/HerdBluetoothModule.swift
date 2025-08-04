@@ -120,7 +120,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func requestBTEnable(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      if(currentManagerState == .poweredOn) {
+        resolve(true)
+      }
+      else {
+        bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
+        resolve(currentManagerState == .poweredOn)
+      }
     }
 
     @objc
