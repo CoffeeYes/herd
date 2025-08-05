@@ -41,20 +41,26 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       ]
     ]
   }
+  
+  let CBManagerStates : [CBManagerState : String] = [
+    .poweredOn : "poweredOn",
+    .poweredOff : "poweredOff",
+    .unauthorized : "unauthorized",
+    .unsupported : "unsupported",
+    .unknown : "unknown"
+  ]
+  
+  var currentManagerState : CBManagerState?;
+  func centralManagerDidUpdateState(_ central: CBCentralManager) {
+    currentManagerState = central.state;
+    print("CBCentralManager State is : \(CBManagerStates[currentManagerState!] ?? "not defined in CBManagerStates")")
     
-    var currentManagerState : CBManagerState?;
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-      print("CBCentralManager initialized");
-      
-      currentManagerState = central.state;
-      print("CBCentralManager State is : \(central.state)")
-      
-      if(central.state == .poweredOff) {
-        EventEmitter.emitter?.sendEvent(
-          withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
-          body: HerdServiceInterfaceModule.bluetoothErrors.ADAPTER_TURNED_OFF.rawValue)
-      }
+    if(central.state == .poweredOff) {
+      EventEmitter.emitter?.sendEvent(
+        withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
+        body: HerdServiceInterfaceModule.bluetoothErrors.ADAPTER_TURNED_OFF.rawValue)
     }
+  }
   
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
     EventEmitter.emitter?.sendEvent(
@@ -145,7 +151,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func requestLocationEnable(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(false)
+      resolve(true)
     }
 
     @objc
