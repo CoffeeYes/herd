@@ -8,6 +8,7 @@ const initialState = {
   sendNotificationForNewMessages : true,
   backgroundServiceRunning : false,
   styles : defaultChatStyles,
+  bluetoothAdapterAvailable : false
 }
 
 const appStateReducer = (state=initialState, action) => {
@@ -34,6 +35,9 @@ const appStateReducer = (state=initialState, action) => {
       let oldStyles = {...state.styles};
       const newStyles = {...oldStyles,...action.payload}
       return {...state, styles : newStyles}
+    }
+    case "SET_BT_ADAPTER_AVAILABLE": {
+      return {...state, bluetoothAdapterAvailable : action.payload}
     }
     default:
       return state;

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { View } from 'react-native';
-import Bluetooth from '../nativeWrapper/Bluetooth';
 import PermissionManager from '../nativeWrapper/PermissionManager';
 import Header from './Header';
 import Card from './Card';
@@ -20,7 +19,12 @@ import { checkOrRequestConnectionServices, requestMakeDiscoverable, requestPermi
 
 const AddContact = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [bluetoothError,setBluetoothError] = useState("");
+  const bluetoothAdapterAvailable = useSelector(state => state.appStateReducer.bluetoothAdapterAvailable)
+  const [bluetoothError,setBluetoothError] = useState(bluetoothAdapterAvailable ? 
+    "" 
+    : 
+    "No Bluetooth Adapters Found"
+  );
   const [showQRCode, setShowQRCode] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [requestedPermissions, setRequestedPermissions] = useState([]);
@@ -31,18 +35,6 @@ const AddContact = ({ navigation }) => {
   const iconSize = useScreenAdjustedSize(0.35,0.075);
 
   const navigating = useRef(false);
-
-  useEffect(() => {
-    initialBTCheck();
-  },[])
-
-  const initialBTCheck = async () => {
-    let adapter = await Bluetooth.checkForBTAdapter();
-
-    if(!adapter) {
-      return setBluetoothError("No Bluetooth Adapters Found");
-    }
-  }
 
   const requestBTPermissions = async () => {
     setBluetoothError("");

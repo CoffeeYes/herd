@@ -54,6 +54,13 @@ const setStyles = styles => {
   }
 }
 
+const setBluetoothAdapterAvailable = available => {
+  return {
+    type : "SET_BT_ADAPTER_AVAILABLE",
+    payload : available
+  }
+}
+
 export {
   setInitialRoute,
   setLocked,
@@ -62,5 +69,6 @@ export {
   setMaxPasswordAttempts,
   setEnableNotifications,
   setBackgroundServiceRunning,
-  setStyles
+  setStyles,
+  setBluetoothAdapterAvailable
 }

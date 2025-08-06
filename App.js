@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import navigationRef from './src/NavigationRef.js'
 import Crypto from './src/nativeWrapper/Crypto.js';
 import ServiceInterface from './src/nativeWrapper/ServiceInterface.js'
+import Bluetooth from './src/nativeWrapper/Bluetooth.js';
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -44,7 +45,7 @@ import { getPasswordHash, openPasswordRealm } from './src/realm/passwordRealm';
 import { setPublicKey, setPassword } from './src/redux/actions/userActions';
 import { setContacts } from './src/redux/actions/contactActions';
 import { setChats, setMessageQueue, removeMessagesFromQueue } from './src/redux/actions/chatActions';
-import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning, setStyles } from './src/redux/actions/appStateActions';
+import { setEnableNotifications, setLastRoutes, setMaxPasswordAttempts, setBackgroundServiceRunning, setStyles, setBluetoothAdapterAvailable } from './src/redux/actions/appStateActions';
 import { getUniqueKeysFromMessages } from './src/helper.js';
 import { loadChatsWithNewMessages, STORAGE_STRINGS } from './src/common.js';
 
@@ -96,6 +97,9 @@ const App = ({ }) => {
       await openContactRealm();
       await openPasswordRealm();
       await loadInitialState();
+
+      dispatch(setBluetoothAdapterAvailable(await Bluetooth.checkForBTAdapter()))
+
       const serviceRunning = await ServiceInterface.isRunning();
       dispatch(setBackgroundServiceRunning(serviceRunning));
       if(serviceRunning) {
