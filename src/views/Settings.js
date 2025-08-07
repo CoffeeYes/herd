@@ -53,6 +53,7 @@ const Settings = ({ navigation }) => {
   const userHasPassword = useSelector(state => state.userReducer.loginPasswordHash).length > 0;
   const enableNotifications = useSelector(state => state.appStateReducer.sendNotificationForNewMessages);
   const backgroundServiceRunning = useSelector(state => state.appStateReducer.backgroundServiceRunning)
+  const bluetoothAdapterAvailable = useSelector(state => state.appStateReducer.bluetoothAdapterAvailable);
 
   const cardIconSize = useScreenAdjustedSize(0.075,0.05) + (customStyle.scaledUIFontSize*0.2);
   
@@ -191,11 +192,18 @@ certain permissions to be allowed all the time`
           will not be transmitted
           </Text>}
 
+          {!bluetoothAdapterAvailable &&
+          <Text style={{...styles.warning, marginTop : 20, fontWeight : "bold"}}>
+              No Bluetooth Adapter Found, Can't use backgroundService
+          </Text>}
+
           <View style={{flexDirection : "row", marginVertical: 10}}>
             <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
             <Switch
             {...switchProps}
+            disabled={!bluetoothAdapterAvailable}
             style={{marginLeft : 10}}
+            {...(!bluetoothAdapterAvailable && {trackColor : palette.grey, ios_backgroundColor : palette.grey})}
             onValueChange={val => toggleBackgroundTransfer(val)}
             value={backgroundServiceRunning}
             thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}/>
