@@ -175,7 +175,7 @@ certain permissions to be allowed all the time`
   const switchProps = {
     disabled : QRCodeVisible,
     trackColor : { false : palette.grey, true : palette.primary},
-    ios_backgroundColor : palette.primary
+    ios_backgroundColor : {false : palette.grey, true : palette.primary}
   }
 
   return (
@@ -203,6 +203,7 @@ certain permissions to be allowed all the time`
             {...switchProps}
             disabled={!bluetoothAdapterAvailable}
             style={{marginLeft : 10}}
+            ios_backgroundColor={backgroundServiceRunning ? palette.primary : palette.grey}
             {...(!bluetoothAdapterAvailable && {trackColor : palette.grey, ios_backgroundColor : palette.grey})}
             onValueChange={val => toggleBackgroundTransfer(val)}
             value={backgroundServiceRunning}
@@ -217,6 +218,7 @@ certain permissions to be allowed all the time`
           style={{marginTop: 10}}
           onValueChange={async val => await toggleNotifications(val)}
           value={enableNotifications}
+          ios_backgroundColor={enableNotifications ? palette.primary : palette.grey}
           thumbColor={enableNotifications ? palette.secondary : palette.lightgrey}/>
         </View>
 
