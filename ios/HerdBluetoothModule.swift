@@ -66,7 +66,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     EventEmitter.emitter?.sendEvent(
       withName: emitterStrings.NEW_BT_DEVICE.rawValue,
       body: [
-        "name" : peripheral.name ?? "Unknown Device"
+        "name" : peripheral.name ?? "Unknown Device",
+        "macAddress" : peripheral.identifier.uuidString
       ]
     )
   }
