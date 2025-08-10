@@ -184,35 +184,37 @@ certain permissions to be allowed all the time`
 
       <ScrollView contentContainerStyle={{alignItems : "center", paddingBottom : 10}}>
 
-        <View style={styles.card}>
+        <View style={{...styles.card, textAlign : "left"}}>
+          
+          <View style={{alignItems : "flex-start"}}>
+            {!backgroundServiceRunning &&
+            <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
+            WARNING : if you disable background transfers your messages
+            will not be transmitted
+            </Text>}
 
-          {!backgroundServiceRunning &&
-          <Text style={{...styles.warning, fontSize : customStyle.scaledUIFontSize}}>
-          WARNING : if you disable background transfers your messages
-          will not be transmitted
-          </Text>}
+            {!bluetoothAdapterAvailable &&
+            <Text style={{...styles.warning, marginTop : 20, fontWeight : "bold"}}>
+                No Bluetooth Adapter Found, Can't use backgroundService
+            </Text>}
 
-          {!bluetoothAdapterAvailable &&
-          <Text style={{...styles.warning, marginTop : 20, fontWeight : "bold"}}>
-              No Bluetooth Adapter Found, Can't use backgroundService
-          </Text>}
-
-          <View style={{flexDirection : "row", marginVertical: 10}}>
-            <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
-            <Switch
-            {...switchProps}
-            disabled={!bluetoothAdapterAvailable}
-            style={{marginLeft : 10}}
-            ios_backgroundColor={backgroundServiceRunning ? palette.primary : palette.grey}
-            {...(!bluetoothAdapterAvailable && {trackColor : palette.grey, ios_backgroundColor : palette.grey})}
-            onValueChange={val => toggleBackgroundTransfer(val)}
-            value={backgroundServiceRunning}
-            thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}/>
+            <View style={{flexDirection : "row", marginVertical: 10}}>
+              <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Background Transfers</Text>
+              <Switch
+              {...switchProps}
+              disabled={!bluetoothAdapterAvailable}
+              style={{marginLeft : 10}}
+              ios_backgroundColor={backgroundServiceRunning ? palette.primary : palette.grey}
+              {...(!bluetoothAdapterAvailable && {trackColor : palette.grey, ios_backgroundColor : palette.grey})}
+              onValueChange={val => toggleBackgroundTransfer(val)}
+              value={backgroundServiceRunning}
+              thumbColor={backgroundServiceRunning ? palette.secondary : palette.lightgrey}/>
+            </View>
           </View>
         </View>
 
         <View style={styles.card}>
-          <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}> Send me a notification when new messages are received</Text>
+          <Text style={{fontWeight : "bold", fontSize : customStyle.scaledUIFontSize}}>Send me a notification when new messages are received</Text>
           <Switch
           {...switchProps}
           style={{marginTop: 10}}
