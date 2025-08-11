@@ -5,6 +5,8 @@ import CoreLocation
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   
+  private let herdDeviceIdentifier = "_HERD"
+  
   enum emitterStrings : String {
     case NEW_BT_DEVICE = "newBTDeviceFound"
     case DISCOVERY_STATE_CHANGE = "BTStateChange"
@@ -63,13 +65,16 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   }
   
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-    EventEmitter.emitter?.sendEvent(
-      withName: emitterStrings.NEW_BT_DEVICE.rawValue,
-      body: [
-        "name" : peripheral.name ?? "Unknown Device",
-        "macAddress" : peripheral.identifier.uuidString
-      ]
-    )
+    let name = peripheral.name
+    if(name != nil && name!.contains(herdDeviceIdentifier)) {
+      EventEmitter.emitter?.sendEvent(
+        withName: emitterStrings.NEW_BT_DEVICE.rawValue,
+        body: [
+          "name" : peripheral.name,
+          "macAddress" : peripheral.identifier.uuidString
+        ]
+      )
+    }
   }
   
     var bluetoothManager : CBCentralManager?
