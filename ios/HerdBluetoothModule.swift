@@ -70,7 +70,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       EventEmitter.emitter?.sendEvent(
         withName: emitterStrings.NEW_BT_DEVICE.rawValue,
         body: [
-          "name" : peripheral.name,
+          "name" : peripheral.name?.replacingOccurrences(of: herdDeviceIdentifier, with: ""),
           "macAddress" : peripheral.identifier.uuidString
         ]
       )
@@ -132,13 +132,10 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func requestBTEnable(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      if(currentManagerState == .poweredOn) {
-        resolve(true)
-      }
-      else {
+      if(currentManagerState != .poweredOn) {
         bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
-        resolve(currentManagerState == .poweredOn)
       }
+      resolve(currentManagerState == .poweredOn)
     }
 
     @objc
