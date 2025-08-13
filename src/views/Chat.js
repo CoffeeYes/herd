@@ -538,6 +538,7 @@ const Chat = ({ route, navigation }) => {
           <LoadingIndicator/>}
 
           <SectionList
+          canCancelContentTouches={!enableGestureHandler}
           removeClippedSubviews
           contentContainerStyle={{paddingTop : 5, flexGrow : 1, justifyContent : "flex-end"}}
           windowSize={chatWindowSize}
