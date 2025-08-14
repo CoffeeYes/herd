@@ -34,8 +34,8 @@ const CustomSlider = ({
 }
 
 CustomSlider.defaultProps = {
-  minimumTrackTintColor : palette.secondary,
-  maximumTrackTintColor : palette.primary,
+  minimumTrackTintColor : palette.primary,
+  maximumTrackTintColor : palette.secondary,
   thumbTintColor : palette.primary
 }
 

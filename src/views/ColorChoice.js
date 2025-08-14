@@ -5,7 +5,6 @@ import ValueSlider from './ValueSlider';
 
 import { palette } from '../assets/palette';
 import { useScreenAdjustedSize, fromHsv } from '../helper';
-import { circle } from 'react-native/Libraries/Animated/Easing';
 
 const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sliderTitleSize,
                        sliderTextSize, overrideSliderValues}) => {

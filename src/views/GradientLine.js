@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { Svg, Defs, Stop, LinearGradient, Line } from 'react-native-svg';
 
 const GradientLine = ({ gradientPoints = [], lineWidth = 10, style }) => {
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(1);
   return (
     <View style={style} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
       <Svg viewBox={`0 0 ${containerWidth} ${lineWidth}`}>
