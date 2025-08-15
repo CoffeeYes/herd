@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import { Svg, Defs, Stop, LinearGradient, Line } from 'react-native-svg';
 
+const defaultContainerWidth = 1;
+
 const GradientLine = ({ gradientPoints = [], lineWidth = 10, style }) => {
-  const [containerWidth, setContainerWidth] = useState(1);
+  const [containerWidth, setContainerWidth] = useState(defaultContainerWidth);
   return (
     <View style={style} onLayout={e => setContainerWidth(e.nativeEvent.layout.width)}>
+      {containerWidth != defaultContainerWidth &&
       <Svg viewBox={`0 0 ${containerWidth} ${lineWidth}`}>
         <Defs>  
           <LinearGradient id="gradient" x1="0%" x2="100%" y1="0" y2="0">
@@ -17,7 +20,7 @@ const GradientLine = ({ gradientPoints = [], lineWidth = 10, style }) => {
           </LinearGradient>
         </Defs>
         <Line stroke="url(#gradient)" x1="0%" x2="100%" y1="0" y2="0" strokeWidth={lineWidth.toString()}/>
-      </Svg>
+      </Svg>}
     </View>
   )
 }
