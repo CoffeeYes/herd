@@ -15,13 +15,13 @@ const CustomSlider = ({
   return (
     <View style={{...styles.container,...containerStyle}}>
       <View style={styles.sliderContainer}>
-      {showColorPreview &&
-      <GradientLine
-      style={styles.gradientLine}
-      gradientPoints={previewGradientPoints}/>}
-      <Slider
-      style={{...styles.slider, ...sliderStyle}}
-      {...props}/>
+        {showColorPreview &&
+        <GradientLine
+        style={styles.gradientLine}
+        gradientPoints={previewGradientPoints}/>}
+        <Slider
+        style={{...styles.slider, ...sliderStyle}}
+        {...props}/>
       </View>
       <View style={rightTextContainerStyle}>
         {rightTitleString?.length > 0 &&
@@ -52,9 +52,10 @@ const styles = {
   },
   sliderContainer : {
     flex : 1,
+    marginRight : Platform.OS == "ios" ? 20 : 0
   },
   gradientLine : {
-    paddingHorizontal : 15,
+    paddingHorizontal : Platform.OS == 'android' ? 15 : 0,
     flex : 1,
     height : 20
   }
