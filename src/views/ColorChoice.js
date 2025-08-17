@@ -1,5 +1,5 @@
 import React, { useMemo }  from 'react';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 
 import ValueSlider from './ValueSlider';
 
@@ -20,7 +20,8 @@ const ColorChoice = ({ style, onColorChange, color, oldColor, containerStyle, sl
     containerStyle : {...styles.sliderContainer, width : sliderWidth},
     rightTitleStyle : {fontWeight : "bold", fontSize : sliderTitleSize},
     tapToSeek : true,
-    rightTextStyle : {fontSize : sliderTextSize}
+    rightTextStyle : {fontSize : sliderTextSize},
+    ...(Platform.OS == "ios" && {sliderContainerStyle : {marginRight : 20}})
   }
 
   const rainbowGradientPoints = useMemo(() => Array.from(Array(36).keys()).map(value => ({

@@ -7,6 +7,7 @@ import GradientLine from './GradientLine';
 
 const CustomSlider = ({
                         rightTitle, rightText, containerStyle, sliderStyle,
+                        sliderContainerStyle,
                         rightTextContainerStyle, rightTextStyle, rightTitleStyle,
                         showColorPreview, previewGradientPoints,
                         ...props}) => {
@@ -14,7 +15,7 @@ const CustomSlider = ({
   const rightTextString = rightText?.toString();
   return (
     <View style={{...styles.container,...containerStyle}}>
-      <View style={styles.sliderContainer}>
+      <View style={{...styles.sliderContainer, ...sliderContainerStyle}}>
         {showColorPreview &&
         <GradientLine
         style={styles.gradientLine}
@@ -52,7 +53,6 @@ const styles = {
   },
   sliderContainer : {
     flex : 1,
-    marginRight : Platform.OS == "ios" ? 20 : 0
   },
   gradientLine : {
     paddingHorizontal : Platform.OS == 'android' ? 15 : 0,
