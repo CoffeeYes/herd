@@ -19,6 +19,11 @@ class HerdCryptoModule : NSObject {
         ]
     }
   
+    @objc
+    static func requiresMainQueueSetup() -> Bool {
+      return true;
+    }
+  
     let commonKeyAttributes : [String : Any] = [
       kSecAttrKeyType as String : kSecAttrKeyTypeRSA,
       kSecAttrKeySizeInBits as String : 2048,

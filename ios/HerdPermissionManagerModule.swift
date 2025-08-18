@@ -21,6 +21,11 @@ class HerdPermissionManagerModule : NSObject {
         ]
       ]
     }
+    
+    @objc
+    static func requiresMainQueueSetup() -> Bool {
+      return true;
+    }
 
     @objc
     func checkBTPermissions(_ resolve : RCTPromiseResolveBlock,

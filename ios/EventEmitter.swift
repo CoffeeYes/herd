@@ -11,6 +11,11 @@ class EventEmitter : RCTEventEmitter {
     EventEmitter.emitter = self
   }
   
+  @objc
+  override static func requiresMainQueueSetup() -> Bool {
+    return true;
+  }
+  
   private static var emitterStrings = [String]();
   
   static func registerEmitterEvents(events : [String]) {

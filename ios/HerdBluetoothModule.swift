@@ -44,6 +44,11 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     ]
   }
   
+  @objc
+  static func requiresMainQueueSetup() -> Bool {
+    return true;
+  }
+  
   let CBManagerStates : [CBManagerState : String] = [
     .poweredOn : "poweredOn",
     .poweredOff : "poweredOff",

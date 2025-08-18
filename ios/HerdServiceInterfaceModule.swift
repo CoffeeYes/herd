@@ -35,6 +35,11 @@ class HerdServiceInterfaceModule : NSObject {
   }
   
   @objc
+  static func requiresMainQueueSetup() -> Bool {
+    return true;
+  }
+  
+  @objc
   func constantsToExport() -> [String : Any] {
     return [
       "emitterStrings" : [
