@@ -46,4 +46,8 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(cancelConnectAsClient : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
+RCT_EXTERN_METHOD(addListener : (NSString*) eventName)
+
+RCT_EXTERN_METHOD(removeListeners : (int) eventName)
+
 @end

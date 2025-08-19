@@ -197,4 +197,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }
+  
+    @objc
+    func addListener(_ eventName: String!) {
+      print("[HerdBluetoothModule] added listener, eventName : \(eventName!)");
+    }
+    
+    @objc
+    func removeListeners(_ count: Double) {
+      print("[HerdBluetoothModule] Removed Listeners, new count : \(count)");
+    }
 }
