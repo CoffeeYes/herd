@@ -95,6 +95,17 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
         HerdBluetoothModule.emitterStrings.NEW_MESSAGE.rawValue
       ])
     }
+  
+    //see below, .denied is propagated when settings -> privacy -> location is turned off
+    //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+      if(manager.authorizationStatus == .denied) {
+        EventEmitter.emitter?.sendEvent(
+          withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
+          body: HerdServiceInterfaceModule.bluetoothErrors.LOCATION_DISABLED.rawValue
+        )
+      }
+    }
     
     @objc
     func scanForDevices(_ resolve : RCTPromiseResolveBlock,
@@ -153,7 +164,10 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
     @objc
     func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-        resolve(HerdPermissionManagerModule().checkLocationIsAuthorized())
+      //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
+      resolve(CLLocationManager.locationServicesEnabled())
+      //old resolver based on app's location permissions.
+      //resolve(HerdPermissionManagerModule().checkLocationIsAuthorized())
     }
 
     @objc
