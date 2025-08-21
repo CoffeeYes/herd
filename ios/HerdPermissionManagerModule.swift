@@ -16,10 +16,22 @@ class HerdPermissionManagerModule : NSObject {
       return [
         "navigationTargets" : [
           "settings" : UIApplication.openSettingsURLString,
-          "notificationSettings" : UIApplication.openSettingsURLString,
+          "notificationSettings" : getNotificationSettingsURL(),
           "locationSettings" : UIApplication.openSettingsURLString
         ]
       ]
+    }
+  
+    func getNotificationSettingsURL() -> String {
+      if #available(iOS 16.0, *) {
+        return UIApplication.openNotificationSettingsURLString
+      }
+      else if #available(iOS 15.4,*) {
+        return UIApplicationOpenNotificationSettingsURLString
+      }
+      else {
+        return UIApplication.openSettingsURLString
+      }
     }
     
     @objc
@@ -77,7 +89,7 @@ class HerdPermissionManagerModule : NSObject {
   func navigateToSettings(_ navigationTarget : String,
   resolve : @escaping RCTPromiseResolveBlock,
   reject : RCTPromiseRejectBlock) {
-    if let settingsURL = URL(string: navigationTarget) {
+    if let settingsURL = URL(string: navigationTarget),UIApplication.shared.canOpenURL(settingsURL) {
       DispatchQueue.main.async(execute: {
         UIApplication.shared.open(settingsURL)
         resolve(true)
