@@ -21,7 +21,8 @@ const NavigationWarningWrapper = ({ children, checkForChanges,
 
   useEffect(() => {
     const beforeGoingBack = navigation.addListener('beforeRemove', async (e) => {
-      if(e.data.action.type !== "GO_BACK") {
+      //GO_BACK is classic back navigation, POP fires e.g on ios swipe-back gesture
+      if(!["GO_BACK","POP"].includes(e.data.action.type)) {
         return;
       }
       e.preventDefault();
