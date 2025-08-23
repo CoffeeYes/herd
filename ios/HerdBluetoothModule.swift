@@ -59,14 +59,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   
   var currentManagerState : CBManagerState?;
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
-    currentManagerState = central.state;
-    print("CBCentralManager State is : \(CBManagerStates[currentManagerState!] ?? "not defined in CBManagerStates")")
-    
-    if(central.state == .poweredOff) {
+    //only send turned_off event if transition is from on->off, currentManager state = previous manager state at this point
+    if(currentManagerState == .poweredOn && central.state == .poweredOff) {
       EventEmitter.emitter?.sendEvent(
         withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
         body: HerdServiceInterfaceModule.bluetoothErrors.ADAPTER_TURNED_OFF.rawValue)
     }
+    currentManagerState = central.state;
+    print("CBCentralManager State is : \(CBManagerStates[currentManagerState!] ?? "not defined in CBManagerStates")")
   }
   
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
