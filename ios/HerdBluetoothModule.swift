@@ -3,7 +3,7 @@ import CoreBluetooth
 import CoreLocation
 
 @objc(HerdBluetoothModule)
-class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
+class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate {
   
   private let herdDeviceIdentifier = "_HERD"
   
@@ -88,6 +88,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
       super.init()
       bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
       locationManager = CLLocationManager();
+      locationManager?.delegate = self;
       EventEmitter.registerEmitterEvents(events: [
         HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
         HerdBluetoothModule.emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
@@ -98,7 +99,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate {
   
     //see below, .denied is propagated when settings -> privacy -> location is turned off
     //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+    func locationManagerDidChangeAuthorization(_ manager : CLLocationManager) {
       if(manager.authorizationStatus == .denied) {
         EventEmitter.emitter?.sendEvent(
           withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
