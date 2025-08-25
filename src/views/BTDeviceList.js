@@ -1,11 +1,12 @@
 import React, { useState, useEffect,  useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Text, View, ScrollView, TouchableOpacity, 
-  NativeEventEmitter, AppState } from 'react-native';
+  NativeEventEmitter, AppState, Platform } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import PermissionManager from '../nativeWrapper/PermissionManager';
+import EventEmitter from '../nativeWrapper/EventEmitter';
 
 import BTExchangeModal from './BTExchangeModal';
 import Header from './Header';
@@ -44,8 +45,8 @@ const BTDeviceList = ({ navigation }) => {
   }
 
   useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(Bluetooth);
-    const serviceEventEmitter = new NativeEventEmitter(ServiceInterface);
+    const eventEmitter = new NativeEventEmitter(Platform.OS == "ios" ? EventEmitter : Bluetooth);
+    const serviceEventEmitter = new NativeEventEmitter(Platform.OS == "ios" ? EventEmitter : ServiceInterface);
 
     const appStateListener = AppState.addEventListener("change",async state => {
       appStateRef.current = state;

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { View, Text, NativeEventEmitter } from 'react-native';
+import { View, Text, NativeEventEmitter, Platform } from 'react-native';
 import Bluetooth from '../nativeWrapper/Bluetooth';
 import ServiceInterface from '../nativeWrapper/ServiceInterface';
 import CustomModal from './CustomModal';
 import CustomButton from './CustomButton';
+import EventEmitter from '../nativeWrapper/EventEmitter';
 
 import { palette } from '../assets/palette';
 import { useOrientationBasedStyle, useStateAndRef } from '../helper';
@@ -29,8 +30,8 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});
 
   useEffect(() => {
-    const eventEmitter = new NativeEventEmitter(Bluetooth);
-    const serviceEventEmitter = new NativeEventEmitter(ServiceInterface)
+    const eventEmitter = new NativeEventEmitter(Platform.OS == "ios" ? EventEmitter : Bluetooth);
+    const serviceEventEmitter = new NativeEventEmitter(Platform.OS == "ios" ? EventEmitter : ServiceInterface)
 
     //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {

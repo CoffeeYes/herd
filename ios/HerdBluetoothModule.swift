@@ -106,6 +106,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
           body: HerdServiceInterfaceModule.bluetoothErrors.LOCATION_DISABLED.rawValue
         )
       }
+      
     }
     
     @objc

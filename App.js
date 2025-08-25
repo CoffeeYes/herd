@@ -15,6 +15,7 @@ import navigationRef from './src/NavigationRef.js'
 import Crypto from './src/nativeWrapper/Crypto.js';
 import ServiceInterface from './src/nativeWrapper/ServiceInterface.js'
 import Bluetooth from './src/nativeWrapper/Bluetooth.js';
+import EventEmitter from './src/nativeWrapper/EventEmitter.js';
 
 import Chats from './src/views/Chats';
 import Chat from './src/views/Chat';
@@ -123,7 +124,7 @@ const App = ({ }) => {
       setLoading(false);
     })()
 
-    const eventEmitter = new NativeEventEmitter(ServiceInterface);
+    const eventEmitter = new NativeEventEmitter(Platform.OS == "ios" ? EventEmitter : ServiceInterface);
     const messagesListener = eventEmitter.addListener(ServiceInterface.emitterStrings.NEW_MESSAGES_RECEIVED, async messages => {
       const routes = navigationRef.current.getState().routes;
       const lastRoute = routes[routes.length - 1];
