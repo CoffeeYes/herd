@@ -161,14 +161,4 @@ class HerdServiceInterfaceModule : NSObject {
     resolve(false);
     return false;
   }
-  
-  @objc
-  func addListener(_ eventName: String!) {
-    print("[ServiceInterfaceModule] added listener, eventName : \(eventName!)");
-  }
-  
-  @objc
-  func removeListeners(_ count: Double) {
-    print("[ServiceInterfaceModule] Removed Listeners, new count : \(count)");
-  }
 }
