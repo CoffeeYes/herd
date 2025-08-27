@@ -148,7 +148,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
                 //create object to pass to javascript
                 val deviceObject : WritableMap = Arguments.createMap();
                 deviceObject.putString("name",deviceName.replace(herdDeviceIdentifier,""));
-                deviceObject.putString("macAddress",deviceHardwareAddress);
+                deviceObject.putString("identifier",deviceHardwareAddress);
 
                 //pass object to JS through event emitter
                 reactContext.getJSModule(RCTDeviceEventEmitter::class.java)

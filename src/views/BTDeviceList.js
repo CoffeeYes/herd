@@ -53,10 +53,10 @@ const BTDeviceList = ({ navigation }) => {
     })
 
     const bluetoothListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_BT_DEVICE, device => {
-      if(!activeScanDeviceList.current.find(existingDevice => existingDevice.macAddress == device.macAddress)) {
+      if(!activeScanDeviceList.current.find(existingDevice => existingDevice.macAddress == device.identifier)) {
         activeScanDeviceList.current.push(device);
       }
-      if(!deviceListRef.current.find(existingDevice => existingDevice.macAddress == device.macAddress)) {
+      if(!deviceListRef.current.find(existingDevice => existingDevice.macAddress == device.identifier)) {
         setDeviceList([...deviceListRef.current,device]);
       }
     });
@@ -116,7 +116,7 @@ const BTDeviceList = ({ navigation }) => {
     if(services.enabled) {
       await Bluetooth.cancelScanForDevices();
       await Bluetooth.listenAsServer();
-      await Bluetooth.connectAsClient(device.macAddress);
+      await Bluetooth.connectAsClient(device.identifier);
       setShowModal(true);
     }
     else if(services.missing == "location") {
@@ -163,11 +163,11 @@ const BTDeviceList = ({ navigation }) => {
         <ScrollView contentContainerStyle={{...styles.BTList}}>
           {deviceList.map((device) =>
             <TouchableOpacity
-            key={device.macAddress}
+            key={device.identifier}
             style={styles.deviceContainer}
             onPress={ () => handleDeviceClick(device)}>
               <Text style={{fontSize : customStyle.scaledUIFontSize}}>{device.name || "Nameless Device"}</Text>
-              <Text style={{fontSize : customStyle.scaledUIFontSize}}>{device.macAddress}</Text>
+              <Text style={{fontSize : customStyle.scaledUIFontSize}}>{device.identifier}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>

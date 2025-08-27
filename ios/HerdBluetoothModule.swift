@@ -76,7 +76,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         withName: emitterStrings.NEW_BT_DEVICE.rawValue,
         body: [
           "name" : peripheral.name?.replacingOccurrences(of: herdDeviceIdentifier, with: ""),
-          "macAddress" : peripheral.identifier.uuidString
+          "identifier" : peripheral.identifier.uuidString
         ]
       )
     }
