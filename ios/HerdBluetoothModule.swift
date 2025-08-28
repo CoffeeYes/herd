@@ -69,9 +69,11 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     print("CBCentralManager State is : \(CBManagerStates[currentManagerState!] ?? "not defined in CBManagerStates")")
   }
   
+  private var discoveredPeripherals : [UUID : CBPeripheral] = [:];
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
     let name = peripheral.name
     if(name != nil && name!.contains(herdDeviceIdentifier)) {
+      discoveredPeripherals[peripheral.identifier] = peripheral;
       EventEmitter.emitter?.sendEvent(
         withName: emitterStrings.NEW_BT_DEVICE.rawValue,
         body: [
@@ -112,6 +114,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     @objc
     func scanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
+      discoveredPeripherals = [:];
       bluetoothManager?.scanForPeripherals(withServices : nil);
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
@@ -203,7 +206,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
 
     @objc
-    func connectAsClient(_ resolve : RCTPromiseResolveBlock,
+  func connectAsClient(_ device : String,
+    resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
         resolve(false)
     }

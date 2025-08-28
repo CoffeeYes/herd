@@ -40,7 +40,8 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(cancelListenAsServer : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(connectAsClient : (RCTPromiseResolveBlock) resolve
+RCT_EXTERN_METHOD(connectAsClient : (NSString*) device
+resolve : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(cancelConnectAsClient : (RCTPromiseResolveBlock) resolve
