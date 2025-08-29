@@ -206,10 +206,15 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
 
     @objc
-  func connectAsClient(_ device : String,
+    func connectAsClient(_ device : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
+      if let deviceUUID = UUID(uuidString: device),discoveredPeripherals[deviceUUID] != nil {
+        let device = discoveredPeripherals[deviceUUID];
+      }
+      else {
         resolve(false)
+      }
     }
 
     @objc
