@@ -86,12 +86,12 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   
     var bluetoothManager : CBCentralManager?
     var locationManager : CLLocationManager?
-    var currentLocationAuthorization : CLAuthorizationStatus?
+    var locationEnabled = false;
     override init() {
       super.init()
       bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
       locationManager = CLLocationManager();
-      currentLocationAuthorization = locationManager?.authorizationStatus;
+      locationEnabled = CLLocationManager.locationServicesEnabled();
       locationManager?.delegate = self;
       EventEmitter.registerEmitterEvents(events: [
         HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
@@ -104,14 +104,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     //see below, .denied is propagated when settings -> privacy -> location is turned off
     //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
     func locationManagerDidChangeAuthorization(_ manager : CLLocationManager) {
-      let wasAuthorized = currentLocationAuthorization == .authorizedAlways || currentLocationAuthorization == .authorizedWhenInUse;
-      if(manager.authorizationStatus == .denied && wasAuthorized) {
+    if(manager.authorizationStatus == .denied && locationEnabled) {
         EventEmitter.emitter?.sendEvent(
           withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
           body: HerdServiceInterfaceModule.bluetoothErrors.LOCATION_DISABLED.rawValue
         )
+        locationEnabled = false;
       }
-      currentLocationAuthorization = manager.authorizationStatus;
     }
     
     @objc
@@ -173,7 +172,9 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
-      resolve(CLLocationManager.locationServicesEnabled())
+      let enabled = CLLocationManager.locationServicesEnabled();
+      locationEnabled = enabled;
+      resolve(enabled)
       //old resolver based on app's location permissions.
       //resolve(HerdPermissionManagerModule().checkLocationIsAuthorized())
     }
