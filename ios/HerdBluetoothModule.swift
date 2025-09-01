@@ -91,7 +91,9 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       super.init()
       bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
       locationManager = CLLocationManager();
-      locationEnabled = CLLocationManager.locationServicesEnabled();
+      if([.authorizedAlways,.authorizedWhenInUse].contains(locationManager?.authorizationStatus)) {
+        locationEnabled = CLLocationManager.locationServicesEnabled();
+      }
       locationManager?.delegate = self;
       EventEmitter.registerEmitterEvents(events: [
         HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
