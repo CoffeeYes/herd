@@ -84,6 +84,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
   }
   
+  let CLLocationStates : [CLAuthorizationStatus : String] = [
+    .authorizedAlways : "authorizedAlways",
+    .authorizedWhenInUse : "authorizedWhenInUse",
+    .denied : "denied",
+    .notDetermined : "notDetermined",
+    .restricted : "restricted",
+  ]
+  
     var bluetoothManager : CBCentralManager?
     var locationManager : CLLocationManager?
     var locationEnabled = false;
@@ -91,9 +99,6 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       super.init()
       bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
       locationManager = CLLocationManager();
-      if([.authorizedAlways,.authorizedWhenInUse].contains(locationManager?.authorizationStatus)) {
-        locationEnabled = CLLocationManager.locationServicesEnabled();
-      }
       locationManager?.delegate = self;
       EventEmitter.registerEmitterEvents(events: [
         HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
@@ -106,12 +111,16 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     //see below, .denied is propagated when settings -> privacy -> location is turned off
     //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
     func locationManagerDidChangeAuthorization(_ manager : CLLocationManager) {
-    if(manager.authorizationStatus == .denied && locationEnabled) {
+      print("locationAuthorizationStatus : \(CLLocationStates[manager.authorizationStatus] ?? "unknown")")
+      if(manager.authorizationStatus == .denied && locationEnabled) {
         EventEmitter.emitter?.sendEvent(
           withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
           body: HerdServiceInterfaceModule.bluetoothErrors.LOCATION_DISABLED.rawValue
         )
         locationEnabled = false;
+      }
+      else if([.authorizedAlways,.authorizedWhenInUse,.notDetermined].contains(locationManager?.authorizationStatus)) {
+        locationEnabled = CLLocationManager.locationServicesEnabled();
       }
     }
     
