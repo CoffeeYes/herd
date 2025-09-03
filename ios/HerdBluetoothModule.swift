@@ -5,7 +5,8 @@ import CoreLocation
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate {
   
-  private let herdDeviceIdentifier = "_HERD"
+  private let herdDeviceIdentifier = "_HERD";
+  let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
   
   enum emitterStrings : String {
     case NEW_BT_DEVICE = "newBTDeviceFound"
@@ -120,7 +121,9 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         locationEnabled = false;
       }
       else if([.authorizedAlways,.authorizedWhenInUse,.notDetermined].contains(locationManager?.authorizationStatus)) {
-        locationEnabled = CLLocationManager.locationServicesEnabled();
+        asyncQueue.async(execute: {
+          self.locationEnabled = CLLocationManager.locationServicesEnabled();
+        })
       }
     }
     
@@ -180,12 +183,12 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
 
     @objc
-    func checkLocationEnabled(_ resolve : RCTPromiseResolveBlock,
+    func checkLocationEnabled(_ resolve : @escaping RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
-      let enabled = CLLocationManager.locationServicesEnabled();
-      locationEnabled = enabled;
-      resolve(enabled)
+      asyncQueue.async(execute: {
+        resolve(CLLocationManager.locationServicesEnabled())
+      })
       //old resolver based on app's location permissions.
       //resolve(HerdPermissionManagerModule().checkLocationIsAuthorized())
     }
