@@ -21,6 +21,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		13BB2F292E0D5D7300BD474C /* HerdPermissionManagerModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13BB2F282E0D5D6900BD474C /* HerdPermissionManagerModule.swift */; };
 		13BB2F2C2E0D5DBC00BD474C /* HerdPermissionManagerModuleBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 13BB2F2B2E0D5DBC00BD474C /* HerdPermissionManagerModuleBridge.m */; };
+		13C3F57E2E69ED5E00FBE522 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13C3F57D2E69ED5700FBE522 /* Constants.swift */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -73,6 +74,7 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = herd/main.m; sourceTree = "<group>"; };
 		13BB2F282E0D5D6900BD474C /* HerdPermissionManagerModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerdPermissionManagerModule.swift; sourceTree = "<group>"; };
 		13BB2F2B2E0D5DBC00BD474C /* HerdPermissionManagerModuleBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HerdPermissionManagerModuleBridge.m; sourceTree = "<group>"; };
+		13C3F57D2E69ED5700FBE522 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		14D779013C374760ADCB39FD /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
 		1C8A5731BD56BCAD4CE41E9B /* Pods-herd.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herd.debug.xcconfig"; path = "Target Support Files/Pods-herd/Pods-herd.debug.xcconfig"; sourceTree = "<group>"; };
 		27EF0F89DB6CC3AB96717C50 /* Pods-herd-herdTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-herd-herdTests.release.xcconfig"; path = "Target Support Files/Pods-herd-herdTests/Pods-herd-herdTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				13C3F57D2E69ED5700FBE522 /* Constants.swift */,
 				13903C3E2E1C150900FCCFEB /* EventEmitter.swift */,
 				13BB2F282E0D5D6900BD474C /* HerdPermissionManagerModule.swift */,
 				13A5A96C2809DB2700DD9AF1 /* HerdBluetoothModule.swift */,
@@ -710,6 +713,7 @@
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				134091EF27F6374100C69C5B /* HerdServiceInterfaceModuleBridge.m in Sources */,
 				13A5A96F2809DB3900DD9AF1 /* HerdServiceInterfaceModule.swift in Sources */,
+				13C3F57E2E69ED5E00FBE522 /* Constants.swift in Sources */,
 				1343776C28074AB500195DE5 /* HerdCryptoModule.swift in Sources */,
 				13BB2F292E0D5D7300BD474C /* HerdPermissionManagerModule.swift in Sources */,
 				134091E927F632BF00C69C5B /* HerdCryptoModuleBridge.m in Sources */,
