@@ -37,7 +37,7 @@ class HerdCryptoModule : NSObject {
           kSecAttrApplicationTag as String: alias
         ]
         var error : Unmanaged<CFError>?
-        guard let privateKey = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
+        guard SecKeyCreateRandomKey(attributes as CFDictionary, &error) != nil else {
             return resolve(false);
         }
         resolve(true);
