@@ -62,7 +62,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func centralManagerDidUpdateState(_ central: CBCentralManager) {
     //only send turned_off event if transition is from on->off, currentManager state = previous manager state at this point
     if(currentManagerState == .poweredOn && central.state == .poweredOff) {
-      EventEmitter.emitter?.sendEvent(
+      EventEmitter.emitter.sendEvent(
         withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
         body: HerdServiceInterfaceModule.bluetoothErrors.ADAPTER_TURNED_OFF.rawValue)
     }
@@ -75,7 +75,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     let name = peripheral.name
     if(name != nil && name!.contains(herdDeviceIdentifier)) {
       discoveredPeripherals[peripheral.identifier] = peripheral;
-      EventEmitter.emitter?.sendEvent(
+      EventEmitter.emitter.sendEvent(
         withName: emitterStrings.NEW_BT_DEVICE.rawValue,
         body: [
           "name" : peripheral.name?.replacingOccurrences(of: herdDeviceIdentifier, with: ""),
@@ -114,7 +114,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     func locationManagerDidChangeAuthorization(_ manager : CLLocationManager) {
       print("locationAuthorizationStatus : \(CLLocationStates[manager.authorizationStatus] ?? "unknown")")
       if(manager.authorizationStatus == .denied && locationEnabled) {
-        EventEmitter.emitter?.sendEvent(
+        EventEmitter.emitter.sendEvent(
           withName: HerdServiceInterfaceModule.emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue,
           body: HerdServiceInterfaceModule.bluetoothErrors.LOCATION_DISABLED.rawValue
         )
@@ -134,10 +134,10 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       bluetoothManager?.scanForPeripherals(withServices : nil);
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
-        EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_STARTED.rawValue)
+        EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_STARTED.rawValue)
         DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
           self.bluetoothManager?.stopScan();
-          EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
+          EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
         }
       }
       resolve(scanning);
@@ -150,7 +150,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       if(scanning!) {
           bluetoothManager?.stopScan();
       }
-      EventEmitter.emitter?.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
+      EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
       resolve(true);
     }
 

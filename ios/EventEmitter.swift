@@ -4,11 +4,10 @@ import React
 @objc(EventEmitter)
 class EventEmitter : RCTEventEmitter {
   
-  public static var emitter : EventEmitter?
+  static let emitter = EventEmitter();
 
   override init() {
     super.init()
-    EventEmitter.emitter = self
   }
   
   @objc
