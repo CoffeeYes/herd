@@ -25,6 +25,9 @@
     <string name="BTConnectionUUID">
       acc99392-7f38-11eb-9439-0242ac130002
     </string>
+    <string name="blePeripheralScanServiceUUID">
+      267d960a-a8ff-4040-9140-c2e7218a4ede    
+    </string>
 
     <string name="serviceChannelID">
       HerdServiceChannel

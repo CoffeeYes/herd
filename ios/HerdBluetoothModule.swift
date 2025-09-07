@@ -131,7 +131,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     func scanForDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       discoveredPeripherals = [:];
-      bluetoothManager?.scanForPeripherals(withServices : nil);
+      bluetoothManager?.scanForPeripherals(withServices : [CBUUID(string: bleUUIDs.peripheralScanServiceUUID)]);
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
         EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_STARTED.rawValue)
