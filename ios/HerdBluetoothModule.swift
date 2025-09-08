@@ -85,6 +85,18 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
   }
   
+  func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+    peripheral.discoverServices(nil);
+  }
+  
+  func peripheral(_ peripheral : CBPeripheral, didDiscoverServices error : Error?) {
+    if(error != nil) {
+      print("Error discovering services \(String(describing: error))");
+      return;
+    }
+    print("Discovered services \(String(describing: peripheral.services))");
+  }
+  
   let CLLocationStates : [CLAuthorizationStatus : String] = [
     .authorizedAlways : "authorizedAlways",
     .authorizedWhenInUse : "authorizedWhenInUse",
@@ -229,6 +241,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     reject : RCTPromiseRejectBlock) {
       if let deviceUUID = UUID(uuidString: device),discoveredPeripherals[deviceUUID] != nil {
         let device = discoveredPeripherals[deviceUUID];
+        bluetoothManager?.connect(device!, options: nil);
       }
       else {
         resolve(false)
