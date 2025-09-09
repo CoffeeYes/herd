@@ -97,6 +97,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     print("Discovered services \(String(describing: peripheral.services))");
   }
   
+  func bleStartAdvertising() {
+    let peripheralManager = CBPeripheralManager();
+    peripheralManager.startAdvertising([
+      CBAdvertisementDataLocalNameKey : UIDevice.current.name + herdDeviceIdentifier,
+      CBAdvertisementDataServiceUUIDsKey : [CBUUID(string: bleUUIDs.peripheralScanServiceUUID)]
+    ])
+  }
+  
   let CLLocationStates : [CLAuthorizationStatus : String] = [
     .authorizedAlways : "authorizedAlways",
     .authorizedWhenInUse : "authorizedWhenInUse",
