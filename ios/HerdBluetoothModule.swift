@@ -3,7 +3,7 @@ import CoreBluetooth
 import CoreLocation
 
 @objc(HerdBluetoothModule)
-class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate {
+class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate, CBPeripheralDelegate {
   
   private let herdDeviceIdentifier = "_HERD";
   let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
@@ -87,6 +87,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
     peripheral.discoverServices(nil);
+    peripheral.delegate = self;
   }
   
   func peripheral(_ peripheral : CBPeripheral, didDiscoverServices error : Error?) {
@@ -97,6 +98,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     print("Discovered services \(String(describing: peripheral.services))");
   }
   
+  func peripheral(_ peripheral : CBPeripheral, didDiscoverCharacteristicsFor service : CBService, error : Error?) {
+    if(error != nil) {
+      print("Error discovering characteristics \(String(describing: error))");
+      return;
+    }
+    print("Discovered characteristics \(String(describing: service.characteristics))");
+  }
+ 
   func bleStartAdvertising() {
     let peripheralManager = CBPeripheralManager();
     peripheralManager.startAdvertising([
