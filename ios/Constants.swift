@@ -8,4 +8,6 @@ struct bleUUIDs {
   static let MTUCharacteristicUUID = "7f9f74f7-2d7d-4f6a-b5c9-81983202ef1f";
   static let BTConnectionUUID = "acc99392-7f38-11eb-9439-0242ac13000";
   static let peripheralScanServiceUUID = "267d960a-a8ff-4040-9140-c2e7218a4ede";
+  static let peripheralPublicKeyCharacteristicUUID = "16c55ee2-0fa4-4324-8b1b-503d7029a9f7";
+  static let peripheralUserDataServiceUUID = "d8128594-e7ab-440f-94f6-9fdf64adfb68";
 }

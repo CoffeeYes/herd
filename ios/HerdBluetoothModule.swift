@@ -108,6 +108,22 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
  
   func bleStartAdvertising() {
     let peripheralManager = CBPeripheralManager();
+    
+    let publicKeyCharacteristic = CBMutableCharacteristic(
+      type: CBUUID(string: bleUUIDs.peripheralPublicKeyCharacteristicUUID),
+      properties: [.read],
+      value: nil,
+      permissions: .readable
+    );
+    
+    let HerdUserDataService = CBMutableService(
+      type: CBUUID(string: bleUUIDs.peripheralUserDataServiceUUID),
+      primary: true
+    );
+    
+    HerdUserDataService.characteristics = [publicKeyCharacteristic];
+    
+    peripheralManager.add(HerdUserDataService)
     peripheralManager.startAdvertising([
       CBAdvertisementDataLocalNameKey : UIDevice.current.name + herdDeviceIdentifier,
       CBAdvertisementDataServiceUUIDsKey : [CBUUID(string: bleUUIDs.peripheralScanServiceUUID)]
