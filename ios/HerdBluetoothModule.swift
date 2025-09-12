@@ -96,6 +96,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       return;
     }
     print("Discovered services \(String(describing: peripheral.services))");
+    
+    if let targetService = peripheral.services?.first(where : {$0.uuid.uuidString == bleUUIDs.peripheralUserDataServiceUUID}) {
+      peripheral.discoverCharacteristics(
+        [CBUUID(string : bleUUIDs.peripheralPublicKeyCharacteristicUUID)],
+        for: targetService
+      )
+    }
   }
   
   func peripheral(_ peripheral : CBPeripheral, didDiscoverCharacteristicsFor service : CBService, error : Error?) {
@@ -104,6 +111,9 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       return;
     }
     print("Discovered characteristics \(String(describing: service.characteristics))");
+    if let publicKeyCharacteristic = service.characteristics?.first(where: {$0.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID}) {
+      peripheral.readValue(for: publicKeyCharacteristic)
+    }
   }
  
   func bleStartAdvertising() {
