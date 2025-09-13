@@ -105,6 +105,19 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
   }
   
+  func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
+    if(error != nil) {
+      print("Error discovering services \(String(describing: error))");
+      return;
+    }
+    if(characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
+      let publicKeyData = characteristic.value! as Data;
+      let publicKeyString = String(decoding: publicKeyData, as: Unicode.UTF8.self);
+      print("read public key from characteristic \(publicKeyString)");
+      EventEmitter.emitter.sendEvent(withName: emitterStrings.NEW_MESSAGE.rawValue, body: ["key" : publicKeyString])
+    }
+  }
+  
   func peripheral(_ peripheral : CBPeripheral, didDiscoverCharacteristicsFor service : CBService, error : Error?) {
     if(error != nil) {
       print("Error discovering characteristics \(String(describing: error))");
