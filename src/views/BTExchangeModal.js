@@ -60,7 +60,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     })
 
     //listen for messages to receive keys and ACKS
-    const messageListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_MESSAGE, msg => {
+    const messageListener = eventEmitter.addListener(Bluetooth.emitterStrings.NEW_DATA_FROM_CONNECTION, msg => {
       try {
         const message = JSON.parse(msg);
         if(message?.key) {

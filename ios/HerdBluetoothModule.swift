@@ -12,7 +12,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     case NEW_BT_DEVICE = "newBTDeviceFound"
     case DISCOVERY_STATE_CHANGE = "BTStateChange"
     case CONNECTION_STATE_CHANGE = "BTConnectionStateChange"
-    case NEW_MESSAGE = "newBTMessageReceived"
+    case NEW_DATA_FROM_CONNECTION = "BTNewDataFromConnection"
   }
 
   enum discoveryEvents : String {
@@ -30,7 +30,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         "NEW_BT_DEVICE" : emitterStrings.NEW_BT_DEVICE.rawValue,
         "DISCOVERY_STATE_CHANGE" : emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
         "CONNECTION_STATE_CHANGE" : emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
-        "NEW_MESSAGE" : emitterStrings.NEW_MESSAGE.rawValue
+        "NEW_DATA_FROM_CONNECTION" : emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue
       ],
       "discoveryEvents" : [
         //needs to be changed down the line in android and IOS as current android implementation
@@ -114,7 +114,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       let publicKeyData = characteristic.value! as Data;
       let publicKeyString = String(decoding: publicKeyData, as: Unicode.UTF8.self);
       print("read public key from characteristic \(publicKeyString)");
-      EventEmitter.emitter.sendEvent(withName: emitterStrings.NEW_MESSAGE.rawValue, body: ["key" : publicKeyString])
+      EventEmitter.emitter.sendEvent(withName: emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue, body: ["key" : publicKeyString])
     }
   }
   
@@ -173,7 +173,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
         HerdBluetoothModule.emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
         HerdBluetoothModule.emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
-        HerdBluetoothModule.emitterStrings.NEW_MESSAGE.rawValue
+        HerdBluetoothModule.emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue
       ])
     }
   

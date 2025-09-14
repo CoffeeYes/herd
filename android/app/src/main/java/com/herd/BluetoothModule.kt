@@ -61,14 +61,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       val NEW_BT_DEVICE = "newBTDeviceFound";
       val DISCOVERY_STATE_CHANGE = "BTStateChange";
       val CONNECTION_STATE_CHANGE = "BTConnectionStateChange";
-      val NEW_MESSAGE = "newBTMessageReceived";
+      val NEW_DATA_FROM_CONNECTION = "BTNewDataFromConnection";
     }
 
     private final val emitterStringMap : Map<String,String> = mapOf(
       "NEW_BT_DEVICE" to emitterStrings.NEW_BT_DEVICE,
       "DISCOVERY_STATE_CHANGE" to emitterStrings.DISCOVERY_STATE_CHANGE,
       "CONNECTION_STATE_CHANGE" to emitterStrings.CONNECTION_STATE_CHANGE,
-      "NEW_MESSAGE" to emitterStrings.NEW_MESSAGE
+      "NEW_DATA_FROM_CONNECTION" to emitterStrings.NEW_DATA_FROM_CONNECTION
     )
 
     private final val bluetoothDiscoveryEventsMap : Map<String,String> = mapOf(
@@ -457,7 +457,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
                 //emit string upwards to javscript event listener
                 context.getJSModule(RCTDeviceEventEmitter::class.java)
-                .emit(emitterStrings.NEW_MESSAGE,receivedString);
+                .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,receivedString);
               }
           }
           Log.i(TAG,"BTConnectionThread shouldRun is false, returning");
