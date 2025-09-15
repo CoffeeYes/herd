@@ -8,6 +8,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   private let herdDeviceIdentifier = "_HERD";
   let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
   
+  private var targetDeviceForConnection : CBPeripheral? = nil;
+  
   enum emitterStrings : String {
     case NEW_BT_DEVICE = "newBTDeviceFound"
     case DISCOVERY_STATE_CHANGE = "BTStateChange"
@@ -86,7 +88,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   }
   
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-    peripheral.discoverServices(nil);
+    print("connected to peripheral, name : \(peripheral.name ?? "no name"), identifier : \(peripheral.identifier.uuidString)");
+    if(peripheral == targetDeviceForConnection) {
+      EventEmitter.emitter.sendEvent(
+        withName: emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+        body: bluetoothStates.STATE_CONNECTED.rawValue
+      )
+    }
+    peripheral.discoverServices([CBUUID(string : bleUUIDs.peripheralUserDataServiceUUID)]);
     peripheral.delegate = self;
   }
   
@@ -297,6 +306,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     reject : RCTPromiseRejectBlock) {
       if let deviceUUID = UUID(uuidString: device),discoveredPeripherals[deviceUUID] != nil {
         let device = discoveredPeripherals[deviceUUID];
+        targetDeviceForConnection = device;
         bluetoothManager?.connect(device!, options: nil);
       }
       else {
