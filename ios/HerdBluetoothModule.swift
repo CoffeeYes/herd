@@ -99,6 +99,20 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     peripheral.delegate = self;
   }
   
+  func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+    if(error != nil) {
+      print("Error during peripheral disconnection \(String(describing: error))");
+      return;
+    }
+    print("disconnected from peripheral, name : \(peripheral.name ?? "no name"), identifier : \(peripheral.identifier.uuidString)");
+    if(peripheral == targetDeviceForConnection) {
+      EventEmitter.emitter.sendEvent(
+        withName: emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+        body: bluetoothStates.STATE_DISCONNECTED.rawValue
+      )
+    }
+  }
+  
   func peripheral(_ peripheral : CBPeripheral, didDiscoverServices error : Error?) {
     if(error != nil) {
       print("Error discovering services \(String(describing: error))");
