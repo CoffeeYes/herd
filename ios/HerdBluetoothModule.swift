@@ -52,6 +52,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     return true;
   }
   
+  func sendBTPeripheralDisconnectEvent() {
+    EventEmitter.emitter.sendEvent(
+      withName: emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
+      body: bluetoothStates.STATE_DISCONNECTED.rawValue
+    )
+  }
+  
   let CBManagerStates : [CBManagerState : String] = [
     .poweredOn : "poweredOn",
     .poweredOff : "poweredOff",
@@ -106,16 +113,15 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
     print("disconnected from peripheral, name : \(peripheral.name ?? "no name"), identifier : \(peripheral.identifier.uuidString)");
     if(peripheral == targetDeviceForConnection) {
-      EventEmitter.emitter.sendEvent(
-        withName: emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
-        body: bluetoothStates.STATE_DISCONNECTED.rawValue
-      )
+      sendBTPeripheralDisconnectEvent();
     }
   }
   
   func peripheral(_ peripheral : CBPeripheral, didDiscoverServices error : Error?) {
     if(error != nil) {
       print("Error discovering services \(String(describing: error))");
+      bluetoothManager?.cancelPeripheralConnection(peripheral);
+      sendBTPeripheralDisconnectEvent();
       return;
     }
     print("Discovered services \(String(describing: peripheral.services))");
@@ -131,6 +137,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
     if(error != nil) {
       print("Error discovering services \(String(describing: error))");
+      bluetoothManager?.cancelPeripheralConnection(peripheral);
+      sendBTPeripheralDisconnectEvent();
       return;
     }
     if(characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
@@ -144,6 +152,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func peripheral(_ peripheral : CBPeripheral, didDiscoverCharacteristicsFor service : CBService, error : Error?) {
     if(error != nil) {
       print("Error discovering characteristics \(String(describing: error))");
+      bluetoothManager?.cancelPeripheralConnection(peripheral);
+      sendBTPeripheralDisconnectEvent();
       return;
     }
     print("Discovered characteristics \(String(describing: service.characteristics))");
