@@ -5,7 +5,6 @@ import CoreLocation
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate, CBPeripheralDelegate {
   
-  private let herdDeviceIdentifier = "_HERD";
   let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
   
   private var targetDeviceForConnection : CBPeripheral? = nil;
@@ -82,16 +81,14 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   private var discoveredPeripherals : [UUID : CBPeripheral] = [:];
   func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
     let name = peripheral.name
-    if(name != nil && name!.contains(herdDeviceIdentifier)) {
-      discoveredPeripherals[peripheral.identifier] = peripheral;
-      EventEmitter.emitter.sendEvent(
-        withName: emitterStrings.NEW_BT_DEVICE.rawValue,
-        body: [
-          "name" : peripheral.name?.replacingOccurrences(of: herdDeviceIdentifier, with: ""),
-          "identifier" : peripheral.identifier.uuidString
-        ]
-      )
-    }
+    discoveredPeripherals[peripheral.identifier] = peripheral;
+    EventEmitter.emitter.sendEvent(
+      withName: emitterStrings.NEW_BT_DEVICE.rawValue,
+      body: [
+        "name" : peripheral.name ?? "N/A",
+        "identifier" : peripheral.identifier.uuidString
+      ]
+    )
   }
   
   func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -181,7 +178,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     
     peripheralManager.add(HerdUserDataService)
     peripheralManager.startAdvertising([
-      CBAdvertisementDataLocalNameKey : UIDevice.current.name + herdDeviceIdentifier,
+      CBAdvertisementDataLocalNameKey : UIDevice.current.name,
       CBAdvertisementDataServiceUUIDsKey : [CBUUID(string: bleUUIDs.peripheralScanServiceUUID)]
     ])
   }
