@@ -16,6 +16,12 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothManager
+
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanFilter
+import android.bluetooth.le.ScanSettings
+
 import android.content.Intent
 import android.content.Context
 import android.content.IntentFilter
@@ -34,6 +40,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.os.Build
+import android.os.ParcelUuid
 import android.net.Uri
 
 import java.util.UUID
@@ -417,6 +424,43 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         catch(e : Exception) {
           Log.e(TAG, "Could not close client socket when cancelling BT client thread")
         }
+      }
+    }
+
+    private val leScanCallback: ScanCallback = object : ScanCallback() {
+        override fun onScanResult(callbackType: Int, result: ScanResult) {
+            super.onScanResult(callbackType, result);
+            Log.i(TAG, "BLE Scan Result Callback Invoked")
+            //perform actions related to finding a device
+            val device : BluetoothDevice = result.getDevice();
+            val name = device.getName();
+            val address = device.getAddress();
+            Log.i(TAG, "device name : " + name);
+            Log.i(TAG, "device Address : " + address);
+        }
+    }
+    
+    private var bleScanning = false;
+    private fun scanForBLEPeripheral() {
+      val bluetoothAdapter = bluetoothManager.getAdapter();
+
+      val peripheralScanServiceUUID = ParcelUuid(UUID.fromString("267d960a-a8ff-4040-9140-c2e7218a4ede"))
+      val filter = ScanFilter.Builder()
+      .setServiceUuid(peripheralScanServiceUUID)
+      .build()
+
+      val settings = ScanSettings.Builder()
+      .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER)
+      .setCallbackType(ScanSettings.CALLBACK_TYPE_FIRST_MATCH or ScanSettings.CALLBACK_TYPE_MATCH_LOST)
+      .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
+      .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
+      .build()
+
+      val bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
+
+      if(!bleScanning) {
+        bleScanner?.startScan(listOf(filter),settings,leScanCallback);
+        bleScanning = true;
       }
     }
 
