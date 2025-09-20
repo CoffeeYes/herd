@@ -437,6 +437,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             val address = device.getAddress();
             Log.i(TAG, "device name : " + name);
             Log.i(TAG, "device Address : " + address);
+            //create object to pass to javascript
+            val deviceName = device?.name ?: "N/A"
+            val deviceHardwareAddress = device?.address // MAC address
+            if(deviceHardwareAddress != null) {
+              Log.i(TAG, "device using blePeripheralServiceUUID found, emitting device to JS")
+              val deviceObject : WritableMap = Arguments.createMap();
+              deviceObject.putString("name",deviceName);
+              deviceObject.putString("identifier",deviceHardwareAddress);
+
+              //pass object to JS through event emitter
+              reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+              .emit(emitterStrings.NEW_BT_DEVICE,deviceObject)
+            }
         }
     }
     
