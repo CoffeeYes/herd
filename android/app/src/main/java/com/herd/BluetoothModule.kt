@@ -17,6 +17,10 @@ import android.bluetooth.BluetoothSocket
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothManager
 
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattServerCallback
+
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanFilter
@@ -475,6 +479,36 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
       }
+    }
+
+    private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
+      override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
+        Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+            BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+            BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+            BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+            BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+            else -> "UNKNOWN STATE"
+        });
+
+        if(newState == BluetoothProfile.STATE_CONNECTED) {
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
+        }
+        else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED)
+        }
+      }
+    }
+
+    fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
+      peripheral.connectGatt(
+        context,
+        false,
+        bluetoothGattClientCallback,
+        BluetoothDevice.TRANSPORT_LE
+      )
     }
 
     private inner class BTConnectionThread(private val socket : BluetoothSocket) : Thread() {
