@@ -461,7 +461,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private fun scanForBLEPeripheral() {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
-      val peripheralScanServiceUUID = ParcelUuid(UUID.fromString("267d960a-a8ff-4040-9140-c2e7218a4ede"))
+      val peripheralScanServiceUUID = ParcelUuid(UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID)))
       val filter = ScanFilter.Builder()
       .setServiceUuid(peripheralScanServiceUUID)
       .build()
