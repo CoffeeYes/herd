@@ -20,6 +20,8 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
+import android.bluetooth.BluetoothGattCharacteristic
 
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -500,6 +502,31 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED)
         }
       }
+
+    override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
+      Log.i(TAG, "onServicesDiscovered fires, status : $status");
+      if(status == BluetoothGatt.GATT_SUCCESS) {
+        val services = gatt.getServices();
+
+        val peripheralScanService : BluetoothGattService? = services.find {
+          service -> service.uuid.equals(UUID.fromString(context.getString(R.string.BTConnectionUUID)))
+        };
+
+        val publicKeyCharacteristic : BluetoothGattCharacteristic? =
+        peripheralScanService?.characteristics?.find { characteristic ->
+          characteristic.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID)))
+        };
+
+        if(publicKeyCharacteristic != null) {
+          Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
+          //gatt.readDescriptor(publicKeyCharacteristic.getDescriptor(messageQueueDescriptorUUID));
+        }
+        else {
+          Log.i(TAG,"No Matching service/characteristic found, disconnecting");
+          gatt.disconnect();
+        }
+      }
+    }
     }
 
     fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
