@@ -494,6 +494,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         });
 
         if(newState == BluetoothProfile.STATE_CONNECTED) {
+          gatt.discoverServices();
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
         }
@@ -508,12 +509,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       if(status == BluetoothGatt.GATT_SUCCESS) {
         val services = gatt.getServices();
 
-        val peripheralScanService : BluetoothGattService? = services.find {
-          service -> service.uuid.equals(UUID.fromString(context.getString(R.string.BTConnectionUUID)))
+        val userDataService : BluetoothGattService? = services.find {
+          service -> service.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID)))
         };
 
         val publicKeyCharacteristic : BluetoothGattCharacteristic? =
-        peripheralScanService?.characteristics?.find { characteristic ->
+        userDataService?.characteristics?.find { characteristic ->
           characteristic.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID)))
         };
 
