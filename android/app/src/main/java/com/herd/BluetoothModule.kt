@@ -49,6 +49,8 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.net.Uri
 
+import android.util.Base64
+
 import java.util.UUID
 import java.io.InputStream
 import java.io.OutputStream
@@ -504,30 +506,49 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         }
       }
 
-    override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
-      Log.i(TAG, "onServicesDiscovered fires, status : $status");
-      if(status == BluetoothGatt.GATT_SUCCESS) {
-        val services = gatt.getServices();
+      override fun onServicesDiscovered(gatt : BluetoothGatt, status : Int) {
+        Log.i(TAG, "onServicesDiscovered fires, status : $status");
+        if(status == BluetoothGatt.GATT_SUCCESS) {
+          val services = gatt.getServices();
 
-        val userDataService : BluetoothGattService? = services.find {
-          service -> service.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID)))
-        };
+          val userDataService : BluetoothGattService? = services.find {
+            service -> service.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID)))
+          };
 
-        val publicKeyCharacteristic : BluetoothGattCharacteristic? =
-        userDataService?.characteristics?.find { characteristic ->
-          characteristic.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID)))
-        };
+          val publicKeyCharacteristic : BluetoothGattCharacteristic? =
+          userDataService?.characteristics?.find { characteristic ->
+            characteristic.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID)))
+          };
 
-        if(publicKeyCharacteristic != null) {
-          Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
-          //gatt.readDescriptor(publicKeyCharacteristic.getDescriptor(messageQueueDescriptorUUID));
-        }
-        else {
-          Log.i(TAG,"No Matching service/characteristic found, disconnecting");
-          gatt.disconnect();
+          if(publicKeyCharacteristic != null) {
+            Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
+            //gatt.readDescriptor(publicKeyCharacteristic.getDescriptor(messageQueueDescriptorUUID));
+          }
+          else {
+            Log.i(TAG,"No Matching service/characteristic found, disconnecting");
+            gatt.disconnect();
+          }
         }
       }
-    }
+
+      override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic : BluetoothGattCharacteristic, status: Int) {
+       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
+       Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
+
+       val blePeripheralPublicKeyCharacteristicUUIDString = context.getString(
+         R.string.blePeripheralPublicKeyCharacteristicUUID
+       ) 
+
+       if(characteristic.uuid.toString() == blePeripheralPublicKeyCharacteristicUUIDString) {
+         val publicKeyBytes : ByteArray = characteristic.getValue();
+         val publicKeyString = Base64.encodeToString(publicKeyBytes,Base64.DEFAULT);
+         val publicKeyObject : WritableMap = Arguments.createMap();
+         publicKeyObject.putString("key",publicKeyString);
+
+         reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+         .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,publicKeyObject)
+       }
+      }
     }
 
     fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
