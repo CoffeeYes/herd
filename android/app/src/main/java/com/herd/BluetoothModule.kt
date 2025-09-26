@@ -23,6 +23,12 @@ import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothGattCharacteristic
 
+import android.bluetooth.le.BluetoothLeAdvertiser
+import android.bluetooth.le.AdvertiseData
+import android.bluetooth.le.AdvertisingSetParameters
+import android.bluetooth.le.AdvertisingSetCallback
+import android.bluetooth.le.AdvertisingSet
+
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanFilter
@@ -482,6 +488,92 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       if(!bleScanning) {
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
+      }
+    }
+
+    private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
+      override fun onAdvertisingSetStarted(advertisingSet : AdvertisingSet?, txPower : Int, status : Int) {
+        Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: $status");
+      }
+
+      override fun onAdvertisingDataSet(advertisingSet : AdvertisingSet?, status : Int) {
+        Log.i(TAG, "onAdvertisingDataSet() : status: $status");
+      }
+
+      override fun onScanResponseDataSet(advertisingSet : AdvertisingSet?,status : Int) {
+        Log.i(TAG, "onScanResponseDataSet(): status: $status");
+      }
+
+      override fun onAdvertisingSetStopped(advertisingSet : AdvertisingSet?) {
+        Log.i(TAG, "onAdvertisingSetStopped()");
+      }
+    };
+
+    private fun advertiseLE() {
+      val bluetoothAdapter = bluetoothManager.getAdapter();
+      //https://source.android.com/devices/bluetooth/ble_advertising
+      val bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
+      if(bleAdvertiser != null) {
+        bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
+        var useLegacyMode : Boolean = false;
+        Log.i(TAG,"Bluetooth LE Advertiser Found");
+        // Check if all features are supported
+        if (!(bluetoothAdapter?.isLe2MPhySupported() as Boolean)) {
+            Log.e(TAG, "2M PHY not supported!");
+            useLegacyMode = true;
+        }
+
+        //default settings for legacy advertisement
+        var advertisingParameters = AdvertisingSetParameters.Builder()
+        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
+        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
+        .setConnectable(true)
+        .setScannable(true)
+        .setLegacyMode(true)
+
+        val peripheralScanServiceUUID = ParcelUuid(UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID)))
+        var advertisingData = AdvertiseData.Builder()
+        .addServiceUuid(peripheralScanServiceUUID)
+        .setIncludeDeviceName(false);
+
+        if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
+          Log.e(TAG, "LE Extended Advertising not supported!");
+          //dont include device name when extended advertising is not supported as only 31 bytes are available
+          advertisingData.setIncludeDeviceName(false);
+          useLegacyMode = true;
+        }
+
+        //override default advertising settings if extended advertising
+        //and ble5 PHYs are supported
+        if(!useLegacyMode) {
+          Log.i(TAG,"Using BLE 5 2MPHY with extended advertising")
+
+          advertisingParameters
+          .setLegacyMode(false)
+          .setScannable(false)
+          .setSecondaryPhy(BluetoothDevice.PHY_LE_2M);
+
+          if(bluetoothAdapter?.isLeCodedPhySupported() as Boolean) {
+            Log.i(TAG,"Coded PHY supported, using it")
+            advertisingParameters
+            .setPrimaryPhy(BluetoothDevice.PHY_LE_CODED)
+          }
+          else {
+            Log.i(TAG,"Coded PHY not supported, using 1M PHY")
+            advertisingParameters
+            .setPrimaryPhy(BluetoothDevice.PHY_LE_1M)
+          }
+
+          advertisingData
+          .setIncludeDeviceName(true);
+        }
+
+        bleAdvertiser?.startAdvertisingSet(
+          advertisingParameters.build(),
+          advertisingData?.build(),
+          null,null,null,
+          advertisingCallback
+        )
       }
     }
 
