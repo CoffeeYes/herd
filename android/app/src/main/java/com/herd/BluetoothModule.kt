@@ -22,6 +22,7 @@ import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattServerCallback
 import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattServer
 
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.bluetooth.le.AdvertiseData
@@ -650,6 +651,76 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bluetoothGattClientCallback,
         BluetoothDevice.TRANSPORT_LE
       )
+    }
+
+    private fun startGATTService(publicKey : String) {
+      try {
+
+        val peripheralScanServiceUUID = UUID.fromString(context.getString(
+         R.string.blePeripheralScanServiceUUID
+        ))
+
+        val service : BluetoothGattService = BluetoothGattService(
+          peripheralScanServiceUUID,
+          BluetoothGattService.SERVICE_TYPE_PRIMARY
+        );
+        
+        val publicKeyCharacteristicUUID = UUID.fromString(context.getString(
+         R.string.blePeripheralPublicKeyCharacteristicUUID
+        ))
+
+        //characteristic through which the message queue will be read
+        val publicKeyCharacteristic = BluetoothGattCharacteristic(
+          publicKeyCharacteristicUUID,
+          BluetoothGattCharacteristic.PROPERTY_READ,
+          BluetoothGattCharacteristic.PERMISSION_READ
+        );
+
+        publicKeyCharacteristic.setValue(publicKey)
+
+        service.addCharacteristic(publicKeyCharacteristic);
+
+        val gattServer = bluetoothManager?.openGattServer(context, bluetoothGattServerCallback);
+        gattServer?.addService(service);
+        Log.i(TAG,"BLE Gatt Server Started");
+      }
+      catch(e : Exception) {
+        Log.d(TAG,"Error creating bluetooth GATT Server : " + e);
+      }
+    }
+
+    private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
+      override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
+        Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
+            BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
+            BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
+            BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
+            BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
+            else -> "UNKNOWN STATE"
+        } + ", Thread : ${Thread.currentThread()}");
+
+        if(newState == BluetoothProfile.STATE_CONNECTED) {
+
+        }
+        else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+        }
+      }
+
+      override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
+      offset : Int, characteristic : BluetoothGattCharacteristic) {
+          Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
+      }
+
+      override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
+         characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
+         responseNeeded : Boolean, offset : Int, value : ByteArray) {
+           Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
+           Log.i(TAG,"characteristic value size : ${value.size}");
+      }
+
+      override fun onServiceAdded(status : Int, service : BluetoothGattService) {
+        Log.i(TAG,"GATT Server onServiceAdded, status : $status");
+      }
     }
 
     private inner class BTConnectionThread(private val socket : BluetoothSocket) : Thread() {
