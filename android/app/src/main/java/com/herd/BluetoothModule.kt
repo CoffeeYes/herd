@@ -700,9 +700,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         } + ", Thread : ${Thread.currentThread()}");
 
         if(newState == BluetoothProfile.STATE_CONNECTED) {
-
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
         }
-        else if(newState == BluetoothProfile.STATE_DISCONNECTED) {
+        else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED)
         }
       }
 
