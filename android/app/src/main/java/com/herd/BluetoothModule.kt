@@ -77,6 +77,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 
+    private val peripheralScanServiceUUID = UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID));
+    private val peripheralScanServiceParcelUUID = ParcelUuid(peripheralScanServiceUUID);
+
     val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
 
     object emitterStrings {
@@ -472,9 +475,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private fun scanForBLEPeripheral() {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
-      val peripheralScanServiceUUID = ParcelUuid(UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID)))
       val filter = ScanFilter.Builder()
-      .setServiceUuid(peripheralScanServiceUUID)
+      .setServiceUuid(peripheralScanServiceParcelUUID)
       .build()
 
       val settings = ScanSettings.Builder()
@@ -532,9 +534,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         .setScannable(true)
         .setLegacyMode(true)
 
-        val peripheralScanServiceUUID = ParcelUuid(UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID)))
         var advertisingData = AdvertiseData.Builder()
-        .addServiceUuid(peripheralScanServiceUUID)
+        .addServiceUuid(peripheralScanServiceParcelUUID)
         .setIncludeDeviceName(false);
 
         if (!(bluetoothAdapter?.isLeExtendedAdvertisingSupported() as Boolean)) {
@@ -655,10 +656,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private fun startGATTService(publicKey : String) {
       try {
-
-        val peripheralScanServiceUUID = UUID.fromString(context.getString(
-         R.string.blePeripheralScanServiceUUID
-        ))
 
         val service : BluetoothGattService = BluetoothGattService(
           peripheralScanServiceUUID,
