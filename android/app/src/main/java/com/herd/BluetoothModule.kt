@@ -80,6 +80,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val peripheralScanServiceUUID = UUID.fromString(context.getString(R.string.blePeripheralScanServiceUUID));
     private val peripheralScanServiceParcelUUID = ParcelUuid(peripheralScanServiceUUID);
 
+    private val publicKeyCharacteristicUUID = UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID));
+    private val userDataServiceUUID = UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID));
+
     val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
 
     object emitterStrings {
@@ -606,12 +609,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           val services = gatt.getServices();
 
           val userDataService : BluetoothGattService? = services.find {
-            service -> service.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID)))
+            service -> service.uuid.equals(userDataServiceUUID)
           };
 
           val publicKeyCharacteristic : BluetoothGattCharacteristic? =
           userDataService?.characteristics?.find { characteristic ->
-            characteristic.uuid.equals(UUID.fromString(context.getString(R.string.blePeripheralPublicKeyCharacteristicUUID)))
+            characteristic.uuid.equals(publicKeyCharacteristicUUID)
           };
 
           if(publicKeyCharacteristic != null) {
@@ -662,10 +665,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           BluetoothGattService.SERVICE_TYPE_PRIMARY
         );
         
-        val publicKeyCharacteristicUUID = UUID.fromString(context.getString(
-         R.string.blePeripheralPublicKeyCharacteristicUUID
-        ))
-
         //characteristic through which the message queue will be read
         val publicKeyCharacteristic = BluetoothGattCharacteristic(
           publicKeyCharacteristicUUID,
