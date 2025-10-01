@@ -448,6 +448,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private var bleDeviceList : MutableMap<String,BluetoothDevice> = mutableMapOf();
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result);
@@ -466,6 +467,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
               val deviceObject : WritableMap = Arguments.createMap();
               deviceObject.putString("name",deviceName);
               deviceObject.putString("identifier",deviceHardwareAddress);
+
+              bleDeviceList.put(deviceHardwareAddress,device);
 
               //pass object to JS through event emitter
               reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
@@ -619,7 +622,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
           if(publicKeyCharacteristic != null) {
             Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
-            //gatt.readDescriptor(publicKeyCharacteristic.getDescriptor(messageQueueDescriptorUUID));
+            gatt.readCharacteristic(publicKeyCharacteristic)
           }
           else {
             Log.i(TAG,"No Matching service/characteristic found, disconnecting");
@@ -632,11 +635,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
 
-       val blePeripheralPublicKeyCharacteristicUUIDString = context.getString(
-         R.string.blePeripheralPublicKeyCharacteristicUUID
-       ) 
-
-       if(characteristic.uuid.toString() == blePeripheralPublicKeyCharacteristicUUIDString) {
+       if(characteristic.uuid.equals(publicKeyCharacteristicUUID)) {
          val publicKeyBytes : ByteArray = characteristic.getValue();
          val publicKeyString = Base64.encodeToString(publicKeyBytes,Base64.DEFAULT);
          val publicKeyObject : WritableMap = Arguments.createMap();
