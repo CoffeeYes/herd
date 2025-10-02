@@ -25,10 +25,11 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattServer
 
 import android.bluetooth.le.BluetoothLeAdvertiser
+import android.bluetooth.le.BluetoothLeScanner 
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertisingSetParameters
 import android.bluetooth.le.AdvertisingSetCallback
-import android.bluetooth.le.AdvertisingSet
+import android.bluetooth.le.AdvertisingSet 
 
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -478,6 +479,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
     
     private var bleScanning = false;
+    private var bleScanner : BluetoothLeScanner? = null;
     private fun scanForBLEPeripheral() {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -492,11 +494,16 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
-      val bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
-
+      bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
+      
+      val handler = Handler();
       if(!bleScanning) {
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
+        handler.postDelayed({
+            bleScanner?.stopScan(leScanCallback)
+            bleScanning = false
+        }, 30000)
       }
     }
 
@@ -648,6 +655,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
+      if(bleScanning) {
+        bleScanner?.stopScan(leScanCallback);
+        bleScanning = false;
+      }
       peripheral.connectGatt(
         context,
         false,
