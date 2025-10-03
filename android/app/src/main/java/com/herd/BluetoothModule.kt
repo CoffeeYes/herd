@@ -666,10 +666,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         BluetoothDevice.TRANSPORT_LE
       )
     }
-
-    private fun startGATTService(publicKey : String) {
+    
+    private var gattServer : BluetoothGattServer? = null;
+    private var publicKey : String? = null;
+    private fun startGATTService(publicKeyString : String) {
       try {
-
+        publicKey = publicKeyString;
         val service : BluetoothGattService = BluetoothGattService(
           peripheralScanServiceUUID,
           BluetoothGattService.SERVICE_TYPE_PRIMARY
@@ -682,11 +684,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           BluetoothGattCharacteristic.PERMISSION_READ
         );
 
-        publicKeyCharacteristic.setValue(publicKey)
+        publicKeyCharacteristic.setValue(publicKeyString)
 
         service.addCharacteristic(publicKeyCharacteristic);
 
-        val gattServer = bluetoothManager?.openGattServer(context, bluetoothGattServerCallback);
+        gattServer = bluetoothManager?.openGattServer(context, bluetoothGattServerCallback);
         gattServer?.addService(service);
         Log.i(TAG,"BLE Gatt Server Started");
       }
@@ -717,14 +719,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
       override fun onCharacteristicReadRequest(device : BluetoothDevice, requestId : Int,
       offset : Int, characteristic : BluetoothGattCharacteristic) {
-          Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
-      }
-
-      override fun onCharacteristicWriteRequest(device : BluetoothDevice, requestId : Int,
-         characteristic : BluetoothGattCharacteristic, preparedWrite : Boolean,
-         responseNeeded : Boolean, offset : Int, value : ByteArray) {
-           Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicWriteRequest");
-           Log.i(TAG,"characteristic value size : ${value.size}");
+        Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
+        if(characteristic.uuid.equals(publicKeyCharacteristicUUID)) {
+          gattServer?.sendResponse(
+            device,
+            requestId,BluetoothGatt.GATT_SUCCESS,
+            0,
+            publicKey?.toByteArray()
+          )
+        }
       }
 
       override fun onServiceAdded(status : Int, service : BluetoothGattService) {
