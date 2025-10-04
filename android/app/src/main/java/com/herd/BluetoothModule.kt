@@ -524,11 +524,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         Log.i(TAG, "onAdvertisingSetStopped()");
       }
     };
-
+    
+    var bleAdvertiser : BluetoothLeAdvertiser? = null;
     private fun advertiseLE() {
       val bluetoothAdapter = bluetoothManager.getAdapter();
       //https://source.android.com/devices/bluetooth/ble_advertising
-      val bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
+      bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
       if(bleAdvertiser != null) {
         bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
         var useLegacyMode : Boolean = false;
@@ -650,6 +651,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
          .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,publicKeyObject)
+
+         gatt.disconnect();
        }
       }
     }
@@ -659,6 +662,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bleScanner?.stopScan(leScanCallback);
         bleScanning = false;
       }
+      bleAdvertiser?.stopAdvertisingSet(advertisingCallback)
       peripheral.connectGatt(
         context,
         false,
