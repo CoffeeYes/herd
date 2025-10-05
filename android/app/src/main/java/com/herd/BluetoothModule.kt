@@ -592,7 +592,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         )
       }
     }
-
+    
+    var gattClient : BluetoothGatt? = null;
     private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
       override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
         Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
@@ -604,6 +605,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         });
 
         if(newState == BluetoothProfile.STATE_CONNECTED) {
+          gattClient = gatt;
           gatt.discoverServices();
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
@@ -662,13 +664,20 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bleScanner?.stopScan(leScanCallback);
         bleScanning = false;
       }
-      bleAdvertiser?.stopAdvertisingSet(advertisingCallback)
       peripheral.connectGatt(
         context,
         false,
         bluetoothGattClientCallback,
         BluetoothDevice.TRANSPORT_LE
       )
+    }
+
+    fun disconnectFromBLEPeripheral(peripheral : BluetoothDevice) {
+      val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+      if(connectedDevices.contains(peripheral)) {
+        gattClient?.disconnect();
+        gattClient?.close();
+      }
     }
     
     private var gattServer : BluetoothGattServer? = null;
@@ -714,6 +723,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if(newState == BluetoothProfile.STATE_CONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
+          bleAdvertiser?.stopAdvertisingSet(advertisingCallback)
         }
         else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
