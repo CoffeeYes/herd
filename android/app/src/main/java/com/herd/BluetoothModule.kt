@@ -592,17 +592,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         )
       }
     }
+
+    val bluetoothConnectionStates : Map<Int,String> = mapOf(
+      BluetoothProfile.STATE_DISCONNECTED to "STATE_DISCONNECTED",
+      BluetoothProfile.STATE_DISCONNECTING to "STATE_DISCONNECTING",
+      BluetoothProfile.STATE_CONNECTED to "STATE_CONNECTED",
+      BluetoothProfile.STATE_CONNECTING to "STATE_CONNECTING"
+    )
     
     var gattClient : BluetoothGatt? = null;
     private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
       override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-        Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-            BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-            BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-            BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-            BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-            else -> "UNKNOWN STATE"
-        });
+        val connectionStateString = bluetoothConnectionStates.getOrElse(newState){"UNKNOWN STATE"};
+        Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + connectionStateString);
 
         if(newState == BluetoothProfile.STATE_CONNECTED) {
           gattClient = gatt;
@@ -712,14 +714,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
       override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
-        Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-            BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-            BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-            BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-            BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-            else -> "UNKNOWN STATE"
-        } + ", Thread : ${Thread.currentThread()}");
-
+        val connectionStateString = bluetoothConnectionStates.getOrElse(newState){"UNKNOWN STATE"};
+        Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + connectionStateString);
         if(newState == BluetoothProfile.STATE_CONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
