@@ -127,6 +127,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       )
     }
 
+    companion object {
+      public val bluetoothConnectionStates : Map<Int,String> = mapOf(
+        BluetoothProfile.STATE_DISCONNECTED to "STATE_DISCONNECTED",
+        BluetoothProfile.STATE_DISCONNECTING to "STATE_DISCONNECTING",
+        BluetoothProfile.STATE_CONNECTED to "STATE_CONNECTED",
+        BluetoothProfile.STATE_CONNECTING to "STATE_CONNECTING"
+      )
+    }
+
     @ReactMethod
     fun addListener(listenerName: String) {
         Log.i(TAG,"addListener called, eventName : $listenerName")
@@ -593,13 +602,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    val bluetoothConnectionStates : Map<Int,String> = mapOf(
-      BluetoothProfile.STATE_DISCONNECTED to "STATE_DISCONNECTED",
-      BluetoothProfile.STATE_DISCONNECTING to "STATE_DISCONNECTING",
-      BluetoothProfile.STATE_CONNECTED to "STATE_CONNECTED",
-      BluetoothProfile.STATE_CONNECTING to "STATE_CONNECTING"
-    )
-    
     var gattClient : BluetoothGatt? = null;
     private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
       override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {

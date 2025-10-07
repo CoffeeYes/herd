@@ -234,13 +234,8 @@ class HerdBackgroundService : Service() {
   private var clientRetryCount : Int = 0;
   private val bluetoothGattClientCallback : BluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-      Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-          else -> "UNKNOWN STATE"
-      } + ", Thread : ${Thread.currentThread()}");
+      val connectionStateString = BluetoothModule.bluetoothConnectionStates.getOrElse(newState){"UNKNOWN STATE"}
+      Log.i(TAG,"Bluetooth GATT Client Callback onConnectionStateChange. Status : " + status + ", STATE : " + connectionStateString + ", Thread : ${Thread.currentThread()}");
 
       if(newState == BluetoothProfile.STATE_CONNECTED) {
         stopLeScan();
@@ -519,13 +514,8 @@ class HerdBackgroundService : Service() {
   var gattClient : BluetoothGatt? = null;
   private val bluetoothGattServerCallback : BluetoothGattServerCallback = object : BluetoothGattServerCallback() {
     override fun onConnectionStateChange(device : BluetoothDevice, status : Int, newState : Int) {
-      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + when(newState) {
-          BluetoothProfile.STATE_DISCONNECTED -> "STATE_DISCONNECTED"
-          BluetoothProfile.STATE_DISCONNECTING -> "STATE_DISCONNECTING"
-          BluetoothProfile.STATE_CONNECTED -> "STATE_CONNECTED"
-          BluetoothProfile.STATE_CONNECTING -> "STATE_CONNECTING"
-          else -> "UNKNOWN STATE"
-      } + ", Thread : ${Thread.currentThread()}");
+      val connectionStateString = BluetoothModule.bluetoothConnectionStates.getOrElse(newState){"UNKNOWN STATE"}
+      Log.i(TAG,"Bluetooth GATT Server Callback onConnectionStateChange. Status : " + status + ", STATE : " + connectionStateString + ", Thread : ${Thread.currentThread()}");
 
       if(newState == BluetoothProfile.STATE_CONNECTED) {
         stopLeScan();
