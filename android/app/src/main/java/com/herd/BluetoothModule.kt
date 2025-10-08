@@ -509,9 +509,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       if(!bleScanning) {
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
+
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,bluetoothDiscoveryEventsMap.ACTION_DISCOVERY_STARTED)
+
         handler.postDelayed({
             bleScanner?.stopScan(leScanCallback)
             bleScanning = false
+            reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+            .emit(emitterStrings.DISCOVERY_STATE_CHANGE,bluetoothDiscoveryEventsMap.ACTION_DISCOVERY_FINISHED)
         }, 30000)
       }
     }
@@ -667,6 +673,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       if(bleScanning) {
         bleScanner?.stopScan(leScanCallback);
         bleScanning = false;
+        reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,bluetoothDiscoveryEventsMap.ACTION_DISCOVERY_FINISHED)
       }
       peripheral.connectGatt(
         context,
