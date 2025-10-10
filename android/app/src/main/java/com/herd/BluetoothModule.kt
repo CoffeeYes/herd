@@ -514,12 +514,24 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_STARTED)
 
         handler.postDelayed({
-            bleScanner?.stopScan(leScanCallback)
-            bleScanning = false
-            context.getJSModule(RCTDeviceEventEmitter::class.java)
-            .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+            if(bleScanning) {
+              bleScanner?.stopScan(leScanCallback)
+              bleScanning = false
+              context.getJSModule(RCTDeviceEventEmitter::class.java)
+              .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+            }
         }, 30000)
       }
+    }
+
+    private fun cancelScanForBLEPeripheral() {
+      if(bleScanning) {
+        bleScanner?.stopScan(leScanCallback);
+        bleScanning = false
+        context.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+      }
+      bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
     }
 
     private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
