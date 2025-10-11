@@ -458,6 +458,15 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
+    private fun stopBLEScan() {
+      if(bleScanning) {
+        bleScanner?.stopScan(leScanCallback)
+        bleScanning = false
+        context.getJSModule(RCTDeviceEventEmitter::class.java)
+        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+      }
+    }
+
     private var bleDeviceList : MutableMap<String,BluetoothDevice> = mutableMapOf();
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -514,23 +523,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_STARTED)
 
         handler.postDelayed({
-            if(bleScanning) {
-              bleScanner?.stopScan(leScanCallback)
-              bleScanning = false
-              context.getJSModule(RCTDeviceEventEmitter::class.java)
-              .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-            }
+          stopBLEScan();
         }, 30000)
       }
     }
 
     private fun cancelScanForBLEPeripheral() {
-      if(bleScanning) {
-        bleScanner?.stopScan(leScanCallback);
-        bleScanning = false
-        context.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-      }
+      stopBLEScan();
       bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
     }
 
@@ -682,12 +681,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
-      if(bleScanning) {
-        bleScanner?.stopScan(leScanCallback);
-        bleScanning = false;
-        context.getJSModule(RCTDeviceEventEmitter::class.java)
-        .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-      }
+      stopBLEScan();
       peripheral.connectGatt(
         context,
         false,
