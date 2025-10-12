@@ -464,9 +464,13 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         bleScanning = false
         context.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
+
+        bleDeviceList = bleOngoingScanDeviceList;
+        bleOngoingScanDeviceList = mutableMapOf();
       }
     }
 
+    private var bleOngoingScanDeviceList : MutableMap<String,BluetoothDevice> = mutableMapOf();
     private var bleDeviceList : MutableMap<String,BluetoothDevice> = mutableMapOf();
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -487,7 +491,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
               deviceObject.putString("name",deviceName);
               deviceObject.putString("identifier",deviceHardwareAddress);
 
-              bleDeviceList.put(deviceHardwareAddress,device);
+              bleOngoingScanDeviceList.put(deviceHardwareAddress,device);
 
               //pass object to JS through event emitter
               reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
@@ -498,7 +502,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     
     private var bleScanning = false;
     private var bleScanner : BluetoothLeScanner? = null;
-    private fun scanForBLEPeripheral() {
+    private fun scanForBLEPeripheral(scanDuration : Long = 30000) {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
       val filter = ScanFilter.Builder()
@@ -524,7 +528,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         handler.postDelayed({
           stopBLEScan();
-        }, 30000)
+        }, scanDuration)
       }
     }
 
@@ -652,11 +656,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           };
 
           if(publicKeyCharacteristic != null) {
-            Log.i(TAG,"Characteristic with matching UUID found, reading descriptor.")
+            Log.i(TAG,"Characteristic with publicKeyCharacteristic UUID found, reading characteristic")
             gatt.readCharacteristic(publicKeyCharacteristic)
           }
           else {
-            Log.i(TAG,"No Matching service/characteristic found, disconnecting");
+            Log.i(TAG,"No Characteristic with publicKeyCharacteristing UUID found, disconnecting");
             gatt.disconnect();
           }
         }
@@ -708,7 +712,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           BluetoothGattService.SERVICE_TYPE_PRIMARY
         );
         
-        //characteristic through which the message queue will be read
         val publicKeyCharacteristic = BluetoothGattCharacteristic(
           publicKeyCharacteristicUUID,
           BluetoothGattCharacteristic.PROPERTY_READ,
@@ -749,7 +752,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if(characteristic.uuid.equals(publicKeyCharacteristicUUID)) {
           gattServer?.sendResponse(
             device,
-            requestId,BluetoothGatt.GATT_SUCCESS,
+            requestId,
+            BluetoothGatt.GATT_SUCCESS,
             0,
             publicKey?.toByteArray()
           )
