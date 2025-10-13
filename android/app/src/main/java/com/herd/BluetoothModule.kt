@@ -684,14 +684,19 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     }
 
-    fun connectToBLEPeripheral(peripheral : BluetoothDevice) {
+    fun connectToBLEPeripheral(peripheralIdentifier : String) : Boolean {
       stopBLEScan();
-      peripheral.connectGatt(
-        context,
-        false,
-        bluetoothGattClientCallback,
-        BluetoothDevice.TRANSPORT_LE
-      )
+      val peripheral = bleDeviceList.get(peripheralIdentifier)
+      val peripheralFound = peripheral != null;
+      if(peripheralFound) {
+        peripheral?.connectGatt(
+          context,
+          false,
+          bluetoothGattClientCallback,
+          BluetoothDevice.TRANSPORT_LE
+        )
+      }
+      return peripheralFound
     }
 
     fun disconnectFromBLEPeripheral(peripheral : BluetoothDevice) {
