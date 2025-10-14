@@ -483,8 +483,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             Log.i(TAG, "device name : " + name);
             Log.i(TAG, "device Address : " + address);
             //create object to pass to javascript
-            val deviceName = device?.name ?: "N/A"
-            val deviceHardwareAddress = device?.address // MAC address
+            val deviceName = device.name ?: "N/A"
+            val deviceHardwareAddress = device.address // MAC address
             if(deviceHardwareAddress != null) {
               Log.i(TAG, "device using blePeripheralServiceUUID found, emitting device to JS")
               val deviceObject : WritableMap = Arguments.createMap();
@@ -572,8 +572,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         //default settings for legacy advertisement
         var advertisingParameters = AdvertisingSetParameters.Builder()
-        .setInterval(AdvertisingSetParameters.INTERVAL_LOW)
-        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_LOW)
+        .setInterval(AdvertisingSetParameters.INTERVAL_HIGH)
+        .setTxPowerLevel(AdvertisingSetParameters.TX_POWER_HIGH)
         .setConnectable(true)
         .setScannable(true)
         .setLegacyMode(true)
@@ -743,7 +743,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         if(newState == BluetoothProfile.STATE_CONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_CONNECTED)
-          bleAdvertiser?.stopAdvertisingSet(advertisingCallback)
         }
         else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
@@ -755,6 +754,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       offset : Int, characteristic : BluetoothGattCharacteristic) {
         Log.i(TAG,"Bluetooth GATT Server Callback onCharacteristicReadRequest, id : $requestId, offset : $offset");
         if(characteristic.uuid.equals(publicKeyCharacteristicUUID)) {
+          bleAdvertiser?.stopAdvertisingSet(advertisingCallback)
           gattServer?.sendResponse(
             device,
             requestId,
