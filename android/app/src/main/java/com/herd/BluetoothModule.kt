@@ -667,10 +667,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
 
       override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic : BluetoothGattCharacteristic, status: Int) {
-       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status");
+       val successful = status == BluetoothGatt.GATT_SUCCESS;
+       Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status, successful : $successful");
        Log.i(TAG,"UUID : ${characteristic.uuid.toString()}")
 
-       if(characteristic.uuid.equals(publicKeyCharacteristicUUID)) {
+       if(characteristic.uuid.equals(publicKeyCharacteristicUUID) && successful) {
          val publicKeyBytes : ByteArray = characteristic.getValue();
          val publicKeyString = Base64.encodeToString(publicKeyBytes,Base64.DEFAULT);
          val publicKeyObject : WritableMap = Arguments.createMap();
@@ -722,8 +723,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           BluetoothGattCharacteristic.PROPERTY_READ,
           BluetoothGattCharacteristic.PERMISSION_READ
         );
-
-        publicKeyCharacteristic.setValue(publicKeyString)
 
         service.addCharacteristic(publicKeyCharacteristic);
 
