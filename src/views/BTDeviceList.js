@@ -86,14 +86,7 @@ const BTDeviceList = ({ navigation }) => {
       }
     })
 
-    Bluetooth.scanForDevices()
-    .catch(e => {
-      setErrors([{
-        type : "general_bluetooth",
-        text : "Something went wrong, please try again"
-      }])
-      __DEV__ && console.log(e)
-    })
+    Bluetooth.scanForBLEDevices()
 
     //cleanup
     return () => {
@@ -129,10 +122,7 @@ const BTDeviceList = ({ navigation }) => {
     dispatch(setLockable(false))
     const services = await checkOrRequestConnectionServices();
     if(services.enabled) {
-      const discoverable = await requestMakeDiscoverable();
-      if(discoverable) {
-        await Bluetooth.scanForDevices();
-      }
+      await Bluetooth.scanForBLEDevices();
     }
     else if(services.missing == "location") {
       setShowConfirmationModal(true);

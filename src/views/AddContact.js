@@ -63,9 +63,6 @@ const AddContact = ({ navigation }) => {
       return;
     }
 
-    let discoverable = await requestMakeDiscoverable();
-
-    discoverable &&
     navigation.navigate("BTDeviceList");
 
     dispatch(setLockable(true));
