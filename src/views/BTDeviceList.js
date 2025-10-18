@@ -81,7 +81,7 @@ const BTDeviceList = ({ navigation }) => {
         if(scanningRef.current) {
           setErrors([bluetoothLocationErrors[state]]);
         }
-        Bluetooth.cancelScanForDevices();
+        Bluetooth.cancelScanForBLEDevices();
         setScanning(false);
       }
     })
@@ -99,7 +99,7 @@ const BTDeviceList = ({ navigation }) => {
 
   //cancel bluetooth scan when user unfocuses this component
   useFocusEffect(useCallback(() => {
-    return async () => await Bluetooth.cancelScanForDevices();
+    return async () => await Bluetooth.cancelScanForBLEDevices();
   },[]))
 
   const handleDeviceClick = async device => {
@@ -107,7 +107,7 @@ const BTDeviceList = ({ navigation }) => {
     const services = await checkOrRequestConnectionServices();
     dispatch(setLockable(true));
     if(services.enabled) {
-      await Bluetooth.cancelScanForDevices();
+      await Bluetooth.cancelScanForBLEDevices();
       await Bluetooth.listenAsServer();
       await Bluetooth.connectAsClient(device.identifier);
       setShowModal(true);
@@ -164,7 +164,7 @@ const BTDeviceList = ({ navigation }) => {
 
         <CustomButton
         text={scanning ? "Cancel Scan" : "Re-Scan"}
-        onPress={async () => scanning ? await Bluetooth.cancelScanForDevices() : await restartScan()}
+        onPress={async () => scanning ? await Bluetooth.cancelScanForBLEDevices() : await restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
         {showModal && <BTExchangeModal

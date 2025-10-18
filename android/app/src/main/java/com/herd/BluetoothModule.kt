@@ -543,6 +543,12 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
     }
 
+    @ReactMethod
+    fun cancelScanForBLEDevices(promise : Promise) {
+      cancelScanForBLEPeripheral();
+      promise.resolve(true);
+    }
+
     private val advertisingCallback : AdvertisingSetCallback = object : AdvertisingSetCallback() {
       override fun onAdvertisingSetStarted(advertisingSet : AdvertisingSet?, txPower : Int, status : Int) {
         Log.i(TAG, "onAdvertisingSetStarted(): txPower:" + txPower + " , status: $status");
