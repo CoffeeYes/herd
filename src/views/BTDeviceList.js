@@ -108,8 +108,7 @@ const BTDeviceList = ({ navigation }) => {
     dispatch(setLockable(true));
     if(services.enabled) {
       await Bluetooth.cancelScanForBLEDevices();
-      await Bluetooth.listenAsServer();
-      await Bluetooth.connectAsClient(device.identifier);
+      await Bluetooth.connectToBLEPeripheral(device.identifier);
       setShowModal(true);
     }
     else if(services.missing == "location") {
