@@ -538,14 +538,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       return bleScanning;
     }
 
-    private fun cancelScanForBLEPeripheral() {
-      stopBLEScan();
-      bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
-    }
-
     @ReactMethod
     fun cancelScanForBLEDevices(promise : Promise) {
-      cancelScanForBLEPeripheral();
+      stopBLEScan();
+      bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
       promise.resolve(true);
     }
 
@@ -712,7 +708,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
       promise.resolve(peripheralFound)
     }
-
+    
+    @ReactMethod
     fun disconnectFromBLEPeripheral(peripheral : BluetoothDevice) {
       val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
       if(connectedDevices.contains(peripheral)) {

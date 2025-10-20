@@ -15,7 +15,7 @@ import ConfirmationModal from './ConfirmationModal';
 
 import { palette } from '../assets/palette';
 import { useStateAndRef } from '../helper';
-import { requestMakeDiscoverable, checkOrRequestConnectionServices} from '../common';
+import { checkOrRequestConnectionServices} from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 import LoadingIndicator from './LoadingIndicator';
 
