@@ -25,7 +25,6 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   const [error, setError, errorRef] = useStateAndRef("");
 
   const customStyle = useSelector(state => state.appStateReducer.styles);
-  const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const contentWidth = useOrientationBasedStyle({width : "80%"},{width : "60%"});
 
@@ -36,10 +35,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
     //listen for connected state to begin key exchange
     const stateChangeListener = eventEmitter.addListener(Bluetooth.emitterStrings.CONNECTION_STATE_CHANGE, async state => {
       setActivityText(activityStateText[state] || activityStateText.waiting);
-      if(state === Bluetooth.bluetoothStates.STATE_CONNECTED) {
-        await Bluetooth.writeToBTConnection(JSON.stringify({key : publicKey}));
-      }
-      else if (state === Bluetooth.bluetoothStates.STATE_DISCONNECTED) {
+      if (state === Bluetooth.bluetoothStates.STATE_DISCONNECTED) {
         setLoading(false);
         cancelBluetoothActions();
       }
@@ -65,7 +61,6 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
         const message = JSON.parse(msg);
         if(message?.key) {
           setReceivedKey(message.key);
-          Bluetooth.writeToBTConnection(JSON.stringify({haveReceivedKey : true}));
         }
         if(message?.haveReceivedKey) {
           setKeySent(true);
@@ -92,9 +87,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   },[keySent, receivedKey])
 
   const cancelBluetoothActions = async () => {
-    await Bluetooth.cancelListenAsServer();
-    await Bluetooth.cancelConnectAsClient();
-    await Bluetooth.cancelBTConnectionThread();
+
   }
 
   return (
