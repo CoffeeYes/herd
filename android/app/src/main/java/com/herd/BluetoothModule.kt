@@ -710,11 +710,14 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
     
     @ReactMethod
-    fun disconnectFromBLEPeripheral(peripheral : BluetoothDevice) {
-      val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-      if(connectedDevices.contains(peripheral)) {
-        gattClient?.disconnect();
-        gattClient?.close();
+    fun disconnectFromBLEPeripheral(peripheralIdentifier : String) {
+      val peripheral = bleDeviceList.get(peripheralIdentifier)
+      if(peripheral != null) {
+        val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+        if(connectedDevices.contains(peripheral)) {
+          gattClient?.disconnect();
+          gattClient?.close();
+        }
       }
     }
     

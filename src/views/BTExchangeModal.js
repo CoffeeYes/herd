@@ -17,7 +17,7 @@ const activityStateText = {
   [Bluetooth.bluetoothStates.STATE_DISCONNECTED]: "Disconnected"
 };
 
-const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
+const BTExchangeModal = ({ deviceIdentifier, onRequestClose, onCancel, onSuccess}) => {
   const [loading, setLoading] = useState(true);
   const [activityText, setActivityText] = useState(activityStateText.waiting);
   const [receivedKey, setReceivedKey] = useState("");
@@ -87,7 +87,7 @@ const BTExchangeModal = ({ onRequestClose, onCancel, onSuccess}) => {
   },[keySent, receivedKey])
 
   const cancelBluetoothActions = async () => {
-
+    await Bluetooth.disconnectFromBLEPeripheral(deviceIdentifier);
   }
 
   return (

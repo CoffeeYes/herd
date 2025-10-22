@@ -24,6 +24,7 @@ const BTDeviceList = ({ navigation }) => {
   const [showModal, setShowModal] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [errors, setErrors] = useState([]);
+  const [chosenDevice, setChosenDevice] = useState("");
   const appStateRef = useRef("active");
 
   const customStyle = useSelector(state => state.appStateReducer.styles);
@@ -109,6 +110,7 @@ const BTDeviceList = ({ navigation }) => {
     if(services.enabled) {
       await Bluetooth.cancelScanForBLEDevices();
       await Bluetooth.connectToBLEPeripheral(device.identifier);
+      setChosenDevice(device.identifier);
       setShowModal(true);
     }
     else if(services.missing == "location") {
@@ -166,7 +168,9 @@ const BTDeviceList = ({ navigation }) => {
         onPress={async () => scanning ? await Bluetooth.cancelScanForBLEDevices() : await restartScan()}
         buttonStyle={{marginTop : 10}}/>
 
-        {showModal && <BTExchangeModal
+        {showModal && 
+        <BTExchangeModal
+        deviceIdentifier={chosenDevice}
         onRequestClose={() => setShowModal(false)}
         onSuccess={value => {
           setShowModal(false);
