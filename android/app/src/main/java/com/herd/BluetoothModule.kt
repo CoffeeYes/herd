@@ -549,6 +549,10 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             0,
             publicKey?.toByteArray()
           )
+          val receivedMap = Arguments.createMap();
+          receivedMap.putString("haveReceivedKey","true")
+          reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
+          .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,receivedMap)
         }
       }
 
