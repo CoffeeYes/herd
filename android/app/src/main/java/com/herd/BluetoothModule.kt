@@ -247,6 +247,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         bleDeviceList = bleOngoingScanDeviceList;
         bleOngoingScanDeviceList = mutableMapOf();
+
+        bleHandler?.removeCallbacksAndMessages(null);
       }
     }
 
@@ -282,6 +284,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     
     private var bleScanning = false;
     private var bleScanner : BluetoothLeScanner? = null;
+    private var bleHandler : Handler? = null;
     private fun scanForBLEPeripheral(scanDuration : Long = 30000) : Boolean {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
@@ -297,8 +300,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       .build()
 
       bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
-      
-      val handler = Handler();
+
+      bleHandler = Handler();
       if(!bleScanning) {
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
@@ -306,7 +309,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         context.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_STARTED)
 
-        handler.postDelayed({
+        bleHandler?.postDelayed({
           stopBLEScan();
         }, scanDuration)
       }
