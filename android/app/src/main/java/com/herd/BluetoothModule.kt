@@ -71,7 +71,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val BLUETOOTH_DISCOVERABLE_REQUEST_CODE : Int = 2;
 
     var bluetoothEnabledPromise : Promise? = null;
-    var bluetoothDiscoverablePromise : Promise? = null;
     var bluetoothDiscoverableDuration : Int? = null;
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -152,13 +151,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           bluetoothEnabledPromise?.resolve(resultCode == Activity.RESULT_OK);
           bluetoothEnabledPromise = null;
         }
-
-        //request make discoverable
-        if(requestCode == BLUETOOTH_DISCOVERABLE_REQUEST_CODE) {
-          //result code is equal to the requested duration when "yes", RESULT_CANCELLED when "no"
-          bluetoothDiscoverablePromise?.resolve(resultCode == bluetoothDiscoverableDuration);
-          bluetoothDiscoverablePromise = null;
-        }
       }
     }
 
@@ -212,23 +204,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             promise.reject("Activity is NULL")
           }
         }
-      }
-    }
-
-    @ReactMethod
-    fun requestBTMakeDiscoverable(duration : Int, promise : Promise) {
-      bluetoothDiscoverableDuration = duration;
-
-      val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-        putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, duration)
-      }
-      val activity : Activity? = getReactApplicationContext().getCurrentActivity();
-      if(activity === null) {
-        promise.reject("Activity is NULL")
-      }
-      else {
-        bluetoothDiscoverablePromise = promise;
-        activity.startActivityForResult(discoverableIntent,BLUETOOTH_DISCOVERABLE_REQUEST_CODE);
       }
     }
 
