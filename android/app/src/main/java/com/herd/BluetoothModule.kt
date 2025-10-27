@@ -68,10 +68,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     val context = reactContext
 
     private val BLUETOOTH_ENABLED_PERMISSION_REQUEST_CODE : Int = 1;
-    private val BLUETOOTH_DISCOVERABLE_REQUEST_CODE : Int = 2;
 
     var bluetoothEnabledPromise : Promise? = null;
-    var bluetoothDiscoverableDuration : Int? = null;
 
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
 

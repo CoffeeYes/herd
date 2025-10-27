@@ -274,13 +274,6 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
 
     @objc
-    func requestBTMakeDiscoverable(_ duration : Int,
-    resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
-
-    @objc
     func checkLocationEnabled(_ resolve : @escaping RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()

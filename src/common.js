@@ -32,14 +32,6 @@ const requestEnableBluetooth = async () => {
   return bluetoothEnabled;
 }
 
-const requestMakeDiscoverable = async (discoverableDuration = 30) => {
-  let discoverable = await Bluetooth.checkBTDiscoverable();
-  if(!discoverable) {
-    discoverable = await Bluetooth.requestBTMakeDiscoverable(discoverableDuration);
-  }
-  return discoverable;
-}
-
 const checkOrRequestConnectionServices = async () => {
     const bluetoothEnabled = await requestEnableBluetooth();
 
@@ -126,7 +118,6 @@ const STORAGE_STRINGS = {
 export {
   requestPermissionsForBluetooth,
   requestEnableBluetooth,
-  requestMakeDiscoverable,
   checkOrRequestConnectionServices,
   decryptStrings,
   decryptStringsWithIdentifier,

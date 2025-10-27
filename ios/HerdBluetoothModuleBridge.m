@@ -18,10 +18,6 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(requestBTEnable : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(requestBTMakeDiscoverable : (int) duration
-resolve: (RCTPromiseResolveBlock) resolve
-reject: (RCTPromiseRejectBlock) reject)
-
 RCT_EXTERN_METHOD(checkLocationEnabled : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
