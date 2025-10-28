@@ -289,48 +289,4 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     reject : RCTPromiseRejectBlock) {
       resolve(true)
     }
-
-    @objc
-    func writeToBTConnection(_ value : String,
-    resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
-
-    @objc
-    func cancelBTConnectionThread() {
-
-    }
-
-    @objc
-    func listenAsServer(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
-
-    @objc
-    func cancelListenAsServer(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
-
-    @objc
-    func connectAsClient(_ device : String,
-    resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-      if let deviceUUID = UUID(uuidString: device),discoveredPeripherals[deviceUUID] != nil {
-        let device = discoveredPeripherals[deviceUUID];
-        targetDeviceForConnection = device;
-        bluetoothManager?.connect(device!, options: nil);
-      }
-      else {
-        resolve(false)
-      }
-    }
-
-    @objc
-    func cancelConnectAsClient(_ resolve : RCTPromiseResolveBlock,
-    reject : RCTPromiseRejectBlock) {
-        resolve(false)
-    }
 }

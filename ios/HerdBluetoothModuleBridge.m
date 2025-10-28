@@ -24,23 +24,4 @@ reject:(RCTPromiseRejectBlock) reject)
 RCT_EXTERN_METHOD(requestLocationEnable : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(writeToBTConnection : (NSString*) value
-resolve:(RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(cancelBTConnectionThread)
-
-RCT_EXTERN_METHOD(listenAsServer : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(cancelListenAsServer : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(connectAsClient : (NSString*) device
-resolve : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
-RCT_EXTERN_METHOD(cancelConnectAsClient : (RCTPromiseResolveBlock) resolve
-reject:(RCTPromiseRejectBlock) reject)
-
 @end
