@@ -6,7 +6,18 @@
 RCT_EXTERN_METHOD(scanForDevices : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(cancelScanForDevices : (RCTPromiseResolveBlock) resolve
+RCT_EXTERN_METHOD(scanForBLEDevices : (RCTPromiseResolveBlock) resolve
+reject:(RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(cancelScanForBLEDevices : (RCTPromiseResolveBlock) resolve
+reject:(RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(connectToBLEPeripheral: (NSString*) peripheralIdentifier
+resolve:(RCTPromiseResolveBlock) resolve
+reject:(RCTPromiseRejectBlock) reject)
+
+RCT_EXTERN_METHOD(disconnectFromBLEPeripheral: (NSString*) peripheralIdentifier
+resolve:(RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
 RCT_EXTERN_METHOD(checkBTEnabled : (RCTPromiseResolveBlock) resolve

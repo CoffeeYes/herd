@@ -226,7 +226,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
     
     @objc
-    func scanForDevices(_ resolve : RCTPromiseResolveBlock,
+    func scanForBLEDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       discoveredPeripherals = [:];
       bluetoothManager?.scanForPeripherals(withServices : [CBUUID(string: bleUUIDs.peripheralScanServiceUUID)]);
@@ -242,7 +242,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
 
     @objc
-    func cancelScanForDevices(_ resolve : RCTPromiseResolveBlock,
+    func cancelScanForBLEDevices(_ resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       let scanning = bluetoothManager?.isScanning;
       if(scanning!) {
@@ -250,6 +250,27 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       }
       EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
       resolve(true);
+    }
+
+    @objc
+    func connectToBLEPeripheral(_ peripheralIdentifier : String,
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+      if let deviceUUID = UUID(uuidString: peripheralIdentifier),discoveredPeripherals[deviceUUID] != nil {
+        let device = discoveredPeripherals[deviceUUID];
+        targetDeviceForConnection = device;
+        bluetoothManager?.connect(device!, options: nil);
+      }
+      else {
+        resolve(false)
+      }
+    }
+
+    @objc
+    func disconnectFromBLEPeripheral(_ peripheralIdentifier : String,
+    resolve : RCTPromiseResolveBlock,
+    reject : RCTPromiseRejectBlock) {
+
     }
 
     @objc
