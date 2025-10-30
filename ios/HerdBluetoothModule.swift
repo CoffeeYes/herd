@@ -251,15 +251,23 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
       resolve(true);
     }
+  
+    func getPeripheralFromList(_ peripheralIdentifier : String) -> CBPeripheral? {
+      if let deviceUUID = UUID(uuidString: peripheralIdentifier),discoveredPeripherals[deviceUUID] != nil {
+        return discoveredPeripherals[deviceUUID];
+      }
+      else {
+        return nil;
+      }
+    }
 
     @objc
     func connectToBLEPeripheral(_ peripheralIdentifier : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-      if let deviceUUID = UUID(uuidString: peripheralIdentifier),discoveredPeripherals[deviceUUID] != nil {
-        let device = discoveredPeripherals[deviceUUID];
+      if let device = getPeripheralFromList(peripheralIdentifier) {
         targetDeviceForConnection = device;
-        bluetoothManager?.connect(device!, options: nil);
+        bluetoothManager?.connect(device, options: nil);
       }
       else {
         resolve(false)
@@ -270,7 +278,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     func disconnectFromBLEPeripheral(_ peripheralIdentifier : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
-
+      if let device = getPeripheralFromList(peripheralIdentifier) {
+        bluetoothManager?.cancelPeripheralConnection(device);
+        resolve(true);
+      }
+      else {
+        resolve(false);
+      }
     }
 
     @objc
