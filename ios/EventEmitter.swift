@@ -4,15 +4,16 @@ import React
 @objc(EventEmitter)
 class EventEmitter : RCTEventEmitter {
   
-  static let emitter = EventEmitter();
+  public static var emitter : RCTEventEmitter!;
 
   override init() {
     super.init()
+    EventEmitter.emitter = self;
   }
   
   @objc
   override static func requiresMainQueueSetup() -> Bool {
-    return true;
+    return false;
   }
   
   private static var emitterStrings = [String]();
