@@ -157,11 +157,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     @ReactMethod
-    fun scanForBLEDevices(promise : Promise) {
-      promise.resolve(scanForBLEPeripheral());
-    }
-
-    @ReactMethod
     fun checkBTEnabled(promise : Promise) {
       val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
 
@@ -258,7 +253,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var bleScanning = false;
     private var bleScanner : BluetoothLeScanner? = null;
     private var bleHandler : Handler? = null;
-    private fun scanForBLEPeripheral(scanDuration : Long = 30000) : Boolean {
+
+    @ReactMethod
+    private fun scanForBLEDevices(scanDuration : Long = 30000, promise : Promise) {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
       val filter = ScanFilter.Builder()
@@ -286,7 +283,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           stopBLEScan();
         }, scanDuration)
       }
-      return bleScanning;
+      promise.resolve(bleScanning);
     }
 
     @ReactMethod
