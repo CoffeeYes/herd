@@ -255,7 +255,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var bleHandler : Handler? = null;
 
     @ReactMethod
-    private fun scanForBLEDevices(scanDuration : Long = 30000, promise : Promise) {
+    private fun scanForBLEDevices(scanDuration : Int = 30000, promise : Promise) {
       val bluetoothAdapter = bluetoothManager.getAdapter();
 
       val filter = ScanFilter.Builder()
@@ -281,7 +281,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         bleHandler?.postDelayed({
           stopBLEScan();
-        }, scanDuration)
+        }, scanDuration.toLong())
       }
       promise.resolve(bleScanning);
     }

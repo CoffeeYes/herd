@@ -19,6 +19,8 @@ import { checkOrRequestConnectionServices} from '../common';
 import { setLockable } from '../redux/actions/appStateActions';
 import LoadingIndicator from './LoadingIndicator';
 
+const scanDuration = 30000;
+
 const BTDeviceList = ({ navigation }) => {
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
@@ -87,7 +89,7 @@ const BTDeviceList = ({ navigation }) => {
       }
     })
 
-    Bluetooth.scanForBLEDevices()
+    Bluetooth.scanForBLEDevices(scanDuration)
 
     //cleanup
     return () => {
@@ -123,7 +125,7 @@ const BTDeviceList = ({ navigation }) => {
     dispatch(setLockable(false))
     const services = await checkOrRequestConnectionServices();
     if(services.enabled) {
-      await Bluetooth.scanForBLEDevices();
+      await Bluetooth.scanForBLEDevices(scanDuration);
     }
     else if(services.missing == "location") {
       setShowConfirmationModal(true);
