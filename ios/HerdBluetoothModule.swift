@@ -159,13 +159,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
   }
  
-  func bleStartAdvertising() {
+  func bleStartAdvertising(publicKey : String) {
     let peripheralManager = CBPeripheralManager();
     
     let publicKeyCharacteristic = CBMutableCharacteristic(
       type: CBUUID(string: bleUUIDs.peripheralPublicKeyCharacteristicUUID),
       properties: [.read],
-      value: nil,
+      value: publicKey,
       permissions: .readable
     );
     
@@ -227,6 +227,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     
     @objc
   func scanForBLEDevices(_ scanDuration : Int = 30000,
+    publicKey : String,
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       let scanDurationSeconds = Double(scanDuration / 1000);
@@ -240,6 +241,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
           EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
         }
       }
+      bleStartAdvertising(publicKey);
       resolve(scanning);
     }
 
