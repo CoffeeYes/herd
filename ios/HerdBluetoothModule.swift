@@ -165,7 +165,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     let publicKeyCharacteristic = CBMutableCharacteristic(
       type: CBUUID(string: bleUUIDs.peripheralPublicKeyCharacteristicUUID),
       properties: [.read],
-      value: publicKey,
+      value: Data(publicKey.utf8),
       permissions: .readable
     );
     
@@ -241,7 +241,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
           EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
         }
       }
-      bleStartAdvertising(publicKey);
+      bleStartAdvertising(publicKey: publicKey);
       resolve(scanning);
     }
 
