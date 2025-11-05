@@ -6,6 +6,7 @@ import CoreLocation
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate, CBPeripheralDelegate {
   
   let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
+  let peripheralManager = CBPeripheralManager();
   
   private var targetDeviceForConnection : CBPeripheral? = nil;
   
@@ -119,6 +120,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       print("Error discovering services \(String(describing: error))");
       bluetoothManager?.cancelPeripheralConnection(peripheral);
       sendBTPeripheralDisconnectEvent();
+      peripheralManager.stopAdvertising();
       return;
     }
     print("Discovered services \(String(describing: peripheral.services))");
@@ -136,6 +138,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       print("Error discovering services \(String(describing: error))");
       bluetoothManager?.cancelPeripheralConnection(peripheral);
       sendBTPeripheralDisconnectEvent();
+      peripheralManager.stopAdvertising();
       return;
     }
     if(characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
@@ -151,6 +154,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       print("Error discovering characteristics \(String(describing: error))");
       bluetoothManager?.cancelPeripheralConnection(peripheral);
       sendBTPeripheralDisconnectEvent();
+      peripheralManager.stopAdvertising();
       return;
     }
     print("Discovered characteristics \(String(describing: service.characteristics))");
@@ -160,8 +164,6 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   }
  
   func bleStartAdvertising(publicKey : String) {
-    let peripheralManager = CBPeripheralManager();
-    
     let publicKeyCharacteristic = CBMutableCharacteristic(
       type: CBUUID(string: bleUUIDs.peripheralPublicKeyCharacteristicUUID),
       properties: [.read],
@@ -252,6 +254,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       if(scanning!) {
           bluetoothManager?.stopScan();
       }
+      peripheralManager.stopAdvertising();
       EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
       resolve(true);
     }
