@@ -162,6 +162,12 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       peripheral.readValue(for: publicKeyCharacteristic)
     }
   }
+  
+  func peripheral(_ peripheral: CBPeripheral, didReceiveReadRequest request : CBATTRequest) {
+    if(request.characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
+      peripheralManager.respond(to: request, withResult: CBATTError.success)
+    }
+  }
  
   func bleStartAdvertising(publicKey : String) {
     let publicKeyCharacteristic = CBMutableCharacteristic(
