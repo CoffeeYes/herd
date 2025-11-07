@@ -107,6 +107,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
     if(error != nil) {
       print("Error during peripheral disconnection \(String(describing: error))");
+      handlePeripheralError(peripheral);
       return;
     }
     print("disconnected from peripheral, name : \(peripheral.name ?? "no name"), identifier : \(peripheral.identifier.uuidString)");
@@ -115,12 +116,16 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     }
   }
   
+  func handlePeripheralError(_ peripheral : CBPeripheral) {
+    bluetoothManager?.cancelPeripheralConnection(peripheral);
+    sendBTPeripheralDisconnectEvent();
+    peripheralManager.stopAdvertising();
+  }
+  
   func peripheral(_ peripheral : CBPeripheral, didDiscoverServices error : Error?) {
     if(error != nil) {
       print("Error discovering services \(String(describing: error))");
-      bluetoothManager?.cancelPeripheralConnection(peripheral);
-      sendBTPeripheralDisconnectEvent();
-      peripheralManager.stopAdvertising();
+      handlePeripheralError(peripheral);
       return;
     }
     print("Discovered services \(String(describing: peripheral.services))");
@@ -136,9 +141,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: (any Error)?) {
     if(error != nil) {
       print("Error discovering services \(String(describing: error))");
-      bluetoothManager?.cancelPeripheralConnection(peripheral);
-      sendBTPeripheralDisconnectEvent();
-      peripheralManager.stopAdvertising();
+      handlePeripheralError(peripheral);
       return;
     }
     if(characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
@@ -152,9 +155,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   func peripheral(_ peripheral : CBPeripheral, didDiscoverCharacteristicsFor service : CBService, error : Error?) {
     if(error != nil) {
       print("Error discovering characteristics \(String(describing: error))");
-      bluetoothManager?.cancelPeripheralConnection(peripheral);
-      sendBTPeripheralDisconnectEvent();
-      peripheralManager.stopAdvertising();
+      handlePeripheralError(peripheral);
       return;
     }
     print("Discovered characteristics \(String(describing: service.characteristics))");
