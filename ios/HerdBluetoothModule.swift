@@ -280,11 +280,21 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       if let device = getPeripheralFromList(peripheralIdentifier) {
+        if(targetDeviceForConnection != nil && targetDeviceForConnection != device) {
+          cancelPeripheralConnection(device);
+        }
         targetDeviceForConnection = device;
         bluetoothManager?.connect(device, options: nil);
       }
       else {
         resolve(false)
+      }
+    }
+  
+    func cancelPeripheralConnection(_ peripheral : CBPeripheral) {
+      if(peripheral.state == .connected) {
+        bluetoothManager?.cancelPeripheralConnection(peripheral);
+        sendBTPeripheralDisconnectEvent();
       }
     }
 
@@ -293,7 +303,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     resolve : RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       if let device = getPeripheralFromList(peripheralIdentifier) {
-        bluetoothManager?.cancelPeripheralConnection(device);
+        cancelPeripheralConnection(device);
         resolve(true);
       }
       else {
