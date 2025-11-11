@@ -80,6 +80,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private val userDataServiceUUID = UUID.fromString(context.getString(R.string.blePeripheralUserDataServiceUUID));
 
     val btUUID = UUID.fromString(context.getString(R.string.BTConnectionUUID));
+    
+    private var bluetoothAdapter : BluetoothAdapter? = null;
+    private var bleScanner : BluetoothLeScanner? = null;
 
     object emitterStrings {
       val NEW_BT_DEVICE = "newBTDeviceFound";
@@ -131,6 +134,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       )
     }
 
+    init {
+      bluetoothAdapter = bluetoothManager.getAdapter();
+      bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
+    }
+
     @ReactMethod
     fun addListener(listenerName: String) {
         Log.i(TAG,"addListener called, eventName : $listenerName")
@@ -158,30 +166,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
     @ReactMethod
     fun checkBTEnabled(promise : Promise) {
-      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-
-      if(adapter === null) {
-        promise.reject("No BluetoothAdapter Found")
-      }
-      else {
-        promise.resolve(adapter.isEnabled())
-      }
+      promise.resolve(bluetoothAdapter?.isEnabled)
     }
 
     @ReactMethod
     fun checkForBTAdapter(promise : Promise) {
-      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-      promise.resolve(adapter !== null);
+      promise.resolve(bluetoothAdapter !== null);
     }
 
     @ReactMethod
     fun requestBTEnable(promise : Promise) {
-      val adapter : BluetoothAdapter? = bluetoothManager.getAdapter();
-      if(adapter === null) {
+      if(bluetoothAdapter === null) {
         promise.reject("No BluetoothAdapter Found")
       }
       else {
-        if(!adapter.isEnabled()) {
+        if(!bluetoothAdapter!!.isEnabled()) {
           val enableBTIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
           val activity : Activity? = getReactApplicationContext().getCurrentActivity();
           if(activity !== null) {
@@ -251,7 +250,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
     
     private var bleScanning = false;
-    private var bleScanner : BluetoothLeScanner? = null;
     private var bleHandler : Handler? = null;
 
     @ReactMethod
@@ -268,8 +266,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       .setMatchMode(ScanSettings.MATCH_MODE_STICKY)
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
-
-      bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
 
       bleHandler = Handler();
       if(!bleScanning) {
@@ -313,7 +309,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     
     var bleAdvertiser : BluetoothLeAdvertiser? = null;
     private fun advertiseLE() {
-      val bluetoothAdapter = bluetoothManager.getAdapter();
       //https://source.android.com/devices/bluetooth/ble_advertising
       bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
       if(bleAdvertiser != null) {
