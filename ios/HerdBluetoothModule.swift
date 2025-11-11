@@ -249,7 +249,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         DispatchQueue.main.asyncAfter(deadline: .now() + scanDurationSeconds) {
           self.bluetoothManager?.stopScan();
           EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
-          bluetoothManager.stopAdvertising();
+          self.peripheralManager.stopAdvertising();
         }
       }
       bleStartAdvertising(publicKey: publicKey);
