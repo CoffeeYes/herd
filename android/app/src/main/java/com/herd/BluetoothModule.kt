@@ -83,6 +83,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     
     private var bluetoothAdapter : BluetoothAdapter? = null;
     private var bleScanner : BluetoothLeScanner? = null;
+    private var bleAdvertiser : BluetoothLeAdvertiser? = null;
 
     object emitterStrings {
       val NEW_BT_DEVICE = "newBTDeviceFound";
@@ -137,6 +138,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     init {
       bluetoothAdapter = bluetoothManager.getAdapter();
       bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
+      bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
     }
 
     @ReactMethod
@@ -307,10 +309,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       }
     };
     
-    var bleAdvertiser : BluetoothLeAdvertiser? = null;
     private fun advertiseLE() {
       //https://source.android.com/devices/bluetooth/ble_advertising
-      bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
       if(bleAdvertiser != null) {
         bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
         var useLegacyMode : Boolean = false;
@@ -482,7 +482,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         service.addCharacteristic(publicKeyCharacteristic);
 
-        gattServer = bluetoothManager?.openGattServer(context, bluetoothGattServerCallback);
+        gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
         gattServer?.addService(service);
         Log.i(TAG,"BLE Gatt Server Started");
       }
