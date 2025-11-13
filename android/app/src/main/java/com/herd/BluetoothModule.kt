@@ -84,6 +84,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var bluetoothAdapter : BluetoothAdapter? = null;
     private var bleScanner : BluetoothLeScanner? = null;
     private var bleAdvertiser : BluetoothLeAdvertiser? = null;
+    private var bleHandler : Handler? = null;
 
     object emitterStrings {
       val NEW_BT_DEVICE = "newBTDeviceFound";
@@ -139,6 +140,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       bluetoothAdapter = bluetoothManager.getAdapter();
       bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
       bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
+      bleHandler = Handler();
     }
 
     @ReactMethod
@@ -252,12 +254,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
     
     private var bleScanning = false;
-    private var bleHandler : Handler? = null;
 
     @ReactMethod
     private fun scanForBLEDevices(scanDuration : Int = 30000, promise : Promise) {
-      val bluetoothAdapter = bluetoothManager.getAdapter();
-
       val filter = ScanFilter.Builder()
       .setServiceUuid(peripheralScanServiceParcelUUID)
       .build()
@@ -269,7 +268,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       .setPhy(ScanSettings.PHY_LE_ALL_SUPPORTED)
       .build()
 
-      bleHandler = Handler();
       if(!bleScanning) {
         bleScanner?.startScan(listOf(filter),settings,leScanCallback);
         bleScanning = true;
@@ -416,7 +414,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           }
         }
       }
-
+  
       override fun onCharacteristicRead(gatt: BluetoothGatt, characteristic : BluetoothGattCharacteristic, status: Int) {
        val successful = status == BluetoothGatt.GATT_SUCCESS;
        Log.i(TAG,"Bluetooth GATT Client Callback onCharacteristicRead, status : $status, successful : $successful");
