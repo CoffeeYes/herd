@@ -136,23 +136,6 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
       )
     }
 
-    init {
-      bluetoothAdapter = bluetoothManager.getAdapter();
-      bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
-      bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
-      bleHandler = Handler();
-    }
-
-    @ReactMethod
-    fun addListener(listenerName: String) {
-        Log.i(TAG,"addListener called, eventName : $listenerName")
-    }
-
-    @ReactMethod
-    fun removeListeners(listenerCount: Int) {
-        Log.i(TAG,"removeListeners called, count : $listenerCount")
-    }
-
     //anonymous inner function to override class functions
     private final val activityListener = object : BaseActivityEventListener() {
       override fun onActivityResult(activity : Activity, requestCode : Int, resultCode : Int, intent : Intent?) {
@@ -165,7 +148,21 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     }
 
     init {
+      bluetoothAdapter = bluetoothManager.getAdapter();
+      bleScanner = bluetoothAdapter?.getBluetoothLeScanner();
+      bleAdvertiser = bluetoothAdapter?.getBluetoothLeAdvertiser();
+      bleHandler = Handler(Looper.getMainLooper());
       reactContext.addActivityEventListener(activityListener);
+    }
+
+    @ReactMethod
+    fun addListener(listenerName: String) {
+        Log.i(TAG,"addListener called, eventName : $listenerName")
+    }
+
+    @ReactMethod
+    fun removeListeners(listenerCount: Int) {
+        Log.i(TAG,"removeListeners called, count : $listenerCount")
     }
 
     @ReactMethod
