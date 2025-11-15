@@ -253,7 +253,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     private var bleScanning = false;
 
     @ReactMethod
-    private fun scanForBLEDevices(scanDuration : Int = 30000, promise : Promise) {
+    private fun scanForBLEDevices(scanDuration : Int = 30000, publicKey: String, promise : Promise) {
       val filter = ScanFilter.Builder()
       .setServiceUuid(peripheralScanServiceParcelUUID)
       .build()
@@ -271,6 +271,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
 
         context.getJSModule(RCTDeviceEventEmitter::class.java)
         .emit(emitterStrings.DISCOVERY_STATE_CHANGE,BluetoothAdapter.ACTION_DISCOVERY_STARTED)
+
+        startGATTService(publicKey);
 
         bleHandler?.postDelayed({
           stopBLEScan();

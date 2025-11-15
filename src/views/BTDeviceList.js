@@ -28,6 +28,7 @@ const BTDeviceList = ({ navigation }) => {
   const appStateRef = useRef("active");
 
   const customStyle = useSelector(state => state.appStateReducer.styles);
+  const publicKey = useSelector(state => state.userReducer.publicKey);
 
   const [deviceList, setDeviceList, deviceListRef] = useStateAndRef([],[]);
   const [scanning, setScanning, scanningRef] = useStateAndRef(false,false);
@@ -87,7 +88,7 @@ const BTDeviceList = ({ navigation }) => {
       }
     })
 
-    Bluetooth.scanForBLEDevices()
+    Bluetooth.scanForBLEDevices(30000,publicKey)
 
     //cleanup
     return () => {
@@ -123,7 +124,7 @@ const BTDeviceList = ({ navigation }) => {
     dispatch(setLockable(false))
     const services = await checkOrRequestConnectionServices();
     if(services.enabled) {
-      await Bluetooth.scanForBLEDevices();
+      await Bluetooth.scanForBLEDevices(30000,publicKey);
     }
     else if(services.missing == "location") {
       setShowConfirmationModal(true);
