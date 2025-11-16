@@ -285,6 +285,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun cancelScanForBLEDevices(promise : Promise) {
       stopBLEScan();
       bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
+      gattServer?.close();
+      gattServer = null;
       promise.resolve(true);
     }
 
@@ -518,6 +520,9 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           receivedMap.putString("haveReceivedKey","true")
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,receivedMap)
+
+          gattServer?.close();
+          gattServer = null;
         }
       }
 
