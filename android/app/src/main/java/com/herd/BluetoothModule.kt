@@ -285,8 +285,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
     fun cancelScanForBLEDevices(promise : Promise) {
       stopBLEScan();
       bleAdvertiser?.stopAdvertisingSet(advertisingCallback);
-      gattServer?.close();
-      gattServer = null;
+      cancelGattServer();
       promise.resolve(true);
     }
 
@@ -371,6 +370,11 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           advertisingCallback
         )
       }
+    }
+
+    private fun cancelGattServer() {
+      gattServer?.close();
+      gattServer = null;
     }
 
     var gattClient : BluetoothGatt? = null;
@@ -480,9 +484,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         );
 
         service.addCharacteristic(publicKeyCharacteristic);
-
-        gattServer = bluetoothManager.openGattServer(context, bluetoothGattServerCallback);
-        gattServer?.addService(service);
+        
+        cancelGattServer();
         Log.i(TAG,"BLE Gatt Server Started");
       }
       catch(e : Exception) {
@@ -501,6 +504,7 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
         else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.CONNECTION_STATE_CHANGE,bluetoothStates.STATE_DISCONNECTED)
+          cancelGattServer();
         }
       }
 
@@ -520,9 +524,8 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
           receivedMap.putString("haveReceivedKey","true")
           reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
           .emit(emitterStrings.NEW_DATA_FROM_CONNECTION,receivedMap)
-
-          gattServer?.close();
-          gattServer = null;
+          
+          cancelGattServer();
         }
       }
 
