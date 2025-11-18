@@ -228,20 +228,18 @@ class BluetoothModule(reactContext: ReactApplicationContext) : ReactContextBaseJ
             Log.i(TAG, "BLE Scan Result Callback Invoked")
             //perform actions related to finding a device
             val device : BluetoothDevice = result.getDevice();
-            val name = device.getName();
+            val name = device.getName() ?: "N/A";
             val address = device.getAddress();
             Log.i(TAG, "device name : " + name);
             Log.i(TAG, "device Address : " + address);
             //create object to pass to javascript
-            val deviceName = device.name ?: "N/A"
-            val deviceHardwareAddress = device.address // MAC address
-            if(deviceHardwareAddress != null) {
+            if(address != null) {
               Log.i(TAG, "device using blePeripheralServiceUUID found, emitting device to JS")
               val deviceObject : WritableMap = Arguments.createMap();
-              deviceObject.putString("name",deviceName);
-              deviceObject.putString("identifier",deviceHardwareAddress);
+              deviceObject.putString("name",name);
+              deviceObject.putString("identifier",address);
 
-              bleOngoingScanDeviceList.put(deviceHardwareAddress,device);
+              bleOngoingScanDeviceList.put(address,device);
 
               //pass object to JS through event emitter
               reactContext.getJSModule(RCTDeviceEventEmitter::class.java)
