@@ -170,6 +170,13 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       EventEmitter.emitter.sendEvent(withName: emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue, body: ["haveReceivedKey" : true]);
     }
   }
+  
+  func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
+    if(request.characteristic.uuid.uuidString == bleUUIDs.peripheralPublicKeyCharacteristicUUID) {
+      peripheralManager.respond(to: request, withResult: CBATTError.success)
+      EventEmitter.emitter.sendEvent(withName: emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue, body: ["haveReceivedKey" : true]);
+    }
+  }
  
   func bleStartAdvertising(publicKey : String) {
     let publicKeyCharacteristic = CBMutableCharacteristic(

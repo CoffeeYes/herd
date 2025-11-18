@@ -6,8 +6,8 @@
 RCT_EXTERN_METHOD(scanForDevices : (RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
-RCT_EXTERN_METHOD(scanForBLEDevices : (NSString*) publicKey
-scanDuration: (Int) scanDuration
+RCT_EXTERN_METHOD(scanForBLEDevices : scanDuration: (Int) scanDuration
+(NSString*) publicKey
 resolve:(RCTPromiseResolveBlock) resolve
 reject:(RCTPromiseRejectBlock) reject)
 
