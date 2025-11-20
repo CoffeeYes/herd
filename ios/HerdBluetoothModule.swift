@@ -5,7 +5,8 @@ import CoreLocation
 @objc(HerdBluetoothModule)
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate, CBPeripheralDelegate {
   
-  let asyncQueue = DispatchQueue(label:"com.herd.bluetooth.queue");
+  let locationAsyncQueue = DispatchQueue(label:"com.herd.bluetooth.locationQueue");
+  let bleAsyncQueue = DispatchQueue(label:"com.herd.bluetooth.blueQueue");
   let peripheralManager = CBPeripheralManager();
   
   private var targetDeviceForConnection : CBPeripheral? = nil;
@@ -236,7 +237,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         locationEnabled = false;
       }
       else if([.authorizedAlways,.authorizedWhenInUse,.notDetermined].contains(locationManager?.authorizationStatus)) {
-        asyncQueue.async(execute: {
+        locationAsyncQueue.async(execute: {
           self.locationEnabled = CLLocationManager.locationServicesEnabled();
         })
       }
@@ -253,7 +254,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       let scanning = bluetoothManager?.isScanning
       if(scanning!) {
         EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_STARTED.rawValue)
-        DispatchQueue.main.asyncAfter(deadline: .now() + scanDurationSeconds) {
+        bleAsyncQueue.asyncAfter(deadline: .now() + scanDurationSeconds) {
           self.bluetoothManager?.stopScan();
           EventEmitter.emitter.sendEvent(withName: emitterStrings.DISCOVERY_STATE_CHANGE.rawValue, body: discoveryEvents.DISCOVERY_FINISHED.rawValue)
           self.peripheralManager.stopAdvertising();
@@ -345,7 +346,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
     func checkLocationEnabled(_ resolve : @escaping RCTPromiseResolveBlock,
     reject : RCTPromiseRejectBlock) {
       //https://developer.apple.com/documentation/corelocation/cllocationmanager/locationservicesenabled()
-      asyncQueue.async(execute: {
+      locationAsyncQueue.async(execute: {
         resolve(CLLocationManager.locationServicesEnabled())
       })
       //old resolver based on app's location permissions.
