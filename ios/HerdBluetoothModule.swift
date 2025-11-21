@@ -42,8 +42,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
         "DISCOVERY_FINISHED" : discoveryEvents.DISCOVERY_FINISHED.rawValue
       ],
       "bluetoothStates" : [
-        "STATE_CONNECTED" : bluetoothStates.STATE_CONNECTED,
-        "STATE_DISCONNECTED" : bluetoothStates.STATE_DISCONNECTED
+        "STATE_CONNECTED" : bluetoothStates.STATE_CONNECTED.rawValue,
+        "STATE_DISCONNECTED" : bluetoothStates.STATE_DISCONNECTED.rawValue
       ]
     ]
   }
