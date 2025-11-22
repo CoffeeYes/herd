@@ -27,7 +27,7 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
   }
   
   @objc
-  func constantsToExport() -> [String : Any] {
+  func constantsToExport() -> [String : [String : String]] {
     return [
       "emitterStrings" : [
         "NEW_BT_DEVICE" : emitterStrings.NEW_BT_DEVICE.rawValue,
@@ -217,12 +217,8 @@ class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManage
       bluetoothManager = CBCentralManager(delegate: self,queue : nil, options : nil);
       locationManager = CLLocationManager();
       locationManager?.delegate = self;
-      EventEmitter.registerEmitterEvents(events: [
-        HerdBluetoothModule.emitterStrings.NEW_BT_DEVICE.rawValue,
-        HerdBluetoothModule.emitterStrings.DISCOVERY_STATE_CHANGE.rawValue,
-        HerdBluetoothModule.emitterStrings.CONNECTION_STATE_CHANGE.rawValue,
-        HerdBluetoothModule.emitterStrings.NEW_DATA_FROM_CONNECTION.rawValue
-      ])
+      let eventsToRegister = Array(constantsToExport()["emitterStrings"]!.values)
+      EventEmitter.registerEmitterEvents(events: eventsToRegister)
     }
   
     //see below, .denied is propagated when settings -> privacy -> location is turned off
