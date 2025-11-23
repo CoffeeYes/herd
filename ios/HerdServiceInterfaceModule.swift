@@ -27,11 +27,8 @@ class HerdServiceInterfaceModule : NSObject {
   
   override init() {
     super.init()
-    EventEmitter.registerEmitterEvents(events: [
-      emitterStrings.NEW_MESSAGES_RECEIVED.rawValue,
-      emitterStrings.REMOVE_MESSAGES_FROM_QUEUE.rawValue,
-      emitterStrings.BLUETOOTH_LOCATION_STATE_CHANGE.rawValue
-    ])
+    let eventsToRegister = Array(constantsToExport()["emitterStrings"]!.values)
+    EventEmitter.registerEmitterEvents(events: eventsToRegister)
   }
   
   @objc
@@ -40,7 +37,7 @@ class HerdServiceInterfaceModule : NSObject {
   }
   
   @objc
-  func constantsToExport() -> [String : Any] {
+  func constantsToExport() -> [String : [String : String]] {
     return [
       "emitterStrings" : [
         "NEW_MESSAGES_RECEIVED" : emitterStrings.NEW_MESSAGES_RECEIVED.rawValue,
