@@ -5,6 +5,7 @@ import React
 class EventEmitter : RCTEventEmitter {
   
   public static var emitter : RCTEventEmitter!;
+  private static var emitterStrings = [String]();
 
   override init() {
     super.init()
@@ -15,9 +16,7 @@ class EventEmitter : RCTEventEmitter {
   override static func requiresMainQueueSetup() -> Bool {
     return false;
   }
-  
-  private static var emitterStrings = [String]();
-  
+
   static func registerEmitterEvents(events : [String]) {
     emitterStrings.append(contentsOf: events)
   }
@@ -26,7 +25,6 @@ class EventEmitter : RCTEventEmitter {
   override func supportedEvents() -> [String] {
     return EventEmitter.emitterStrings
   }
-  
   
   @objc
   override func addListener(_ eventName: String!) {

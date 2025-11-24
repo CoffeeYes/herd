@@ -6,7 +6,7 @@ import CoreLocation
 class HerdBluetoothModule : NSObject, CBCentralManagerDelegate, CLLocationManagerDelegate, CBPeripheralDelegate {
   
   let locationAsyncQueue = DispatchQueue(label:"com.herd.bluetooth.locationQueue");
-  let bleAsyncQueue = DispatchQueue(label:"com.herd.bluetooth.blueQueue");
+  let bleAsyncQueue = DispatchQueue(label:"com.herd.bluetooth.bleQueue");
   let peripheralManager = CBPeripheralManager();
   
   private var targetDeviceForConnection : CBPeripheral? = nil;
