@@ -5,6 +5,8 @@ import CoreLocation
 @objc(HerdPermissionManagerModule)
 class HerdPermissionManagerModule : NSObject {
   
+    let asyncPermissionQueue = DispatchQueue(label:"com.herd.bluetooth.permissionQueue");
+  
     var locationManager : CLLocationManager?
     override init() {
       super.init();
@@ -90,7 +92,7 @@ class HerdPermissionManagerModule : NSObject {
   resolve : @escaping RCTPromiseResolveBlock,
   reject : RCTPromiseRejectBlock) {
     if let settingsURL = URL(string: navigationTarget),UIApplication.shared.canOpenURL(settingsURL) {
-      DispatchQueue.main.async(execute: {
+      asyncPermissionQueue.async(execute: {
         UIApplication.shared.open(settingsURL)
         resolve(true)
       })
